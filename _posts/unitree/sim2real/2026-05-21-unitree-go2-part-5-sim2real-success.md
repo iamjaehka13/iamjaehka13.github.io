@@ -14,7 +14,7 @@ math: true
 
 이전 글들에서는 simulation에서는 걷는 policy가 실제 로봇에서는 발을 제대로 떼지 못하거나, command 방향으로 base만 기울이는 문제를 다뤘습니다. 중간 과정에서는 reward 수정, stiffness 증가, feed-forward torque 등을 시도했습니다.
 
-최종적으로 성공한 방향은 높은 stiffness나 feed-forward torque에 의존하는 방식이 아니었습니다. 최종 deploy는 낮은 PD gain을 유지하고, training 단계에서 적절한 **Domain Randomization**을 적용하는 방향이었습니다.
+최종적으로 성공한 방향은 높은 stiffness나 feed-forward torque에 의존하는 방식이 아니었습니다. 최종 deploy는 적절한 PD gain을 유지하고, training 단계에서 적절한 **Domain Randomization**을 적용하는 방향이었습니다.
 
 ```text
 Kp = 20
@@ -58,7 +58,7 @@ Kp를 높이면 실제로 로봇이 더 강하게 움직입니다. 하지만 이
 - torque saturation 가능성이 커짐
 - policy가 실제로 안정적인 target trajectory를 만든 것인지 판단하기 어려움
 
-최종 모델은 낮은 gain에서도 실제 로봇이 걸었습니다.
+최종 모델은 적절한 gain 설정에서도 실제 로봇이 걸었습니다.
 
 이 점이 중요합니다. 단순히 제어기를 강하게 만들어 움직인 것이 아니라, policy가 real actuator가 따라갈 수 있는 범위의 action을 출력한 것입니다.
 
@@ -256,7 +256,7 @@ tau = 0
 
 | 구분 | 이전 시도 | 최종 모델 |
 | --- | --- | --- |
-| 제어 방향 | stiffness 증가, feed-forward torque 시도 | 낮은 gain + DR |
+| 제어 방향 | stiffness 증가, feed-forward torque 시도 | 적절한 gain + DR |
 | 발 들기 | 실패하거나 과격함 | 안정적인 swing motion |
 | base 자세 | command 방향으로 기울어짐 | 비교적 안정적 |
 | real 반응성 | 특정 조건에서만 움직임 | command에 반응 |
@@ -264,7 +264,7 @@ tau = 0
 
 중요한 것은 단순히 로봇이 움직였다는 점이 아닙니다.
 
-낮은 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점이 핵심입니다.
+적절한 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점이 핵심입니다.
 
 ## **12. 정리**
 
@@ -273,7 +273,7 @@ tau = 0
 1. Reward만 수정해서 해결되는 문제가 아니었습니다.
 2. Kp를 높이면 일부 실패 모드는 가려지지만, 안정적인 해결책은 아니었습니다.
 3. Feed-forward torque는 원인 분석에는 도움이 되었지만, 최종 해결책은 아니었습니다.
-4. 최종적으로는 낮은 gain과 적절한 Domain Randomization이 중요했습니다.
+4. 최종적으로는 적절한 gain과 Domain Randomization이 중요했습니다.
 5. Deploy observation, action scale, joint order 같은 정합성이 매우 중요했습니다.
 6. Sim2Real 문제는 action이 실제 joint motion으로 이어지는 closed-loop transition을 학습 중에 충분히 경험하게 만드는 문제로 볼 수 있습니다.
 
