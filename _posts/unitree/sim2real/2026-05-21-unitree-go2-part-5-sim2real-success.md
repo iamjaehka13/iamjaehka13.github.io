@@ -3,7 +3,7 @@ title: "[Unitree Go2 part 5] Sim2Real 성공"
 date: 2026-05-21 21:11:00 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-lab, deployment, domain-randomization]
-description: Unitree Go2에 강화학습 policy를 실제 deploy하여 보행에 성공한 과정과, 최종적으로 중요했던 Domain Randomization과 deploy 정합성을 정리한다.
+description: Unitree Go2에 강화학습 policy를 실제 deploy하여 보행에 성공한 과정과 Domain Randomization, deploy 정합성을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg
 math: true
 ---
@@ -12,9 +12,9 @@ math: true
 
 이번 글에서는 Unitree Go2에 강화학습 policy를 실제 deploy하여 보행에 성공한 과정을 정리합니다.
 
-이전 글들에서는 simulation에서는 걷는 policy가 실제 로봇에서는 발을 제대로 떼지 못하거나, command 방향으로 base만 기울이는 문제를 다뤘습니다. 중간 과정에서는 reward 수정, stiffness 증가, feed-forward torque 등을 시도했습니다.
+이전 시도에서는 simulation에서 걷던 policy가 실제 로봇에서는 발을 제대로 떼지 못하거나, command 방향으로 base만 기울이는 문제가 반복되었습니다. reward 수정, stiffness 증가, feed-forward torque까지 시도했지만 최종 해결 방향은 더 단순했습니다.
 
-최종적으로 성공한 방향은 높은 stiffness나 feed-forward torque에 의존하는 방식이 아니었습니다. 최종 deploy는 적절한 PD gain을 유지하고, training 단계에서 적절한 **Domain Randomization**을 적용하는 방향이었습니다.
+최종 deploy는 높은 stiffness나 추가 torque에 의존하지 않고, 적절한 PD gain과 **Domain Randomization**을 함께 사용하는 구조였습니다.
 
 ```text
 Kp = 20
@@ -32,15 +32,9 @@ Kd = 0.5
 - stiffness를 높이면 움직이지만 gait가 과격해짐
 - feed-forward torque를 넣으면 움직이기 시작하지만 동작이 불안정함
 
-초기에는 reward 문제로 접근했습니다. `feet_air_time`, `feet_clearance`, `feet_slide` 등을 조정하며 발을 더 들도록 유도했습니다.
+처음에는 `feet_air_time`, `feet_clearance`, `feet_slide`를 조정하며 발을 더 들도록 유도했습니다. Simulation에서는 어느 정도 효과가 있었지만 real robot에서는 충분하지 않았습니다.
 
-이 방식은 simulation에서는 효과가 있었습니다. 하지만 real robot에서는 여전히 충분하지 않았습니다. 문제는 reward 하나로 설명되지 않았습니다.
-
-결국 더 중요했던 것은 policy가 학습하는 **closed-loop dynamics**였습니다. 강화학습 policy는 매 timestep마다 action을 출력하고, 그 action으로 만들어진 다음 state를 다시 observation으로 받아 학습합니다.
-
-이때 command가 실제 joint motion으로 이어지지 않고, base가 기울거나 관절이 target을 거의 따라가지 못하는 transition이 반복되면 rollout distribution 자체가 정지에 가까운 상태들로 채워집니다. 그러면 policy는 발을 내딛어 보상을 얻는 전략보다, 크게 움직이지 않고 자세를 유지하는 전략을 더 안정적인 선택으로 받아들일 수 있습니다.
-
-즉, 문제는 단순히 "발을 못 들었다"가 아니라, **학습 과정에서 정지에 가까운 transition이 누적되며 policy가 그 분포에 적응해버리는 것**이었습니다.
+문제는 reward 하나보다 **closed-loop rollout의 분포**에 가까웠습니다. Command가 실제 joint motion으로 이어지지 않으면 다음 observation에는 낮은 joint velocity, 남은 tracking error, 거의 변하지 않은 contact pattern이 다시 들어갑니다. 이런 transition이 반복되면 policy는 발을 내딛는 전략보다 자세를 유지하는 전략을 더 안정적인 선택으로 받아들일 수 있습니다.
 
 > action이 joint motion으로 이어지는 경험이 충분히 쌓이지 않으면, policy는 움직이는 방법이 아니라 움직이지 않고 버티는 방법을 학습할 수 있다.
 
@@ -48,7 +42,7 @@ Kd = 0.5
 
 한때는 real robot에서 torque margin이 부족하다고 보고 stiffness를 높이는 방향을 시도했습니다.
 
-Kp를 높이면 실제로 로봇이 더 강하게 움직입니다. 하지만 이 방식은 문제를 해결한다기보다 일부 실패 모드를 가리는 효과가 컸습니다.
+Kp를 높이면 로봇은 더 강하게 움직입니다. 하지만 이 방식은 문제를 해결한다기보다 일부 실패 모드를 가리는 효과가 컸습니다.
 
 높은 Kp에서는 policy가 부정확한 target을 출력해도 joint가 강제로 끌려갑니다. 이 경우 다음 문제가 생겼습니다.
 
@@ -58,9 +52,7 @@ Kp를 높이면 실제로 로봇이 더 강하게 움직입니다. 하지만 이
 - torque saturation 가능성이 커짐
 - policy가 실제로 안정적인 target trajectory를 만든 것인지 판단하기 어려움
 
-최종 모델은 적절한 gain 설정에서도 실제 로봇이 걸었습니다.
-
-이 점이 중요합니다. 단순히 제어기를 강하게 만들어 움직인 것이 아니라, policy가 real actuator가 따라갈 수 있는 범위의 action을 출력한 것입니다.
+최종 모델은 제어기를 과하게 강하게 만들지 않아도 실제 로봇에서 걸었습니다. Policy가 real actuator가 따라갈 수 있는 범위의 action을 출력했다는 점이 차이였습니다.
 
 ## **4. Feed-forward Torque 실험의 의미**
 
@@ -70,21 +62,15 @@ $$
 \tau = K_p(q_{\mathrm{des}} - q) + K_d(\dot{q}_{\mathrm{des}} - \dot{q}) + \tau_{\mathrm{ff}}
 $$
 
-이 실험은 문제 분석에는 도움이 되었습니다. 특히 real robot에서 필요한 torque margin, actuator response, PD target tracking 문제가 있다는 것을 확인할 수 있었습니다.
+이 실험은 real robot에서 필요한 torque margin, actuator response, PD target tracking 문제를 확인하는 데 도움이 되었습니다. 다만 최종 해결책은 feed-forward torque를 크게 넣는 것이 아니었습니다.
 
-하지만 최종 해결책은 feed-forward torque를 크게 넣는 것이 아니었습니다.
+Deploy에서만 torque를 추가하면 policy가 training에서 본 actuator model과 실제 deploy actuator model이 달라집니다. 그래서 feed-forward torque는 최종 controller라기보다 문제를 확인하기 위한 디버깅 도구에 가까웠습니다.
 
-Real deploy에서만 추가 torque를 넣으면, policy가 training에서 본 actuator model과 실제 deploy actuator model이 달라집니다. 그러면 policy가 학습한 transition과 real transition이 다시 달라질 수 있습니다.
-
-따라서 feed-forward torque는 최종 해답이라기보다 디버깅 도구에 가까웠습니다.
-
-최종 방향은 deploy controller를 단순하게 유지하고, training 단계에서 real uncertainty를 반영하는 것이었습니다.
+그래서 deploy controller는 단순하게 유지하고, training 단계에서 real uncertainty를 반영하는 방향으로 갔습니다.
 
 ## **5. 최종 방향: Domain Randomization**
 
-최종 성공에서 핵심은 Domain Randomization이었습니다.
-
-DR은 특별한 trick이라기보다, simulation에 빠져 있는 real-world variation을 넣는 과정입니다. 실제 로봇에서는 다음 요소들이 고정되어 있지 않습니다.
+성공에 직접 영향을 준 부분은 Domain Randomization이었습니다. 실제 로봇에서는 다음 요소들이 고정되어 있지 않습니다.
 
 - contact friction
 - motor strength
@@ -94,19 +80,13 @@ DR은 특별한 trick이라기보다, simulation에 빠져 있는 real-world var
 - base mass / center of mass
 - joint tracking error
 
-항상 같은 friction, 같은 actuator response, 같은 delay, 같은 initial pose에서만 학습한 policy는 real robot에서 쉽게 깨집니다.
-
-최종 학습에서는 contact, actuator, sensor, initial state 쪽의 variation을 넣었습니다. 기준은 단순했습니다.
+항상 같은 friction, actuator response, delay, initial pose에서만 학습한 policy는 real robot에서 쉽게 깨집니다. 최종 학습에서는 contact, actuator, sensor, initial state 쪽의 variation을 넣었습니다.
 
 > real robot에서 실제로 달라질 수 있는 요소를 simulation에 넣는다.
 
-DR을 크게 넣는 것이 항상 좋은 것은 아닙니다.
+DR을 무조건 크게 넣는 것이 답은 아니었습니다. 학습 가능한 범위 안에서 real variation을 반영해야 했습니다.
 
-너무 강하면 학습이 어려워지고, 너무 약하면 real gap을 커버하지 못합니다. 따라서 policy가 학습 가능한 범위 안에서 real variation을 반영하는 것이 중요했습니다.
-
-## **6. MDP 관점에서 본 Sim2Real**
-
-이번 과정에서 MDP 관점이 실제 deploy 문제와 직접 연결된다는 것을 다시 확인했습니다.
+## **6. Closed-loop Rollout 관점**
 
 강화학습에서는 policy가 현재 state 또는 observation을 보고 action을 선택합니다.
 
@@ -114,7 +94,7 @@ DR을 크게 넣는 것이 항상 좋은 것은 아닙니다.
 s_t -> a_t -> s_{t+1}
 ```
 
-로봇 보행에서도 마찬가지입니다. 현재 observation은 단순한 순간값이 아니라, 이전 action과 contact, actuator delay, joint tracking 결과가 반영된 상태입니다.
+로봇 보행에서도 현재 observation은 단순한 순간값이 아니라, 이전 action과 contact, actuator delay, joint tracking 결과가 반영된 상태입니다.
 
 예를 들어 다음 값들은 모두 과거 동작의 결과를 포함합니다.
 
@@ -125,20 +105,18 @@ s_t -> a_t -> s_{t+1}
 - previous action
 - gait phase
 
-즉, policy는 전체 history를 직접 보지 않더라도 현재 observation을 통해 필요한 정보를 일부 요약해서 받습니다.
-
-여기서 중요한 점은 transition이 한 번만 일어나고 끝나는 것이 아니라는 점입니다. 강화학습은 simulation 안에서 closed-loop rollout을 반복하며 데이터를 계속 쌓습니다.
+Policy는 전체 history를 직접 보지 않더라도 현재 observation을 통해 필요한 정보를 일부 요약해서 받습니다. 그래서 어떤 transition이 반복적으로 쌓이는지가 관건입니다.
 
 ```text
 simulation: s_t + a_t -> s_{t+1}^{sim}
 real:       s_t + a_t -> s_{t+1}^{real}
 ```
 
-같은 state와 action이라도 friction, actuator delay, motor strength, mass distribution이 다르면 다음 state가 달라집니다. 특히 action이 실제 joint displacement로 이어지지 않으면, 다음 observation에는 낮은 joint velocity, 남아 있는 tracking error, 거의 변하지 않은 contact pattern이 그대로 반영됩니다.
+같은 state와 action이라도 friction, actuator delay, motor strength, mass distribution이 다르면 다음 state가 달라집니다.
 
-이런 transition이 반복되면 policy는 그 경험을 기준으로 업데이트됩니다. command를 따라 실제로 발을 내딛는 transition보다, base만 기울이거나 posture를 유지하는 transition이 더 자주 쌓이면 policy는 움직임을 만들어내는 방향이 아니라 정지 상태로 수렴하는 local optimum에 가까워질 수 있습니다.
+Command를 따라 발을 내딛는 transition보다 base만 기울이거나 posture를 유지하는 transition이 더 많이 쌓이면, policy는 움직임을 만들어내는 방향이 아니라 정지 상태로 수렴하는 local optimum에 가까워질 수 있습니다.
 
-Domain Randomization은 이 누적 문제를 줄이기 위한 방법입니다. 하나의 고정된 dynamics에서만 학습하면 policy가 특정 transition distribution에 쉽게 적응합니다. 반대로 여러 actuator response, contact, delay, 초기 자세를 경험하게 만들면, policy가 정지에 가까운 쉬운 해에 고정되지 않고 실제 로봇에서도 tracking 가능한 action을 찾도록 유도할 수 있습니다.
+Domain Randomization은 하나의 고정된 transition distribution에 overfit되는 것을 줄여줍니다. 여러 actuator response, contact, delay, 초기 자세를 경험하게 만들면 policy가 정지에 가까운 쉬운 해에 고정되지 않고, 실제 로봇에서도 tracking 가능한 action을 찾도록 유도할 수 있습니다.
 
 ## **7. Deploy Repository 구조**
 
@@ -181,9 +159,7 @@ last action
 sin/cos gait phase
 ```
 
-여기서 중요한 항목은 `last_action`입니다.
-
-이전에는 deploy 과정에서 `last_action`에 raw policy output이 아니라, scale과 offset이 적용된 target joint position에 가까운 값이 들어가는 문제가 있었습니다. 이 경우 policy가 training 때와 다른 observation을 받게 됩니다.
+`last_action`은 특히 조심해야 했습니다. 이전에는 deploy 과정에서 raw policy output이 아니라, scale과 offset이 적용된 target joint position에 가까운 값이 들어가는 문제가 있었습니다. 이 경우 policy가 training 때와 다른 observation을 받게 됩니다.
 
 최종 deploy에서는 다음 구조를 유지했습니다.
 
@@ -197,7 +173,7 @@ obs[33:45] = last_action
 target_pos = default_joint_pos + action_scale * action
 ```
 
-즉, policy input으로 들어가는 action history와 실제 joint target은 구분해야 합니다.
+Policy input으로 들어가는 action history와 실제 joint target은 구분해야 합니다.
 
 ## **9. Joint Order 정합성**
 
@@ -219,7 +195,7 @@ Sim2Real 정합성은 물리 파라미터만의 문제가 아닙니다.
 - control frequency
 - action delay
 
-이런 값들이 모두 transition에 영향을 줍니다.
+이 값들도 모두 transition에 영향을 줍니다.
 
 ## **10. Action to Target Position**
 
@@ -238,9 +214,7 @@ kd  = Kd
 tau = 0
 ```
 
-즉, 최종 deploy는 복잡한 torque controller가 아니라, policy가 출력한 joint target을 PD controller로 추종하는 구조입니다.
-
-중요한 점은 deploy loop를 training 때의 구조와 최대한 맞추는 것입니다. Deploy에서만 추가적인 보정이나 복잡한 controller를 넣으면, 그 자체가 새로운 sim-to-real gap이 될 수 있습니다.
+최종 deploy는 복잡한 torque controller가 아니라, policy가 출력한 joint target을 PD controller로 추종하는 구조입니다. Deploy에서만 추가적인 보정이나 복잡한 controller를 넣으면, 그 자체가 새로운 sim-to-real gap이 될 수 있습니다.
 
 ## **11. 결과**
 
@@ -260,11 +234,9 @@ tau = 0
 | 발 들기 | 실패하거나 과격함 | 안정적인 swing motion |
 | base 자세 | command 방향으로 기울어짐 | 비교적 안정적 |
 | real 반응성 | 특정 조건에서만 움직임 | command에 반응 |
-| 핵심 문제 인식 | reward 또는 torque 부족 | closed-loop transition 분포와 actuator variation |
+| 문제 인식 | reward 또는 torque 부족 | closed-loop transition 분포와 actuator variation |
 
-중요한 것은 단순히 로봇이 움직였다는 점이 아닙니다.
-
-적절한 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점이 핵심입니다.
+단순히 로봇이 움직였다는 것보다, 적절한 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점에 의미가 있었습니다.
 
 ## **12. 정리**
 
@@ -273,15 +245,13 @@ tau = 0
 1. Reward만 수정해서 해결되는 문제가 아니었습니다.
 2. Kp를 높이면 일부 실패 모드는 가려지지만, 안정적인 해결책은 아니었습니다.
 3. Feed-forward torque는 원인 분석에는 도움이 되었지만, 최종 해결책은 아니었습니다.
-4. 최종적으로는 적절한 gain과 Domain Randomization이 중요했습니다.
-5. Deploy observation, action scale, joint order 같은 정합성이 매우 중요했습니다.
+4. 최종적으로는 적절한 gain과 Domain Randomization이 필요했습니다.
+5. Deploy observation, action scale, joint order 같은 정합성이 큰 영향을 줬습니다.
 6. Sim2Real 문제는 action이 실제 joint motion으로 이어지는 closed-loop transition을 학습 중에 충분히 경험하게 만드는 문제로 볼 수 있습니다.
-
-결국 핵심은 다음입니다.
 
 > real에서 더 강하게 제어하는 것이 아니라, sim에서 action이 joint motion으로 이어지는 dynamics를 충분히 학습시키는 것.
 
-이번 성공은 특정 reward weight 하나나 magic number 하나로 만들어진 결과가 아닙니다. Real robot에서 달라질 수 있는 요소들을 simulation에 넣고, deploy에서는 policy가 학습한 구조를 최대한 유지한 것이 핵심이었습니다.
+이번 성공은 특정 reward weight 하나보다, real robot에서 달라질 수 있는 요소들을 simulation에 넣고 deploy 구조를 training과 맞춘 결과에 가까웠습니다.
 
 ## **13. 다음 목표**
 

@@ -15,7 +15,7 @@ math: true
 
 지난 글에서는 policy를 실제 Go2에 deploy했지만, 로봇이 발을 떼지 못하고 command 방향으로 base만 기울이는 문제를 확인했습니다. 이후 며칠 동안 reward와 학습 설정을 바꿔가며 원인을 좁혀보았습니다.
 
-핵심 질문은 단순했습니다.
+질문은 하나였습니다.
 
 > simulation에서는 걷는 것처럼 보이는데, 왜 real robot에서는 발을 떼지 못할까?
 
@@ -123,7 +123,7 @@ def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = Scen
 
 로그를 확인해보니 `feet_air_time`이 대부분 0에 가까웠습니다. policy 입장에서는 threshold보다 오래 발을 들어 보상을 얻기보다, 발을 계속 붙인 채 0에 가까운 보상을 받는 쪽이 더 쉬운 선택이었을 가능성이 있습니다.
 
-또한 바닥에 발을 붙인 상태로 몸통만 흔들어도 velocity command와 관련된 보상을 일부 받을 수 있었습니다. 즉, 실제로 발을 들어 걷는 것보다 몸통을 흔드는 local minimum에 빠질 수 있는 구조였습니다.
+또한 바닥에 발을 붙인 상태로 몸통만 흔들어도 velocity command와 관련된 보상을 일부 받을 수 있었습니다. 실제로 발을 들어 걷는 것보다 몸통을 흔드는 local minimum에 빠질 수 있는 구조였습니다.
 
 관련 issue를 찾아보며 다음 방향으로 설정을 바꿨습니다.
 
@@ -193,4 +193,4 @@ def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = Scen
 
 테스트 결과, real robot에서와 마찬가지로 MuJoCo에서도 로봇이 제대로 움직이지 않는 것을 확인했습니다.
 
-이 결과는 중요했습니다. 문제가 단순히 real robot hardware만의 문제라기보다, policy와 deploy 환경 사이의 정합성 또는 dynamics gap에 있을 가능성이 커졌기 때문입니다. 이후부터는 MuJoCo에서 통과한 모델만 실제 로봇에 deploy하는 방식으로 검증 단계를 나누는 것이 좋다고 판단했습니다.
+이 결과로 문제가 real robot hardware만의 문제가 아니라, policy와 deploy 환경 사이의 정합성 또는 dynamics gap에 있을 가능성이 커졌습니다. 이후부터는 MuJoCo에서 통과한 모델만 실제 로봇에 deploy하는 방식으로 검증 단계를 나누기로 했습니다.
