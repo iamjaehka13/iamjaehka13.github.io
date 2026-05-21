@@ -22,8 +22,6 @@ Kd = 0.5
 + Domain Randomization
 ```
 
-정확한 reward weight와 DR range는 공개하지 않습니다. 이 글에서는 수치 자체보다, 어떤 문제를 보고 어떤 방향으로 수정했는지에 집중합니다.
-
 ![실제 Unitree Go2 전진 보행 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
 
 ## **2. 이전까지의 실패 모드**
