@@ -13,7 +13,7 @@ math: true
 
 발을 들게하는 여러가지 reward를 추가하였더니 이제는 mujoco상에서는 go2가 걸을 수 있게 되었습니다.
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/329cbb7d-7937-805c-8183-fc646408590c.gif)
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1586.gif)
 
 발을 들도록 하는 reward는 크게 3가지로 볼 수 있습니다.
 
@@ -138,9 +138,11 @@ math: true
 
 1. 다양한 모델을 학습하고 real에 배포 하였지만 이전과 마찬가지로 앞뒤좌우로 몸을 기울이기만 할뿐 발을 드는 동작을 보이진 않았습니다.
 
-   <p class="text-center">
-     <img src="/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif" alt="">
-   </p>
+   <div class="text-center">
+     <a href="/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif" class="popup img-link shimmer d-inline-block" style="max-width: 420px;">
+       <img src="/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif" alt="" style="width: 100%; height: auto;">
+     </a>
+   </div>
 
 
 1. 또한 로봇이 stand 상태일때 발을 많이 접는 현상이 있었습니다…
