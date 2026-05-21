@@ -1,27 +1,29 @@
 ---
-title: "[Unitree Go2 part 2] Sim2Real 사연있습니다."
+title: "[Unitree Go2 part 2] 발을 떼지 않는 문제 분석"
 date: 2026-03-13 19:40:00 +0900
 last_modified_at: 2026-03-23 22:34:27 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
-description: What is problem?
+description: 첫 deploy에서 Go2가 발을 떼지 못했던 문제를 reward 설정, terrain, feet clearance, MuJoCo sim-to-sim 관점에서 분석한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-80f8-85bf-d0023259d89d.gif
 math: true
 ---
 
-# What is problem?
+## **1. 현재 문제**
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/img-1539.gif)
 
-지난 시간에 로봇이 발을 떼지 않는 문제점을 발견하였다… 지난 3일간 여러가지 세팅으로 테스트를 반복해 보았다.
+지난 글에서는 policy를 실제 Go2에 deploy했지만, 로봇이 발을 떼지 못하고 command 방향으로 base만 기울이는 문제를 확인했습니다. 이후 며칠 동안 reward와 학습 설정을 바꿔가며 원인을 좁혀보았습니다.
 
+핵심 질문은 단순했습니다.
 
+> simulation에서는 걷는 것처럼 보이는데, 왜 real robot에서는 발을 떼지 못할까?
 
-## hypothesis 1.
+## **2. 가설 1: 발을 드는 Reward가 부족한가**
 
-로봇개가 발을 들도록 하는 reward setting이 잘못 되었다는 것이다. unitree_rl_lab에서 기본적으로 제공하던 관련 세팅은 아래와 같았다.
+첫 번째 가설은 발을 드는 동작을 유도하는 reward setting이 충분하지 않다는 것이었습니다. `unitree_rl_lab`에서 기본으로 제공하는 관련 reward는 아래와 같았습니다.
 
-### feet_air_time()
+### **2.1 feet_air_time()**
 
 <details markdown="1">
 <summary>feet_air_time</summary>
@@ -55,19 +57,19 @@ def feet_air_time(
 
 - 변수
   - $t_{air, i}$: $i$번째 발이 공중에 떠 있었던 시간 (`last_air_time`)
-  - $C_i$ :  $i$번째 발이 지면에 닿았는지 여부를 나타내는 이진 플래그 (0 또는 1) (`first_contact`)
+  - $C_i$: $i$번째 발이 지면에 닿았는지 여부를 나타내는 이진 플래그 (`first_contact`)
   - $\tau$: 보상을 주기 위한 최소 공중 체류 시간 임계값 (`threshold`)
-  - $\mathbf{v}_{cmd}$: 로봇에게 내려진 속도 명령 (x, y 평면 속도)
+  - $\mathbf{v}_{cmd}$: 로봇에게 내려진 속도 command
 - reward
   - $R_{air} = \sum_{i \in \text{feet}} (t_{air, i} - \tau) \cdot C_i$
-  - 즉, threshold 시간보다 길게 발을 들고 있는 발이 땅에 닿는 순간 보상을 준다.
+  - threshold 시간보다 길게 발을 들고 있던 발이 다시 땅에 닿는 순간 보상을 줍니다.
 
 
-**기존에 0.1로 되어있던 이 가중치를 5.0으로 대폭 늘려 발을 드는것에 대한 보상을 크게 늘렸다.**
+기존에 `0.1`로 되어 있던 weight를 `5.0`으로 크게 올려, 발을 드는 행동에 대한 보상을 강화했습니다.
 
 
 
-### feet_slide()
+### **2.2 feet_slide()**
 
 <details markdown="1">
 <summary>feet_slide()</summary>
@@ -102,35 +104,35 @@ def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = Scen
   - $I$: 접촉 판단 임계값 (코드에서는 `1.0` Newton)
 - reward
   - $R_{slide} = \sum_{i \in \text{feet}} \|v_{i, xy}\| \cdot C_i$
-  - 즉, 발이 닿아있는 상태에서 foot에 속도가 들어가고 있다면 그 값에 음의 가중치를 곱해 negative reward를 주는 형식이다.
+  - 발이 지면에 닿아 있는 상태에서 foot velocity가 발생하면 negative reward를 주는 구조입니다.
 
 
-**기존에 -0.1로 되어있던 이 가중치를 -1.0으로 대폭 늘렸다.**
+기존에 `-0.1`로 되어 있던 weight를 `-1.0`으로 변경해, 발이 미끄러지는 행동에 대한 penalty를 강화했습니다.
 
 
 
-### result
+### **2.3 결과**
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-80f8-85bf-d0023259d89d.gif)
 
-해당 세팅으로 학습을 진행한 후 test 해본 결과 simulation 상에서도 로봇이 걷지 못하는 문제점이 발생하였다…
+해당 세팅으로 학습한 결과, 오히려 simulation에서도 로봇이 제대로 걷지 못했습니다. 발을 들도록 유도하려던 수정이 policy 학습을 더 어렵게 만든 것입니다.
 
 
 
-## hypothesis 1.
+## **3. 가설 2: Terrain과 Clearance가 필요한가**
 
-- **feet air time이 땅에 발이 붙어서 0으로 들어가고 있었다**. 아무래도 threshold를 낮춰주지 않아 로봇이 threshold보다 길게 발을 들어서 보상을 키우는 것 보다. 차라리 땅에서 발을 떼지않고 0의 보상을 받는게 이득이라고 판단한 것 같다.
-- 바닥에 발을 붙이고 **몸통만을 이리저리 움직이며 속도 명령에 따라 보상을 조금씩 받고 있었다**. 아무래도 실제로 명령에 따라 움직이는 것보다 몸통만 흔드는 것이 보상이 더 컷나보다..
+로그를 확인해보니 `feet_air_time`이 대부분 0에 가까웠습니다. policy 입장에서는 threshold보다 오래 발을 들어 보상을 얻기보다, 발을 계속 붙인 채 0에 가까운 보상을 받는 쪽이 더 쉬운 선택이었을 가능성이 있습니다.
 
+또한 바닥에 발을 붙인 상태로 몸통만 흔들어도 velocity command와 관련된 보상을 일부 받을 수 있었습니다. 즉, 실제로 발을 들어 걷는 것보다 몸통을 흔드는 local minimum에 빠질 수 있는 구조였습니다.
 
-원인에 대해서 찾아보던 도중 굉장히 도움이 되는 issue를 발견하였다. 내용은 다음과 같았고 그에 따라서 설정을 변경해주었다.
+관련 issue를 찾아보며 다음 방향으로 설정을 바꿨습니다.
 
-- 단계별로 어려워지는 다른 terrian을 학습에 추가하여 로봇이 발을 들게 하는 요인을 만들어줄것
-  - 커리큘럼에 따라서 난이도를 조절하고 (height of terrian) 계단을 제외한 두가지 rough terrian을 추가하였다.
-- 로봇의 usd file이 잘못되어 바닥에서 발이 떨어져도 자신의 calflower 부분과 foot부분이 contact 상태라는 것
-  - usd file관련된 이슈는 확인해본 결과 이미 고쳐졌는지 바닥에서 떨어지자 contact신호는 들어오지 않았다.
-- feet과 관련된 보상중에 발을 특정 높이까지 들었을때 보상을 주는 feet clearance 함수를 새로 만들 것
-  - terrain이 추가된 이상 foot의 world z축을 기준으로 보상을 주기 보다는 로봇의 base와 foot간의 거리를 기준으로한 feet_height_body 함수를 새로 만들어 발을 특정 위치 이상으로 들도록 하였다.
+- 단계적으로 어려워지는 terrain을 추가해, 로봇이 발을 들어야 하는 상황을 만듭니다.
+  - curriculum에 따라 terrain 난이도를 조절하고, 계단을 제외한 rough terrain을 추가했습니다.
+- USD contact 설정 문제를 확인합니다.
+  - 확인 결과, 현재 사용한 asset에서는 발이 바닥에서 떨어질 때 contact signal도 정상적으로 끊어졌습니다.
+- 발을 특정 높이 이상 들도록 하는 feet clearance 계열 reward를 추가합니다.
+  - terrain이 추가되면 foot의 world z만 기준으로 삼기 어렵기 때문에, base와 foot 사이의 상대 높이를 사용하는 `feet_height_body` 함수를 추가했습니다.
   <details markdown="1">
   <summary>feet_height_body</summary>
 
@@ -171,20 +173,24 @@ def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = Scen
 
 
 
-### result
+### **3.1 결과**
 
-feet slid의 가중치를 -1.0에서 다시 -0.1로 되돌리고 threshold를 조금 낮추고 학습해보았다. 그 결과 로봇이 simulation 상에서 잘 걷게 되었다.
+`feet_slide` weight를 `-1.0`에서 다시 `-0.1`로 되돌리고, `feet_air_time` threshold를 낮춘 뒤 학습했습니다. 그 결과 simulation에서는 Go2가 다시 안정적으로 걷는 모습을 보였습니다.
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-8028-9067-d926b8217a1d.gif)
 
 
 
-## mujoco
+## **4. MuJoCo Sim-to-Sim 테스트**
 
-이전에는 바로 sim2real이 되지 않을까 해서 deploy 해보았지만 보통은 isaaclab에서 학습하고 더 정교한  **cpu기반 시뮬레이터인 mujoco에서 sim2sim 테스트**를 해보곤 한다. 따라서 이번에 모델을 시뮬레이터 상에서 테스트 해보았다.
+이전에는 학습 결과가 좋아 보여 곧바로 real robot에 deploy했습니다. 하지만 보통은 Isaac Lab에서 학습한 policy를 먼저 CPU 기반 시뮬레이터인 **MuJoCo**에서 sim-to-sim 테스트해보는 것이 좋습니다.
+
+그래서 이번에는 학습된 모델을 MuJoCo에서도 확인했습니다.
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-802c-ba1b-e6fa12bcea96.gif)
 
 
 
-테스트 결과 현실에서와 마찬가지로 mujoco상에서도 로봇이 움직이지 않는 것을 확인하였다… 앞으로는 mujoco에서 무조건 테스트를 통과한 모델만 depoly하는 것이 좋을것 같다.
+테스트 결과, real robot에서와 마찬가지로 MuJoCo에서도 로봇이 제대로 움직이지 않는 것을 확인했습니다.
+
+이 결과는 중요했습니다. 문제가 단순히 real robot hardware만의 문제라기보다, policy와 deploy 환경 사이의 정합성 또는 dynamics gap에 있을 가능성이 커졌기 때문입니다. 이후부터는 MuJoCo에서 통과한 모델만 실제 로봇에 deploy하는 방식으로 검증 단계를 나누는 것이 좋다고 판단했습니다.

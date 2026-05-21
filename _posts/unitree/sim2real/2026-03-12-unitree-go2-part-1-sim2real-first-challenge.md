@@ -1,44 +1,43 @@
 ---
-title: "[Unitree Go2 part 1] Sim2Real에 처음 도전하다."
+title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
 date: 2026-03-12 14:28:00 +0900
 last_modified_at: 2026-03-23 22:34:27 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
-description: What is this project
+description: Unitree Go2에 강화학습 기반 보행 policy를 실제 deploy하기 위해 baseline을 정하고, 첫 학습과 real deploy를 시도한 과정을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80b5-bdf0-f4eb03b0e2ff.gif
 math: true
 ---
 
-What is this project
-====================
+## **1. 프로젝트 목표**
 
-이 프로젝트는 Unitree Go2의 로봇개를 구매한후 25년 12월 부터 구상하기 시작해서 현재까지 이르게 되었다.
+이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다.
 
-이 프로젝트에 대해서 간단하게 설명 하자면 go2 로봇의 /lowstate에 로봇 각 모터의 현재 온도와 토크 같은 정보가 들어 있는데 이를 활용하여 **보행시에 온도를 높이지 않고 부담이 많이가는 모터를 인지**하여 스스로 **건강을 관리하는 “강화학습” 모델**을 만든는 것이다!
+장기적인 목표는 Go2의 `/lowstate`에서 제공되는 모터 온도, torque, joint state 정보를 활용해, **보행 중 특정 모터에 부담이 몰리지 않도록 스스로 상태를 관리하는 강화학습 모델**을 만드는 것입니다. 이번 글에서는 그 첫 단계로, 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 정리합니다.
 
-What is Plan
-------------
+## **2. 베이스라인 선택**
 
-계획을 세웠다면 이를 이루기 위한 계획이 필요하다. 첫번째로는 Baseline을 정하는 것이다.
+가장 먼저 정해야 할 것은 baseline이었습니다. 처음부터 모든 환경과 deploy 코드를 직접 만들기보다는, 이미 real robot deploy까지 고려된 reference를 기준으로 잡는 편이 안전하다고 판단했습니다.
 
-베이스라인의 기준은 아래와 같았다.
+baseline을 고르는 기준은 아래와 같았습니다.
 
-1.  Unitree Go2 모델을 Real에서 걷게 할 수 있는 RL 보행 모델일 것.
-    1.  나중에 sim2real gap을 매꾸기가 어려울 것을 알고 있었기 때문에 나중에 이것저것 설정을 추가할 것을 고려해서 가장 basic한 reference를 찾았다.
-2.  Isaaclab이나 Unitree에서 배포한 env 환경설정을 따를 것.
+1. Unitree Go2를 real robot에서 걷게 할 수 있는 RL 보행 모델일 것
+2. Isaac Lab 또는 Unitree에서 공개한 환경 설정을 기반으로 할 것
+3. 이후 Sim2Real gap을 줄이기 위해 설정을 확장하기 쉬울 것
 
-결론적으로 Baseline으로 unitree 사에서 내놓은 Unitree_rl_lab을 따르기로 했다.
+결론적으로 baseline은 Unitree에서 공개한 `unitree_rl_lab`을 따르기로 했습니다.
 
 <https://github.com/unitreerobotics/unitree_rl_lab>
 
-1.  Unitree 사에서 직접 배포한 repo인 만큼 사용 설명이 잘 정리되어 있었고 많은 사람이 시도해 보았기 때문에 잔 버그가 없을 것 같았다.
-2.  g1 휴머노이드 모델이 real에서 잘 걷는 것을 보고 이 정책대로만 학습하면 go2도 잘 걸을 수 있을 것이라 생각하였다.
-3.  무엇보다 unitree sdk2와 연동이 잘 되어있어 재현하기가 쉬울 것 같았다.
+선택한 이유는 세 가지였습니다.
 
-IsaacSim train
-==============
+1. Unitree에서 직접 배포한 repository라 사용 설명과 deploy 흐름이 비교적 잘 정리되어 있었습니다.
+2. G1 humanoid 예제가 실제 로봇에서 걷는 것을 확인했기 때문에, Go2에서도 같은 방향으로 시작해볼 수 있다고 판단했습니다.
+3. Unitree SDK2와의 연동 코드가 포함되어 있어 real deploy까지 이어가기 쉬웠습니다.
 
-simulation 상에서 train 하는 것 자체는 매우 쉬웠다. 일단 처음 학습해보는 것인 만큼 기본 설정대로 iteration을 10000번만큼 학습하였다.
+## **3. Isaac Sim 학습**
+
+simulation에서 학습하는 과정 자체는 비교적 단순했습니다. 첫 시도였기 때문에 기본 설정을 최대한 유지하고, iteration을 10000으로 두고 학습했습니다.
 
 ```bash
 python scripts/rsl_rl/train.py --headless --task Unitree-Go2-Velocity --video --video_interval 1000 --num_envs 4096 --seed 42 --max_iterations 10000
@@ -46,22 +45,21 @@ python scripts/rsl_rl/train.py --headless --task Unitree-Go2-Velocity --video --
 
 [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80b5-bdf0-f4eb03b0e2ff.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80b5-bdf0-f4eb03b0e2ff.gif){.popup .img-link .shimmer}
 
--   — video 옵션을 주어 학습중에 자동으로 비디오가 저장되게 하였고 영상 속에서는 학습 결과가 나쁘지 않은 것처럼 보였다!
+`--video` 옵션을 사용해 학습 중간 결과가 자동으로 저장되도록 했습니다. 영상만 보면 policy가 simulation 안에서는 나쁘지 않게 걷는 것처럼 보였습니다.
 
-trained model depoly
---------------------
+## **4. 실제 로봇 Deploy 준비**
 
-원래는 sim2sim으로 cpu기반 시뮬레이터인 **mujoco**에서 테스트를 해보아야 했지만 train 결과가 너무 좋아보였기 때문에 바로 실제 로봇에 deploy 해보기로 결정했다.
+원래는 real robot에 올리기 전에 CPU 기반 시뮬레이터인 **MuJoCo**에서 sim-to-sim 테스트를 먼저 해보는 편이 맞습니다. 하지만 첫 학습 결과가 꽤 좋아 보였기 때문에, 이 단계에서는 바로 실제 로봇에 deploy해보기로 했습니다.
 
-### unitree python sdk
+### **4.1 Unitree Python SDK 기반 제어**
 
-모델을 depoly 하기 위해 /lowstate 토픽에서 joint_pose, joint_vel, imu, 압력센서, last_action등을 observation으로 하고 이를 onnx 모델에서 추론하여 50hz로 action을 /lowcmd 로 발행하였습니다.
+모델을 deploy하기 위해 `/lowstate` topic에서 `joint_pose`, `joint_vel`, `imu`, pressure sensor, `last_action` 등을 observation으로 구성했습니다. 이후 ONNX 모델로 action을 추론하고, 50 Hz로 `/lowcmd`에 command를 발행하는 구조를 사용했습니다.
 
--   Joint Pos : $q_{rel} = q - \text{default joint pos}$
--   joint Vel : $dq$
--   base_ang_vel : $\text{imu (gyroscope)} : [w_x, w_y, w_z]$
--   Projected gravity : $g_{body} = R(q)^T \cdot \begin{bmatrix} 0 \ 0 \ -1 \end{bmatrix}$
--   velocity command : keyboard input
+- Joint Pos: $q_{rel} = q - \text{default joint pos}$
+- Joint Vel: $dq$
+- Base angular velocity: $\text{imu (gyroscope)} : [w_x, w_y, w_z]$
+- Projected gravity: $g_{body} = R(q)^T \cdot \begin{bmatrix} 0 \ 0 \ -1 \end{bmatrix}$
+- Velocity command: keyboard input
 
 <details markdown="1">
 <summary>code base</summary>
@@ -599,11 +597,11 @@ if __name__ == "__main__":
 
 </details>
 
-### test 1.
+## **5. 첫 Deploy 결과**
 
--   로봇개에 랜선을 연결하였을때 eno1 네트워크 인터페이스가 잡혔습니다.
--   go2에 /lowcmd를 전달하기 위해서는 기존에 go2내부에서 작동하고 있던 모든 컨트롤 시스템을 shutdown하는 작업이 필수적이였습니다.
-    -   이를 위해서 unitree_sdk2_python에 있던 msc 인터페이스를 통해 rl을 명령을 내릴 수 있었습니다.
+- 로봇에 랜선을 연결하자 `eno1` 네트워크 인터페이스가 잡혔습니다.
+- Go2에 `/lowcmd`를 전달하려면, 기존에 내부에서 동작하던 control system을 먼저 shutdown해야 했습니다.
+  - 이를 위해 `unitree_sdk2_python`의 `msc` interface를 사용해 RL mode로 전환했습니다.
 
             self.msc = MotionSwitcherClient()
             self.msc.SetTimeout(5.0)
@@ -613,7 +611,12 @@ if __name__ == "__main__":
 
 [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp){.popup .img-link .shimmer}
 
--   [1.0, 0.4, -1.0] 과 같은 명령을 주었는데도 go2 로봇이 발을 떼지 않는 문제가 있습니다. 방향에 따라 몸통을 기울이기는 하지만 go2가 실제로 움직이지는 않는 상황입니다. 예상되는 원인은 아래와 같습니다.
-    1.  depoly시에 observation으로 주는 값이 train과 같지 않다.
-    2.  imu 정보를 읽어오는 부분에서 좌표계가 꼬였다.
-    3.  보상중에 발을 땅에서 떼도록 하는 feet_air_time과 feet_slide의 가중치가 잘못 되었다.
+`[1.0, 0.4, -1.0]` 같은 command를 주었는데도 Go2는 발을 떼지 못했습니다. command 방향에 따라 base를 기울이기는 했지만, 실제 보행으로 이어지지는 않았습니다.
+
+이 시점에서 예상한 원인은 아래와 같았습니다.
+
+1. deploy에서 구성한 observation이 training 때의 observation과 다를 수 있습니다.
+2. IMU 정보를 읽는 과정에서 좌표계가 어긋났을 수 있습니다.
+3. `feet_air_time`, `feet_slide`처럼 발을 떼는 동작과 관련된 reward weight가 적절하지 않을 수 있습니다.
+
+첫 시도는 실패였지만, 문제를 좁히기 위한 기준은 생겼습니다. 다음 단계에서는 reward 설정과 sim-to-sim 검증을 중심으로 원인을 확인합니다.

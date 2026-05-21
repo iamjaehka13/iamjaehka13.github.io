@@ -1,26 +1,26 @@
 ---
-title: "[Unitree Go2 part 3] Sim2Real 쉽지 않습니다."
+title: "[Unitree Go2 part 3] Reward 수정과 Real Gap"
 date: 2026-03-20 21:03:00 +0900
 last_modified_at: 2026-03-24 00:00:13 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
-description: 현재상황
+description: reward 수정으로 MuJoCo 보행은 개선되었지만, 실제 Go2 deploy에서 다시 드러난 real gap과 torque 문제를 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif
 math: true
 ---
 
-# 현재상황
+## **1. 현재 상황**
 
-발을 들게하는 여러가지 reward를 추가하였더니 이제는 mujoco상에서는 go2가 걸을 수 있게 되었습니다.
+발을 들도록 유도하는 reward를 여러 방식으로 추가한 결과, 이제는 MuJoCo에서는 Go2가 걸을 수 있게 되었습니다.
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/329cbb7d-7937-805c-8183-fc646408590c.gif)
 
-발을 들도록 하는 reward는 크게 3가지로 볼 수 있습니다.
+이번에 사용한 reward는 크게 세 가지였습니다.
 
-1. 발을 threshold 보다 긴 시간동안 들면 보상을 주는 feet_air_time 보상
-   1. weight를 0.01 → 5.0으로 변경하였습니다.
-1. height scanner를 기준으로발을 일정 target height만큼 높게 들때 보상을 주는 feet_clearance 보상
-   1. 움직이고 있는 발의 x,y좌표로부터 가장 가까운 height scanner의 높이와 비교하여 target height를 0.08로 하였습니다.
+1. `feet_air_time`: 발을 threshold보다 오래 들었을 때 보상을 주는 항입니다.
+   1. weight를 `0.01`에서 `5.0`으로 변경했습니다.
+1. `feet_clearance`: height scanner를 기준으로 발을 target height만큼 들어 올렸을 때 보상을 주는 항입니다.
+   1. 움직이는 발의 x, y 좌표에서 가장 가까운 height scanner 값을 기준으로 비교했고, target height는 `0.08 m`로 설정했습니다.
    <details markdown="1">
    <summary>feet_clearance_reward()</summary>
 
@@ -71,8 +71,8 @@ math: true
 
 
    </details>
-1. 몸통을 기준으로 몸통 아래로 특정 높이만큼 들게 하는 feet_body_height 보상
-   1. go2의 default pose 몸통 높이가 약 35cm이므로 발높이를 지면으로부터 8cm로 하여 -0.27의 target height를 부여하였습니다.
+1. `feet_body_height`: base frame을 기준으로 발이 특정 높이까지 올라오도록 유도하는 항입니다.
+   1. Go2의 default pose에서 body height가 약 35 cm이므로, 지면으로부터 약 8 cm를 목표로 잡아 target height를 `-0.27`로 설정했습니다.
    <details markdown="1">
    <summary>feet_height_body()</summary>
 
@@ -106,25 +106,24 @@ math: true
 
 
    </details>
-# What is Problem?
+## **2. Simulation에서 확인한 문제**
 
-## 진행과정
+reward를 추가하면서 simulation에서는 분명히 개선이 있었습니다. 하지만 reward를 강하게 줄수록 policy가 의도하지 않은 방식으로 보상을 최적화하는 모습도 보였습니다.
 
+### **2.1 Reward 민감도**
 
-
-### in simulation
-
-1. feet slide에 상당히 go2가 민감하게 반응하는 것을 확인하였습니다. 과도하게 높은 weight를 설정하자 아예 발을 떼지 않게 되는 것을 확인할 수 있었습니다.
-1. 따라서 발을 드는 보상인 feet body height 보상을 설계하였습니다.
-   1. feet height의 target height를 높게 설정하는 순간 robot이 base의 높이를 낮춰버리는 문제가 발생하였습니다…
+1. Go2는 `feet_slide` weight에 상당히 민감하게 반응했습니다. penalty를 과하게 키우면 오히려 발을 떼지 않는 문제가 생겼습니다.
+1. 이를 보완하기 위해 `feet_body_height` reward를 설계했습니다.
+   1. 하지만 target height를 높게 설정하는 순간, robot이 발을 드는 대신 base height를 낮추는 문제가 발생했습니다.
       ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80eb-a498-f16ed8ec48fd.gif)
-1. feet_clearance 보상을 사용하여 target height를 0.08m로 하고 학습하였더니 발을 옆으로 들면서 air time보상과 clearance보상을 최대화하려는 local minima에 빠지는 것이 확인되었습니다.
+1. `feet_clearance` reward에서 target height를 `0.08 m`로 두고 학습하자, 발을 옆으로 들어 `air_time`과 `clearance` reward를 동시에 키우려는 local minimum이 나타났습니다.
    ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-8095-8563-fd5600868e80.gif)
-→ 최종적으로 feet air time을 빼고 feet clearance만 사용하기로 하였습니다.
+
+최종적으로 이 단계에서는 `feet_air_time`을 빼고 `feet_clearance` 중심으로 학습하는 방향을 선택했습니다.
 
 
 
-### feet clearance reward
+### **2.2 feet_clearance reward 확인**
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/feet-clearance-1.png)
 
@@ -134,30 +133,34 @@ math: true
 
 
 
-### in real
+## **3. Real Deploy 결과**
 
-1. 다양한 모델을 학습하고 real에 배포 하였지만 이전과 마찬가지로 앞뒤좌우로 몸을 기울이기만 할뿐 발을 드는 동작을 보이진 않았습니다.
+다양한 모델을 학습한 뒤 실제 로봇에 deploy했지만, 결과는 아직 충분하지 않았습니다. 이전과 마찬가지로 앞뒤좌우 command에 따라 몸을 기울이기만 할 뿐, 발을 제대로 드는 동작은 거의 보이지 않았습니다.
 
    [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
    {: .text-center}
 
 
-1. 또한 로봇이 stand 상태일때 발을 많이 접는 현상이 있었습니다…
-   1. 이 현상은 observation에 있는 last action에 onnx파일의 출력으로 나오는 raw action을 넣어주었어야 하는데 scale과 offset을 적용한 값을 넣어주어 이전 action이 엄청나게 보수적으로 들어가는 버그가 있었습니다. 이를 해결하니 로봇 다리가 펴지는 것을 확인할 수 있었습니다.
+또한 로봇이 stand 상태에서 다리를 많이 접는 현상이 있었습니다. 이 문제는 `last_action` observation 구성 버그와 관련이 있었습니다.
+
+`last_action`에는 ONNX 모델의 raw action이 들어가야 했지만, deploy 코드에서는 scale과 offset이 적용된 target position에 가까운 값이 들어가고 있었습니다. 이 때문에 policy가 training 때와 다른 형태의 action history를 보고 있었고, 이전 action이 지나치게 보수적으로 들어가는 문제가 생겼습니다. 이 부분을 수정하자 로봇 다리가 펴지는 것을 확인할 수 있었습니다.
+
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-806c-8f0e-cd1ed2ba67cc.gif)
 
 
 
-1. go2에 depoly된 모델의 토크값을 확인해보았을때 뒷다리의 토크값이 앞다리에 비해 비정상적으로 낮은 것을 확인하였습니다. 원인으로는 아래 두가지를 생각하고 있습니다.
-   ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80d3-8e0f-cac3ab04cc22.webp)
+## **4. Torque 관점에서 본 문제**
 
-   1. terrain을 너무 높게 잡아서 (go2 보다 높은 40cm) 앞발이 go2를 견인하고 있다.
-   1. q error만으로 RL model을 학습 시키기에는 go2 자체가 필요한 토크가 너무 크다.
+Go2에 deploy된 모델의 torque 값을 확인해보니, 뒷다리 torque가 앞다리에 비해 비정상적으로 낮게 나오는 것을 확인했습니다.
 
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80d3-8e0f-cac3ab04cc22.webp)
 
+가능한 원인은 두 가지로 봤습니다.
 
+1. terrain height를 너무 높게 잡아, 앞발이 Go2 전체를 끌어가는 형태로 학습되었을 수 있습니다.
+1. position error 기반의 PD target만으로는 Go2가 실제로 필요한 torque를 만들기 어려웠을 수 있습니다.
 
-1. depoly할때의 뒷다리의 stiffness를 25 → 40으로 변경하니 앞뒤 좌우로 걷기 시작하였습니다.
+deploy 시 뒷다리 stiffness를 `25`에서 `40`으로 변경하자, 로봇이 앞뒤좌우로 조금씩 걷기 시작했습니다.
 
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif)
@@ -166,17 +169,22 @@ math: true
 
 
 
-**문제점**
+## **5. 남은 문제**
 
-- 앞뒤로 움직일때 다리를 너무 높게 드는 문제점이 있습니다.
-  - 뒷발의 stiffness를 임의로 높게 설정하여 torque값이 강하게 나와 앞발과 비교할때 상대적으로 높게 다리를 드는 것을 확인할 수 있었습니다. → go2의 밸런스 악화 → 제대로된 제어 불가능 으로 이어집니다.
-
-
-- 또한 제어값을 0.5 m/s이상으로 주어야만 움직이기 시작합니다. 움직이기 위한 최소한의 토크가 높다는 뜻입니다.
+- 앞뒤로 움직일 때 다리를 너무 높게 드는 문제가 있었습니다.
+  - 뒷다리 stiffness를 임의로 높이면서 torque가 강하게 나왔고, 그 결과 앞다리에 비해 뒷다리가 과하게 올라갔습니다. 이는 Go2의 balance를 무너뜨려 안정적인 제어를 어렵게 만들었습니다.
 
 
-**해결책**
+- command를 `0.5 m/s` 이상으로 줘야만 로봇이 움직이기 시작했습니다.
+  - 즉, 실제로 움직이기 위해 필요한 torque margin이 높다는 뜻입니다.
 
-1. **이전 상황 (문제점):** 기존에는 로봇이 자기 몸무게를 버티고 일어서려면, 인공지능이 목표 관절 각도(Target)를 비정상적으로 꺾이게 던져서 **억지로 큰 에러(Error)와 텐션**을 만들어내야만 했습니다. 시뮬레이션에선 이 꼼수가 통했지만, 진짜 로봇(Real)에 넣으면 모터가 그 과격한 명령을 버티지 못하고 주저앉아버렸죠.
-1. **해결책:** 물리 엔진(PhysX)이 매 순간 **"현재 자세에서 중력을 버티려면 이 관절에 얼만큼의 기본 힘이 필요한지"**를 계산해서 **피드포워드(**$\tau_{ff}$**)**로 먼저 쏴줍니다.
-1. **기대 효과:** 로봇 입장에서는 이미 누군가가 밑에서 몸무게를 받쳐주는 느낌이 듭니다. 덕분에 인공지능은 무거운 몸을 띄우기 위해 억지 타겟을 내뱉지 않아도 되고, 오직 **'원하는 방향으로 부드럽게 발을 뻗는 궤적**만 얌전하게 출력하게 됩니다.
+
+## **6. 다음 방향**
+
+이 시점에서 단순히 reward만 조정해서 해결하기는 어렵다고 판단했습니다. simulation에서는 통과하지만 real에서 torque가 부족하거나 target tracking이 제대로 되지 않는 문제가 남아 있었기 때문입니다.
+
+다음 글에서는 이 문제를 줄이기 위해 feed-forward torque를 추가하는 방향을 실험합니다.
+
+1. 기존 구조에서는 로봇이 자기 몸무게를 버티기 위해 policy가 목표 관절 각도를 크게 틀어야 했습니다. simulation에서는 이런 방식이 어느 정도 통했지만, real robot에서는 actuator가 그 target을 안정적으로 따라가지 못했습니다.
+1. PhysX에서 계산한 gravity compensation torque를 사용해, 현재 자세에서 중력을 버티는 데 필요한 기본 torque를 feed-forward로 먼저 넣어봅니다.
+1. 기대한 효과는 policy가 몸을 억지로 띄우기 위한 과격한 target을 내지 않고, 더 부드러운 발 궤적을 출력하도록 만드는 것입니다.

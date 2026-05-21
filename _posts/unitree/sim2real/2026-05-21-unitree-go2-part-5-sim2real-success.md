@@ -8,7 +8,7 @@ image: /assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/su
 math: true
 ---
 
-## 현재상황
+## **1. 현재 상황**
 
 이번 글에서는 Unitree Go2에 강화학습 policy를 실제 deploy하여 보행에 성공한 과정을 정리합니다.
 
@@ -26,7 +26,7 @@ Kd = 0.5
 
 ![실제 Unitree Go2 전진 보행 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
 
-## 이전까지의 실패 모드
+## **2. 이전까지의 실패 모드**
 
 초기 모델은 simulation에서는 정상적으로 걷는 것처럼 보였지만, 실제 로봇에서는 다음 문제가 반복되었습니다.
 
@@ -44,7 +44,7 @@ Kd = 0.5
 
 > policy가 학습한 MDP와 real robot이 실제로 겪는 MDP가 달랐다.
 
-## Kp를 올리는 방식의 한계
+## **3. Kp를 올리는 방식의 한계**
 
 한때는 real robot에서 torque margin이 부족하다고 보고 stiffness를 높이는 방향을 시도했습니다.
 
@@ -62,7 +62,7 @@ Kp를 높이면 실제로 로봇이 더 강하게 움직입니다. 하지만 이
 
 이 점이 중요합니다. 단순히 제어기를 강하게 만들어 움직인 것이 아니라, policy가 real actuator가 따라갈 수 있는 범위의 action을 출력한 것입니다.
 
-## Feed-forward Torque 실험의 의미
+## **4. Feed-forward Torque 실험의 의미**
 
 이전 글에서는 gravity compensation 기반 feed-forward torque를 시도했습니다.
 
@@ -80,7 +80,7 @@ Real deploy에서만 추가 torque를 넣으면, policy가 training에서 본 ac
 
 최종 방향은 deploy controller를 단순하게 유지하고, training 단계에서 real uncertainty를 반영하는 것이었습니다.
 
-## 최종 방향: Domain Randomization
+## **5. 최종 방향: Domain Randomization**
 
 최종 성공에서 핵심은 Domain Randomization이었습니다.
 
@@ -104,7 +104,7 @@ DR을 크게 넣는 것이 항상 좋은 것은 아닙니다.
 
 너무 강하면 학습이 어려워지고, 너무 약하면 real gap을 커버하지 못합니다. 따라서 policy가 학습 가능한 범위 안에서 real variation을 반영하는 것이 중요했습니다.
 
-## MDP 관점에서 본 Sim2Real
+## **6. MDP 관점에서 본 Sim2Real**
 
 이번 과정에서 MDP 관점이 실제 deploy 문제와 직접 연결된다는 것을 다시 확인했습니다.
 
@@ -138,7 +138,7 @@ real:       s_t + a_t -> s_{t+1}^{real}
 
 Domain Randomization은 이 transition mismatch를 줄이기 위한 방법입니다. 정확히는 하나의 simulation MDP에 overfit하지 않도록, 여러 dynamics variation을 학습 중에 노출시키는 방식입니다.
 
-## Deploy Repository 구조
+## **7. Deploy Repository 구조**
 
 실제 deploy에는 별도의 runtime repository를 사용했습니다.
 
@@ -165,7 +165,7 @@ scripts/
 
 구조는 최대한 단순하게 유지했습니다.
 
-## Observation 구성
+## **8. Observation 구성**
 
 Deploy observation은 training observation과 의미가 맞도록 구성했습니다.
 
@@ -197,7 +197,7 @@ target_pos = default_joint_pos + action_scale * action
 
 즉, policy input으로 들어가는 action history와 실제 joint target은 구분해야 합니다.
 
-## Joint Order 정합성
+## **9. Joint Order 정합성**
 
 Policy joint order와 Unitree SDK joint order는 다릅니다. 따라서 deploy 중 index mapping이 필요합니다.
 
@@ -219,7 +219,7 @@ Sim2Real 정합성은 물리 파라미터만의 문제가 아닙니다.
 
 이런 값들이 모두 transition에 영향을 줍니다.
 
-## Action to Target Position
+## **10. Action to Target Position**
 
 최종 deploy에서는 policy action을 target joint position으로 변환합니다.
 
@@ -240,7 +240,7 @@ tau = 0
 
 중요한 점은 deploy loop를 training 때의 구조와 최대한 맞추는 것입니다. Deploy에서만 추가적인 보정이나 복잡한 controller를 넣으면, 그 자체가 새로운 sim-to-real gap이 될 수 있습니다.
 
-## 결과
+## **11. 결과**
 
 최종 policy는 실제 Unitree Go2에서 전진 command에 대해 안정적으로 보행했습니다.
 
@@ -260,7 +260,7 @@ tau = 0
 
 낮은 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점이 핵심입니다.
 
-## 정리
+## **12. 정리**
 
 이번 Sim2Real 과정에서 확인한 내용은 다음과 같습니다.
 
@@ -277,7 +277,7 @@ tau = 0
 
 이번 성공은 특정 reward weight 하나나 magic number 하나로 만들어진 결과가 아닙니다. Real robot에서 달라질 수 있는 요소들을 simulation에 넣고, deploy에서는 policy가 학습한 구조를 최대한 유지한 것이 핵심이었습니다.
 
-## 다음 목표
+## **13. 다음 목표**
 
 - 더 낮은 command에서의 보행 안정화
 - 후진, 좌우, yaw command 테스트
