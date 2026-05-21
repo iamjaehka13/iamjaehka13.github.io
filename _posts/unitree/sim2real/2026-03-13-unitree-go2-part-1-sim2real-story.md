@@ -1,5 +1,5 @@
 ---
-title: "[Unitree Go2 part 1] Sim2Real 사연있습니다.."
+title: "[Unitree Go2 part 2] Sim2Real 사연있습니다."
 date: 2026-03-13 19:40:00 +0900
 last_modified_at: 2026-03-23 22:34:27 +0900
 categories: [Unitree, Sim2Real]
