@@ -11,7 +11,9 @@ math: true
 
 # What is problem?
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-8049-bb73-c10329367298.gif)
+<video class="w-100 rounded" controls preload="metadata">
+  <source src="/assets/video/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/img-1539.mp4" type="video/mp4">
+</video>
 
 지난 시간에 로봇이 발을 떼지 않는 문제점을 발견하였다… 지난 3일간 여러가지 세팅으로 테스트를 반복해 보았다.
 
