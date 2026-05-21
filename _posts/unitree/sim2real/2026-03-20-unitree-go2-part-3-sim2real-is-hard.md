@@ -13,7 +13,7 @@ math: true
 
 발을 들게하는 여러가지 reward를 추가하였더니 이제는 mujoco상에서는 go2가 걸을 수 있게 되었습니다.
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1586.gif)
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/329cbb7d-7937-805c-8183-fc646408590c.gif)
 
 발을 들도록 하는 reward는 크게 3가지로 볼 수 있습니다.
 
@@ -161,6 +161,8 @@ math: true
 
 
 ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif)
+
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1586.gif)
 
 
 
