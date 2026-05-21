@@ -38,9 +38,13 @@ Kd = 0.5
 
 이 방식은 simulation에서는 효과가 있었습니다. 하지만 real robot에서는 여전히 충분하지 않았습니다. 문제는 reward 하나로 설명되지 않았습니다.
 
-결국 핵심은 다음에 가까웠습니다.
+결국 더 중요했던 것은 policy가 학습하는 **closed-loop dynamics**였습니다. 강화학습 policy는 매 timestep마다 action을 출력하고, 그 action으로 만들어진 다음 state를 다시 observation으로 받아 학습합니다.
 
-> policy가 학습한 MDP와 real robot이 실제로 겪는 MDP가 달랐다.
+이때 command가 실제 joint motion으로 이어지지 않고, base가 기울거나 관절이 target을 거의 따라가지 못하는 transition이 반복되면 rollout distribution 자체가 정지에 가까운 상태들로 채워집니다. 그러면 policy는 발을 내딛어 보상을 얻는 전략보다, 크게 움직이지 않고 자세를 유지하는 전략을 더 안정적인 선택으로 받아들일 수 있습니다.
+
+즉, 문제는 단순히 "발을 못 들었다"가 아니라, **학습 과정에서 정지에 가까운 transition이 누적되며 policy가 그 분포에 적응해버리는 것**이었습니다.
+
+> action이 joint motion으로 이어지는 경험이 충분히 쌓이지 않으면, policy는 움직이는 방법이 아니라 움직이지 않고 버티는 방법을 학습할 수 있다.
 
 ## **3. Kp를 올리는 방식의 한계**
 
@@ -94,7 +98,7 @@ DR은 특별한 trick이라기보다, simulation에 빠져 있는 real-world var
 
 항상 같은 friction, 같은 actuator response, 같은 delay, 같은 initial pose에서만 학습한 policy는 real robot에서 쉽게 깨집니다.
 
-최종 학습에서는 contact, actuator, sensor, initial state 쪽의 variation을 넣었습니다. 정확한 range는 공개하지 않지만, 기준은 단순했습니다.
+최종 학습에서는 contact, actuator, sensor, initial state 쪽의 variation을 넣었습니다. 기준은 단순했습니다.
 
 > real robot에서 실제로 달라질 수 있는 요소를 simulation에 넣는다.
 
@@ -125,16 +129,18 @@ s_t -> a_t -> s_{t+1}
 
 즉, policy는 전체 history를 직접 보지 않더라도 현재 observation을 통해 필요한 정보를 일부 요약해서 받습니다.
 
-문제는 simulation과 real에서 transition이 다르다는 점입니다.
+여기서 중요한 점은 transition이 한 번만 일어나고 끝나는 것이 아니라는 점입니다. 강화학습은 simulation 안에서 closed-loop rollout을 반복하며 데이터를 계속 쌓습니다.
 
 ```text
 simulation: s_t + a_t -> s_{t+1}^{sim}
 real:       s_t + a_t -> s_{t+1}^{real}
 ```
 
-같은 state와 action이라도 friction, actuator delay, motor strength, mass distribution이 다르면 다음 state가 달라집니다. 이 차이가 누적되면 simulation에서 안정적인 policy도 real에서는 실패합니다.
+같은 state와 action이라도 friction, actuator delay, motor strength, mass distribution이 다르면 다음 state가 달라집니다. 특히 action이 실제 joint displacement로 이어지지 않으면, 다음 observation에는 낮은 joint velocity, 남아 있는 tracking error, 거의 변하지 않은 contact pattern이 그대로 반영됩니다.
 
-Domain Randomization은 이 transition mismatch를 줄이기 위한 방법입니다. 정확히는 하나의 simulation MDP에 overfit하지 않도록, 여러 dynamics variation을 학습 중에 노출시키는 방식입니다.
+이런 transition이 반복되면 policy는 그 경험을 기준으로 업데이트됩니다. command를 따라 실제로 발을 내딛는 transition보다, base만 기울이거나 posture를 유지하는 transition이 더 자주 쌓이면 policy는 움직임을 만들어내는 방향이 아니라 정지 상태로 수렴하는 local optimum에 가까워질 수 있습니다.
+
+Domain Randomization은 이 누적 문제를 줄이기 위한 방법입니다. 하나의 고정된 dynamics에서만 학습하면 policy가 특정 transition distribution에 쉽게 적응합니다. 반대로 여러 actuator response, contact, delay, 초기 자세를 경험하게 만들면, policy가 정지에 가까운 쉬운 해에 고정되지 않고 실제 로봇에서도 tracking 가능한 action을 찾도록 유도할 수 있습니다.
 
 ## **7. Deploy Repository 구조**
 
@@ -252,7 +258,7 @@ tau = 0
 | 발 들기 | 실패하거나 과격함 | 안정적인 swing motion |
 | base 자세 | command 방향으로 기울어짐 | 비교적 안정적 |
 | real 반응성 | 특정 조건에서만 움직임 | command에 반응 |
-| 핵심 문제 인식 | reward 또는 torque 부족 | transition mismatch |
+| 핵심 문제 인식 | reward 또는 torque 부족 | closed-loop transition 분포와 actuator variation |
 
 중요한 것은 단순히 로봇이 움직였다는 점이 아닙니다.
 
@@ -267,11 +273,11 @@ tau = 0
 3. Feed-forward torque는 원인 분석에는 도움이 되었지만, 최종 해결책은 아니었습니다.
 4. 최종적으로는 낮은 gain과 적절한 Domain Randomization이 중요했습니다.
 5. Deploy observation, action scale, joint order 같은 정합성이 매우 중요했습니다.
-6. Sim2Real 문제는 결국 transition mismatch 문제로 볼 수 있습니다.
+6. Sim2Real 문제는 action이 실제 joint motion으로 이어지는 closed-loop transition을 학습 중에 충분히 경험하게 만드는 문제로 볼 수 있습니다.
 
 결국 핵심은 다음입니다.
 
-> real에서 더 강하게 제어하는 것이 아니라, sim에서 real variation을 견딜 수 있게 학습시키는 것.
+> real에서 더 강하게 제어하는 것이 아니라, sim에서 action이 joint motion으로 이어지는 dynamics를 충분히 학습시키는 것.
 
 이번 성공은 특정 reward weight 하나나 magic number 하나로 만들어진 결과가 아닙니다. Real robot에서 달라질 수 있는 요소들을 simulation에 넣고, deploy에서는 policy가 학습한 구조를 최대한 유지한 것이 핵심이었습니다.
 
