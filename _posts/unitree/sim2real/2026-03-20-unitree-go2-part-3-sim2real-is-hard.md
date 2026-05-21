@@ -126,9 +126,9 @@ math: true
 
 ### feet clearance reward
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80e7-a3c6-df270e2c7418.webp)
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/feet-clearance-1.png)
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80a3-a46c-fb7628f88258.webp)
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/feet-clearance-2.png)
 
 
 
