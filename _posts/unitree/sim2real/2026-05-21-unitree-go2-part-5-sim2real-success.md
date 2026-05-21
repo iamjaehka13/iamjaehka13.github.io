@@ -22,8 +22,6 @@ Kd = 0.5
 + Domain Randomization
 ```
 
-![실제 Unitree Go2 전진 보행 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
-
 ## **2. 이전까지의 실패 모드**
 
 초기 모델은 simulation에서는 정상적으로 걷는 것처럼 보였지만, 실제 로봇에서는 다음 문제가 반복되었습니다.
@@ -247,6 +245,10 @@ tau = 0
 ## **11. 결과**
 
 최종 policy는 실제 Unitree Go2에서 전진 command에 대해 안정적으로 보행했습니다.
+
+![실제 Unitree Go2 전진 보행 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
+
+또한 command 변화에 대해서도 이전처럼 base만 기울어지는 것이 아니라, 실제 보행 motion으로 반응하는 것을 확인했습니다.
 
 ![실제 Unitree Go2 command 반응 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif)
 
