@@ -101,7 +101,10 @@ go2에 아무리 커멘드를 주어도 go2가 발을 떼지 못하고 base만 c
   </details>
 
   - depoly 할때에는 go2의 urdf파일로부터 go2 각 파트의 질량 정보를 가져와 joint_pos + base quaternion(IMU) 를 입력으로 각 모터에 필요한 $\tau_{ff}$ 를 계산합니다.
-$τ_{computed}​=k_p​∗(q_{des}​−q)+k+d​∗(q'_{des​}−q'​)+τ_{ff​}$
+
+$$
+\tau_{\text{computed}} = k_p(q_{\text{des}} - q) + k_d(\dot{q}_{\text{des}} - \dot{q}) + \tau_{\text{ff}}
+$$
 
 - 이러한 방법을 통해 position error가 없는데도 error를 억지로 늘려서 서있기 위한 토크를 만들어야 했던 영향을 제거하고 순전히 target position과의 오차를 줄이기 위한 토크를 낼 수 있습니다.
 
