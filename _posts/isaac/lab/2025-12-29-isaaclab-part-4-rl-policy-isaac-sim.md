@@ -1,5 +1,5 @@
 ---
-title: "[Unitree Go2] Part 4. RL Policy로 Isaac Sim에서 Go2 로봇 걷게하기"
+title: "[IsaacLab Part 4] RL Policy로 Isaac Sim에서 Go2 로봇 걷게하기"
 date: 2025-12-29 19:53:25 +0900
 last_modified_at: 2025-12-29 19:53:25 +0900
 categories: [Isaac, Lab]

@@ -1,5 +1,5 @@
 ---
-title: "[Unitree Go2] Part 1. URDF import"
+title: "[IsaacLab Part 1] Unitree Go2 URDF import"
 date: 2025-12-04 18:49:09 +0900
 last_modified_at: 2025-12-04 22:38:25 +0900
 categories: [Isaac, Lab]

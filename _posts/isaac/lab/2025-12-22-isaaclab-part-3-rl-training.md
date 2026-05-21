@@ -1,5 +1,5 @@
 ---
-title: "[Unitree Go2] Part 3. 강화학습으로 Go2 걷게하기"
+title: "[IsaacLab Part 3] 강화학습으로 Go2 걷게하기"
 date: 2025-12-22 19:25:58 +0900
 last_modified_at: 2025-12-23 10:45:18 +0900
 categories: [Isaac, Lab]

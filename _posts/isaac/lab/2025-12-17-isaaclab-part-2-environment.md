@@ -1,5 +1,5 @@
 ---
-title: "[Unitree Go2] Part 2. Isaac Lab 환경 구성하기"
+title: "[IsaacLab Part 2] Unitree Go2 환경 구성하기"
 date: 2025-12-17 23:36:43 +0900
 last_modified_at: 2025-12-17 23:36:43 +0900
 categories: [Isaac, Lab]
