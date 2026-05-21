@@ -138,7 +138,9 @@ math: true
 
 1. 다양한 모델을 학습하고 real에 배포 하였지만 이전과 마찬가지로 앞뒤좌우로 몸을 기울이기만 할뿐 발을 드는 동작을 보이진 않았습니다.
 
-   ![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)
+   <p class="text-center">
+     <img src="/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif" alt="">
+   </p>
 
 
 1. 또한 로봇이 stand 상태일때 발을 많이 접는 현상이 있었습니다…
