@@ -137,7 +137,7 @@ math: true
 ### in real
 
 1. 다양한 모델을 학습하고 real에 배포 하였지만 이전과 마찬가지로 앞뒤좌우로 몸을 기울이기만 할뿐 발을 드는 동작을 보이진 않았습니다.
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-8010-b571-c392468892d0.gif)
+![](/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)
 
 
 
