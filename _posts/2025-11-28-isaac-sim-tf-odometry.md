@@ -77,7 +77,9 @@ translation: (0, 0, 0)
 
 ![최종 TF tree](/assets/img/posts/isaac-sim-tf-odometry/12-final-tf-tree.png)
 
-[![RViz2에서 TF 확인](/assets/img/posts/isaac-sim-tf-odometry/13-rviz-tf-preview.jpg)](https://tv.kakao.com/v/459588561)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-tf-odometry/13-rviz-tf-preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-tf-odometry/13-rviz-tf.mp4" type="video/mp4">
+</video>
 
 전체 흐름은 아래처럼 생각하면 된다.
 

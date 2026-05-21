@@ -152,7 +152,9 @@ ros2 topic pub /cmd_vel geometry_msgs/Twist "{'linear': {'x': 0.2, 'y': 0.0, 'z'
 
 앞으로 직진하면서 동시에 회전한다면 ROS2 bridge, `/cmd_vel` subscription, Differential Controller, Articulation Controller까지 연결이 된 것이다.
 
-[![TurtleBot 주행 결과 영상 썸네일](/assets/img/posts/isaac-sim-turtlebot-ros2/16-drive-result-thumbnail.jpg)](https://tv.kakao.com/v/459546248)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-turtlebot-ros2/16-drive-result-thumbnail.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-turtlebot-ros2/16-drive-result.mp4" type="video/mp4">
+</video>
 
 ## 정리
 

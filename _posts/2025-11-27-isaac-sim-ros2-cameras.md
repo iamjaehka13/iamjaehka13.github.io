@@ -22,7 +22,9 @@ image: /assets/img/posts/isaac-sim-ros2-cameras/05-camera-ros2-omnigraph.png
 
 URDF import 후 namespace가 붙은 경우에는 보통 `a__namespace_base_footprint` 같은 이름의 base prim 아래에 카메라를 추가한다.
 
-[![Base link 아래에 camera를 추가하는 과정](/assets/img/posts/isaac-sim-ros2-cameras/01-add-camera-under-baselink.jpg)](https://tv.kakao.com/v/459558724)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-ros2-cameras/01-add-camera-under-baselink.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-ros2-cameras/01-add-camera-under-baselink.mp4" type="video/mp4">
+</video>
 
 두 카메라의 transform은 로봇 기준 앞뒤를 바라보도록 잡는다. 한쪽 카메라는 전방, 다른 한쪽은 후방을 보게 만들면 ROS2 topic이 정상적으로 분리되는지 확인하기 쉽다.
 
@@ -32,7 +34,9 @@ URDF import 후 namespace가 붙은 경우에는 보통 `a__namespace_base_footp
 
 카메라가 제대로 붙었는지는 viewport를 하나 더 띄워 확인할 수 있다. `Window > Viewport`로 보조 viewport를 만들고, 하나는 perspective view, 다른 하나는 camera view로 두면 stage와 camera 시야를 동시에 볼 수 있다.
 
-[![Viewport에서 camera view 확인](/assets/img/posts/isaac-sim-ros2-cameras/04-camera-viewport-preview.jpg)](https://tv.kakao.com/v/459558737)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-ros2-cameras/04-camera-viewport-preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-ros2-cameras/04-camera-viewport.mp4" type="video/mp4">
+</video>
 
 또는 `Tools > Sensors > Camera Inspector`를 열면 scene 안에 있는 카메라들을 모아서 확인할 수 있다.
 
@@ -61,7 +65,9 @@ Camera prim
 
 `Isaac Create Render Product` 노드의 target은 방금 추가한 camera prim으로 잡는다. 이후 `ROS2 Camera Helper` 노드에서 topic name과 message type을 설정한다.
 
-[![Render Product target과 ROS2 topic 설정](/assets/img/posts/isaac-sim-ros2-cameras/06-render-product-topic-target.jpg)](https://tv.kakao.com/v/459559367)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-ros2-cameras/06-render-product-topic-target.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-ros2-cameras/06-render-product-topic-target.mp4" type="video/mp4">
+</video>
 
 ## 3. RViz2에서 카메라 topic 확인
 
@@ -73,7 +79,9 @@ ros2 topic list
 
 카메라 graph가 정상이라면 설정한 image topic이 topic list에 나타난다. RViz2에서 `Image` display를 추가하고 해당 topic을 선택하면 Isaac Sim camera image를 볼 수 있다.
 
-[![RViz2에서 카메라 image topic 확인](/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera-preview.jpg)](https://tv.kakao.com/v/459559454)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera-preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera.mp4" type="video/mp4">
+</video>
 
 카메라가 두 개라면 같은 구조의 graph를 하나 더 만들고 topic name을 분리하면 된다. 예를 들어 `camera1`, `camera2`에 대해 각각 render product와 ROS2 Camera Helper를 만들면 앞뒤 카메라를 따로 받을 수 있다.
 

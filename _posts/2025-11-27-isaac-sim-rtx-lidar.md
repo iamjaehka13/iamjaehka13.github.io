@@ -85,7 +85,9 @@ ros2 topic list
 
 정상적으로 연결되면 `scans`, `points` topic이 보인다. RViz2에서는 2D Lidar는 `LaserScan`, 3D Lidar는 `PointCloud2` display로 확인한다.
 
-[![RViz2에서 point topic 확인](/assets/img/posts/isaac-sim-rtx-lidar/08-rviz-pointcloud-preview.jpg)](https://tv.kakao.com/v/459561493)
+<video controls preload="metadata" poster="/assets/img/posts/isaac-sim-rtx-lidar/08-rviz-pointcloud-preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/isaac-sim-rtx-lidar/08-rviz-pointcloud.mp4" type="video/mp4">
+</video>
 
 ## 정리
 
