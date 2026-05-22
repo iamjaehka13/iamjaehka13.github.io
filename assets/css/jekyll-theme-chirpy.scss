@@ -24,6 +24,8 @@
   --jaehka-sidebar-width-wide: 330px;
   --jaehka-sidebar-width-large: 350px;
   --jaehka-sidebar-width-mobile: 280px;
+  --jaehka-sidebar-art-top: clamp(25.5rem, 49vh, 30rem);
+  --jaehka-sidebar-art-bottom: 8.5rem;
 }
 
 #sidebar {
@@ -37,11 +39,9 @@
   --sidebar-border-color: rgb(255 255 255 / 14%);
   --avatar-border-color: rgb(255 250 244 / 78%);
 
-  background-color: #18120f;
-  background-image: url('/assets/img/sidebar-bg-bottom.jpg');
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background:
+    radial-gradient(circle at 50% 58%, rgb(42 31 25 / 72%), transparent 44%),
+    linear-gradient(180deg, #050505 0%, #050505 30%, #16110f 100%);
   isolation: isolate;
   width: var(--jaehka-sidebar-width);
 }
@@ -49,10 +49,24 @@
 #sidebar::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: var(--jaehka-sidebar-art-top) 1rem var(--jaehka-sidebar-art-bottom);
   z-index: 0;
   pointer-events: none;
-  background-color: rgb(18 14 12 / 70%);
+  border: 1px solid rgb(255 245 232 / 14%);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(0 0 0 / 10%),
+      rgb(0 0 0 / 0%) 32%,
+      rgb(0 0 0 / 36%) 100%
+    ),
+    url('/assets/img/sidebar-art-full.jpg') center bottom / contain no-repeat,
+    url('/assets/img/sidebar-art-blur.jpg') center center / cover no-repeat;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 5%),
+    inset 0 -46px 54px rgb(0 0 0 / 36%),
+    0 18px 34px rgb(0 0 0 / 28%);
 }
 
 #sidebar > * {
