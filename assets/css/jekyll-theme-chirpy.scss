@@ -19,6 +19,47 @@
   border-radius: 1rem !important;
 }
 
+#sidebar {
+  --site-title-color: rgb(255 250 244 / 96%);
+  --site-subtitle-color: rgb(255 240 222 / 86%);
+  --sidebar-muted-color: rgb(255 245 232 / 84%);
+  --sidebar-active-color: #fffaf4;
+  --sidebar-hover-bg: rgb(255 255 255 / 16%);
+  --sidebar-btn-bg: rgb(255 255 255 / 14%);
+  --sidebar-btn-color: rgb(255 245 232 / 84%);
+  --sidebar-border-color: rgb(255 255 255 / 14%);
+  --avatar-border-color: rgb(255 250 244 / 78%);
+
+  background-color: #18120f;
+  background-image: url('/assets/img/sidebar-bg.jpg');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  isolation: isolate;
+}
+
+#sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: rgb(18 14 12 / 70%);
+}
+
+#sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+#sidebar .site-title,
+#sidebar .site-subtitle,
+#sidebar .nav-link,
+#sidebar .sidebar-bottom a,
+#sidebar .sidebar-bottom #mode-toggle {
+  text-shadow: 0 1px 2px rgb(0 0 0 / 55%);
+}
+
 @mixin jaehka-light-palette {
   --main-bg: #f4f7f2;
   --mask-bg: rgb(63 76 69 / 28%);
