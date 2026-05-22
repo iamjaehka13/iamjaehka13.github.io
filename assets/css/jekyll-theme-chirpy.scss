@@ -20,9 +20,10 @@
 }
 
 :root {
-  --jaehka-sidebar-width: 330px;
-  --jaehka-sidebar-width-large: 360px;
-  --jaehka-sidebar-width-mobile: 300px;
+  --jaehka-sidebar-width: 360px;
+  --jaehka-sidebar-width-wide: 400px;
+  --jaehka-sidebar-width-large: 440px;
+  --jaehka-sidebar-width-mobile: 320px;
 }
 
 #sidebar {
@@ -37,7 +38,7 @@
   --avatar-border-color: rgb(255 250 244 / 78%);
 
   background-color: #18120f;
-  background-image: url('/assets/img/sidebar-bg.jpg');
+  background-image: url('/assets/img/sidebar-bg-panel.jpg');
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -89,9 +90,23 @@
   }
 }
 
+@media (min-width: 1200px) {
+  #sidebar {
+    width: var(--jaehka-sidebar-width-wide);
+  }
+
+  #main-wrapper {
+    margin-left: var(--jaehka-sidebar-width-wide);
+  }
+
+  #toc-popup {
+    left: var(--jaehka-sidebar-width-wide);
+  }
+}
+
 @media (min-width: 1400px) {
   #back-to-top {
-    right: calc((100vw - var(--jaehka-sidebar-width) - 1140px) / 2 + 3rem);
+    right: calc((100vw - var(--jaehka-sidebar-width-wide) - 1140px) / 2 + 3rem);
   }
 }
 
