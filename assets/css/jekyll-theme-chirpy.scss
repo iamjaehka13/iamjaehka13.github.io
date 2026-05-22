@@ -24,7 +24,7 @@
   --jaehka-sidebar-width-wide: 330px;
   --jaehka-sidebar-width-large: 350px;
   --jaehka-sidebar-width-mobile: 280px;
-  --jaehka-sidebar-art-top: clamp(25.5rem, 49vh, 30rem);
+  --jaehka-sidebar-art-top: clamp(17.75rem, 29vh, 19rem);
   --jaehka-sidebar-art-bottom: 8.5rem;
 }
 
@@ -49,24 +49,21 @@
 #sidebar::before {
   content: '';
   position: absolute;
-  inset: var(--jaehka-sidebar-art-top) 1rem var(--jaehka-sidebar-art-bottom);
+  inset: var(--jaehka-sidebar-art-top) 0 var(--jaehka-sidebar-art-bottom);
   z-index: 0;
   pointer-events: none;
-  border: 1px solid rgb(255 245 232 / 14%);
-  border-radius: 1.15rem;
   background:
     linear-gradient(
       180deg,
-      rgb(0 0 0 / 10%),
-      rgb(0 0 0 / 0%) 32%,
-      rgb(0 0 0 / 36%) 100%
+      rgb(0 0 0 / 22%),
+      rgb(0 0 0 / 10%) 34%,
+      rgb(0 0 0 / 46%) 100%
     ),
-    url('/assets/img/sidebar-art-full.jpg') center bottom / contain no-repeat,
-    url('/assets/img/sidebar-art-blur.jpg') center center / cover no-repeat;
+    url('/assets/img/sidebar-art-full.jpg') center top / 100% auto no-repeat,
+    url('/assets/img/sidebar-art-blur.jpg') center top / cover no-repeat;
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 5%),
-    inset 0 -46px 54px rgb(0 0 0 / 36%),
-    0 18px 34px rgb(0 0 0 / 28%);
+    inset 0 22px 28px rgb(0 0 0 / 46%),
+    inset 0 -52px 58px rgb(0 0 0 / 42%);
 }
 
 #sidebar > * {
@@ -80,6 +77,17 @@
 #sidebar .sidebar-bottom a,
 #sidebar .sidebar-bottom #mode-toggle {
   text-shadow: 0 1px 2px rgb(0 0 0 / 55%);
+}
+
+#sidebar .nav-link {
+  border-radius: 0.7rem;
+  background-color: rgb(0 0 0 / 24%);
+  backdrop-filter: blur(2px);
+}
+
+#sidebar .nav-item.active .nav-link,
+#sidebar .nav-link:hover {
+  background-color: rgb(255 255 255 / 16%);
 }
 
 @media (max-width: 849.98px) {
