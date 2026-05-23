@@ -183,6 +183,141 @@
   --inline-code-bg: rgb(47 67 58 / 7%);
 }
 
+@mixin jaehka-dark-palette {
+  color-scheme: dark;
+
+  --bs-body-bg: #050505;
+  --bs-body-color: #cec7bc;
+  --bs-body-color-rgb: 206, 199, 188;
+  --bs-emphasis-color: #fffaf4;
+  --bs-secondary-color: rgb(146 137 126 / 82%);
+  --bs-secondary-bg: #0d0d0d;
+  --bs-tertiary-bg: #111111;
+  --bs-heading-color: #f2ece2;
+  --bs-link-color: #e1c353;
+  --bs-link-color-rgb: 225, 195, 83;
+  --bs-link-hover-color: #fee715;
+  --bs-link-hover-color-rgb: 254, 231, 21;
+  --bs-code-color: #eccd64;
+  --bs-border-color: rgb(255 250 244 / 12%);
+  --bs-border-color-translucent: rgb(255 250 244 / 12%);
+
+  --main-bg: #050505;
+  --mask-bg: rgb(5 5 5 / 72%);
+  --main-border-color: rgb(255 250 244 / 10%);
+  --text-color: #cec7bc;
+  --text-muted-color: #92897e;
+  --text-muted-highlight-color: #c8bfb3;
+  --heading-color: #f2ece2;
+  --label-color: #bdb4a8;
+  --blockquote-border-color: rgb(255 250 244 / 18%);
+  --blockquote-text-color: #a99f92;
+  --link-color: #e1c353;
+  --link-underline-color: rgb(225 195 83 / 36%);
+  --button-bg: #0d0d0d;
+  --btn-border-color: rgb(255 250 244 / 13%);
+  --btn-backtotop-color: #cec7bc;
+  --btn-backtotop-border-color: rgb(255 250 244 / 12%);
+  --card-header-bg: #111111;
+  --checkbox-color: #8f887e;
+  --checkbox-checked-color: #e1c353;
+  --img-bg: radial-gradient(circle, #111111 0%, #050505 100%);
+  --shimmer-bg: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%) 0%,
+    rgb(255 250 244 / 12%) 50%,
+    rgb(255 255 255 / 0%) 100%
+  );
+
+  --site-title-color: rgb(255 250 244 / 96%);
+  --site-subtitle-color: rgb(255 240 222 / 86%);
+  --sidebar-bg: #050505;
+  --sidebar-border-color: rgb(255 250 244 / 10%);
+  --sidebar-muted-color: rgb(255 245 232 / 84%);
+  --sidebar-active-color: #fffaf4;
+  --sidebar-hover-bg: rgb(255 255 255 / 16%);
+  --sidebar-btn-bg: rgb(255 255 255 / 14%);
+  --sidebar-btn-color: rgb(255 245 232 / 84%);
+  --avatar-border-color: rgb(255 250 244 / 78%);
+
+  --topbar-bg: rgb(5 5 5 / 84%);
+  --topbar-text-color: #cec7bc;
+  --search-border-color: rgb(255 250 244 / 13%);
+  --search-icon-color: #8f887e;
+  --input-focus-border-color: rgb(225 195 83 / 58%);
+
+  --post-list-text-color: #a99f92;
+  --btn-patinator-text-color: #cec7bc;
+  --btn-paginator-hover-color: #151515;
+
+  --toc-highlight: #e1c353;
+  --toc-popup-border-color: rgb(255 250 244 / 12%);
+  --tag-hover: rgb(255 250 244 / 9%);
+  --tb-odd-bg: #0b0b0b;
+  --tb-even-bg: #080808;
+  --tb-border-color: rgb(255 250 244 / 10%);
+  --footnote-target-bg: rgb(225 195 83 / 18%);
+  --btn-share-color: #92897e;
+  --btn-share-hover-color: #e1c353;
+  --card-bg: #0d0d0d;
+  --card-hover-bg: #161616;
+  --card-shadow: rgb(0 0 0 / 44%) 0 10px 26px 0,
+    rgb(255 250 244 / 8%) 0 0 0 1px;
+  --kbd-wrap-color: #8f887e;
+  --kbd-text-color: #f2ece2;
+  --kbd-bg-color: #111111;
+  --prompt-text-color: rgb(242 236 226 / 78%);
+  --prompt-tip-bg: rgb(31 61 39 / 58%);
+  --prompt-tip-icon-color: rgb(90 207 104 / 82%);
+  --prompt-info-bg: rgb(28 56 86 / 72%);
+  --prompt-info-icon-color: #76aee8;
+  --prompt-warning-bg: rgb(88 68 12 / 78%);
+  --prompt-warning-icon-color: #e1c353;
+  --prompt-danger-bg: rgb(86 28 8 / 76%);
+  --prompt-danger-icon-color: #de6f55;
+
+  --tag-border: rgb(255 250 244 / 14%);
+  --tag-shadow: rgb(0 0 0 / 42%);
+  --dash-color: rgb(255 250 244 / 18%);
+  --search-tag-bg: #111111;
+
+  --categories-border: rgb(255 250 244 / 12%);
+  --categories-hover-bg: rgb(255 250 244 / 8%);
+  --categories-icon-hover-color: #fffaf4;
+
+  --timeline-node-bg: #92897e;
+  --timeline-color: rgb(255 250 244 / 12%);
+  --timeline-year-dot-color: #050505;
+
+  --language-border-color: rgb(255 250 244 / 12%);
+  --highlight-bg-color: #0a0a0a;
+  --highlighter-rouge-color: #e6d39a;
+  --highlight-lineno-color: #7d746a;
+  --inline-code-bg: rgb(255 250 244 / 7%);
+  --code-color: #d6cec2;
+  --code-header-text-color: #92897e;
+  --code-header-muted-color: #1a1a1a;
+  --code-header-icon-color: #7d746a;
+  --clipboard-checked-color: #81d078;
+  --filepath-text-color: #cec7bc;
+
+  body,
+  #main-wrapper {
+    background-color: var(--main-bg);
+  }
+
+  #archives ul li:nth-child(odd) {
+    background-image: linear-gradient(
+      to left,
+      #050505,
+      #0d0d0d,
+      #0d0d0d,
+      #0d0d0d,
+      #050505
+    );
+  }
+}
+
 @media (prefers-color-scheme: light) {
   html:not([data-mode]) {
     @include jaehka-light-palette;
@@ -191,6 +326,10 @@
 
 html[data-mode='light'] {
   @include jaehka-light-palette;
+}
+
+html[data-mode='dark'] {
+  @include jaehka-dark-palette;
 }
 
 #topbar-wrapper {
