@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
 date: 2026-03-12 14:28:00 +0900
-last_modified_at: 2026-05-25 01:25:08 +0900
+last_modified_at: 2026-05-25 01:40:57 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: Unitree Go2에 강화학습 기반 보행 policy를 실제 deploy하기 위해 baseline을 정하고, 첫 학습과 real deploy를 시도한 과정을 정리한다.
@@ -15,9 +15,11 @@ math: true
 
 장기적으로 주장하고 싶은 것은 다음과 같습니다.
 
-> 실로봇 장시간 보행에서는 nominal RL policy가 command tracking은 잘해도, 특정 actuator에 열과 부하가 불균일하게 쌓여 thermal bottleneck이 될 수 있다. 따라서 `/lowstate`에서 얻을 수 있는 per-motor temperature, current/load, torque, joint state를 이용해 runtime에서 보행 입력을 조절하는 thermal-aware regulator가 필요하다.
+> 실로봇 장시간 보행에서는 nominal RL policy가 command tracking은 잘해도, 특정 actuator에 열과 부하가 불균일하게 쌓여 thermal bottleneck이 될 수 있다. 따라서 `/lowstate`에서 얻을 수 있는 per-actuator reported temperature, current/load, torque, joint state를 이용해 runtime에서 보행 입력을 조절하는 thermal-aware regulator가 필요하다.
 
-즉 목표는 새로운 보행 policy 하나를 더 만드는 것이 아니라, **기본 보행 policy 위에 per-motor thermal state와 current-derived load를 보는 runtime regulation layer를 얹어, 비슷한 walking task를 유지하면서 peak temperature와 temperature rise를 줄일 수 있는지** 확인하는 것입니다.
+여기서 temperature는 실제 winding temperature를 직접 측정한 값이라고 단정하기보다, robot이 onboard로 report하는 actuator temperature로 다루는 편이 안전합니다.
+
+즉 목표는 새로운 보행 policy 하나를 더 만드는 것이 아니라, **기본 보행 policy 위에 per-actuator reported temperature와 current-derived load를 보는 runtime regulation layer를 얹어, 비슷한 walking task를 유지하면서 peak reported temperature와 temperature rise를 줄일 수 있는지** 확인하는 것입니다.
 
 이 글은 그 첫 단계로, 이후 실험의 기준선이 될 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 다룹니다. 이 baseline은 나중에 proposed thermal-aware controller가 정말 나아졌는지 비교하기 위한 control group이 됩니다.
 
@@ -25,7 +27,7 @@ math: true
 
 가장 먼저 정해야 할 것은 baseline이었습니다. 처음부터 모든 환경과 deploy 코드를 직접 만들기보다는, 이미 real robot deploy까지 고려된 reference를 기준으로 잡는 편이 안전하다고 판단했습니다.
 
-여기서 baseline은 단순한 출발 코드가 아닙니다. 나중에 thermal-aware regulator를 붙였을 때 비교할 nominal policy이기도 합니다. 그래서 baseline은 "걷는 것"뿐 아니라, 같은 command profile에서 motor temperature, torque, current, runtime이 어떻게 나오는지 측정할 수 있어야 합니다.
+여기서 baseline은 단순한 출발 코드가 아닙니다. 나중에 thermal-aware regulator를 붙였을 때 비교할 nominal policy이기도 합니다. 그래서 baseline은 "걷는 것"뿐 아니라, 같은 command profile에서 reported actuator temperature, torque, current, runtime이 어떻게 나오는지 측정할 수 있어야 합니다.
 
 baseline을 고르는 기준은 아래와 같았습니다.
 
