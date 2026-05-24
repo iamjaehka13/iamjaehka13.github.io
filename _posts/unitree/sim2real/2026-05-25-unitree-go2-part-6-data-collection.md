@@ -1,9 +1,10 @@
 ---
 title: "[Unitree Go2 part 6] 논문을 위한 데이터 따기"
 date: 2026-05-25 00:45:00 +0900
+last_modified_at: 2026-05-25 01:25:08 +0900
 categories: [Unitree, Sim2Real]
-tags: [unitree-go2, sim2real, reinforcement-learning, data-collection, baseline, hyperparameter-tuning, lowstate]
-description: Unitree Go2 논문 실험을 위해 baseline 보행 policy 데이터를 수집하고, 하이퍼파라미터 튜닝을 위한 기준 지표를 정리한다.
+tags: [unitree-go2, sim2real, reinforcement-learning, data-collection, baseline, thermal-aware-control, lowstate]
+description: Unitree Go2 논문 실험을 위해 baseline 보행 policy의 모터 온도, 전류, torque, joint state 데이터를 수집하고 thermal-aware regulator 비교 기준을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/data-collection-terminal.jpg
 math: true
 ---
@@ -12,27 +13,33 @@ math: true
 
 Part 1에서 설명했던 것처럼, 이 프로젝트는 Unitree Go2를 구매한 뒤 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다.
 
-장기적인 목표는 Go2의 `/lowstate`에서 제공되는 모터 온도, torque, joint state 정보를 활용해, **보행 중 특정 모터에 부담이 몰리지 않도록 스스로 상태를 관리하는 강화학습 모델**을 만드는 것입니다.
+하지만 지금 논문에서 주장하고 싶은 것은 단순히 "로봇개가 걷는다"가 아닙니다.
+
+> 실로봇 장시간 보행에서는 nominal RL baseline이 command tracking은 잘해도, 특정 actuator에 열이 불균일하게 쌓여 thermal bottleneck이 생길 수 있다. 따라서 per-motor temperature와 current/load 정보를 보는 runtime regulator가 필요하고, 이를 사용하면 비슷한 walking task를 유지하면서 peak temperature와 temperature rise를 줄이고 더 오래 안전하게 걸을 수 있다.
+
+핵심은 평균 온도나 배터리 전류만 보는 것이 아니라, **어느 motor가 hotspot이 되는지**를 보는 것입니다. 한 모터만 빠르게 뜨거워져도 전체 보행 시간은 그 motor에 의해 제한될 수 있습니다.
 
 이전 글까지는 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정에 집중했습니다. Part 5에서는 Domain Randomization과 deploy 정합성을 맞춘 뒤, 실제 Go2가 안정적으로 걷는 것까지 확인했습니다.
 
-이번 글은 그 다음 단계입니다. 이제부터는 "걸었다"에서 끝나는 것이 아니라, 논문에 넣을 수 있는 형태로 baseline 데이터를 모으고 있습니다.
+이번 글은 그 다음 단계입니다. 이제부터는 "걸었다"에서 끝나는 것이 아니라, baseline policy가 실제 로봇에서 **얼마나 전류를 먹고, 어느 motor가 얼마나 빨리 뜨거워지는지**를 논문에 넣을 수 있는 형태로 모으는 단계입니다.
 
 ## **2. 지금 하는 일: baseline 데이터 수집**
 
 현재 목표는 논문의 baseline으로 사용할 데이터를 확보하는 것입니다.
 
-아직 최종 모델을 주장하는 단계는 아닙니다. 먼저 기본 보행 policy가 실제 로봇에서 어떤 상태 분포를 만들고, 어떤 joint와 motor에 부담을 주는지 확인해야 합니다. 그래야 이후 하이퍼파라미터를 바꿨을 때 좋아진 것인지, 단순히 보기만 좋아진 것인지 비교할 수 있습니다.
+아직 proposed controller를 주장하는 단계는 아닙니다. 먼저 nominal walking policy가 실제 로봇에서 어떤 열/전류 기준선을 만드는지 확인해야 합니다. 그래야 이후 thermal-aware regulator를 붙였을 때 좋아진 것인지, 단순히 느리게 걸어서 덜 뜨거워진 것인지 구분할 수 있습니다.
 
 현재 데이터 수집의 목적은 다음과 같습니다.
 
-1. 기본 보행 policy의 real robot baseline 만들기
-2. command에 따른 joint state, torque, motor temperature 변화 기록하기
-3. 특정 다리나 특정 motor에 부담이 몰리는지 확인하기
-4. 이후 reward weight, Domain Randomization range, PD gain을 튜닝할 때 비교 기준 만들기
-5. 논문 실험에서 사용할 정량 지표를 정리하기
+1. nominal baseline policy의 real robot 열/전류 기준선 만들기
+2. 같은 command profile에서 12 motor temperature, battery current, pack voltage, `tau_est`, `dq` 기록하기
+3. 평균 온도가 아니라 per-motor hotspot이 어디서 생기는지 확인하기
+4. proposed thermal-aware regulator와 공정하게 비교할 control group 만들기
+5. "그냥 느리게 걸어서 덜 뜨거운 것"이라는 반박을 막기 위한 speed-scaled baseline 준비하기
 
-강화학습 policy는 영상만 보면 좋아 보일 수 있습니다. 하지만 논문에서는 영상보다 데이터가 중요합니다. 같은 보행이라도 torque가 과하게 튀거나, 특정 motor temperature가 계속 상승하거나, command tracking이 불안정하면 좋은 policy라고 말하기 어렵습니다.
+강화학습 policy는 영상만 보면 좋아 보일 수 있습니다. 하지만 논문에서는 영상보다 데이터가 중요합니다. 같은 보행이라도 torque가 과하게 튀거나, 특정 motor temperature가 계속 상승하거나, battery current가 높게 유지되면 long-duration deployment 관점에서는 좋은 policy라고 말하기 어렵습니다.
+
+그래서 baseline 데이터는 우리 thermal regulation이 실제로 baseline보다 낫다는 것을 보이기 위한 control group입니다. 온도만 보는 것이 아니라, **비슷한 속도와 거리에서 더 덜 뜨거워졌는가**를 증명하려는 용도입니다.
 
 ## **3. 수집하려는 데이터**
 
@@ -45,6 +52,8 @@ joint position
 joint velocity
 estimated torque
 motor temperature
+battery current
+pack voltage
 imu
 command
 policy action
@@ -59,11 +68,15 @@ timestamp
 | command tracking error | 입력한 속도 command를 얼마나 잘 따라가는지 |
 | joint tracking error | policy target과 실제 joint position 차이 |
 | torque peak / RMS | 순간적인 부담과 평균 부담 |
+| current / energy | 전류와 에너지 사용량 |
 | motor temperature trend | 특정 motor가 계속 뜨거워지는지 |
+| max motor temperature | 가장 뜨거운 actuator의 절대 온도 |
+| hottest motor temp rise | 가장 뜨거운 actuator의 온도 상승량 |
 | left/right leg balance | 좌우 다리에 부담이 치우치는지 |
+| runtime until thermal stop | thermal limit에 도달하기 전까지의 보행 시간 |
 | rollout stability | 일정 시간 이상 넘어지지 않고 유지되는지 |
 
-최종적으로 하고 싶은 것은 단순히 Go2를 걷게 만드는 것이 아닙니다. 로봇이 걷는 동안 자기 상태를 보고, 특정 motor에 부담이 몰리지 않도록 더 안전한 action을 선택하게 만드는 것입니다.
+최종적으로 하고 싶은 것은 단순히 Go2를 걷게 만드는 것이 아닙니다. 로봇이 걷는 동안 자기 상태를 보고, 특정 motor에 부담이 몰리지 않도록 runtime에서 command scale이나 intervention을 조절하게 만드는 것입니다.
 
 그러려면 먼저 현재 baseline이 어떤 부담 분포를 만드는지 알아야 합니다.
 
@@ -129,9 +142,30 @@ python sim_to_real.py \
 
 현재는 긴 시간 하나를 무리해서 찍기보다, 짧은 episode를 여러 개 모으는 쪽이 더 안전하다고 보고 있습니다. 실패하거나 멈춘 구간도 버리지 않고 따로 표시해두면, 이후 policy가 어떤 상황에서 불안정해지는지 분석할 수 있습니다.
 
-## **8. 하이퍼파라미터 튜닝 방향**
+## **8. 비교해야 할 baseline들**
 
-이제부터 튜닝할 후보는 크게 네 가지입니다.
+이 논문에서 조심해야 할 반박은 분명합니다.
+
+> 그냥 느리게 걸어서 덜 뜨거워진 것 아닌가?
+
+이 반박을 막으려면 proposed controller만 보여주면 안 됩니다. 최소한 다음 baseline들이 필요합니다.
+
+| 조건 | 역할 |
+| --- | --- |
+| Nominal baseline | 일반 velocity tracking policy의 열/전류 기준선 |
+| Speed-scaled baseline | 단순히 command를 줄였을 때의 thermal tradeoff |
+| Current-only monitor | 전류 또는 부하만 보고 조절했을 때의 기준 |
+| Proposed thermal-aware regulator | per-motor temperature와 current/load를 함께 보는 방법 |
+
+비교는 같은 command profile, 비슷한 SOC, 비슷한 초기 motor temperature 조건에서 해야 합니다. 그래야 결과가 공정합니다.
+
+특히 speed-scaled baseline은 중요합니다. Proposed가 peak temperature를 낮췄더라도 tracking이 크게 무너지거나 이동 거리가 줄어들었다면 좋은 결과라고 보기 어렵습니다. 반대로 단순히 속도를 줄인 baseline보다 비슷한 tracking을 유지하면서 hottest motor temperature rise를 더 낮춘다면, per-motor thermal state를 보는 runtime regulator가 실제 정보를 제공했다는 주장이 강해집니다.
+
+## **9. 하이퍼파라미터와 regulator 튜닝 방향**
+
+현재 수집 중인 baseline 데이터는 두 가지 튜닝에 쓰입니다.
+
+첫 번째는 기존 locomotion policy 쪽 튜닝입니다.
 
 1. **Reward weight**
    - tracking reward
@@ -156,39 +190,59 @@ python sim_to_real.py \
    - yaw command를 섞었을 때 자세가 무너지지 않는지
    - 후진, 좌우 command까지 확장 가능한지
 
+두 번째는 thermal-aware runtime regulator 쪽 튜닝입니다.
+
+1. **Temperature threshold**
+   - intervention을 시작할 motor temperature
+   - hottest motor 기준으로 볼지, temperature rise 기준으로 볼지
+
+2. **Current/load score**
+   - battery current
+   - per-joint `tau_est`
+   - $\tau \cdot \dot{q}$ 형태의 mechanical power proxy
+
+3. **Command scaling**
+   - 전체 속도 command를 줄이는 방식
+   - 특정 gait phase나 방향 command에 더 민감하게 반응하는 방식
+
+4. **Recovery logic**
+   - cooling 구간을 어떻게 정의할지
+   - temperature가 내려가면 원래 command로 얼마나 빠르게 복귀할지
+
 이 값들을 바꾸기 전에 baseline 데이터를 먼저 잡아야 합니다. 그래야 다음 모델이 좋아졌는지 판단할 수 있습니다.
 
-예를 들어 reward를 바꾼 뒤 영상에서 gait가 더 자연스러워 보여도, torque RMS가 커지고 motor temperature가 빠르게 올라간다면 논문 목표와는 맞지 않을 수 있습니다.
+예를 들어 reward를 바꾼 뒤 영상에서 gait가 더 자연스러워 보여도, torque RMS가 커지고 motor temperature가 빠르게 올라간다면 논문 목표와는 맞지 않을 수 있습니다. 반대로 tracking이 조금 손해를 보더라도 hottest motor의 temperature rise를 크게 낮추고 runtime을 늘린다면, long-duration deployment 관점에서는 의미 있는 tradeoff가 될 수 있습니다.
 
-## **9. 논문에서 보여주고 싶은 방향**
+## **10. 논문에서 보여주고 싶은 방향**
 
-논문에서 보여주고 싶은 핵심은 다음과 같습니다.
+논문에서 보여주고 싶은 핵심은 다음 한 문장에 가깝습니다.
 
-> Go2의 real low-level state를 활용해, 보행 성능만이 아니라 motor 부담까지 고려하는 policy를 만들 수 있는가?
+> Per-motor thermal state and current-derived load provide actionable information for long-duration quadruped deployment, enabling a lightweight runtime regulator to reduce actuator thermal risk while preserving the nominal locomotion task.
 
-이를 위해 baseline은 반드시 필요합니다.
+한국어로 쓰면 다음과 같습니다.
 
-Baseline policy는 일반적인 velocity tracking을 목표로 합니다. 이후 모델은 여기에 motor state awareness를 추가하는 방향이 될 수 있습니다.
+> 실로봇 보행에서 열 문제는 평균 전류 문제가 아니라 모터별 hotspot 문제이고, 이를 관측해서 runtime에 제어 입력을 조절하면 baseline보다 더 열적으로 안전하게 오래 걸을 수 있다.
 
-비교는 다음 형태가 될 것 같습니다.
+이 주장을 위해서는 다음 네 가지를 보여줘야 합니다.
 
-| 모델 | 목표 |
-| --- | --- |
-| Baseline | command tracking 중심 보행 |
-| Torque-aware policy | torque peak/RMS를 줄이는 보행 |
-| Temperature-aware policy | 장시간 보행 중 motor temperature 상승을 완화하는 보행 |
+1. Nominal baseline이 장시간 보행 중 특정 motor hotspot을 만든다.
+2. 평균 온도나 전체 전류만 보면 per-motor hotspot을 놓칠 수 있다.
+3. Per-motor thermal state와 current/load를 보는 runtime regulator가 thermal risk를 줄인다.
+4. 그 결과가 단순한 감속 효과가 아니라, speed-scaled baseline보다 나은 tracking/thermal tradeoff를 만든다.
 
-아직은 첫 줄, 즉 baseline 데이터를 정리하는 단계입니다. 하지만 이 단계가 정리되어야 이후 실험이 논문 형태로 이어질 수 있습니다.
+그래서 baseline policy는 일반적인 velocity tracking을 목표로 하고, proposed controller는 policy 자체를 처음부터 다시 학습시키기보다 그 위에서 command scale 또는 intervention을 조절하는 runtime layer로 시작합니다.
 
-## **10. 다음 작업**
+## **11. 다음 작업**
 
 다음으로 할 일은 다음과 같습니다.
 
 1. baseline rollout을 여러 episode로 수집하기
 2. `/lowstate` log를 episode 단위로 정리하기
-3. torque, joint state, motor temperature plot 만들기
-4. command tracking error 계산하기
-5. reward / DR / PD gain을 바꾼 모델과 baseline 비교하기
+3. 12 motor temperature, battery current, pack voltage, `tau_est`, `dq` plot 만들기
+4. command tracking error와 이동 거리 계산하기
+5. max motor temperature, hottest motor temp rise, energy, runtime 계산하기
+6. speed-scaled baseline과 current-only monitor 추가하기
+7. proposed thermal-aware regulator와 같은 command profile에서 비교하기
 
 이번 글은 결과 정리라기보다, 논문 실험으로 넘어가기 위한 데이터 수집 시작 기록입니다.
 

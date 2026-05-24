@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
 date: 2026-03-12 14:28:00 +0900
-last_modified_at: 2026-03-23 22:34:27 +0900
+last_modified_at: 2026-05-25 01:25:08 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: Unitree Go2에 강화학습 기반 보행 policy를 실제 deploy하기 위해 baseline을 정하고, 첫 학습과 real deploy를 시도한 과정을 정리한다.
@@ -11,19 +11,28 @@ math: true
 
 ## **1. 프로젝트 목표**
 
-이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다.
+이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다. 하지만 최종 목표는 단순히 "걷게 만들기"에서 끝나지 않습니다.
 
-장기적인 목표는 Go2의 `/lowstate`에서 제공되는 모터 온도, torque, joint state 정보를 활용해, **보행 중 특정 모터에 부담이 몰리지 않도록 스스로 상태를 관리하는 강화학습 모델**을 만드는 것입니다. 이 글은 그 첫 단계로, 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 다룹니다.
+장기적으로 주장하고 싶은 것은 다음과 같습니다.
+
+> 실로봇 장시간 보행에서는 nominal RL policy가 command tracking은 잘해도, 특정 actuator에 열과 부하가 불균일하게 쌓여 thermal bottleneck이 될 수 있다. 따라서 `/lowstate`에서 얻을 수 있는 per-motor temperature, current/load, torque, joint state를 이용해 runtime에서 보행 입력을 조절하는 thermal-aware regulator가 필요하다.
+
+즉 목표는 새로운 보행 policy 하나를 더 만드는 것이 아니라, **기본 보행 policy 위에 per-motor thermal state와 current-derived load를 보는 runtime regulation layer를 얹어, 비슷한 walking task를 유지하면서 peak temperature와 temperature rise를 줄일 수 있는지** 확인하는 것입니다.
+
+이 글은 그 첫 단계로, 이후 실험의 기준선이 될 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 다룹니다. 이 baseline은 나중에 proposed thermal-aware controller가 정말 나아졌는지 비교하기 위한 control group이 됩니다.
 
 ## **2. 베이스라인 선택**
 
 가장 먼저 정해야 할 것은 baseline이었습니다. 처음부터 모든 환경과 deploy 코드를 직접 만들기보다는, 이미 real robot deploy까지 고려된 reference를 기준으로 잡는 편이 안전하다고 판단했습니다.
+
+여기서 baseline은 단순한 출발 코드가 아닙니다. 나중에 thermal-aware regulator를 붙였을 때 비교할 nominal policy이기도 합니다. 그래서 baseline은 "걷는 것"뿐 아니라, 같은 command profile에서 motor temperature, torque, current, runtime이 어떻게 나오는지 측정할 수 있어야 합니다.
 
 baseline을 고르는 기준은 아래와 같았습니다.
 
 1. Unitree Go2를 real robot에서 걷게 할 수 있는 RL 보행 모델일 것
 2. Isaac Lab 또는 Unitree에서 공개한 환경 설정을 기반으로 할 것
 3. 이후 Sim2Real gap을 줄이기 위해 설정을 확장하기 쉬울 것
+4. 이후 `/lowstate` 기반 thermal/current logging과 연결하기 쉬울 것
 
 결론적으로 baseline은 Unitree에서 공개한 `unitree_rl_lab`을 따르기로 했습니다.
 
