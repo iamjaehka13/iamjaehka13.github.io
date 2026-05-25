@@ -350,31 +350,6 @@ html[data-mode='dark'] {
   border-color: var(--main-border-color);
 }
 
-#panel-wrapper .panel-mascot {
-  display: flex;
-  justify-content: flex-end;
-  margin: 2.25rem 1.75rem 0 0;
-  pointer-events: none;
-}
-
-#panel-wrapper .panel-mascot img {
-  width: min(100%, 13.25rem);
-  height: auto;
-  border: 1px solid rgb(255 250 244 / 12%);
-  border-radius: 0.85rem;
-  box-shadow:
-    rgb(0 0 0 / 34%) 0 14px 34px,
-    rgb(255 250 244 / 7%) 0 0 0 1px;
-  filter: saturate(0.74) brightness(0.72) contrast(1.04);
-  opacity: 0.78;
-}
-
-@media (max-width: 1199.98px) {
-  #panel-wrapper .panel-mascot {
-    display: none;
-  }
-}
-
 .access-categories {
   .panel-category-list {
     display: grid;
