@@ -1,6 +1,6 @@
 ---
 title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
-date: 2026-03-12 14:28:00 +0900
+date: 2026-01-23 14:28:00 +0900
 last_modified_at: 2026-05-25 01:40:57 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]

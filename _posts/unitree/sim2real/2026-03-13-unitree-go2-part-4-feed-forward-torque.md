@@ -1,6 +1,6 @@
 ---
 title: "[Unitree Go2 part 4] Feed-forward Torque 실험"
-date: 2026-03-23 19:14:00 +0900
+date: 2026-03-13 19:14:00 +0900
 last_modified_at: 2026-03-24 00:00:13 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
