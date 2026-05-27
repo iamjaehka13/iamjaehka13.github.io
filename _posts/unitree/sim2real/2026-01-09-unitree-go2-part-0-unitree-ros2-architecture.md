@@ -1,10 +1,11 @@
 ---
 title: "[Unitree Go2 part 0] Unitree Go2와 Unitree ROS2 구조 분석"
-date: 2026-05-27 11:20:00 +0900
+date: 2026-01-09 11:20:00 +0900
+last_modified_at: 2026-05-27 11:31:00 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, unitree-ros2, unitree-sdk2, ros2, dds, lowstate, lowcmd, sim2real]
 description: Unitree Go2에서 강화학습 policy를 deploy하기 전에 알아야 하는 하드웨어, Unitree SDK2, DDS, Unitree ROS2, lowstate, lowcmd 구조를 정리한다.
-image: /assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg
+image: /assets/img/posts/unitree/sim2real/unitree-go2-part-0-unitree-ros2-architecture/part0.png
 math: true
 ---
 
@@ -47,7 +48,7 @@ Unitree 공식 자료 기준으로 `unitree_ros2`는 SDK2와 CycloneDDS 기반 �
 
 이번 글은 그 차이를 정리하는 글입니다.
 
-![Unitree Go2 ROS2 and SDK2 architecture](/assets/img/posts/unitree/sim2real/unitree-go2-part-0-unitree-ros2-architecture/go2-ros2-architecture.svg)
+![Unitree Go2 ROS2 and SDK2 architecture](/assets/img/posts/unitree/sim2real/unitree-go2-part-0-unitree-ros2-architecture/part0.png)
 
 ## **2. Unitree Go2를 어떻게 볼 것인가**
 
