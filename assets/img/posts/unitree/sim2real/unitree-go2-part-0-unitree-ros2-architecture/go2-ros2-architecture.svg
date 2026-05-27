@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Unitree Go2 ROS2 and SDK2 architecture</title>
+  <desc id="desc">A diagram showing how an RL policy, deploy node, Unitree ROS2, SDK2, DDS, lowstate, lowcmd, sport mode, and robot hardware relate to each other.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#080b0f"/>
+      <stop offset="0.52" stop-color="#11151b"/>
+      <stop offset="1" stop-color="#080b0f"/>
+    </linearGradient>
+    <linearGradient id="robot" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#f06b4f"/>
+      <stop offset="1" stop-color="#f8b85e"/>
+    </linearGradient>
+    <linearGradient id="policy" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#4da3ff"/>
+      <stop offset="1" stop-color="#67d7c7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#cbd5e1"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="38" y="38" width="1124" height="599" rx="28" fill="#0f141b" stroke="#263241" stroke-width="2"/>
+
+  <text x="72" y="92" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="700">Unitree Go2 control stack</text>
+  <text x="72" y="126" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="18">RL policy deploy needs both high-level ROS2 commands and low-level SDK2/DDS state-command loops.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="188" width="252" height="128" rx="18" fill="#111827" stroke="#334155" stroke-width="2"/>
+    <text x="102" y="232" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">RL Policy</text>
+    <text x="102" y="264" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="17">observation -> action</text>
+    <text x="102" y="292" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="15">TorchScript / ONNX / teleop</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="398" width="252" height="128" rx="18" fill="#111827" stroke="#334155" stroke-width="2"/>
+    <text x="102" y="442" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="700">Logger</text>
+    <text x="102" y="474" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="17">state + command + action</text>
+    <text x="102" y="502" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="15">CSV / rosbag / trial metadata</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="410" y="168" width="300" height="388" rx="22" fill="#0b1320" stroke="#3b82f6" stroke-width="2"/>
+    <text x="450" y="216" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Deploy node</text>
+    <text x="450" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="17">sim_to_real.py / ROS2 node</text>
+
+    <rect x="450" y="292" width="220" height="58" rx="12" fill="#172554" stroke="#60a5fa"/>
+    <text x="475" y="328" fill="#dbeafe" font-family="Inter, Arial, sans-serif" font-size="17">Build observation</text>
+
+    <rect x="450" y="372" width="220" height="58" rx="12" fill="#164e63" stroke="#67e8f9"/>
+    <text x="475" y="408" fill="#ecfeff" font-family="Inter, Arial, sans-serif" font-size="17">Scale policy action</text>
+
+    <rect x="450" y="452" width="220" height="58" rx="12" fill="#4a1d1f" stroke="#fb7185"/>
+    <text x="475" y="488" fill="#ffe4e6" font-family="Inter, Arial, sans-serif" font-size="17">Publish low command</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="795" y="168" width="324" height="164" rx="22" fill="#111827" stroke="#475569" stroke-width="2"/>
+    <text x="835" y="216" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Unitree ROS2</text>
+    <text x="835" y="250" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="17">unitree_go / unitree_api msgs</text>
+    <text x="835" y="284" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="15">/lowstate /lowcmd /api/sport/request</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="795" y="382" width="324" height="164" rx="22" fill="#111827" stroke="#475569" stroke-width="2"/>
+    <text x="835" y="430" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Unitree SDK2 + DDS</text>
+    <text x="835" y="464" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="17">CycloneDDS communication</text>
+    <text x="835" y="498" fill="#94a3b8" font-family="Inter, Arial, sans-serif" font-size="15">robot status and motor control transport</text>
+  </g>
+
+  <rect x="792" y="590" width="327" height="32" rx="16" fill="url(#robot)"/>
+  <text x="844" y="612" fill="#111827" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">Go2 hardware: actuators, IMU, BMS, sensors</text>
+
+  <path d="M324 252 H395" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M710 252 H780" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M957 332 V368" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M957 546 V578" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M795 464 H724" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M410 464 H340" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <path d="M560 556 V602 H790" stroke="#67d7c7" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="466" y="610" fill="#67d7c7" font-family="Inter, Arial, sans-serif" font-size="15">lowcmd</text>
+
+  <path d="M790 590 H352 V462 H326" stroke="#f8b85e" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+  <text x="610" y="578" fill="#f8b85e" font-family="Inter, Arial, sans-serif" font-size="15">lowstate + telemetry</text>
+</svg>
