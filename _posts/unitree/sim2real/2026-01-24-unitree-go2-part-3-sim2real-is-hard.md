@@ -1,6 +1,6 @@
 ---
 title: "[Unitree Go2 part 3] Reward 수정과 Real Gap"
-date: 2026-02-27 21:03:00 +0900
+date: 2026-01-24 21:03:00 +0900
 last_modified_at: 2026-03-24 00:00:13 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]

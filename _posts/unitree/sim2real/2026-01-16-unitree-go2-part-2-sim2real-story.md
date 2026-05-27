@@ -1,6 +1,6 @@
 ---
 title: "[Unitree Go2 part 2] 발을 떼지 않는 문제 분석"
-date: 2026-02-06 19:40:00 +0900
+date: 2026-01-16 19:40:00 +0900
 last_modified_at: 2026-03-23 22:34:27 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]

@@ -1,6 +1,6 @@
 ---
 title: "[Unitree Go2 part 6] 논문을 위한 데이터 따기"
-date: 2026-05-15 00:45:00 +0900
+date: 2026-03-20 00:45:00 +0900
 last_modified_at: 2026-05-25 01:36:41 +0900
 categories: [Unitree, Sim2Real]
 tags: [unitree-go2, sim2real, reinforcement-learning, data-collection, baseline, thermal-aware-control, lowstate]
