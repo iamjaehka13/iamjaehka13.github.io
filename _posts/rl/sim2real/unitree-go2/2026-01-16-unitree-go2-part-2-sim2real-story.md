@@ -2,7 +2,7 @@
 title: "[Unitree Go2 part 2] 발을 떼지 않는 문제 분석"
 date: 2026-01-16 19:40:00 +0900
 last_modified_at: 2026-03-23 22:34:27 +0900
-categories: [Unitree, Sim2Real]
+categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: 첫 deploy에서 Go2가 발을 떼지 못했던 문제를 reward 설정, terrain, feet clearance, MuJoCo sim-to-sim 관점에서 분석한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/322cbb7d-7937-80f8-85bf-d0023259d89d.gif

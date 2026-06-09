@@ -346,6 +346,17 @@ html[data-mode='dark'] {
   border-color: var(--main-border-color);
 }
 
+.categories .category-third-list {
+  margin-top: 0.45rem;
+  margin-left: 1.35rem;
+
+  .list-group-item {
+    padding: 0.35rem 0 0.1rem;
+    border-width: 0;
+    background: transparent;
+  }
+}
+
 #panel-wrapper .access > section {
   border-color: var(--main-border-color);
 }
@@ -357,7 +368,8 @@ html[data-mode='dark'] {
   }
 
   .panel-category-main,
-  .panel-category-children a {
+  .panel-category-children a,
+  .panel-category-grandchildren a {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -382,7 +394,14 @@ html[data-mode='dark'] {
     margin-left: 0.45rem;
   }
 
-  .panel-category-children a {
+  .panel-category-grandchildren {
+    display: grid;
+    gap: 0.15rem;
+    margin-left: 0.8rem;
+  }
+
+  .panel-category-children a,
+  .panel-category-grandchildren a {
     padding: 0.35rem 0.5rem;
     color: var(--text-muted-color);
 

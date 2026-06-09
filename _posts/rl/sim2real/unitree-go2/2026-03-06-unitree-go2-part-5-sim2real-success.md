@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 5] Sim2Real 성공"
 date: 2026-03-06 21:11:00 +0900
-categories: [Unitree, Sim2Real]
+categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-lab, deployment, domain-randomization]
 description: Unitree Go2에 강화학습 policy를 실제 deploy하여 보행에 성공한 과정과 Domain Randomization, deploy 정합성을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg

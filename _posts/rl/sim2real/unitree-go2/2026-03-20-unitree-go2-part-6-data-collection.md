@@ -2,7 +2,7 @@
 title: "[Unitree Go2 part 6] 논문을 위한 데이터 따기"
 date: 2026-03-20 00:45:00 +0900
 last_modified_at: 2026-05-25 01:36:41 +0900
-categories: [Unitree, Sim2Real]
+categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, data-collection, baseline, thermal-aware-control, lowstate]
 description: Unitree Go2 논문 실험을 위해 baseline 보행 policy의 reported actuator temperature, 전류, torque, joint state 데이터를 수집하고 thermal-aware regulator 비교 기준을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/data-collection-terminal.jpg

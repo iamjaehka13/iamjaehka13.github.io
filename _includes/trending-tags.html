@@ -42,16 +42,53 @@
             {% if sub_categories.size > 0 %}
               <div class="panel-category-children">
                 {% for sub_category in sub_categories %}
-                  {% assign posts_size = site.categories[sub_category] | size %}
+                  {% assign third_categories = '' | split: '' %}
+                  {% assign posts_size = 0 %}
+
+                  {% for post in posts_of_category %}
+                    {% if post.categories[1] == sub_category %}
+                      {% assign posts_size = posts_size | plus: 1 %}
+                      {% assign third_category = post.categories[2] %}
+                      {% if third_category %}
+                        {% unless third_categories contains third_category %}
+                          {% assign third_categories = third_categories | push: third_category %}
+                        {% endunless %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% assign third_categories = third_categories | sort %}
                   {% capture sub_category_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
 
                   <a href="{{ sub_category_url | relative_url }}">
                     <span class="category-name">
-                      <i class="far fa-folder fa-fw"></i>
+                      <i class="far fa-folder{% if third_categories.size > 0 %}-open{% endif %} fa-fw"></i>
                       {{ sub_category }}
                     </span>
                     <span class="category-count">{{ posts_size }}</span>
                   </a>
+
+                  {% if third_categories.size > 0 %}
+                    <div class="panel-category-grandchildren">
+                      {% for third_category in third_categories %}
+                        {% assign third_posts_size = 0 %}
+                        {% for post in posts_of_category %}
+                          {% if post.categories[1] == sub_category and post.categories[2] == third_category %}
+                            {% assign third_posts_size = third_posts_size | plus: 1 %}
+                          {% endif %}
+                        {% endfor %}
+
+                        {% capture third_category_url %}/categories/{{ third_category | slugify | url_encode }}/{% endcapture %}
+                        <a href="{{ third_category_url | relative_url }}">
+                          <span class="category-name">
+                            <i class="far fa-folder fa-fw"></i>
+                            {{ third_category }}
+                          </span>
+                          <span class="category-count">{{ third_posts_size }}</span>
+                        </a>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 {% endfor %}
               </div>
             {% endif %}

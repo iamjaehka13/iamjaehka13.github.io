@@ -2,7 +2,7 @@
 title: "[Unitree Go2 part 4] Feed-forward Torque 실험"
 date: 2026-01-30 19:14:00 +0900
 last_modified_at: 2026-03-24 00:00:13 +0900
-categories: [Unitree, Sim2Real]
+categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: 실제 Go2 deploy에서 부족해 보였던 torque margin을 확인하기 위해 gravity compensation 기반 feed-forward torque를 적용한 실험을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-8055-bcb2-d4b130bc0615.gif
