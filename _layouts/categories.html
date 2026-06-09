@@ -118,6 +118,17 @@ layout: page
                 {% endif %}
               {% endfor %}
 
+              {% for extra_group in site.data.category_tree.additional_category_children %}
+                {% assign extra_parent = extra_group.parent %}
+                {% if extra_parent[0] == category_name and extra_parent[1] == sub_category %}
+                  {% for extra_category in extra_group.children %}
+                    {% unless third_categories contains extra_category %}
+                      {% assign third_categories = third_categories | push: extra_category %}
+                    {% endunless %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+
               {% assign third_categories = third_categories | sort %}
               {% assign third_categories_size = third_categories | size %}
 
