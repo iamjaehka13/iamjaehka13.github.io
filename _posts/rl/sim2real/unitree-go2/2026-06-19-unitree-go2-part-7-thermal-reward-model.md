@@ -65,15 +65,15 @@ $$
 \end{aligned}
 $$
 
-여기서 \(j\)는 motor index이고, \(g\)는 motor group입니다. 각 항의 의미는 다음과 같습니다.
+여기서 $j$는 motor index이고, $g$는 motor group입니다. 각 항의 의미는 다음과 같습니다.
 
 | 항 | 의미 |
 | --- | --- |
-| \(\tau_j^2\) | torque가 클수록 생기는 Joule-heating류 부담 |
-| \(\max(\tau_j\dot{q}_j,0)\) | motor가 양의 mechanical work를 할 때의 power 부담 |
-| \(\lvert\tau_j\dot{q}_j\rvert\) | positive/negative work를 모두 포함한 load proxy |
-| \(I^2\) | battery current 기반 전체 부하 proxy |
-| \(-(T_j-T_{\mathrm{amb}})\) | 주변 온도와의 차이에 따른 cooling |
+| $\tau_j^2$ | torque가 클수록 생기는 Joule-heating류 부담 |
+| $\max(\tau_j\dot{q}_j,0)$ | motor가 양의 mechanical work를 할 때의 power 부담 |
+| $\lvert\tau_j\dot{q}_j\rvert$ | positive/negative work를 모두 포함한 load proxy |
+| $I^2$ | battery current 기반 전체 부하 proxy |
+| $-(T_j-T_{\mathrm{amb}})$ | 주변 온도와의 차이에 따른 cooling |
 
 엄밀히 말하면 이 모델은 actuator 내부 열전달을 완전히 설명하는 모델이 아닙니다. 목적은 논문용 motor physics simulator를 만드는 것이 아니라, 실제 Go2 로그에서 관찰된 reported temperature 상승 경향을 학습 중에 재현할 수 있는 risk proxy를 만드는 것입니다.
 
@@ -126,7 +126,7 @@ $$
 T_{j,t+1} = T_{j,t} + \Delta t \dot{T}_j
 $$
 
-구현에서는 simulated torque, joint velocity, current proxy를 모델에 넣고, 예측된 \(\dot{T}\)를 EMA로 smoothing합니다. 그리고 policy observation에도 thermal state를 추가했습니다.
+구현에서는 simulated torque, joint velocity, current proxy를 모델에 넣고, 예측된 $\dot{T}$를 EMA로 smoothing합니다. 그리고 policy observation에도 thermal state를 추가했습니다.
 
 기본 locomotion policy observation은 47-D였습니다. Thermal policy는 여기에 30-D thermal/load observation을 추가해서 77-D가 됩니다.
 
@@ -172,7 +172,7 @@ $$
 
 첫째, 음의 temperature rate는 크게 벌주지 않습니다. 즉, motor가 식고 있으면 그 자체는 나쁜 action으로 보지 않습니다.
 
-둘째, predicted temperature가 warning temperature 근처로 갈수록 gate가 커집니다. 현재 temperature가 충분히 낮으면 같은 \(\dot{T}\)라도 penalty가 상대적으로 약하고, warning 근처에서는 더 강해집니다.
+둘째, predicted temperature가 warning temperature 근처로 갈수록 gate가 커집니다. 현재 temperature가 충분히 낮으면 같은 $\dot{T}$라도 penalty가 상대적으로 약하고, warning 근처에서는 더 강해집니다.
 
 셋째, motor별 weight를 둡니다. 실제 로그에서 더 자주 hotspot이 되는 group에 penalty가 더 민감하게 들어가도록 했습니다.
 
@@ -196,13 +196,13 @@ $$
 \max(\|v^{cmd}_{xy}\| - v_{\mathrm{along\ cmd}} - \epsilon, 0)^2
 $$
 
-여기서 \(\epsilon\)은 작은 tolerance입니다. 현재 설정에서는 `0.10 m/s` 정도의 여유를 두고, command speed가 너무 작은 경우에는 이 penalty를 끕니다.
+여기서 $\epsilon$은 작은 tolerance입니다. 현재 설정에서는 `0.10 m/s` 정도의 여유를 두고, command speed가 너무 작은 경우에는 이 penalty를 끕니다.
 
 즉, thermal policy는 "덜 뜨거워져라"만 받는 것이 아니라, "그래도 command 방향으로 걸어라"를 같이 받습니다.
 
 ## **10. 온도만 보면 생길 수 있는 문제**
 
-초기 thermal-only reward는 fitted \(\dot{T}\)를 줄이는 데 집중했습니다. 그런데 여기에는 약점이 있습니다.
+초기 thermal-only reward는 fitted $\dot{T}$를 줄이는 데 집중했습니다. 그런데 여기에는 약점이 있습니다.
 
 온도 모델은 proxy입니다. policy가 이 proxy만 보고 최적화하면, 실제 actuator load를 줄이지 않고도 surrogate를 낮추는 방향을 찾을 수 있습니다. 예를 들어 특정 다리에 부담을 몰거나, yaw가 틀어진 상태에서 이상한 load distribution을 만들 수도 있습니다.
 
@@ -238,8 +238,8 @@ $$
 | policy | observation | thermal reward |
 | --- | --- | --- |
 | Baseline | 47-D locomotion obs | 없음 |
-| Thermal Feedback | 77-D locomotion + thermal obs | fitted positive \(\dot{T}\) penalty |
-| Thermal-Torque Feedback | 77-D locomotion + thermal obs | \(\dot{T}\) + torque/power + margin penalty |
+| Thermal Feedback | 77-D locomotion + thermal obs | fitted positive $\dot{T}$ penalty |
+| Thermal-Torque Feedback | 77-D locomotion + thermal obs | $\dot{T}$ + torque/power + margin penalty |
 
 Baseline은 기존 locomotion reward만 봅니다.
 
