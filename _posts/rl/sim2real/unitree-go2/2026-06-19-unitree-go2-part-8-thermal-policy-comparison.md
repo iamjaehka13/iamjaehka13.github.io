@@ -65,13 +65,27 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
 | Thermal Feedback | 1.40 | 58.7 | 47.3 | 251.3 |
 | Thermal-Torque Feedback | 1.36 | 34.2 | 40.9 | 157.8 |
 
-표만 보면 이 차이가 잘 안 느껴집니다. 그래서 같은 `vx_cmd = 1.5 m/s`에서 10 m 근처까지 걸린 짧은 gait visualization을 같이 보면 훨씬 직관적입니다. 이 영상은 아래 thermal metric을 계산한 480 s rollout 자체가 아니라, 세 policy의 보행 형태와 yaw drift 차이를 보여주기 위한 시각화입니다.
+표만 보면 이 차이가 잘 안 느껴집니다. 그래서 같은 `vx_cmd = 1.5 m/s`에서 짧은 10 m visualization을 같이 봤습니다. 아래 영상들은 thermal metric을 계산한 480 s rollout 자체가 아니라, 세 policy의 보행 형태, yaw drift, 발 궤적 차이를 보여주기 위한 시각화입니다. yaw drift를 드러내기 위해 이 짧은 시각화는 heading correction 없이 봤습니다.
+
+먼저 10 m 지점에서 yaw가 얼마나 틀어지는지 보면 차이가 바로 보입니다. Thermal Feedback은 10 m에서 약 `-18.2 deg`까지 틀어지지만, Thermal-Torque Feedback은 거의 정면을 유지합니다.
+
+<video controls playsinline preload="metadata" poster="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_yaw10m_comparison_preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_yaw10m_comparison.mp4" type="video/mp4">
+</video>
+
+사선 follow-view로 보면 gait 자체의 차이도 더 잘 보입니다. 여기서는 단순히 최종 숫자가 아니라, body가 어떤 자세로 앞으로 가고 다리가 어떻게 움직이는지를 볼 수 있습니다.
+
+<video controls playsinline preload="metadata" poster="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison_preview.jpg" style="width: 100%; border-radius: 6px;">
+  <source src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison.mp4" type="video/mp4">
+</video>
+
+마지막으로 top-view에서 rear feet trail을 같이 보면, Thermal Feedback의 발 궤적과 body yaw가 훨씬 더 흔들리는 것이 보입니다.
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_policy_comparison_preview.jpg" style="width: 100%; border-radius: 6px;">
   <source src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_policy_comparison.mp4" type="video/mp4">
 </video>
 
-여기서 Thermal Feedback은 앞으로 가기는 하지만 발 궤적과 body yaw가 크게 흔들립니다. 반대로 Thermal-Torque Feedback은 Baseline보다 drift가 작고, gait도 더 정리된 형태로 보입니다. 이게 뒤에서 설명할 "온도만 보면 부족하고, torque와 power load를 같이 봐야 한다"는 해석을 시각적으로 보여줍니다.
+이 세 영상의 목적은 "누가 더 멋있게 걷는다"가 아니라, 온도-only reward가 보행 안정성과 load distribution에 빈틈을 만들 수 있다는 점을 눈으로 보여주는 것입니다. 이게 뒤에서 설명할 "온도만 보면 부족하고, torque와 power load를 같이 봐야 한다"는 해석을 시각적으로 보여줍니다.
 
 ![thermal metrics](/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_paper_thermal_metrics.png){: .d-block .mx-auto }
 
