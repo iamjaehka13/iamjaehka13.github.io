@@ -4,7 +4,7 @@ date: 2026-06-22 11:00:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, capstone-design, thermal-reward, locomotion, lidar-slam]
 description: Unitree Go2 종합설계를 마무리하며 모터 온도 reward, torque/load 관점, 실제 로봇 실험에서 느낀 문제 정의의 중요성, 그리고 다음 연구 방향을 정리한다.
-image: /assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_yaw10m_comparison_preview.jpg
+image: /assets/img/posts/unitree/sim2real/unitree-go2-part-9-capstone-retrospective/capstone-paper-abstract-preview.png
 math: true
 ---
 
