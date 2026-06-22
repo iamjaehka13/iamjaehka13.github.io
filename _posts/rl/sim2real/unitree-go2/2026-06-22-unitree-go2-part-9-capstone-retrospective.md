@@ -12,6 +12,10 @@ math: true
 
 이번 글은 새로운 실험 결과라기보다, Unitree Go2 종합설계를 마무리하면서 남은 생각을 정리하는 글입니다.
 
+종합설계 제출용으로 정리한 논문 PDF는 아래에 같이 올려두었습니다.
+
+[종합설계 논문 PDF 보기](/assets/files/posts/unitree/sim2real/unitree-go2-part-9-capstone-retrospective/unitree-go2-capstone-paper.pdf){: target="_blank" rel="noopener" }
+
 종합설계를 진행하면서 가장 크게 느낀 것은 실제 로봇 연구에서는 아이디어 자체보다도 **문제를 어떻게 정의하느냐**가 훨씬 중요하다는 점이었습니다.
 
 처음에는 "모터 온도"를 꽤 직접적인 문제로 봤습니다. 전류가 커지면 torque가 커지고, torque가 커지면 발열도 커진다는 흐름이 있었기 때문입니다. 그래서 보행 중 actuator reported temperature를 보고, 이를 reward나 feedback에 넣으면 더 thermal-safe한 locomotion을 만들 수 있을 것이라고 생각했습니다.
