@@ -1,16 +1,17 @@
 ---
 title: "[Unitree Go2 part 9] 종합설계 후기"
 date: 2026-06-22 11:00:00 +0900
+last_modified_at: 2026-06-23 00:00:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, capstone-design, thermal-reward, locomotion, lidar-slam]
-description: Unitree Go2 종합설계를 마무리하며 모터 온도 reward, torque/load 관점, 실제 로봇 실험에서 느낀 문제 정의의 중요성, 그리고 다음 연구 방향을 정리한다.
+description: Unitree Go2 종합설계를 마무리하며 thermal reward, torque/load 관점, 실제 로봇 실험에서 느낀 문제 정의의 중요성, 그리고 다음 연구 방향을 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-9-capstone-retrospective/capstone-paper-abstract-preview.png
 math: true
 ---
 
 ## **1. 종합설계를 끝내고**
 
-이번 글은 새로운 실험 결과라기보다, Unitree Go2 종합설계를 마무리하면서 남은 생각을 정리하는 글입니다.
+이번 글은 새로운 실험 결과라기보다, Unitree Go2 종합설계를 마무리하면서 남은 생각을 정리하는 글입니다. Part 5에서 실제 Go2 deploy를 성공시키고, Part 6에서 real robot log를 모으고, Part 7과 Part 8에서 thermal reward를 분석한 뒤에 남은 회고에 가깝습니다.
 
 종합설계 제출용으로 정리한 논문 PDF는 아래에 같이 올려두었습니다.
 
@@ -18,7 +19,7 @@ math: true
 
 종합설계를 진행하면서 가장 크게 느낀 것은 실제 로봇 연구에서는 아이디어 자체보다도 **문제를 어떻게 정의하느냐**가 훨씬 중요하다는 점이었습니다.
 
-처음에는 "모터 온도"를 꽤 직접적인 문제로 봤습니다. 전류가 커지면 torque가 커지고, torque가 커지면 발열도 커진다는 흐름이 있었기 때문입니다. 그래서 보행 중 actuator reported temperature를 보고, 이를 reward나 feedback에 넣으면 더 thermal-safe한 locomotion을 만들 수 있을 것이라고 생각했습니다.
+처음에는 "모터 온도"를 꽤 직접적인 문제로 봤습니다. 전류가 커지면 torque가 커지고, torque가 커지면 발열도 커진다는 흐름이 있었기 때문입니다. 그래서 보행 중 reported actuator temperature를 보고, 이를 reward나 feedback에 넣으면 더 thermal-safe한 locomotion을 만들 수 있을 것이라고 생각했습니다.
 
 하지만 실제 로봇을 움직이고, 데이터를 모으고, sim-to-real을 겪으면서 생각이 조금 바뀌었습니다.
 
@@ -38,9 +39,9 @@ math: true
 motor current -> motor torque -> motor heating -> reported actuator temperature
 ```
 
-그래서 motor current, torque, reported actuator temperature의 관계를 보고, 장시간 보행에서 특정 motor가 뜨거워지는 문제를 다루려고 했습니다.
+그래서 motor current, torque, reported actuator temperature의 관계를 보고, 장시간 보행에서 특정 actuator가 뜨겁게 보고되는 문제를 다루려고 했습니다.
 
-당시에는 이 접근이 타당하다고 생각했습니다. 실제로 Part 7과 Part 8에서 정리한 것처럼, reported actuator temperature를 모델링하고, 이를 reward에 넣는 것 자체는 충분히 해볼 만한 시도였습니다.
+당시에는 이 접근이 타당하다고 생각했습니다. 실제로 Part 7과 Part 8에서 정리한 것처럼, reported actuator temperature를 모델링하고 이를 reward에 넣는 것 자체는 충분히 해볼 만한 시도였습니다.
 
 하지만 지금 다시 보면 아쉬움도 남습니다.
 
@@ -58,11 +59,13 @@ Thermal Feedback policy는 온도 observation과 fitted temperature-rate penalty
 
 > 온도는 결과에 가깝고, torque와 positive mechanical power는 원인에 더 가깝다.
 
-그래서 Thermal-Torque Feedback에서는 온도 surrogate만 보지 않고, torque와 positive power를 reward에 직접 묶었습니다. 이때야 비로소 Baseline보다 thermal dose, max rise, hotspot dose가 좋아졌습니다.
+그래서 Thermal-Torque Feedback에서는 온도 surrogate만 보지 않고, torque와 positive power를 reward에 직접 묶었습니다. 이때 `vx_cmd = 1.5 m/s` MuJoCo corrected-fit 비교에서는 Baseline보다 thermal dose, max rise, hotspot dose가 좋아졌습니다.
 
 이 결과 자체는 좋았지만, 동시에 이런 생각도 들었습니다.
 
 처음부터 "모터 온도를 줄이자"가 아니라 "불필요한 motor load와 contact shock을 줄이는 보행을 만들자"로 문제를 잡았다면 더 자연스러웠을지도 모릅니다.
+
+여기서도 선은 분명히 그어야 합니다. 실제 Go2 hardware는 baseline deploy, log collection, thermal model grounding에 사용했습니다. Learned thermal policy comparison 자체는 real robot 장시간 deployment 결과가 아니라 MuJoCo 기반 비교였습니다.
 
 ## **4. 실제 로봇에서 더 크게 느낀 것**
 
@@ -70,7 +73,7 @@ Thermal Feedback policy는 온도 observation과 fitted temperature-rate penalty
 
 로봇이 지면을 밟을 때 생기는 진동과 충격이 생각보다 큽니다. 그리고 그 충격은 단순히 "보행이 된다"는 영상만으로는 잘 보이지 않습니다.
 
-특히 앞다리가 더 뜨거워지는 현상을 보면서도 다시 생각하게 됐습니다. 처음에는 motor별 torque나 temperature trace만 봤지만, 실제 보행을 보면 앞다리는 단순히 다리를 앞으로 보내는 역할만 하는 것이 아닙니다.
+특히 앞다리가 더 뜨겁게 보고되는 현상을 보면서도 다시 생각하게 됐습니다. 처음에는 motor별 torque나 reported-temperature trace만 봤지만, 실제 보행을 보면 앞다리는 단순히 다리를 앞으로 보내는 역할만 하는 것이 아닙니다.
 
 앞다리는 stance phase에서 몸체를 받아내고, 지면 충격을 버티고, body pitch나 forward motion을 안정화하는 역할을 크게 합니다. 반면 뒷다리는 상대적으로 추진력을 만드는 쪽에 더 가깝습니다.
 
@@ -150,11 +153,11 @@ locomotion policy
 
 > 온도를 줄이는 문제라고 생각했지만, 결국은 motor load와 contact shock을 어떻게 줄일 것인가의 문제였다.
 
-처음부터 완벽한 문제 정의를 하지는 못했습니다. thermal reward를 만들었고, thermal-only reward가 잘 안 됐고, torque와 power를 같이 넣으면서 결과가 좋아졌습니다. 하지만 그 과정을 지나고 나서야 "온도"보다 앞에 있는 원인들을 더 봐야 한다는 생각이 선명해졌습니다.
+처음부터 완벽한 문제 정의를 하지는 못했습니다. thermal reward를 만들었고, thermal-only reward가 잘 안 됐고, torque와 power를 같이 넣으면서 MuJoCo corrected-fit metric은 나아졌습니다. 하지만 그 과정을 지나고 나서야 "온도"보다 앞에 있는 원인들을 더 봐야 한다는 생각이 선명해졌습니다.
 
 그래서 이번 프로젝트는 성공과 아쉬움이 같이 남습니다.
 
-실제로 Go2를 걷게 만들었고, 데이터를 모았고, thermal reward와 torque-aware reward를 비교했습니다. 동시에, 실제 로봇 연구에서는 주제 설정과 문제 정의가 얼마나 중요한지도 배웠습니다.
+실제로 Go2를 걷게 만들었고, 데이터를 모았고, 그 데이터로 grounded한 thermal proxy를 이용해 thermal reward와 torque-aware reward를 비교했습니다. 동시에, 실제 로봇 연구에서는 주제 설정과 문제 정의가 얼마나 중요한지도 배웠습니다.
 
 다음에는 이 경험을 바탕으로 단순히 thermal-safe하거나 energy-efficient한 보행을 넘어서, perception과 locomotion이 서로 영향을 주는 문제를 더 깊게 보고 싶습니다.
 

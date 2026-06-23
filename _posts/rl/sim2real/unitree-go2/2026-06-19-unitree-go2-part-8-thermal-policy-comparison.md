@@ -1,14 +1,15 @@
 ---
 title: "[Unitree Go2 part 8] 온도 Reward는 왜 한 번 실패했나"
 date: 2026-06-19 15:25:00 +0900
+last_modified_at: 2026-06-23 00:00:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, thermal-reward, reward-hacking, mujoco]
-description: Unitree Go2 thermal-only reward가 왜 기대와 다르게 동작했는지 분석하고, torque와 positive power를 reward에 묶어야 했던 이유를 정리한다.
+description: Unitree Go2 thermal-only reward가 왜 기대와 다르게 동작했는지 ablation으로 분석하고, torque와 positive power를 reward에 직접 묶어야 했던 이유를 정리한다.
 image: /assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_paper_thermal_metrics.png
 math: true
 ---
 
-## **1. 처음 기대했던 것**
+## **1. 처음 기대와 실제 질문**
 
 Part 7에서는 실제 Go2 `/lowstate` 로그에서 reported actuator temperature 모델을 만들고, 그 모델을 학습 환경의 thermal reward로 넣는 과정을 정리했습니다.
 
@@ -16,7 +17,13 @@ Part 7에서는 실제 Go2 `/lowstate` 로그에서 reported actuator temperatur
 
 > 온도 상승률을 penalty로 주면, policy가 알아서 덜 뜨거운 보행을 찾지 않을까?
 
-하지만 결과는 그렇게 깔끔하지 않았습니다. 오히려 이 실험에서 제일 중요한 교훈은 **온도 reward를 넣으면 무조건 좋아지는 것이 아니라는 점**이었습니다.
+하지만 결과는 그렇게 깔끔하지 않았습니다. 이 글은 성공한 thermal policy를 바로 보여주는 글이라기보다, 먼저 실패한 reward 설계를 분석하는 글에 가깝습니다.
+
+실제로 확인해야 했던 질문은 이것이었습니다.
+
+> 온도 상승률 proxy만 reward로 넣으면, policy가 실제 actuator load까지 좋은 방향으로 바꾸는가?
+
+답은 아니었습니다.
 
 온도만 reward로 넣으면 policy가 실제 actuator load를 줄이기보다, temperature surrogate가 덜 나빠 보이는 방식으로 움직일 수 있습니다. 이게 이번 글의 핵심입니다.
 
@@ -36,11 +43,13 @@ Thermal Feedback은 Part 7에서 만든 reported-temperature rate 모델을 보�
 
 Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical power 관련 penalty를 추가한 모델입니다. 즉, 온도 surrogate만 보는 것이 아니라, 온도를 만드는 원인인 actuator load를 직접 묶은 모델입니다.
 
+이 세 모델은 단순한 성능 순위 비교가 아닙니다. Baseline은 기존 보행의 기준선이고, Thermal Feedback은 "온도만 reward로 보면 되는가"를 확인하는 ablation입니다. Thermal-Torque Feedback은 그 ablation에서 드러난 빈틈을 막기 위해 만든 다음 설계입니다.
+
 ## **3. 비교 조건**
 
 결과를 볼 때 가장 조심해야 하는 것은 속도입니다.
 
-같은 `vx_cmd = 1.5 m/s`를 줘도 policy마다 실제 평균 속도가 달라집니다. 어떤 policy가 단순히 느리게 걸어서 덜 뜨거워진다면, 그건 좋은 thermal-aware locomotion이라고 보기 어렵습니다.
+같은 `vx_cmd = 1.5 m/s`를 줘도 policy마다 실제 평균 속도가 달라집니다. 어떤 policy가 단순히 느리게 걸어서 덜 뜨거워진다면, 그건 좋은 thermal-aware locomotion이라고 보기 어렵습니다. 반대로 더 빠르게 걷지만 특정 actuator에 부하를 몰아도 좋은 결과라고 말하기 어렵습니다.
 
 그래서 비교는 다음 기준으로 봤습니다.
 
@@ -54,6 +63,8 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
 | hardware role | real Go2 log collection과 model grounding |
 
 여기서 중요한 선은 분명합니다. 이 결과는 learned thermal policy를 실제 Go2에 올려서 장시간 걸린 hardware result가 아닙니다. 실제 Go2 데이터는 thermal model을 만들고 grounding하는 데 사용했고, learned policy comparison은 MuJoCo에서 했습니다.
+
+그래서 해석도 보수적으로 해야 합니다. 이 글에서 주장할 수 있는 것은 hardware deployment 성공이 아니라, `vx_cmd = 1.5 m/s` operating point에서 reward 설계가 corrected reported-temperature proxy와 gait behavior에 어떤 차이를 만들었는지입니다.
 
 ## **4. 결과: 온도-only는 기대처럼 좋아지지 않았다**
 
@@ -99,7 +110,7 @@ Baseline과 비교하면 Thermal Feedback은:
 2. max reported-temperature rise가 `45.0 C`에서 `47.3 C`로 증가했습니다.
 3. hotspot dose per meter가 `216.1`에서 `251.3`으로 증가했습니다.
 
-즉, 온도-only reward는 "온도를 잘 줄이는 policy"로 바로 이어지지 않았습니다.
+즉, 온도-only reward는 "온도를 잘 줄이는 policy"로 바로 이어지지 않았습니다. 오히려 이 결과는 온도 proxy만 objective에 넣었을 때 policy가 어떤 빈틈을 찾을 수 있는지 보여줍니다.
 
 ## **5. 이걸 실패로만 보면 안 되는 이유**
 
@@ -122,6 +133,8 @@ Baseline과 비교하면 Thermal Feedback은:
 > 특정 actuator에 부담이 몰리지 않게 하면서, command를 따라 걷고, 실제 torque와 power load도 줄여라.
 
 이 둘은 같은 말이 아닙니다.
+
+그래서 Thermal Feedback의 나쁜 결과는 단순 실패가 아닙니다. 오히려 다음 reward 설계에서 어떤 물리량을 직접 묶어야 하는지 알려주는 실험이었습니다.
 
 ## **6. 온도만 보면 왜 빈틈이 생기나**
 
@@ -151,7 +164,7 @@ $$
 3. 전체 보행은 유지하지만 yaw, lateral drift, hotspot distribution이 이상해진다.
 4. 결과적으로 "온도 reward를 받았는데 실제 thermal metric은 더 나빠지는" 상황이 생긴다.
 
-이게 온도-only reward의 핵심 문제였습니다.
+이게 온도-only reward의 핵심 문제였습니다. 온도는 봤지만, 온도를 만드는 원인을 충분히 직접 제어하지 못한 것입니다.
 
 ## **7. torque를 봐야 원인이 보인다**
 
@@ -200,7 +213,7 @@ $$
 \max \left(0, \frac{\sum_j \tau_j^2 - \bar{Q}(v^{cmd})}{s_Q}\right)^2
 $$
 
-이렇게 하면 policy가 필요한 만큼의 actuator load는 쓰되, 특정 motor에 과도하게 몰리는 부하를 줄이는 방향으로 학습됩니다.
+이렇게 하면 policy가 필요한 만큼의 actuator load는 쓰되, 특정 motor에 과도하게 몰리는 부하를 줄이는 방향으로 학습됩니다. Part 7에서 만든 temperature-rate proxy는 그대로 쓰지만, proxy 하나에 모든 책임을 맡기지 않는 구조입니다.
 
 ## **9. 최종 결과 해석**
 
@@ -223,6 +236,8 @@ Baseline 대비:
 그래서 이 결과는 다음처럼 해석하는 것이 안전합니다.
 
 > `vx_cmd = 1.5 m/s` MuJoCo corrected-fit evaluation에서 Thermal-Torque Feedback은 command tracking을 크게 포기하지 않으면서 corrected reported-temperature risk와 hotspot accumulation을 줄였다.
+
+여기서도 "안전합니다"의 의미는 중요합니다. 이 문장은 실제 Go2 hardware에서 장시간 thermal policy deployment를 했다는 뜻이 아닙니다. 실제 로그로 grounded한 reported-temperature proxy를 기준으로, MuJoCo policy comparison에서 reward 설계 차이가 어떤 방향으로 나타났는지를 말하는 것입니다.
 
 ## **10. 이 실험에서 주장해야 하는 것**
 
