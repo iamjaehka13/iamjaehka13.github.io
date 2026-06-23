@@ -70,11 +70,13 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
 
 결과를 먼저 보면 다음과 같습니다.
 
-| policy | actual vx [m/s] | thermal dose / m | max rise [C] | hotspot dose / m |
+| policy | actual vx [m/s] | thermal dose [C*s/m] | max rise [C] | hotspot dose [C*s/m] |
 | --- | ---: | ---: | ---: | ---: |
 | Baseline | 1.30 | 44.2 | 45.0 | 216.1 |
 | Thermal Feedback | 1.40 | 58.7 | 47.3 | 251.3 |
 | Thermal-Torque Feedback | 1.36 | 34.2 | 40.9 | 157.8 |
+
+여기서 `max rise [C]`는 rollout 동안 가장 많이 오른 reported temperature의 절대 상승량입니다. 반면 `thermal dose`와 `hotspot dose`는 이동거리로 normalize한 누적량이므로 단위가 `C*s/m`입니다. 뒤에서 쓰는 `peak reported-temp rise [C/m]`는 가장 많이 오른 reported-temperature rise를 이동거리로 나눈 값입니다.
 
 표만 보면 이 차이가 잘 안 느껴집니다. 그래서 같은 `vx_cmd = 1.5 m/s`에서 짧은 10 m visualization을 같이 봤습니다. 아래 영상들은 thermal metric을 계산한 480 s rollout 자체가 아니라, 세 policy의 보행 형태, yaw drift, 발 궤적 차이를 보여주기 위한 시각화입니다. yaw drift를 드러내기 위해 이 짧은 시각화는 heading correction 없이 봤습니다.
 
@@ -226,10 +228,10 @@ Baseline 대비:
 | metric | Baseline | Thermal-Torque Feedback | 변화 |
 | --- | ---: | ---: | ---: |
 | actual vx [m/s] | 1.30 | 1.36 | +0.06 |
-| thermal dose / m | 44.2 | 34.2 | -22.5% |
+| thermal dose [C*s/m] | 44.2 | 34.2 | -22.5% |
 | max rise [C] | 45.0 | 40.9 | -9.2% |
-| peak rise / m | 0.072 | 0.063 | -13.2% |
-| hotspot dose / m | 216.1 | 157.8 | -27.0% |
+| peak reported-temp rise [C/m] | 0.072 | 0.063 | -13.2% |
+| hotspot dose [C*s/m] | 216.1 | 157.8 | -27.0% |
 
 여기서 중요한 것은 actual vx입니다. Thermal-Torque Feedback은 Baseline보다 느리게 걸어서 thermal metric을 낮춘 것이 아닙니다. 실제 평균 속도는 `1.36 m/s`로 Baseline의 `1.30 m/s`보다 약간 높았습니다.
 
