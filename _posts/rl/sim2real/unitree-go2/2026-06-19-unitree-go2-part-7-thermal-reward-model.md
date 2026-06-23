@@ -52,6 +52,15 @@ Part 6에서는 실제 Go2에서 baseline policy를 굴리면서 `/lowstate` 데
 
 ![real log spatial thermal imbalance](/assets/img/posts/unitree/sim2real/unitree-go2-part-7-thermal-reward-model/real_log_spatial_thermal_imbalance.png){: .d-block .mx-auto }
 
+이 그림의 값은 절대 온도가 아니라, 각 motor가 분석 window 시작 시점 대비 얼마나 더 뜨겁게 보고되었는지를 나타냅니다. 즉 motor $j$에 대해 다음 값을 계산한 것입니다.
+
+$$
+\Delta T^{\mathrm{peak}}_j
+= \max_t \left(T_j(t) - T_j(t_0)\right)
+$$
+
+따라서 단위는 `C`입니다. 예를 들어 어떤 칸이 `8 C`라면, 그 motor의 reported actuator temperature가 해당 window 시작점보다 최대 `8 C` 더 높게 보고되었다는 뜻입니다. 이 값은 실제 winding temperature를 직접 측정한 값이 아니라 Go2가 `/lowstate`로 제공한 onboard reported actuator temperature의 상승량입니다.
+
 같은 보행 중에도 어떤 motor는 거의 평균 근처에 있고, 어떤 motor는 훨씬 빠르게 올라갑니다. 이게 중요한 이유는 thermal bottleneck이 평균으로 생기지 않기 때문입니다.
 
 예를 들어 12개 motor 평균이 괜찮아 보여도, 한두 개 motor가 빠르게 올라가면 그 motor가 전체 rollout을 제한합니다. 그래서 thermal reward도 전체 평균만 줄이는 방향이면 부족합니다. 어느 motor가 hotspot이 되는지, 그리고 그 motor에 torque와 positive mechanical power가 계속 들어가는지를 같이 봐야 합니다.
