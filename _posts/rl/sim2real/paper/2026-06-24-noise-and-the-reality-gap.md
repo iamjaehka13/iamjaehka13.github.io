@@ -1,9 +1,10 @@
 ---
-title: "[Sim2Real Paper 1] Noise and the Reality Gap"
+title: "[Sim2Real Paper 1] Noise and The Reality Gap"
 date: 2026-06-24 12:45:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, reality-gap, robot-simulation, noise, evolutionary-robotics]
 description: Jakobi et al.의 Noise and The Reality Gap을 통해 Sim2Real에서 reality gap이 왜 생기고, simulation noise가 어떤 역할을 하는지 정리한다.
+math: true
 ---
 
 ## **0. 전체 그림: Simulation은 왜 현실과 달라지는가**
@@ -28,24 +29,7 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 
 > Simulation을 현실과 완전히 같게 만들 수 없다면, 우리는 simulation을 어떻게 써야 하는가?
 
-## **1. 논문이 다루는 문제**
-
-논문이 경계하는 것은 **naive simulation**입니다.
-
-여기서 naive simulation은 실제 로봇과 환경의 불확실성을 충분히 반영하지 않은 simulation을 뜻합니다. 예를 들어 sensor가 항상 깨끗한 값을 주고, motor가 명령을 정확히 따르고, 바닥이나 벽과의 상호작용도 단순하게 모델링되어 있는 simulation입니다.
-
-이런 simulation에서는 controller가 좋아 보일 수 있습니다. 하지만 그 controller가 실제 로봇에서도 좋다는 뜻은 아닙니다.
-
-문제는 controller가 simulation의 깨끗한 조건에 과적합될 수 있다는 점입니다.
-
-- simulation sensor는 깨끗하지만 real sensor는 noisy합니다.
-- simulation motor는 명령을 정확히 따르지만 real actuator는 지연과 오차가 있습니다.
-- simulation contact는 단순하지만 real contact는 마찰, 미끄러짐, 충격이 섞입니다.
-- simulation에서는 같은 action이 같은 결과를 내지만 real robot에서는 반복마다 조금씩 달라집니다.
-
-정리하면, simulation이 너무 이상적이면 controller는 현실에서 버틸 수 없는 fragile behavior를 학습할 수 있습니다.
-
-## **2. 논문 정보**
+## **1. 논문 정보**
 
 | 항목 | 내용 |
 |---|---|
@@ -62,7 +46,7 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 
 > Simulation에서 얻은 behavior가 real robot에서도 같은 behavior로 나오는가?
 
-## **3. 핵심 아이디어: Noise를 현실의 일부로 넣기**
+## **2. 핵심 아이디어: Noise를 현실의 일부로 넣기**
 
 이 논문에서 가장 중요한 개념은 **envelope of noise**입니다.
 
@@ -74,11 +58,11 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 >
 > 실제 robot에서 생기는 불확실성을 simulation 안에서 일정 범위의 noise로 감싸서, controller가 깨끗한 simulation에만 맞춰지지 않도록 하는 방법입니다.
 
-여기서 중요한 점은 noise가 단순한 방해물이 아니라는 것입니다.
+여기서 중요한 점은 noise가 단순한 방해물이 아니라는 것입니다. 이 논문에서 noise는 simulation을 일부러 더 어렵게 만들기 위한 장치가 아니라, **real world에서 피할 수 없는 불확실성을 training distribution 안으로 넣는 장치**입니다.
 
 적절한 noise는 controller가 simulation의 특수한 조건에 overfit되는 것을 막습니다. Simulation 안에서 조금 흔들리는 세계를 경험한 controller는 실제 robot의 불완전함에도 더 잘 버틸 수 있습니다.
 
-지금 용어로 바꿔 말하면, 이 논문은 domain randomization의 초기 형태를 보여준다고 볼 수 있습니다.
+지금 용어로 바꿔 말하면, 이 논문은 domain randomization의 초기 형태를 보여준다고 볼 수 있습니다. 다만 이 논문은 modern deep RL이나 quadruped locomotion 논문이 아니라, evolutionary robotics에서 controller transfer를 다룬 초기 논문입니다.
 
 | 1995년 논문에서의 관점 | 현대 Sim2Real에서의 대응 |
 |---|---|
@@ -88,29 +72,9 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 | simulation-real correspondence | sim-to-real validation |
 | envelope of noise | randomization range |
 
-## **4. 실험 구조**
-
 논문은 Khepera robot을 대상으로 simulation을 만들고, 그 안에서 neural network controller를 evolution으로 학습합니다. 이후 학습된 controller를 실제 Khepera robot에 올려서 behavior가 얼마나 비슷하게 나오는지 확인합니다.
 
-실험 task는 두 가지입니다.
-
-### **4.1 Obstacle avoidance**
-
-첫 번째 task는 장애물 회피입니다.
-
-로봇은 IR proximity sensor를 이용해 주변 장애물을 감지하고, 장애물을 피하면서 움직여야 합니다.
-
-이 task에서 중요한 것은 sensor 값이 현실에서 완전히 깨끗하지 않다는 점입니다. 장애물과의 거리, 각도, 표면 상태에 따라 sensor reading은 조금씩 흔들릴 수 있습니다.
-
-### **4.2 Light seeking**
-
-두 번째 task는 빛을 찾아가는 행동입니다.
-
-로봇은 light sensor를 이용해 light source 방향으로 움직여야 합니다. 이 경우에도 sensor noise와 환경 조건이 behavior에 영향을 줍니다.
-
-### **4.3 Noise 조건**
-
-논문은 controller를 세 가지 noise 조건에서 학습합니다.
+실험 task는 obstacle avoidance와 light seeking입니다. Controller는 세 가지 noise 조건에서 학습됩니다.
 
 | 조건 | 의미 |
 |---|---|
@@ -118,113 +82,264 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 | observed noise | 실제 robot에서 관찰된 수준의 noise를 넣음 |
 | double noise | observed noise보다 더 큰 noise를 넣음 |
 
-핵심은 noise를 넣었는지 여부만 보는 것이 아닙니다. **noise level이 현실과 얼마나 잘 맞는지**를 봅니다.
-
-## **5. 결과: Noise는 많을수록 좋은 것이 아니다**
-
 결과를 단순히 요약하면 observed noise 조건이 가장 좋았습니다.
 
-Obstacle avoidance 결과는 다음과 같이 정리할 수 있습니다.
-
-| Noise condition | Mean correspondence score |
-|---|---:|
-| zero noise | 6.2 |
-| observed noise | 8.0 |
-| double noise | 6.8 |
-
-Light seeking에서도 비슷한 경향이 나옵니다.
-
-| Noise condition | Mean correspondence score |
-|---|---:|
-| zero noise | 5.6 |
-| observed noise | 7.8 |
-| double noise | 5.4 |
+| Task | zero noise | observed noise | double noise |
+|---|---:|---:|---:|
+| obstacle avoidance | 6.2 | 8.0 | 6.8 |
+| light seeking | 5.6 | 7.8 | 5.4 |
 
 여기서 correspondence score는 simulation behavior와 real robot behavior가 얼마나 잘 맞는지를 평가한 값입니다.
 
-결과에서 중요한 점은 두 가지입니다.
+이 결과에서 바로 얻을 수 있는 결론은 다음입니다.
 
-첫째, noise가 없는 simulation은 위험합니다.
+> Noise는 없는 것보다 있는 편이 좋을 수 있지만, 많을수록 좋은 것은 아니다.
 
-Zero noise 조건에서는 controller가 깨끗하고 deterministic한 simulation에 맞춰질 수 있습니다. 이런 controller는 실제 robot에서 sensor나 actuator가 조금만 흔들려도 behavior가 깨질 수 있습니다.
+즉 핵심은 noise의 양 자체가 아니라, **real robot에서 실제로 생기는 variation을 적절한 범위로 감싸는 것**입니다.
 
-둘째, noise를 너무 많이 넣어도 좋지 않습니다.
+## **3. 핵심 아이디어의 이론적 원리**
 
-Double noise 조건은 observed noise보다 항상 좋은 결과를 만들지 않았습니다. Noise가 너무 크면 controller가 실제 현실에는 없는 과한 불확실성에 맞춰질 수 있습니다.
+이 논문의 이론적 의미는 "simulation에 noise를 넣었다"보다 더 넓게 볼 수 있습니다. 핵심은 controller가 하나의 깨끗한 simulator에 과적합되는 문제를 줄이고, real world에서 나타날 수 있는 transition variation에 대해 robust하게 만드는 것입니다.
 
-정리하면 이 논문의 결론은 "noise를 많이 넣자"가 아닙니다.
+### **3.1 Clean simulation은 하나의 좁은 MDP다**
 
-> 현실에서 실제로 생기는 불확실성에 맞는 noise를 simulation에 넣어야 한다.
+Reinforcement learning 관점으로 보면, simulation environment는 하나의 MDP로 볼 수 있습니다.
 
-## **6. Sim2Real 관점에서의 해석**
+$$
+\mathcal{M}_{\mathrm{sim}}
+= (\mathcal{S}, \mathcal{A}, P_{\mathrm{sim}}, R_{\mathrm{sim}}, \gamma)
+$$
 
-이 논문은 Khepera robot을 다루지만, Sim2Real의 기본 감각은 지금도 그대로 적용됩니다.
+여기서 $P_{\mathrm{sim}}(s_{t+1} \mid s_t, a_t)$는 simulation 안에서 state와 action이 다음 state로 이어지는 transition입니다.
 
-### **6.1 깨끗한 simulation은 좋은 simulation이 아닐 수 있다**
+문제는 real robot의 transition이 이와 같지 않다는 점입니다.
 
-처음에는 simulation을 최대한 이상적으로 만들고 싶어집니다. 그러면 reward curve도 잘 나오고, behavior도 깔끔해 보입니다.
+$$
+P_{\mathrm{real}}(s_{t+1} \mid s_t, a_t)
+\neq
+P_{\mathrm{sim}}(s_{t+1} \mid s_t, a_t)
+$$
 
-하지만 real robot으로 policy를 옮길 생각이라면, 너무 깨끗한 simulation은 오히려 위험할 수 있습니다. Real robot에서 반드시 생기는 흔들림을 policy가 학습 중에 한 번도 경험하지 못하기 때문입니다.
+Naive simulation은 하나의 고정된 transition을 제공합니다. Sensor는 항상 깨끗하고, actuator는 명령을 거의 정확히 따르고, contact도 단순하게 처리됩니다.
 
-### **6.2 Randomization range가 중요하다**
+그러면 controller는 다음 objective에 맞춰집니다.
 
-현대 Sim2Real에서는 noise 대신 randomization이라는 말을 더 많이 씁니다.
+$$
+\max_{\pi} J(\pi; \mathcal{M}_{\mathrm{sim}})
+$$
 
-Go2 같은 quadruped locomotion에서는 다음과 같은 축을 생각할 수 있습니다.
+하지만 우리가 실제로 원하는 것은 real robot에서 잘 동작하는 controller입니다.
 
-| Randomization axis | Go2에서의 의미 |
+$$
+\max_{\pi} J(\pi; \mathcal{M}_{\mathrm{real}})
+$$
+
+두 MDP의 transition이 다르면, simulation에서 높은 return을 얻는 policy가 real robot에서도 높은 return을 얻는다는 보장은 없습니다. 이 차이가 바로 reality gap입니다.
+
+### **3.2 Noise는 transition distribution을 넓힌다**
+
+Noise를 넣는다는 것은 simulator를 하나의 deterministic world로 두지 않고, 여러 possible world를 갖는 distribution으로 바꾸는 것과 비슷합니다.
+
+이를 parameterized simulator로 보면 다음처럼 쓸 수 있습니다.
+
+$$
+\mathcal{M}_{\xi}
+= (\mathcal{S}, \mathcal{A}, P_{\xi}, R_{\xi}, \gamma),
+\quad
+\xi \sim p(\xi)
+$$
+
+여기서 $\xi$는 sensor noise, motor noise, 환경 perturbation 같은 simulation variation을 나타냅니다.
+
+Noise가 들어간 training은 하나의 simulator에서만 잘하는 policy를 찾는 것이 아니라, noise distribution 위에서 평균적으로 잘 동작하는 policy를 찾는 문제에 가까워집니다.
+
+$$
+\max_{\pi}
+\mathbb{E}_{\xi \sim p(\xi)}
+\left[
+J(\pi; \mathcal{M}_{\xi})
+\right]
+$$
+
+이 관점에서 envelope of noise는 $p(\xi)$의 support를 정하는 문제입니다.
+
+즉, 어떤 불확실성을 포함할 것인지, 각 불확실성을 어느 정도 범위로 흔들 것인지가 중요합니다.
+
+### **3.3 Noise envelope은 coverage 문제다**
+
+Noise envelope이 너무 좁으면 real world가 training distribution 밖에 있을 수 있습니다.
+
+```text
+training distribution too narrow
+-> policy only sees clean / limited cases
+-> real perturbation falls outside training support
+-> transfer fails
+```
+
+반대로 noise envelope이 너무 넓어도 문제가 생깁니다.
+
+```text
+training distribution too wide
+-> policy must survive unrealistic perturbations
+-> task signal becomes harder to exploit
+-> policy becomes conservative or inefficient
+```
+
+그래서 이 논문의 중요한 메시지는 "noise를 많이 넣자"가 아닙니다.
+
+> Real robot에서 실제로 생기는 variation을 덮을 만큼은 넓고, task structure를 잃을 만큼은 넓지 않은 noise envelope이 필요하다.
+
+이것이 현대 Sim2Real에서 randomization range를 잡는 문제와 연결됩니다.
+
+### **3.4 Noise는 shortcut을 막는다**
+
+Clean simulation에서는 controller가 현실에서는 성립하지 않는 shortcut을 사용할 수 있습니다.
+
+예를 들어 sensor가 항상 깨끗하면 controller는 아주 작은 sensor 차이에 민감하게 반응하는 전략을 학습할 수 있습니다. Motor가 항상 정확하면 controller는 실제 actuator가 따라가기 어려운 빠르고 날카로운 command를 사용할 수 있습니다.
+
+이런 strategy는 simulation 안에서는 높은 score를 얻을 수 있지만, real robot에서는 작은 noise나 delay만 들어와도 깨질 수 있습니다.
+
+Noise를 넣으면 이런 shortcut이 불안정해집니다. Controller는 한 번의 깨끗한 trajectory에만 의존할 수 없고, 여러 perturbation 아래에서도 유지되는 feature와 behavior를 찾아야 합니다.
+
+현대적인 표현으로 말하면, noise는 policy가 simulation-specific feature에 overfit되는 것을 줄이고, real world에서도 유지될 가능성이 높은 invariant behavior를 학습하도록 압력을 줍니다.
+
+### **3.5 Correspondence는 reward와 다르다**
+
+이 논문에서 중요한 또 다른 점은 real transfer를 단순히 simulation score로 판단하지 않는다는 것입니다.
+
+Simulation에서 reward가 높아도 real robot에서 같은 behavior가 나오지 않으면 transfer에 실패한 것입니다.
+
+그래서 논문은 simulation behavior와 real behavior의 correspondence를 봅니다.
+
+이 관점은 지금도 중요합니다.
+
+$$
+\text{high sim reward}
+\nRightarrow
+\text{high real correspondence}
+$$
+
+즉 Sim2Real에서는 policy performance뿐 아니라, simulation에서 보인 behavior가 real robot에서 얼마나 재현되는지도 봐야 합니다.
+
+이것은 이후 domain randomization, dynamics randomization, actuator model 논문으로 이어지는 중요한 기준입니다.
+
+## **4. Sim2Real 관점에서의 해석**
+
+이 논문은 작은 Khepera robot과 evolutionary controller를 다룹니다. 하지만 Sim2Real 관점에서 보면 이후 연구의 기본 문장을 이미 갖고 있습니다.
+
+> Real world를 정확히 복제할 수 없다면, real world에서 생기는 불확실성을 training distribution 안에 넣어야 한다.
+
+### **4.1 Simulation fidelity와 robustness는 같이 봐야 한다**
+
+Sim2Real에는 크게 두 방향이 있습니다.
+
+첫째, simulator를 현실에 가깝게 맞추는 방향입니다.
+
+```text
+system identification
+actuator modeling
+contact parameter fitting
+sensor calibration
+```
+
+둘째, policy가 남은 차이에 버티도록 만드는 방향입니다.
+
+```text
+noise injection
+domain randomization
+dynamics randomization
+external perturbation
+observation noise
+```
+
+이 논문은 두 번째 방향의 초기 형태에 가깝습니다. Simulator를 완벽하게 만들기 어렵다면, 현실에서 생기는 흔들림을 simulation에 넣어 controller가 fragile해지지 않게 만들자는 것입니다.
+
+### **4.2 Randomization range는 설계 변수다**
+
+현대 Sim2Real에서는 noise라는 단어보다 randomization이라는 단어를 더 많이 씁니다.
+
+하지만 문제의 형태는 같습니다.
+
+| Jakobi et al.의 noise | 현대 Sim2Real의 randomization |
 |---|---|
-| action delay | policy action이 실제 joint motion으로 반영되는 지연 |
-| motor strength | actuator 출력 차이 또는 tracking 능력 차이 |
-| friction | 발과 지면 사이의 마찰 변화 |
-| mass / inertia | robot model과 실제 hardware 차이 |
-| observation noise | IMU, joint velocity, base velocity 추정 오차 |
-| terrain variation | 평평하지 않은 바닥, 작은 충격, contact 변화 |
+| sensor noise | observation noise |
+| motor noise | actuator strength / motor delay |
+| environment noise | friction, terrain, mass, contact variation |
+| observed noise | measured or realistic randomization range |
+| double noise | overly broad randomization range |
 
-하지만 이 값들을 무작정 크게 흔들면 안 됩니다. 현실보다 너무 좁으면 transfer가 안 되고, 현실보다 너무 넓으면 policy가 task를 제대로 수행하지 못하거나 필요 이상으로 conservative해질 수 있습니다.
+이 논문이 보여주는 핵심은 randomization range를 크게 잡는 것이 항상 좋은 것이 아니라는 점입니다.
 
-### **6.3 Simulation reward와 real behavior는 따로 봐야 한다**
+Range가 너무 좁으면 real world를 덮지 못합니다. Range가 너무 넓으면 policy가 실제로는 필요 없는 불확실성까지 견디느라 task performance를 잃을 수 있습니다.
 
-Simulation reward가 높다고 real robot에서 같은 behavior가 나온다는 보장은 없습니다.
+따라서 Sim2Real에서 randomization은 "많이 넣는 옵션"이 아니라, real deployment condition을 보고 설계해야 하는 training distribution입니다.
 
-Go2에서도 같은 관점이 필요합니다.
+### **4.3 Evaluation은 real behavior correspondence를 봐야 한다**
 
-- simulation에서 gait가 좋아 보이는가?
-- real robot에서도 같은 command에서 비슷한 motion이 나오는가?
-- foot contact timing이 비슷한가?
-- body attitude가 크게 무너지지 않는가?
-- torque, current, actuator load가 과하지 않은가?
-- delay나 sensor noise가 들어가도 policy가 버티는가?
+Sim2Real에서 중요한 질문은 다음입니다.
 
-즉 simulation score와 real behavior correspondence를 분리해서 봐야 합니다.
+```text
+simulation에서 성공했는가?
+```
 
-## **7. Go2 Sim2Real에서 가져갈 점**
+보다 더 정확히는 다음입니다.
 
-이 논문을 Go2 Sim2Real 관점으로 읽으면 다음 체크리스트가 나옵니다.
+```text
+simulation에서 나온 behavior가 real robot에서도 같은 구조로 재현되는가?
+```
 
-1. Simulation이 너무 deterministic하지 않은가?
-2. Real robot에서 실제로 흔들리는 축을 알고 있는가?
-3. Randomization range가 현실보다 너무 좁거나 넓지 않은가?
-4. Policy가 simulation-only shortcut을 쓰고 있지 않은가?
-5. Simulation reward와 real behavior correspondence를 따로 보고 있는가?
-6. 같은 command를 real robot에서 반복했을 때 variation을 측정했는가?
-7. Noise를 견디는 policy인지, noise를 이용하는 policy인지 구분하고 있는가?
+이 차이가 중요합니다.
 
-특히 Go2에서는 actuator와 delay 쪽이 중요합니다. Simulation에서 joint target이 잘 따라가는 것처럼 보여도, 실제 actuator가 그 target을 같은 속도와 정확도로 따라간다는 보장은 없습니다.
+Policy가 simulation reward를 잘 얻더라도, real robot에서 sensor noise, actuator delay, contact variation 때문에 다른 behavior로 바뀌면 transfer에 실패한 것입니다.
 
-그래서 이 논문을 읽고 바로 가져갈 수 있는 결론은 다음입니다.
+그래서 Sim2Real 평가에서는 reward, success rate뿐 아니라 behavior correspondence를 같이 봐야 합니다.
 
-> Sim2Real을 하려면 simulation을 완벽하게 믿는 것이 아니라, 현실에서 생기는 불확실성을 simulation 안에서 적절히 경험시켜야 한다.
+Legged locomotion으로 옮겨 생각하면 다음과 같은 값이 correspondence에 해당할 수 있습니다.
 
-## **8. 정리하며: Reality Gap에서 Domain Randomization으로**
+| Correspondence 축 | 의미 |
+|---|---|
+| gait timing | swing/stance phase가 비슷하게 유지되는가 |
+| body attitude | roll/pitch/yaw가 simulation과 비슷한가 |
+| command response | 같은 command에 비슷한 velocity가 나오는가 |
+| actuator load | torque/current가 비현실적으로 커지지 않는가 |
+| disturbance response | 작은 perturbation에 비슷하게 복구되는가 |
+
+핵심은 simulation reward가 아니라 real behavior가 최종 기준이라는 점입니다.
+
+## **5. 이 논문의 한계**
+
+이 논문은 Sim2Real의 기본 질문을 잘 보여주지만, 현대 legged robot RL 논문과는 차이가 큽니다.
+
+첫째, task와 robot이 작습니다.
+
+Khepera는 wheeled robot이고, task도 obstacle avoidance와 light seeking입니다. Quadruped locomotion처럼 contact-rich하고 high-dimensional한 control 문제를 다루지는 않습니다.
+
+둘째, controller와 training 방식이 modern RL과 다릅니다.
+
+논문은 recurrent dynamical neural network controller를 evolutionary method로 학습합니다. PPO, actor-critic, value function, policy gradient 같은 현대 deep RL 구조를 다루지는 않습니다.
+
+셋째, noise model은 사람이 정합니다.
+
+Observed noise와 double noise를 비교하지만, 어떤 uncertainty를 어떤 distribution으로 넣어야 하는지 자동으로 찾는 방법을 제안하지는 않습니다.
+
+넷째, actuator dynamics나 contact model을 깊게 다루지는 않습니다.
+
+현대 legged Sim2Real에서는 actuator delay, motor strength, joint friction, foot-ground contact, state estimation noise가 매우 중요합니다. 이 논문은 그런 세부 모델링보다는 simulation noise의 원리를 보여주는 초기 논문에 가깝습니다.
+
+그래서 이 글을 읽을 때는 "이 논문을 그대로 quadruped locomotion에 적용하자"가 아니라, 다음 원리를 가져가는 것이 좋습니다.
+
+> Real transfer를 목표로 한다면, clean simulator에서만 좋은 controller를 믿으면 안 된다.
+
+## **6. 정리하며: Reality Gap에서 Domain Randomization으로**
 
 이번 글에서는 Jakobi et al.의 **Noise and The Reality Gap**을 통해 Sim2Real의 가장 기본적인 문제를 정리했습니다.
 
 - Reality gap은 simulation behavior와 real robot behavior 사이의 차이입니다.
-- 깨끗한 simulation은 controller를 fragile하게 만들 수 있습니다.
-- 적절한 noise는 controller가 현실의 불확실성에 더 잘 버티게 만들 수 있습니다.
-- 하지만 noise가 너무 많아도 좋지 않습니다.
-- 중요한 것은 real robot에서 실제로 생기는 variation에 맞는 noise range를 잡는 것입니다.
+- Clean simulation은 하나의 좁은 MDP이기 때문에 controller가 simulation-specific shortcut에 overfit될 수 있습니다.
+- Noise envelope은 real world에서 생길 수 있는 transition variation을 training distribution 안에 넣는 방법입니다.
+- Noise range가 너무 좁으면 real world를 덮지 못하고, 너무 넓으면 policy가 지나치게 conservative해질 수 있습니다.
+- Sim2Real에서는 simulation reward뿐 아니라 real behavior correspondence를 봐야 합니다.
+- 이 논문은 이후 domain randomization과 dynamics randomization으로 이어지는 기본 관점을 제공합니다.
 
 이 논문은 오래됐지만, Sim2Real의 출발점을 잘 보여줍니다.
 
