@@ -48,8 +48,9 @@ rigid-body simulator
 | Venue | Science Robotics |
 | Robot | ANYmal |
 | Tasks | velocity command following, high-speed locomotion, fall recovery |
+| Simulator | in-house rigid-body simulator with learned actuator nets |
 | RL algorithm | TRPO |
-| Key transfer tools | system identification, learned actuator net, hybrid simulator, dynamics randomization, direct deployment |
+| Key transfer tools | system identification, learned actuator net, stochastic rigid-body model, dynamics randomization, hybrid simulator, direct deployment |
 | Source | [arXiv](https://arxiv.org/abs/1901.08652), [Science Robotics DOI](https://www.science.org/doi/10.1126/scirobotics.aau5872) |
 
 이 논문은 "simulation에서 학습한 policy를 full-size quadruped에 직접 올릴 수 있는가?"에 대한 대표적인 초기 답입니다.
@@ -87,6 +88,8 @@ policy observation
 중요한 점은 actuator net이 policy 밖에 있다는 것입니다.
 
 Policy가 actuator net을 직접 학습하는 것이 아니라, actuator net이 simulator의 일부가 됩니다. 그래서 policy는 학습 중부터 ideal actuator가 아니라 현실적인 actuator response를 가진 robot을 상대하게 됩니다.
+
+이 구조가 실용적인 이유는 빠르기 때문입니다. 논문은 rigid-body simulator와 actuator nets를 합친 hybrid simulator가 거의 500K time steps per second 수준으로 동작한다고 설명합니다. 즉 real robot에서 직접 수많은 시행착오를 하는 대신, simulation에서 많은 rollout을 빠르게 만들 수 있습니다.
 
 논문이 보여준 결과는 세 가지입니다.
 
@@ -196,7 +199,7 @@ $$
 
 학습은 supervised learning입니다.
 
-Real robot에서 command, joint state, measured torque data를 모으고, 다음 loss를 줄입니다.
+Real robot에서 command, joint state, measured torque data를 모으고, 다음 loss를 줄입니다. 논문에서는 이를 physical system에서 얻은 data를 이용한 self-supervised learning으로 볼 수 있습니다. 사람이 torque label을 손으로 붙이는 것이 아니라, robot이 낸 command와 sensor/estimator로 기록된 response가 training data가 됩니다.
 
 $$
 \min_{\phi}
@@ -252,7 +255,47 @@ $$
 
 > Actuator net은 torque prediction model이지만, Sim2Real 관점에서는 policy가 보는 dynamics distribution을 바꾸는 장치다.
 
-### **3.4 System identification은 중심을 맞추고 randomization은 주변을 덮는다**
+### **3.4 Stochastic rigid-body model은 남은 불확실성을 distribution으로 만든다**
+
+Actuator net만으로 transfer가 끝나는 것은 아닙니다.
+
+Actuator side를 잘 맞춰도 rigid-body model과 contact model에는 여전히 uncertainty가 남습니다. 실제 robot의 mass distribution, joint damping, friction, ground contact, sensor noise는 정확히 고정하기 어렵습니다.
+
+그래서 이 논문은 deterministic simulator가 아니라 stochastic model을 사용합니다.
+
+이를 MDP 관점에서 보면, policy가 하나의 transition만 보는 것이 아니라 가능한 transition family를 봅니다.
+
+$$
+\mathcal{M}_{\xi}
+=
+(\mathcal{S}, \mathcal{A}, P_{\xi}, r, \gamma)
+$$
+
+$$
+\xi
+\sim
+p(\xi)
+$$
+
+여기서 $\xi$는 physical parameter, delay, sensor noise 같은 random variable입니다.
+
+Policy objective는 다음처럼 볼 수 있습니다.
+
+$$
+\max_{\pi}
+\mathbb{E}_{\xi \sim p(\xi)}
+\left[
+J(\pi; \mathcal{M}_{\xi})
+\right]
+$$
+
+이 구조의 의미는 단순합니다.
+
+> 하나의 정확한 simulator를 믿는 대신, 현실이 있을 법한 simulator family에서 평균적으로 잘하는 policy를 만든다.
+
+다만 이 논문은 distribution을 무작정 넓히지 않습니다. 먼저 system identification과 actuator net으로 mean model을 맞춘 뒤, 남은 uncertainty를 stochastic modeling으로 처리합니다.
+
+### **3.5 System identification은 중심을 맞추고 randomization은 주변을 덮는다**
 
 이 논문도 randomization을 사용합니다.
 
@@ -291,7 +334,7 @@ $$
 
 Dynamics randomization은 여전히 중요하지만, mean model이 너무 틀리면 randomization만으로는 부족합니다.
 
-### **3.5 Policy action은 torque가 아니라 joint position target이다**
+### **3.6 Policy action은 torque가 아니라 joint position target이다**
 
 이 논문에서 policy는 직접 torque를 출력하지 않습니다.
 
@@ -327,7 +370,7 @@ $$
 
 이 논문은 그 질문을 actuator net으로 직접 모델링합니다.
 
-### **3.6 RL objective는 task마다 다르지만 simulator 구조는 공유된다**
+### **3.7 RL objective는 task마다 다르지만 simulator 구조는 공유된다**
 
 논문은 TRPO로 policy를 학습합니다.
 
@@ -359,6 +402,8 @@ rigid-body simulator + actuator net + stochastic modeling
 
 논문이 제안한 것은 특정 gait 하나가 아니라, agile motor skill을 학습하고 transfer하기 위한 simulation-training-deployment pipeline입니다.
 
+또 하나 중요한 점은 deploy cost입니다. 학습은 simulation에서 무겁게 하지만, real robot에서 실행되는 policy는 작은 MLP입니다. 논문은 policy inference가 single CPU thread에서 약 25 microseconds 수준이라고 보고합니다. 즉 runtime에서는 복잡한 online optimization이 아니라 빠른 network inference만 수행합니다.
+
 ## **4. Sim2Real 관점에서의 해석**
 
 이 논문은 Sim2Real을 다음처럼 나누어 생각하게 해줍니다.
@@ -374,6 +419,10 @@ Actuator net은 control policy가 아닙니다. Real actuator data로 학습한 
 셋째, randomization은 mean model을 고친 뒤에 더 잘 작동합니다.
 
 Simulator의 중심이 현실과 너무 멀면 robust policy는 과하게 보수적이 되거나, real robot에서 필요한 dynamics를 아예 보지 못할 수 있습니다.
+
+넷째, simulation speed도 transfer pipeline의 일부입니다.
+
+Actuator net을 넣으면 simulator가 현실적이 되지만 너무 느려지면 RL rollout을 많이 만들 수 없습니다. 이 논문의 hybrid simulator는 actuator net을 넣고도 빠르게 동작하도록 설계되어, 실제 robot을 위험하게 굴리지 않고도 충분한 experience를 만들 수 있습니다.
 
 이 논문의 Sim2Real pipeline은 다음처럼 정리할 수 있습니다.
 
@@ -433,6 +482,7 @@ Command following, high-speed locomotion, fall recovery는 각각 reward와 init
 - Actuator net은 position error와 joint velocity history를 입력으로 torque를 예측합니다.
 - History input은 actuator의 hidden internal state, delay, limited bandwidth를 간접적으로 표현합니다.
 - Hybrid simulator는 policy가 학습하는 transition을 real robot에 더 가깝게 만듭니다.
+- Stochastic rigid-body model은 actuator net이 덮지 못하는 physical uncertainty를 distribution으로 처리합니다.
 - System identification과 actuator net은 mean model을 맞추고, randomization은 남은 uncertainty를 덮습니다.
 - Ideal actuator model과 hand-tuned analytical model은 실제 ANYmal에서 실패했고, learned actuator net이 transfer에 핵심 역할을 했습니다.
 - 논문은 velocity command following, high-speed locomotion, fall recovery를 real ANYmal에서 보여줍니다.
