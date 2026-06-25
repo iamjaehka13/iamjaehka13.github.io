@@ -21,7 +21,7 @@ $$
 {}^W T_L = {}^W T_B {}^B T_L
 $$
 
-그리고 scan 내부의 어느 시점 \(t_i\)에서 LiDAR가 기준 시점 \(t_r\) 대비 얼마나 움직였는지 계산합니다.
+그리고 scan 내부의 어느 시점 $t_i$에서 LiDAR가 기준 시점 $t_r$ 대비 얼마나 움직였는지 계산합니다.
 
 $$
 \Delta T_i =
@@ -35,22 +35,22 @@ $$
 
 frame은 위치와 방향을 표현하기 위한 기준 좌표계입니다.
 
-예를 들어 같은 컵도 방 기준으로 보면 \((5, 2, 1)\)일 수 있고, 책상 기준으로 보면 \((1, 0, 1)\)일 수 있습니다. 컵은 하나지만 기준 좌표계가 다르기 때문에 좌표값이 달라집니다.
+예를 들어 같은 컵도 방 기준으로 보면 $(5, 2, 1)$일 수 있고, 책상 기준으로 보면 $(1, 0, 1)$일 수 있습니다. 컵은 하나지만 기준 좌표계가 다르기 때문에 좌표값이 달라집니다.
 
 로봇에서도 똑같습니다.
 
 | Frame | 의미 |
 |---|---|
-| \(W\) | world 또는 map frame. 움직이지 않는 지도 기준 |
-| \(B\) | robot base frame. 로봇 몸통에 붙어 같이 움직이는 기준 |
-| \(I\) | IMU frame. IMU 센서에 붙은 기준 |
-| \(L\) | LiDAR frame. LiDAR 센서에 붙은 기준 |
+| $W$ | world 또는 map frame. 움직이지 않는 지도 기준 |
+| $B$ | robot base frame. 로봇 몸통에 붙어 같이 움직이는 기준 |
+| $I$ | IMU frame. IMU 센서에 붙은 기준 |
+| $L$ | LiDAR frame. LiDAR 센서에 붙은 기준 |
 
-이번 주에는 특히 \(W\), \(B\), \(L\)을 정확히 구분해야 합니다.
+이번 주에는 특히 $W$, $B$, $L$을 정확히 구분해야 합니다.
 
 LiDAR가 base 위에 고정되어 있다는 말은 다음 뜻입니다.
 
-> \(B\) 기준으로 본 \(L\)의 위치와 방향은 고정되어 있다.
+> $B$ 기준으로 본 $L$의 위치와 방향은 고정되어 있다.
 
 하지만 world에서 본 LiDAR pose는 로봇이 움직이면 계속 바뀝니다.
 
@@ -82,9 +82,9 @@ R & t \\
 \end{bmatrix}
 $$
 
-여기서 \(R\)은 3x3 rotation matrix이고, \(t\)는 3D translation vector입니다.
+여기서 $R$은 3x3 rotation matrix이고, $t$는 3D translation vector입니다.
 
-예를 들어 base pose가 world 기준으로 \(x=2\), \(y=1\), \(z=0.4\)에 있고 회전이 없다면,
+예를 들어 base pose가 world 기준으로 $x=2$, $y=1$, $z=0.4$에 있고 회전이 없다면,
 
 $$
 {}^W T_B =
@@ -138,9 +138,9 @@ $$
 
 이 식의 의미는 다음과 같습니다.
 
-1. \( {}^B T_L \): base 기준으로 본 LiDAR pose
-2. \( {}^W T_B \): world 기준으로 본 base pose
-3. \( {}^W T_L \): world 기준으로 본 LiDAR pose
+1. $ {}^B T_L $: base 기준으로 본 LiDAR pose
+2. $ {}^W T_B $: world 기준으로 본 base pose
+3. $ {}^W T_L $: world 기준으로 본 LiDAR pose
 
 즉 LiDAR pose는 base pose와 LiDAR extrinsic을 합성해서 구합니다.
 
@@ -163,7 +163,7 @@ transform 곱셈은 교환법칙이 성립하지 않습니다.
 
 scan 안에서 LiDAR가 얼마나 움직였는지 보려면 절대 pose 두 개를 비교해야 합니다.
 
-기준 시점의 LiDAR pose를 \(T_{\text{ref}}\), 현재 시점의 LiDAR pose를 \(T_i\)라고 하면 상대 pose는 다음과 같습니다.
+기준 시점의 LiDAR pose를 $T_{\text{ref}}$, 현재 시점의 LiDAR pose를 $T_i$라고 하면 상대 pose는 다음과 같습니다.
 
 $$
 T_{\text{rel}, i} = T_{\text{ref}}^{-1} T_i
@@ -224,9 +224,9 @@ R_{\text{rel}} & t_{\text{rel}} \\
 \end{bmatrix}
 $$
 
-여기서 \(t_{\text{rel}}\)은 기준 frame에서 본 현재 LiDAR 원점의 상대 위치입니다.
+여기서 $t_{\text{rel}}$은 기준 frame에서 본 현재 LiDAR 원점의 상대 위치입니다.
 
-회전은 \(R_{\text{rel}}\)에 들어 있습니다. 회전 크기를 안정적으로 보려면 Euler angle 단순 차이보다 rotation log를 쓰는 것이 좋습니다.
+회전은 $R_{\text{rel}}$에 들어 있습니다. 회전 크기를 안정적으로 보려면 Euler angle 단순 차이보다 rotation log를 쓰는 것이 좋습니다.
 
 SO(3) log는 rotation matrix를 rotation vector로 바꾸는 연산입니다.
 
@@ -234,7 +234,7 @@ $$
 \phi = \log(R_{\text{rel}})
 $$
 
-rotation vector \(\phi\)는 3차원 벡터입니다.
+rotation vector $\phi$는 3차원 벡터입니다.
 
 - 방향: 회전축
 - 크기: 회전각
@@ -250,7 +250,7 @@ $$
 \end{bmatrix}
 $$
 
-여기서 \(0.1745\) rad는 약 10도입니다.
+여기서 $0.1745$ rad는 약 10도입니다.
 
 코드로는 SciPy의 `Rotation.as_rotvec()`를 사용할 수 있습니다.
 
@@ -267,7 +267,7 @@ relative_rpy_deg = rotation.as_euler("xyz", degrees=True)
 
 ## **6. SE(3) Log에서 헷갈린 부분**
 
-이번 주에 헷갈리기 쉬운 부분은 \(t_{\text{rel}}\)과 SE(3) log의 translation 성분 \(\rho\)입니다.
+이번 주에 헷갈리기 쉬운 부분은 $t_{\text{rel}}$과 SE(3) log의 translation 성분 $\rho$입니다.
 
 상대 pose는 다음처럼 생겼습니다.
 
@@ -279,7 +279,7 @@ R_{\text{rel}} & t_{\text{rel}} \\
 \end{bmatrix}
 $$
 
-여기서 \(t_{\text{rel}}\)은 상대 pose 행렬 안에 들어 있는 최종 상대 위치입니다.
+여기서 $t_{\text{rel}}$은 상대 pose 행렬 안에 들어 있는 최종 상대 위치입니다.
 
 반면 SE(3) log는 pose 전체를 6차원 motion vector로 바꿉니다.
 
@@ -297,11 +297,11 @@ $$
 \end{bmatrix}
 $$
 
-여기서 \(\phi\)는 rotation log이고, \(\rho\)는 SE(3) log의 translation 성분입니다.
+여기서 $\phi$는 rotation log이고, $\rho$는 SE(3) log의 translation 성분입니다.
 
 중요한 점은 다음입니다.
 
-> \(t_{\text{rel}}\)과 \(\rho\)는 항상 같은 값이 아니다.
+> $t_{\text{rel}}$과 $\rho$는 항상 같은 값이 아니다.
 
 회전이 없으면 둘은 같습니다. 하지만 translation과 rotation이 동시에 있으면 SE(3) exponential 관계에서 다음처럼 회전 보정이 들어갑니다.
 
@@ -342,7 +342,7 @@ motion_summary_6d = np.concatenate([t_rel, rotvec])
 | 이름 | 의미 |
 |---|---|
 | `t_rel` | 상대 transform 행렬 안의 translation |
-| `rotvec` | \(R_{\text{rel}}\)의 SO(3) log |
+| `rotvec` | $R_{\text{rel}}$의 SO(3) log |
 | `motion_summary_6d` | `[t_rel, rotvec]`를 붙인 직관적 요약 |
 | `se3_xi` | 엄밀한 SE(3) log, `[rho, rotvec]` |
 
@@ -350,7 +350,7 @@ motion_summary_6d = np.concatenate([t_rel, rotvec])
 
 scan 하나는 순간적으로 찍힌 것이 아닙니다. LiDAR가 scan을 만드는 동안 로봇은 계속 움직입니다.
 
-따라서 point 또는 sample 시점 \(t_i\)의 pose가 필요합니다. 하지만 pose가 모든 시점에 직접 저장되어 있지 않을 수 있습니다. 이때 scan 시작 pose와 끝 pose 사이를 보간합니다.
+따라서 point 또는 sample 시점 $t_i$의 pose가 필요합니다. 하지만 pose가 모든 시점에 직접 저장되어 있지 않을 수 있습니다. 이때 scan 시작 pose와 끝 pose 사이를 보간합니다.
 
 시간 비율은 다음처럼 계산합니다.
 
@@ -405,9 +405,9 @@ def interpolate_transform(T0, T1, alpha):
 
 입력은 다음입니다.
 
-- scan 시작 base pose \( {}^W T_B(t_{\text{start}}) \)
-- scan 끝 base pose \( {}^W T_B(t_{\text{end}}) \)
-- LiDAR extrinsic \( {}^B T_L \)
+- scan 시작 base pose $ {}^W T_B(t_{\text{start}}) $
+- scan 끝 base pose $ {}^W T_B(t_{\text{end}}) $
+- LiDAR extrinsic $ {}^B T_L $
 - scan 시작/끝 시간
 - scan 내부 sample time들
 
@@ -536,7 +536,7 @@ def describe_relative_motion(T_rel):
 
 base가 제자리에서 회전하더라도 LiDAR가 base 원점에서 떨어져 있으면 LiDAR 원점은 world에서 움직입니다. 그래서 base motion과 LiDAR motion은 항상 같지 않습니다.
 
-이게 \( {}^W T_L = {}^W T_B {}^B T_L \)을 직접 계산해야 하는 이유입니다.
+이게 $ {}^W T_L = {}^W T_B {}^B T_L $을 직접 계산해야 하는 이유입니다.
 
 ## **11. 이번 주 정리**
 
