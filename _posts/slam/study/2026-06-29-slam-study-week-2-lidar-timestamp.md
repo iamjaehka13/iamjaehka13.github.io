@@ -1,9 +1,10 @@
 ---
 title: "[SLAM Study 2주차] LiDAR Timestamp와 측정 시간"
 date: 2026-06-29 11:20:00 +0900
+last_modified_at: 2026-06-29 13:10:19 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, timestamp, pointcloud2, imu, deskew, ros2, robotics]
-description: SLAM 공부 2주차에 LiDAR scan, packet, point별 timestamp, ring/channel, point ordering, LiDAR-IMU clock, jitter, packet loss, lidar_time_auditor 구현 흐름을 정리한다.
+description: SLAM 공부 2주차에 LiDAR scan, packet, point별 timestamp, ring/channel, point ordering, LiDAR-IMU clock, jitter, packet loss, lidar_time_auditor 구현 흐름과 실제 rosbag audit 결과를 정리한다.
 math: true
 ---
 
@@ -679,7 +680,98 @@ t
 9. buffering latency가 일정한가?
 10. raw cloud와 deskewed cloud가 둘 다 있다면 이미 driver가 deskew를 수행하는가?
 
-## **13. 이번 주 정리**
+## **13. 실제 rosbag audit 결과**
+
+위 프로토콜을 실제 Unitree LiDAR rosbag에 적용해 봤습니다.
+
+대상 topic은 다음처럼 잡았습니다.
+
+```text
+cloud_topic: /utlidar/cloud
+imu_topic:   /utlidar/imu
+point fields: x, y, z, intensity, ring, time
+point time field: time
+```
+
+즉 이 데이터의 `PointCloud2`에는 point별 `time` field가 존재했습니다. 따라서 scan 내부의 최소/최대 point time으로 scan 측정 구간을 직접 계산할 수 있습니다.
+
+이번에 확인한 bag은 두 개입니다.
+
+| Bag | 구간 | Scan 수 | point 수 median | scan duration median | header interval median |
+|---|---|---:|---:|---:|---:|
+| `22_04_22_0.db3` | stand-like | 10550 | 1422 | 0.063838 s | 0.066969 s |
+| `22_04_22_0.db3` | walk-like | 3897 | 1416 | 0.064105 s | 0.066975 s |
+| `22_33_07_0.db3` | walk-like | 14015 | 1331 | 0.063841 s | 0.066986 s |
+
+여기서 먼저 볼 점은 scan duration입니다. 이 rosbag에서는 한 scan이 약 `0.064 s` 동안 측정됐고, cloud header 간격은 약 `0.067 s`였습니다.
+
+```text
+scan duration ~= 64 ms
+cloud interval ~= 67 ms
+```
+
+따라서 이 데이터는 10 Hz의 100 ms scan이라고 가정하면 안 됩니다. 실제 point time field에서 scan 길이를 직접 읽어야 합니다.
+
+IMU coverage와 timestamp 품질은 다음처럼 나왔습니다.
+
+| Bag | 구간 | monotonic ratio | dropped flag ratio | IMU start max | IMU end max | IMU samples median | max point time gap |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `22_04_22_0.db3` | stand-like | 0.997 | 0.000095 | 0.007678 s | 0.005375 s | 16 | 0.010375 s |
+| `22_04_22_0.db3` | walk-like | 0.997 | 0.000257 | 0.007144 s | 0.007091 s | 16 | 0.030729 s |
+| `22_33_07_0.db3` | walk-like | 0.998 | 0.006208 | 0.007735 s | 0.005477 s | 16 | 0.031112 s |
+
+이 결과에서 중요한 해석은 네 가지입니다.
+
+첫째, point time은 거의 monotonic하지만 완전히 monotonic하지는 않았습니다.
+
+```text
+monotonic ratio ~= 0.997 ~ 0.998
+```
+
+그래서 point array index를 그대로 시간순이라고 믿으면 안 됩니다. deskew 구현에서는 point별 `time` 값을 기준으로 처리하거나, 최소한 ring/channel별 ordering을 따로 확인해야 합니다.
+
+둘째, IMU는 scan 구간을 대체로 잘 덮고 있었습니다. scan마다 scan 내부 IMU sample median은 16개였고, scan 시작/끝에서 가장 가까운 IMU까지의 최대 margin도 약 5-8 ms 수준이었습니다.
+
+```text
+IMU samples in scan median ~= 16
+IMU start/end max margin ~= 5-8 ms
+```
+
+이 정도면 deskew 단계에서 IMU interpolation을 시도할 수 있는 데이터 조건은 갖춰져 있다고 볼 수 있습니다. 다만 실제 deskew에서는 scan start보다 앞의 IMU와 scan end보다 뒤의 IMU가 모두 필요하므로, bag 시작과 끝부분은 별도로 잘라내는 편이 안전합니다.
+
+셋째, walking 구간에서는 stand-like 구간보다 `max_point_time_gap`이 더 크게 관찰됐습니다.
+
+```text
+stand-like max point time gap: about 10 ms
+walk-like max point time gap: about 31 ms
+```
+
+이 값은 point stream 내부에 시간 간격이 크게 벌어진 scan이 있다는 뜻입니다. 이것이 실제 packet loss인지, driver buffering인지, ring/channel ordering의 영향인지는 이 결과만으로 단정하면 안 됩니다.
+
+넷째, `dropped_packet_flag`는 보수적인 study flag입니다.
+
+```text
+dropped_packet_flag == suspicious scan
+dropped_packet_flag != packet loss proof
+```
+
+라고 해석하면 안 됩니다. 여기서는 point 수, scan duration, point time gap이 평소보다 이상한 scan을 표시한 것입니다. 특히 두 번째 walk-like bag에서는 flag ratio가 약 `0.62%`로 더 높았으므로, 해당 scan들을 따로 열어서 point count, ring 분포, time gap 위치를 확인해야 합니다.
+
+이번 audit 결과를 2주차 관점에서 정리하면 다음입니다.
+
+```text
+1. /utlidar/cloud에는 point별 time field가 있다.
+2. 실제 scan duration은 약 64 ms였다.
+3. header interval은 약 67 ms였다.
+4. point ordering은 거의 시간순이지만 완전히 믿을 수 없다.
+5. IMU coverage는 deskew 실험을 시작할 수 있을 정도로 확보됐다.
+6. walking 구간에는 더 큰 point time gap이 보인다.
+7. dropped_packet_flag는 의심 신호이지 packet loss 확정 증거가 아니다.
+```
+
+따라서 다음 단계는 단순히 deskew를 적용하는 것이 아니라, flagged scan을 먼저 시각화하고 ring별 point time 분포를 확인하는 것입니다. 그래야 deskew가 실제 motion distortion을 줄이는지, 아니면 timestamp/order 문제를 더 크게 만드는지 분리해서 볼 수 있습니다.
+
+## **14. 이번 주 정리**
 
 2주차를 한 문장으로 정리하면 다음입니다.
 
