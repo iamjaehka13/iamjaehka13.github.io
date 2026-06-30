@@ -1,7 +1,7 @@
 ---
 title: "[SLAM Study 2주차] LiDAR Timestamp와 측정 시간"
 date: 2026-06-29 11:20:00 +0900
-last_modified_at: 2026-06-29 13:10:19 +0900
+last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, timestamp, pointcloud2, imu, deskew, ros2, robotics]
 description: SLAM 공부 2주차에 LiDAR scan, packet, point별 timestamp, ring/channel, point ordering, LiDAR-IMU clock, jitter, packet loss, lidar_time_auditor 구현 흐름과 실제 rosbag audit 결과를 정리한다.
@@ -421,6 +421,93 @@ IMU timestamp:   10.000
 
 Go2처럼 body pitch/roll/yaw가 흔들리는 플랫폼에서는 수 ms offset도 결과에 영향을 줄 수 있습니다.
 
+### **Clock Model로 보면 더 명확하다**
+
+LiDAR timestamp와 IMU timestamp가 모두 초 단위 숫자로 보인다고 해서 같은 clock이라는 뜻은 아닙니다.
+
+센서 time을 ROS time으로 옮기는 과정을 단순화하면 다음처럼 볼 수 있습니다.
+
+$$
+t_{\text{ros}}
+=
+a t_{\text{sensor}}
++
+b
++
+\epsilon(t)
+$$
+
+여기서 각 항의 의미는 다음입니다.
+
+| 항 | 의미 |
+|---|---|
+| $a$ | clock scale 또는 drift. 이상적이면 1 |
+| $b$ | clock offset |
+| $\epsilon(t)$ | jitter, driver delay, scheduling noise |
+
+2주차에서 가장 먼저 보는 것은 보통 offset $b$입니다.
+
+하지만 긴 bag이나 hardware sync가 약한 시스템에서는 scale $a$도 문제가 될 수 있습니다.
+
+```text
+offset 문제:
+  처음부터 끝까지 일정하게 20 ms 밀림
+
+drift 문제:
+  bag 초반에는 맞지만 시간이 갈수록 점점 벌어짐
+
+jitter 문제:
+  평균은 맞지만 scan마다 흔들림
+```
+
+deskew에서는 이 차이를 구분해야 합니다.
+
+offset은 한 번 보정하면 줄일 수 있지만, jitter는 scan마다 남고, drift는 시간 구간별로 달라질 수 있습니다.
+
+### **시간 오차가 공간 오차로 바뀌는 방식**
+
+timestamp error가 왜 위험한지 수식으로 보면 더 직관적입니다.
+
+point time이 $\delta t$만큼 틀렸다고 하겠습니다.
+
+LiDAR가 선속도 $\mathbf{v}$와 각속도 $\boldsymbol{\omega}$로 움직이고 있다면, 1차 근사로 point 위치 오차는 다음처럼 볼 수 있습니다.
+
+$$
+\|\delta \mathbf{p}\|
+\approx
+\|\mathbf{v}\| |\delta t|
++
+r \|\boldsymbol{\omega}\| |\delta t|
+$$
+
+여기서 $r$은 LiDAR에서 point까지의 거리입니다.
+
+translation에 의한 오차는 속도와 시간 오차에 비례합니다.
+
+rotation에 의한 오차는 여기에 range가 곱해집니다.
+
+예를 들어 point가 10 m 앞에 있고, 각속도가 `100 deg/s`라고 하겠습니다.
+
+```text
+100 deg/s ~= 1.745 rad/s
+delta_t = 0.005 s
+r = 10 m
+```
+
+그러면 rotation time error만으로도 대략:
+
+$$
+10 \times 1.745 \times 0.005
+\approx
+0.087\ \mathrm{m}
+$$
+
+약 8.7 cm point 위치 오차가 생길 수 있습니다.
+
+그래서 legged robot에서는 "몇 ms 정도는 괜찮겠지"라고 생각하면 위험합니다.
+
+body pitch/roll/yaw가 빠르게 흔들릴수록, 그리고 멀리 있는 구조물을 볼수록 timestamp alignment가 더 중요해집니다.
+
 ## **9. IMU가 Scan을 덮는다는 뜻**
 
 LiDAR scan 시간 구간이 다음과 같다고 하겠습니다.
@@ -487,6 +574,39 @@ margin이 음수라고 해서 항상 IMU 센서가 나쁜 것은 아닙니다. �
 8. rosbag playback에서 topic sync가 꼬임
 
 따라서 margin은 원인 확정이 아니라 timestamp/coverage 문제를 드러내는 진단 지표로 봐야 합니다.
+
+### **Interpolation에 필요한 coverage**
+
+IMU가 scan 구간 안에 sample을 가지고 있다는 것만으로 충분하지 않을 때가 많습니다.
+
+point time $t_i$에서 angular velocity나 orientation을 interpolate하려면 보통 $t_i$의 앞뒤 sample이 필요합니다.
+
+```text
+imu[k].time <= t_i <= imu[k + 1].time
+```
+
+따라서 scan 시작과 끝에서 약간의 여유가 필요합니다.
+
+```text
+scan_start보다 조금 앞의 IMU sample
+scan_end보다 조금 뒤의 IMU sample
+```
+
+이 여유가 없으면 extrapolation을 해야 합니다.
+
+extrapolation은 interpolation보다 위험합니다.
+
+```text
+interpolation:
+  이미 관측된 두 sample 사이를 채움
+
+extrapolation:
+  관측 범위 밖 motion을 예측함
+```
+
+짧은 extrapolation은 큰 문제가 아닐 수 있지만, foot impact나 빠른 body rotation이 있는 scan에서는 scan 끝 몇 ms도 무시하기 어렵습니다.
+
+그래서 auditor에서 `imu_start_margin`, `imu_end_margin`을 따로 저장하는 것이 중요합니다.
 
 ## **10. Jitter, Packet Loss, Buffering Latency**
 

@@ -1,7 +1,7 @@
 ---
 title: "[SLAM Study 5주차] Fixed Map Registration과 Point-to-Plane Residual"
 date: 2026-06-30 19:44:50 +0900
-last_modified_at: 2026-06-30 20:07:54 +0900
+last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, registration, scan-matching, point-to-plane, fixed-map, residual, inlier, deskew, ros2]
 description: "SLAM 공부 5주차에 fixed map 기준 scan registration, point-to-plane residual, correspondence, inlier ratio, geometry degeneracy, UNIST fixed-map residual evaluator 결과를 정리한다."
@@ -35,6 +35,31 @@ quadruped gait / body motion
 즉 5주차는 SLAM 전체를 새로 만드는 주가 아닙니다.
 
 고정된 map에 현재 scan을 붙여 보고, scan distortion이 registration 품질 지표에 어떻게 나타나는지 측정하는 evaluator를 만드는 주입니다.
+
+### **1~4주차가 여기로 이어지는 방식**
+
+5주차는 앞 주차 개념을 한 번에 다시 쓰는 지점입니다.
+
+```text
+1주차:
+  frame과 SE(3)를 알아야 scan point를 map frame으로 올릴 수 있다.
+
+2주차:
+  point time을 알아야 scan distortion과 deskew error를 말할 수 있다.
+
+3주차:
+  synthetic re-skew/deskew로 point 위치 오차가 어떻게 생기는지 분리했다.
+
+4주차:
+  실제 rosbag에서 correction magnitude와 trajectory source의 한계를 봤다.
+
+5주차:
+  그 결과가 map registration residual과 inlier ratio에 어떻게 보이는지 본다.
+```
+
+즉 5주차의 residual은 갑자기 나온 metric이 아닙니다.
+
+앞에서 공부한 frame, time, deskew, trajectory estimate가 모두 맞아야 registration residual도 의미 있게 해석됩니다.
 
 ## **1. Registration은 무엇을 하는가**
 

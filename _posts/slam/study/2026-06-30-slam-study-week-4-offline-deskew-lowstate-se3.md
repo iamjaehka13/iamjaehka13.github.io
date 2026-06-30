@@ -1,7 +1,7 @@
 ---
 title: "[SLAM Study 4주차] 실제 rosbag Offline Deskew: UNIST Livox와 Go2 연결"
 date: 2026-06-30 15:27:00 +0900
-last_modified_at: 2026-06-30 18:02:18 +0900
+last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, deskew, offline-deskew, livox, mcap, imu, unitree-go2, lowstate, ros2]
 description: SLAM 공부 4주차에 실제 rosbag에서 UNIST Livox gyro-integrated rotation deskew를 메인 시각화로 보고, Go2 LowState estimated SE(3) deskew를 연구 연결용 보조 근거로 정리한다.
@@ -171,6 +171,80 @@ translation_compensated: false
 ```
 
 이 bag에는 pose/odometry topic이 없었기 때문입니다.
+
+### **Gyro Integration이 실제로 하는 일**
+
+IMU gyro는 angular velocity를 줍니다.
+
+$$
+\boldsymbol{\omega}(t)
+=
+\begin{bmatrix}
+\omega_x(t) \\
+\omega_y(t) \\
+\omega_z(t)
+\end{bmatrix}
+$$
+
+짧은 시간 $\Delta t$ 동안 회전은 작은 rotation vector로 근사할 수 있습니다.
+
+$$
+\Delta \boldsymbol{\theta}
+\approx
+\boldsymbol{\omega}(t)\Delta t
+$$
+
+이를 SO(3) exponential로 회전에 누적하면:
+
+$$
+R_{k+1}
+=
+R_k
+\exp
+\left(
+[\boldsymbol{\omega}_k \Delta t]_\times
+\right)
+$$
+
+입니다.
+
+이번 UNIST deskew는 이 과정을 scan window 안에서 수행한 것입니다.
+
+```text
+/livox/imu angular_velocity
+-> scan 시간 구간에서 적분
+-> point time마다 orientation interpolation
+-> rotation-only deskew
+```
+
+여기서 중요한 제한이 있습니다.
+
+gyro integration은 orientation 변화량을 만들 수 있지만, translation은 만들지 못합니다.
+
+또한 gyro bias가 있으면 시간이 길어질수록 orientation drift가 누적됩니다.
+
+이번 scan은 약 `0.1 s`로 짧기 때문에 rotation-only 시각화에는 쓸 수 있지만, 이것을 긴 구간의 reference trajectory라고 부르면 안 됩니다.
+
+### **Rotation-only Deskew의 한계**
+
+rotation-only deskew는 다음을 가정하는 것과 비슷합니다.
+
+```text
+scan 동안 LiDAR 원점 translation은 무시할 수 있다.
+하지만 LiDAR orientation 변화는 보정한다.
+```
+
+이 가정은 회전이 dominant한 장면에서는 꽤 큰 geometry 변화를 보여줄 수 있습니다.
+
+하지만 실제 rigid body motion은 SE(3)입니다.
+
+```text
+pose(t) = rotation(t) + translation(t)
+```
+
+translation이 큰 구간에서는 rotation-only 결과가 오히려 일부 metric에서 애매하게 보일 수 있습니다.
+
+그래서 UNIST 결과는 "rotation deskew가 point geometry를 크게 바꾼다"는 시각화에는 좋지만, full SE(3) deskew 검증으로 쓰면 안 됩니다.
 
 ## **5. 새 Livox MCAP explorer**
 
@@ -361,6 +435,79 @@ J(\mathbf{q})\dot{\mathbf{q}}
 \boldsymbol{\omega}_B \times \mathbf{p}_{BF}
 \right)
 $$
+
+이 식은 다음 contact constraint에서 나온 직관입니다.
+
+stance foot이 순간적으로 world에서 고정되어 있다고 보면, foot의 world velocity는 0에 가깝습니다.
+
+```text
+stance foot world velocity ~= 0
+```
+
+base frame에서 foot 위치를 $\mathbf{p}_{BF}$라고 하면, foot velocity에는 세 항이 섞입니다.
+
+```text
+base translation velocity
+base angular velocity 때문에 생기는 lever-arm velocity
+joint motion 때문에 foot이 움직이는 velocity
+```
+
+이를 base frame에서 쓰면 대략:
+
+$$
+\mathbf{v}_{F}
+\approx
+\mathbf{v}_{B}
++
+\boldsymbol{\omega}_{B}
+\times
+\mathbf{p}_{BF}
++
+J(\mathbf{q})\dot{\mathbf{q}}
+$$
+
+stance foot이 고정되어 있으니 $\mathbf{v}_F \approx 0$으로 두고 정리하면:
+
+$$
+\mathbf{v}_B
+\approx
+-
+\left(
+J(\mathbf{q})\dot{\mathbf{q}}
++
+\boldsymbol{\omega}_{B}
+\times
+\mathbf{p}_{BF}
+\right)
+$$
+
+가 됩니다.
+
+즉 이것은 "관절각으로 base pose를 직접 푼 것"이 아닙니다.
+
+짧은 순간의 contact constraint를 이용해 body translation velocity를 추정한 것입니다.
+
+그래서 이름도 `measured odometry`가 아니라 `contact-kinematic estimated translation`에 가깝습니다.
+
+### **왜 Foot Slip이 핵심 리스크인가**
+
+위 식은 stance foot이 world에서 고정되어 있다는 가정에 기대고 있습니다.
+
+하지만 실제 보행에서는 다음 일이 생길 수 있습니다.
+
+```text
+foot slip
+soft ground
+contact timing error
+foot force threshold error
+URDF / joint calibration error
+```
+
+이 경우 $\mathbf{v}_F \approx 0$ 가정이 깨집니다.
+
+그러면 추정된 $\mathbf{v}_B$도 bias를 갖습니다.
+
+그래서 LowState SE(3) deskew는 연구적으로 흥미로운 proprioceptive path이지만, 외부 odometry나 SLAM trajectory와 비교하기 전까지는 reference trajectory가 아닙니다.
 
 이 translation estimate를 기존 `offline_deskew_explorer.py`에 넣기 위해 다음 option도 추가했습니다.
 

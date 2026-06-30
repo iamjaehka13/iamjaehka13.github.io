@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 1주차] 좌표계와 SE(3)"
 date: 2026-06-25 22:00:00 +0900
+last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, se3, so3, coordinate-frame, transform, lidar, imu, robotics]
 description: SLAM 공부 1주차에 좌표계 frame, transform composition, relative pose, rotation log, interpolation, frame_motion_analyzer 구현 흐름을 정리한다.
@@ -127,6 +128,77 @@ lidar in W = (2.3, 1.0, 0.6)
 ```
 
 하지만 base가 회전하면 LiDAR offset도 base 회전에 의해 같이 회전합니다. 그래서 실제 계산에서는 항상 transform matrix 곱을 사용해야 합니다.
+
+### **Notation을 먼저 고정하기**
+
+SLAM에서 가장 많이 틀리는 부분은 transform 자체보다 notation입니다.
+
+이 글에서는 다음 convention을 씁니다.
+
+$$
+{}^A T_B
+$$
+
+는 `B frame에서 표현된 좌표를 A frame 좌표로 바꾸는 transform`입니다.
+
+즉 point $\mathbf{p}$가 $B$ frame 좌표로 주어졌다면:
+
+$$
+{}^A \mathbf{p}
+=
+{}^A T_B
+{}^B \mathbf{p}
+$$
+
+입니다.
+
+그래서 ${}^W T_L$은 다음 두 의미를 동시에 가집니다.
+
+```text
+1. LiDAR frame의 원점과 축이 world에서 어디 있는가?
+2. LiDAR frame 좌표로 표현된 point를 world frame 좌표로 어떻게 바꾸는가?
+```
+
+이 둘이 같은 행렬로 표현되기 때문에 헷갈립니다.
+
+첫 번째는 pose 해석이고, 두 번째는 coordinate transform 해석입니다.
+
+코드에서는 보통 두 번째 해석이 더 중요합니다.
+
+```python
+p_W = T_WL @ p_L
+```
+
+즉 `T_WL`은 `LiDAR point를 world로 보낸다`고 읽으면 실수를 줄일 수 있습니다.
+
+### **Active Transform과 Passive Transform**
+
+조금 더 깊게 들어가면 transform에는 두 가지 해석이 있습니다.
+
+```text
+active transform:
+  물체 또는 point 자체를 움직인다.
+
+passive transform:
+  같은 물리적 point를 다른 frame 좌표로 다시 표현한다.
+```
+
+SLAM에서 frame 변환은 대부분 passive 해석입니다.
+
+world에 고정된 벽 point가 실제로 움직이는 것이 아니라, 그 point를 LiDAR frame에서 볼지 world frame에서 볼지 좌표 표현만 바꾸는 것입니다.
+
+하지만 수식 모양은 active transform처럼 보일 수 있습니다.
+
+그래서 안전한 기준은 다음입니다.
+
+```text
+이 행렬은 point를 실제로 움직이는가?
+아니면 같은 point의 좌표 표현을 바꾸는가?
+```
+
+deskew를 공부할 때도 이 구분이 중요합니다.
+
+deskew는 벽을 움직이는 것이 아니라, 서로 다른 시점의 LiDAR frame에서 측정된 point들을 같은 기준 frame으로 다시 표현하는 과정입니다.
 
 ## **3. Transform Composition**
 
@@ -345,6 +417,91 @@ motion_summary_6d = np.concatenate([t_rel, rotvec])
 | `rotvec` | $R_{\text{rel}}$의 SO(3) log |
 | `motion_summary_6d` | `[t_rel, rotvec]`를 붙인 직관적 요약 |
 | `se3_xi` | 엄밀한 SE(3) log, `[rho, rotvec]` |
+
+### **Adjoint는 왜 나중에 필요해지는가**
+
+1주차 구현에서는 adjoint까지 없어도 됩니다.
+
+하지만 SLAM 최적화, IMU preintegration, scan matching Jacobian으로 가면 adjoint가 계속 나옵니다.
+
+직관적으로 adjoint는 `twist나 작은 pose perturbation을 다른 frame으로 옮기는 연산`입니다.
+
+예를 들어 작은 motion vector를 다음 순서로 쓴다고 하겠습니다.
+
+$$
+\xi =
+\begin{bmatrix}
+\rho \\
+\phi
+\end{bmatrix}
+$$
+
+여기서 $\rho$는 translation 성분, $\phi$는 rotation 성분입니다.
+
+transform이 다음과 같을 때:
+
+$$
+T =
+\begin{bmatrix}
+R & t \\
+0 & 1
+\end{bmatrix}
+$$
+
+이 convention에서 adjoint는 보통 다음 형태로 씁니다.
+
+$$
+\mathrm{Ad}_T =
+\begin{bmatrix}
+R & [t]_\times R \\
+0 & R
+\end{bmatrix}
+$$
+
+여기서 $[t]_\times$는 cross product matrix입니다.
+
+이 식의 의미는 다음입니다.
+
+```text
+local frame에서 본 작은 motion을
+다른 frame 기준의 작은 motion으로 바꿀 때
+rotation뿐 아니라 lever arm t도 영향을 준다.
+```
+
+LiDAR가 base 원점에서 떨어져 있으면 base가 회전할 때 LiDAR 원점도 같이 움직입니다.
+
+이 효과가 바로 adjoint와 lever arm 개념으로 이어집니다.
+
+그래서 1주차의 핵심은 단순히 $T$를 곱하는 데서 끝나지 않습니다.
+
+나중에 Jacobian을 만들 때는 `이 perturbation이 어느 frame 기준인가`까지 반드시 따라가야 합니다.
+
+### **Left Perturbation과 Right Perturbation**
+
+SLAM 최적화에서는 pose를 조금 고칠 때 보통 exponential map을 씁니다.
+
+그런데 작은 update를 왼쪽에 붙이는지, 오른쪽에 붙이는지에 따라 의미가 달라집니다.
+
+```text
+left perturbation:
+  T_new = exp(delta_xi) T
+
+right perturbation:
+  T_new = T exp(delta_xi)
+```
+
+left perturbation은 update를 world 또는 reference frame 쪽에서 거는 해석에 가깝고, right perturbation은 body/local frame 쪽에서 거는 해석에 가깝습니다.
+
+처음 공부할 때는 이 차이를 깊게 구현하지 않아도 됩니다.
+
+하지만 5주차의 point-to-plane Jacobian이나 ICP pose update로 가면 이 차이가 실제 부호와 Jacobian 형태를 바꿉니다.
+
+따라서 지금은 다음 정도만 기억하면 충분합니다.
+
+```text
+SE(3) pose update는 그냥 벡터 덧셈이 아니다.
+exp(delta_xi)를 어느 쪽에 곱하는지까지 convention이다.
+```
 
 ## **7. Scan 내부 Pose Interpolation**
 
@@ -565,4 +722,3 @@ frame 구분
 > 보행 중 LiDAR가 scan 내부에서 얼마나 흔들렸고, 그 흔들림이 scan matching residual과 conditioning에 어떤 영향을 주는가?
 
 1주차의 `frame_motion_analyzer`는 이 질문으로 가기 위한 첫 번째 도구입니다.
-

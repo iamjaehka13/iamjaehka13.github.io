@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 3주차] Synthetic Deskew와 Scan Distortion"
 date: 2026-06-29 14:35:00 +0900
+last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, deskew, scan-distortion, pointcloud, se3, synthetic, robotics]
 description: SLAM 공부 3주차에 LiDAR scan distortion, deskew 기본식, synthetic re-skew, exact deskew, constant-velocity deskew, deskew error 해석을 정리한다.
@@ -76,6 +77,47 @@ point i는 L(t_i) frame에서 측정됐다.
 ```
 
 결국 deskew는 각 point를 측정 시점 LiDAR frame에서 기준 시점 LiDAR frame으로 재표현하는 과정입니다.
+
+### **수식 방향 sanity check**
+
+deskew 수식에서 가장 흔한 실수는 inverse 방향을 반대로 쓰는 것입니다.
+
+아래 식을 오른쪽부터 읽으면 방향이 명확해집니다.
+
+$$
+{}^{L(t_r)}\mathbf{p}_i =
+\left({}^W T_L(t_r)\right)^{-1}
+{}^W T_L(t_i)
+{}^{L(t_i)}\mathbf{p}_i
+$$
+
+```text
+1. p_i는 처음에 L(t_i) frame 좌표다.
+2. T_WL(t_i)를 곱하면 world 좌표가 된다.
+3. inverse(T_WL(t_r))를 곱하면 기준 LiDAR frame L(t_r) 좌표가 된다.
+```
+
+즉 중간에 반드시 world frame을 한 번 거칩니다.
+
+sanity check는 다음처럼 할 수 있습니다.
+
+```text
+t_i == t_r이면:
+  inverse(T_WL(t_r)) @ T_WL(t_i) = I
+  deskewed point == raw point
+```
+
+이 조건이 깨지면 transform 방향이나 reference time이 틀렸을 가능성이 큽니다.
+
+또 하나의 sanity check는 static trajectory입니다.
+
+```text
+T_WL(t_i)가 scan 전체에서 모두 같다면:
+  모든 point의 deskew transform은 identity
+  correction amount는 0에 가까워야 함
+```
+
+synthetic 실험에서는 이 두 case를 먼저 통과해야 합니다.
 
 ## **2. Deskew가 필요한 이유**
 
@@ -438,6 +480,30 @@ $$
 
 3주차에서는 빠르게 검증하는 것이 더 중요합니다.
 
+여기서도 1주차의 convention을 그대로 씁니다.
+
+```text
+T_WL:
+  LiDAR frame 좌표를 world frame 좌표로 보낸다.
+
+inverse(T_WL):
+  world frame 좌표를 LiDAR frame 좌표로 가져온다.
+```
+
+synthetic re-skew와 deskew는 서로 반대 과정입니다.
+
+따라서 두 함수를 나란히 놓고 보면 transform 방향이 검증됩니다.
+
+```text
+re-skew:
+  L(t_ref) -> W -> L(t_i)
+
+deskew:
+  L(t_i) -> W -> L(t_ref)
+```
+
+이 대칭성이 깨지면 exact deskew가 clean cloud를 복원하지 못합니다.
+
 ## **12. Synthetic Re-skew 구현**
 
 clean point는 기준 시점 $L(t_r)$ frame에 있습니다.
@@ -754,6 +820,77 @@ exact trajectory로 만든 raw cloud
 ```
 
 이 구조가 이해되면 4주차 실제 rosbag 분석에서 훨씬 덜 헷갈립니다.
+
+### **Synthetic Ablation을 왜 하는가**
+
+synthetic의 장점은 하나씩 망가뜨릴 수 있다는 점입니다.
+
+실제 rosbag에서 deskew 결과가 나쁘면 원인이 한 번에 섞입니다.
+
+```text
+point time이 틀렸나?
+IMU integration이 틀렸나?
+extrinsic이 틀렸나?
+scan 자체가 dynamic object를 본 건가?
+```
+
+synthetic에서는 이 중 하나만 켤 수 있습니다.
+
+예를 들어 time offset만 보고 싶으면, raw cloud는 exact trajectory로 만들고 deskew할 때만 point time에 offset을 더합니다.
+
+```text
+raw 생성:
+  T_WL(t_i)
+
+deskew:
+  T_WL(t_i + delta_t)
+```
+
+그러면 deskew error는 거의 time offset 하나에서 옵니다.
+
+trajectory model mismatch도 같은 방식으로 볼 수 있습니다.
+
+```text
+raw 생성:
+  sinusoidal pitch trajectory
+
+deskew:
+  start/end pose만 쓰는 constant-velocity trajectory
+```
+
+이 실험에서 error가 커지면 "constant velocity model이 고주파 motion을 못 따라간다"는 해석이 가능합니다.
+
+extrinsic error도 분리할 수 있습니다.
+
+```text
+raw 생성:
+  true T_BL
+
+deskew:
+  T_BL에 2 cm translation error 또는 1 deg rotation error 추가
+```
+
+이렇게 해야 4주차 실제 데이터에서 결과가 애매할 때도 어떤 원인을 의심해야 하는지 감이 생깁니다.
+
+### **Aliasing 관점**
+
+scan 안의 motion을 point time으로 샘플링한다고 보면, 고주파 motion에는 aliasing 문제가 생길 수 있습니다.
+
+예를 들어 foot impact처럼 짧은 순간 큰 angular velocity가 생겼는데 IMU sample rate나 interpolation이 충분하지 않으면, 실제 peak motion을 놓칠 수 있습니다.
+
+```text
+실제 motion:
+  scan 중간에 짧은 pitch impulse
+
+deskew model:
+  시작/끝 pose만 보고 부드러운 motion으로 보간
+```
+
+이 경우 시작 pose와 끝 pose가 거의 같아도 scan 중간 point는 크게 틀어질 수 있습니다.
+
+그래서 3주차 synthetic case에 `touchdown impulse`가 들어갑니다.
+
+이 case는 legged robot에서 특히 중요합니다.
 
 ## **20. Scan Matching Residual과 연결**
 
