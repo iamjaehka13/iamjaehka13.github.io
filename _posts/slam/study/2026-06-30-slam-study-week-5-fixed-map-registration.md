@@ -1,11 +1,11 @@
 ---
 title: "[SLAM Study 5주차] Fixed Map Registration과 Point-to-Plane Residual"
 date: 2026-06-30 19:44:50 +0900
-last_modified_at: 2026-06-30 19:44:50 +0900
+last_modified_at: 2026-06-30 20:07:54 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, registration, scan-matching, point-to-plane, fixed-map, residual, inlier, deskew, ros2]
 description: "SLAM 공부 5주차에 fixed map 기준 scan registration, point-to-plane residual, correspondence, inlier ratio, geometry degeneracy, UNIST fixed-map residual evaluator 결과를 정리한다."
-image: /assets/img/posts/slam/study/week-5-fixed-map-registration/spatial_residual_3d.png
+image: /assets/img/posts/slam/study/week-5-fixed-map-registration/vtk_low_oblique_residual_triptych.png
 math: true
 ---
 
@@ -27,6 +27,10 @@ quadruped gait / body motion
 -> inlier ratio 감소 또는 pose update 불안정
 -> mapping / odometry 성능 저하
 ```
+
+다만 이번 5주차 실험 데이터는 로봇개 bag이 아니라 UNIST Livox 데이터입니다.
+
+이 선택의 이유는 단순합니다. fixed-map registration residual을 보여주려면 map 구조가 선명하고 scan이 잘 보여야 합니다. Go2 야외 bag은 연구 주제와 더 직접적으로 연결되지만, 블로그 대표 그림으로는 구조가 덜 선명했습니다. 그래서 5주차는 UNIST 데이터로 evaluator를 먼저 검증하고, quadruped gait-induced motion 주장은 이후 Go2 데이터에서 다시 연결하는 흐름으로 잡습니다.
 
 즉 5주차는 SLAM 전체를 새로 만드는 주가 아닙니다.
 
@@ -55,6 +59,56 @@ metric: residual, inlier ratio, robust cost
 ```
 
 이렇게 하면 map이 계속 변하는 효과를 줄이고, scan 자체의 왜곡이 registration metric에 어떻게 드러나는지 보기 쉽습니다.
+
+### **Scan-to-Scan과 Scan-to-Map**
+
+registration은 크게 두 방식으로 볼 수 있습니다.
+
+```text
+scan-to-scan:
+  현재 scan을 직전 scan에 맞춘다.
+
+scan-to-map:
+  현재 scan을 누적 map 또는 fixed map에 맞춘다.
+```
+
+scan-to-scan은 짧은 시간 간격에서는 계산이 가볍고 drift를 바로 추정하기 좋습니다.
+
+하지만 직전 scan도 이미 왜곡되어 있거나 pose가 틀려 있으면, 두 scan 사이의 오차가 어디서 왔는지 분리하기 어렵습니다.
+
+scan-to-map은 더 강한 기준면을 둡니다.
+
+```text
+현재 scan이 고정된 map 표면에 얼마나 잘 붙는가?
+```
+
+이번 주에는 이 질문에 집중했습니다.
+
+그래서 fixed map은 "정답"이라기보다, 모든 scan을 같은 기준으로 비교하기 위한 reference surface입니다.
+
+### **Registration은 residual 최소화 문제**
+
+registration을 수식으로 보면 결국 residual을 줄이는 문제입니다.
+
+$$
+\min_{R,t}
+\sum_i
+\rho(r_i)
+$$
+
+여기서 $r_i$는 각 point의 residual이고, $\rho(\cdot)$는 outlier 영향을 줄이기 위한 robust loss입니다.
+
+이 관점에서 보면 registration 품질은 다음 세 가지가 같이 결정합니다.
+
+```text
+1. correspondence가 맞는가?
+2. residual이 작은가?
+3. pose update가 안정적으로 계산되는가?
+```
+
+이번 5주차 evaluator는 2번과 일부 1번을 먼저 계측합니다.
+
+아직 3번, 즉 pose update 자체를 반복해서 푸는 ICP/Gauss-Newton 단계는 넣지 않았습니다.
 
 ## **2. Point-to-Plane Residual**
 
@@ -96,6 +150,38 @@ abs residual 큼:
   scan point가 map 표면에서 많이 벗어남
 ```
 
+point-to-plane residual은 점과 점 사이의 거리를 직접 보는 것이 아니라, map 표면의 normal 방향으로 얼마나 떠 있는지를 봅니다.
+
+그림으로 생각하면 이런 차이입니다.
+
+```text
+point-to-point:
+  scan point와 가장 가까운 map point 사이의 3D 거리
+
+point-to-plane:
+  scan point가 map local plane에서 수직 방향으로 벗어난 거리
+```
+
+벽면을 예로 들면, 같은 벽 위에서 조금 옆으로 밀린 point는 point-to-point 거리로는 크게 보일 수 있습니다.
+
+하지만 벽의 normal 방향으로는 거의 벗어나지 않았을 수 있습니다.
+
+SLAM registration에서 더 중요한 것은 보통 "표면에서 떴는가"입니다.
+
+그래서 벽, 바닥, 기둥처럼 표면 구조가 많은 LiDAR scene에서는 point-to-plane residual이 point-to-point residual보다 pose 보정 방향을 더 잘 줍니다.
+
+단점도 있습니다.
+
+한 평면만 보면 그 평면을 따라 미끄러지는 방향은 residual이 거의 변하지 않습니다.
+
+```text
+벽 하나만 볼 때:
+  벽 normal 방향 이동 -> residual이 크게 변함
+  벽을 따라 이동 -> residual이 거의 안 변할 수 있음
+```
+
+그래서 실제 registration은 여러 방향의 벽, 바닥, 모서리, 기둥이 같이 있어야 6DoF pose가 잘 구속됩니다.
+
 ## **3. Correspondence와 Plane Fitting**
 
 point-to-plane residual을 계산하려면 먼저 각 scan point에 대응되는 map surface를 찾아야 합니다.
@@ -119,6 +205,52 @@ plane normal은 local map point들의 covariance를 보고 구할 수 있습니�
 이 부분이 중요한 이유는, residual이 단순히 두 point 사이의 거리만 보는 것이 아니기 때문입니다.
 
 벽이나 바닥 같은 구조물에서는 point-to-plane residual이 point-to-point distance보다 registration 방향을 더 잘 설명합니다.
+
+local plane fitting은 대략 다음 계산입니다.
+
+주변 map point들을 $\mathbf{x}_j$라고 하면 평균은:
+
+$$
+\boldsymbol{\mu}
+=
+\frac{1}{N}
+\sum_j
+\mathbf{x}_j
+$$
+
+covariance는:
+
+$$
+C
+=
+\frac{1}{N}
+\sum_j
+(\mathbf{x}_j - \boldsymbol{\mu})
+(\mathbf{x}_j - \boldsymbol{\mu})^T
+$$
+
+이 covariance의 eigenvalue를 보면 local geometry를 알 수 있습니다.
+
+```text
+작은 eigenvalue 1개:
+  점들이 한 평면 근처에 모여 있음
+  해당 eigenvector가 plane normal
+
+작은 eigenvalue 2개:
+  점들이 선처럼 분포함
+  normal이 불안정할 수 있음
+
+eigenvalue 3개가 비슷함:
+  local shape가 평면이라고 보기 어려움
+```
+
+normal 방향의 부호는 중요하지 않습니다.
+
+$\mathbf{n}_i$ 대신 $-\mathbf{n}_i$를 써도 signed residual의 부호만 바뀌고, 절댓값 residual은 같습니다.
+
+하지만 normal 자체가 불안정하면 residual도 흔들립니다.
+
+따라서 sparse point, glass처럼 반사가 이상한 surface, dynamic object, map edge 근처 point에서는 correspondence와 normal을 그대로 믿으면 안 됩니다.
 
 ## **4. Inlier Ratio와 Residual Metric**
 
@@ -162,6 +294,44 @@ registration_failure
 
 평균은 일부 쉬운 point가 많으면 좋아 보일 수 있지만, p95는 scan에서 크게 어긋난 tail 쪽을 더 잘 보여줍니다.
 
+이번 UNIST evaluator에서는 다음 threshold를 사용했습니다.
+
+```text
+nn_threshold_m: 0.35
+residual_threshold_m: 0.20
+registration_failure threshold:
+  inlier_ratio < 0.5
+```
+
+여기서 `correspondence_count`와 `inlier_count`는 다릅니다.
+
+```text
+correspondence_count:
+  fixed map에서 충분히 가까운 neighbor를 찾은 point 수
+
+inlier_count:
+  correspondence가 있고, residual threshold도 통과한 point 수
+```
+
+따라서 다음 두 상황은 서로 다릅니다.
+
+```text
+correspondence_count가 감소:
+  scan point가 map 기준으로 너무 멀어졌거나,
+  map이 없는 영역으로 나갔거나,
+  initial pose가 크게 틀어졌을 가능성
+
+inlier_ratio가 감소:
+  correspondence는 잡혔지만,
+  local plane에서 벗어난 point가 많아졌을 가능성
+```
+
+robust cost는 큰 residual을 그대로 제곱해서 벌주지 않고, 일정 이상에서는 영향을 줄인 cost입니다.
+
+이 값은 outlier에 덜 민감하지만, 반대로 p95처럼 tail 악화를 직관적으로 보여주지는 않습니다.
+
+그래서 이번 글에서는 `residual_p95`와 `inlier_ratio`를 중심으로 해석합니다.
+
 ## **5. 나빠지는 방식은 하나가 아니다**
 
 이번 주에서 가장 조심해야 할 부분은 registration degradation을 한 가지 현상으로 뭉뚱그리지 않는 것입니다.
@@ -192,6 +362,77 @@ C. geometry degeneracy
 
 residual, inlier ratio, nearest-neighbor distance, pose update 안정성을 같이 봐야 합니다.
 
+### **Initial Pose가 중요한 이유**
+
+registration은 보통 local optimization입니다.
+
+처음 pose가 어느 정도 맞아 있어야 nearest neighbor도 맞고, plane normal도 맞고, residual도 의미가 있습니다.
+
+초기 pose가 많이 틀리면 문제는 이렇게 바뀝니다.
+
+```text
+처음 pose가 좋음:
+  scan point가 실제 map surface 근처에 있음
+  correspondence가 대체로 맞음
+  residual이 scan distortion이나 deskew 품질을 반영함
+
+처음 pose가 나쁨:
+  scan point가 엉뚱한 wall/floor에 붙음
+  correspondence가 잘못됨
+  residual 증가는 scan distortion 때문인지 initial pose 때문인지 분리하기 어려움
+```
+
+이번 실험에서 `initial_pose = identity`로 고정한 이유도 여기에 있습니다.
+
+처음부터 pose optimization까지 섞으면, residual 변화가 scan 왜곡 때문인지, optimizer가 다른 local minimum으로 간 것인지 구분하기 어려워집니다.
+
+### **Gauss-Newton과 Hessian은 다음 단계**
+
+full point-to-plane ICP에서는 보통 pose update $\delta \boldsymbol{\xi}$를 반복해서 풉니다.
+
+작은 pose 변화에 대해 residual을 선형화하면:
+
+$$
+r_i(\boldsymbol{\xi} + \delta \boldsymbol{\xi})
+\approx
+r_i(\boldsymbol{\xi})
++
+J_i
+\delta \boldsymbol{\xi}
+$$
+
+전체 residual을 쌓으면 normal equation은 다음 형태가 됩니다.
+
+$$
+H
+\delta \boldsymbol{\xi}
+=
+-g
+$$
+
+여기서:
+
+```text
+J: residual Jacobian
+H = J^T J: Hessian approximation
+g = J^T r: gradient
+```
+
+Hessian이 잘 conditioned 되어 있으면 pose update 방향이 안정적입니다.
+
+반대로 구조가 부족하면 특정 방향이 거의 관측되지 않습니다.
+
+예를 들어 긴 복도에서는 앞뒤 translation이나 yaw가 헷갈릴 수 있고, 큰 평면 하나만 있으면 평면을 따라 움직이는 방향이 약하게 구속됩니다.
+
+그래서 5주차에서 말하는 `geometry degeneracy`는 단순히 residual이 크다는 뜻이 아닙니다.
+
+```text
+residual은 낮아 보이지만,
+pose를 어느 방향으로 고쳐야 하는지 정보가 부족한 상태
+```
+
+이것이 다음 주에 Hessian condition과 initial pose perturbation sweep을 보려는 이유입니다.
+
 ## **6. 최소 구현 구조**
 
 5주차 evaluator의 최소 코드는 다음 구조입니다.
@@ -213,8 +454,8 @@ def point_to_plane_residuals(scan_points_map, plane_points, plane_normals):
 def compute_registration_metrics(
     residuals,
     nn_distances,
-    residual_threshold=0.1,
-    nn_threshold=0.5,
+    residual_threshold=0.2,
+    nn_threshold=0.35,
 ):
     valid_corr = nn_distances < nn_threshold
     inliers = valid_corr & (np.abs(residuals) < residual_threshold)
@@ -223,9 +464,15 @@ def compute_registration_metrics(
     inlier_count = int(np.sum(inliers))
 
     if correspondence_count == 0:
-        inlier_ratio = 0.0
-    else:
-        inlier_ratio = inlier_count / correspondence_count
+        return {
+            "correspondence_count": 0,
+            "inlier_count": 0,
+            "inlier_ratio": 0.0,
+            "residual_p95": float("inf"),
+            "registration_failure": True,
+        }
+
+    inlier_ratio = inlier_count / correspondence_count
 
     return {
         "correspondence_count": correspondence_count,
@@ -283,11 +530,11 @@ method: fixed map에 대한 point-to-plane residual evaluator
 
 다만 같은 fixed map 후보를 기준으로 raw scan, gyro-deskewed scan, synthetic distorted scan의 registration metric을 비교할 수 있습니다.
 
-## **8. 대표 그림이 의미하는 것**
+## **8. 대표 3D 그림이 의미하는 것**
 
-5주차 대표 그림은 `spatial_residual_3d.png`입니다.
+5주차 대표 그림은 VTK로 다시 렌더링한 `vtk_low_oblique_residual_triptych.png`입니다.
 
-![UNIST fixed map registration residual 3D view](/assets/img/posts/slam/study/week-5-fixed-map-registration/spatial_residual_3d.png){: .d-block .mx-auto }
+![UNIST fixed map registration residual 3D VTK triptych](/assets/img/posts/slam/study/week-5-fixed-map-registration/vtk_low_oblique_residual_triptych.png){: .d-block .mx-auto }
 
 이 그림은 세 개의 scan을 fixed map 위에 올려 놓고 비교한 것입니다.
 
@@ -324,6 +571,20 @@ right:
 
 그래서 5주차 글에서는 이 그림을 registration residual 분포를 보는 진단 그림으로 해석해야 합니다.
 
+처음 matplotlib 3D 그림만 보면 데이터가 2D처럼 보일 수 있습니다. 하지만 데이터 자체는 2D가 아닙니다.
+
+```text
+fixed map z span: 8.252 m
+raw scan z span: 8.837 m
+gyro-deskewed scan z span: 8.814 m
+```
+
+2D처럼 보였던 이유는 point cloud가 빈 공간을 채우는 volume data가 아니라, 벽, 바닥, 구조물 표면을 샘플링한 surface data이기 때문입니다. 즉 LiDAR point cloud는 3D 좌표를 갖지만, 시각적으로는 얇은 표면들의 집합처럼 보이는 것이 자연스럽습니다.
+
+보조로 축과 colorbar가 있는 matplotlib 3D 그림도 남겨 둡니다. 수치 비교를 읽기에는 이 그림이 더 직접적입니다.
+
+![UNIST fixed map registration residual 3D matplotlib view](/assets/img/posts/slam/study/week-5-fixed-map-registration/spatial_residual_3d.png){: .d-block .mx-auto }
+
 ## **9. 주요 수치**
 
 이번 evaluator에서 나온 핵심 수치는 다음입니다.
@@ -357,6 +618,63 @@ synthetic_yaw_strong_6deg:
 strong synthetic yaw distortion은 raw보다 residual p95가 커지고, inlier ratio가 낮아졌습니다.
 
 즉 controlled distortion이 fixed-map registration metric을 악화시키는 방향은 확인됐습니다.
+
+이 표에서 읽어야 하는 포인트는 세 가지입니다.
+
+첫째, raw와 gyro-deskewed의 차이는 매우 작습니다.
+
+```text
+raw residual p95:
+  0.323333 m
+
+gyro_deskewed residual p95:
+  0.320903 m
+```
+
+rotation-only gyro deskew가 p95 residual을 약간 줄였지만, inlier ratio는 오히려 raw보다 낮습니다.
+
+이것은 이상한 결과라기보다, 현재 evaluator의 한계를 보여주는 결과입니다.
+
+```text
+1. translation deskew는 들어가지 않음
+2. fixed map이 ground truth는 아님
+3. initial pose를 identity로 고정함
+4. residual은 local plane fitting과 correspondence 선택에 민감함
+```
+
+즉 gyro-deskewed가 모든 metric에서 이겨야 한다고 기대하면 안 됩니다.
+
+둘째, synthetic strong은 raw보다 더 나쁜 방향으로 움직였습니다.
+
+```text
+raw inlier ratio:
+  0.676642
+
+synthetic strong inlier ratio:
+  0.658219
+```
+
+같은 fixed map, 같은 evaluator에서 강한 artificial yaw distortion을 넣었을 때 inlier ratio가 떨어졌습니다.
+
+이 부분이 5주차의 핵심 관찰입니다.
+
+셋째, residual p95와 inlier ratio는 서로 보완적입니다.
+
+residual p95는 살아남은 correspondence들 중 tail이 얼마나 나쁜지 보여줍니다.
+
+inlier ratio는 threshold를 통과한 point가 얼마나 남았는지 보여줍니다.
+
+따라서 좋은 registration은 보통 다음 형태를 기대합니다.
+
+```text
+residual p95 낮음
+inlier ratio 높음
+correspondence_count 충분함
+robust cost 낮음
+pose update 안정적
+```
+
+이번 구현은 이 중 pose update 안정성까지는 아직 보지 않았습니다.
 
 ## **10. 조심해야 하는 해석**
 
@@ -408,6 +726,7 @@ study/fixed_map_registration.py
 study/results/fixed_map_registration/unist_livox_scan1896/
   registration_metrics.csv
   summary.md
+  vtk_low_oblique_residual_triptych.png
   spatial_residual_3d.png
   spatial_inlier_3d.png
   residual_p95_bar.png
