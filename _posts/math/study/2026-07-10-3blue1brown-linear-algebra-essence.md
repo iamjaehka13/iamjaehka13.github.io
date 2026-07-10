@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 17:49:27 +0900
+last_modified_at: 2026-07-10 18:49:56 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -38,9 +38,9 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 이 글은 영상을 그대로 옮긴 transcript가 아닙니다. 영상의 핵심 관점을 바탕으로, 내가 선형대수를 다시 볼 때 필요한 개념을 공부용으로 재구성한 글입니다.
 
-이번 수정에서는 3Blue1Brown 선형대수 2강부터 12강까지의 공식 YouTube 영상을 각 개념 섹션에 임베드했습니다.
+이번 수정에서는 3Blue1Brown 공식 **Essence of Linear Algebra** playlist 기준으로 1강부터 16강까지의 공식 YouTube 영상을 각 개념 섹션에 임베드했습니다.
 
-원본 영상의 캡처/GIF를 내 asset으로 복사한 것이 아니라, 공식 플레이어를 직접 연결해 원본 시각화를 함께 볼 수 있게 했습니다.
+각 섹션에는 공식 YouTube embed를 먼저 두고, 바로 아래에는 원본 영상에서 짧게 발췌한 study용 GIF를 붙였습니다.
 
 목표는 하나입니다.
 
@@ -48,12 +48,13 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 ### **0.1 이 글의 범위와 출처 사용 기준**
 
-2강부터 12강까지를 제대로 정리하려면 각 강의 핵심 질문이 분명해야 합니다.
+1강부터 16강까지를 제대로 정리하려면 각 강의 핵심 질문이 분명해야 합니다.
 
-이 글에서 2강부터 12강은 다음 범위로 봅니다.
+이 글에서 각 강은 다음 범위로 봅니다.
 
 | 3Blue1Brown 강 | 이 글의 섹션 | 핵심 질문 |
 |---|---|---|
+| 1강 | 벡터란 무엇인가 | 벡터를 화살표, 숫자 리스트, 공간의 원소로 함께 볼 수 있는가? |
 | 2강 | 선형결합, span, basis | 어떤 벡터 조합이 공간을 만들 수 있는가? |
 | 3강 | 행렬과 선형변환 | 행렬의 열벡터는 무엇을 의미하는가? |
 | 4강 | 행렬곱 | 행렬곱을 변환의 합성으로 볼 수 있는가? |
@@ -65,6 +66,10 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 | 10강 | cross product | 외적을 oriented area와 normal vector로 볼 수 있는가? |
 | 11강 | cross product와 선형변환 | 외적을 determinant와 duality로 다시 설명할 수 있는가? |
 | 12강 | Cramer's rule | 해의 좌표를 determinant 비율로 해석할 수 있는가? |
+| 13강 | 기저변환 | 같은 벡터를 다른 좌표계의 언어로 다시 읽을 수 있는가? |
+| 14강 | 고유벡터와 고유값 | 변환 후에도 방향이 유지되는 축을 찾을 수 있는가? |
+| 15강 | 고유값 계산 trick | characteristic equation을 determinant collapse로 이해할 수 있는가? |
+| 16강 | 추상 벡터공간 | 화살표가 아닌 함수와 다항식도 벡터처럼 볼 수 있는가? |
 
 3Blue1Brown 공식 FAQ 기준으로 still image나 짧은 clip 사용은 조건이 있습니다.
 
@@ -79,7 +84,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
-이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 2강부터 12강까지는 각 강마다 원본 영상에서 짧게 발췌한 GIF clip을 함께 넣었습니다.
+이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 1강부터 16강까지는 각 강마다 원본 영상에서 짧게 발췌한 GIF clip을 함께 넣었습니다.
 
 각 GIF는 각 원본 영상에서 60초보다 훨씬 짧게 발췌했습니다. GIF 자체에는 별도 글자를 덮지 않고, 바로 아래 caption에 출처와 원본 링크를 연결했습니다.
 
@@ -140,6 +145,19 @@ $$
 하나의 흐름으로 이어집니다.
 
 ## **2. 벡터란 무엇인가**
+
+3Blue1Brown 1강은 벡터를 화살표, 숫자 리스트, 추상적인 공간의 원소라는 세 관점으로 연결합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/fNk_zzaMoSs" title="3Blue1Brown Chapter 1 - Vectors" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-vectors.gif" alt="3Blue1Brown Ch.1 vectors visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 벡터는 분야마다 조금씩 다르게 보입니다.
 
@@ -1351,6 +1369,19 @@ iterative solver
 
 ## **13. 기저변환**
 
+3Blue1Brown 13강은 change of basis를 “벡터를 움직이는 것”이 아니라 “같은 벡터를 다른 좌표계 언어로 읽는 것”으로 설명합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/P2LTAUO1TdA" title="3Blue1Brown Chapter 13 - Change of basis" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-change-of-basis.gif" alt="3Blue1Brown Ch.13 change of basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/P2LTAUO1TdA">3Blue1Brown Ch.13</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 기저변환(change of basis)은 처음에는 헷갈립니다.
 
 그 이유는 우리가 보통 벡터와 좌표를 같은 것으로 착각하기 때문입니다.
@@ -1454,6 +1485,19 @@ world frame에서 본 벡터, body frame에서 본 벡터, LiDAR frame에서 본
 
 ## **14. 고유벡터와 고유값**
 
+3Blue1Brown 14강은 eigenvector를 선형변환 이후에도 같은 직선 위에 남는 특수한 방향으로 설명합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/PFDu9oVAE-g" title="3Blue1Brown Chapter 14 - Eigenvectors and eigenvalues" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigenvectors.gif" alt="3Blue1Brown Ch.14 eigenvectors and eigenvalues visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/PFDu9oVAE-g">3Blue1Brown Ch.14</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 고유벡터(eigenvector)는 선형변환을 적용해도 방향이 바뀌지 않는 벡터입니다.
 
 방향은 유지되고, 길이만 늘어나거나 줄거나 반대로 뒤집힙니다.
@@ -1521,6 +1565,19 @@ SLAM normal equation
 
 ## **15. 고유값을 계산하는 trick**
 
+3Blue1Brown 15강은 2x2 행렬에서 eigenvalue를 빠르게 계산하는 방법을 다루지만, 핵심은 여전히 $\det(A-\lambda I)=0$이 어떤 방향의 collapse를 뜻한다는 점입니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/e50Bj7jn9IQ" title="3Blue1Brown Chapter 15 - A quick trick for computing eigenvalues" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch15-eigenvalue-trick.gif" alt="3Blue1Brown Ch.15 eigenvalue trick visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/e50Bj7jn9IQ">3Blue1Brown Ch.15</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 고유값은 다음 식에서 나옵니다.
 
 $$
@@ -1559,6 +1616,19 @@ A - lambda I가 어떤 방향을 0으로 누르는 lambda를 찾는다.
 determinant가 0이면 차원이 collapse된다는 관점에서 자연스럽게 나옵니다.
 
 ## **16. 추상 벡터공간**
+
+3Blue1Brown 16강은 벡터공간을 2D/3D 화살표에서 벗어나 함수, 다항식, 신호 같은 대상으로 확장합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/TgKwz5Ikpc8" title="3Blue1Brown Chapter 16 - Abstract vector spaces" loading="lazy" allowfullscreen></iframe>
+</div>
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch16-abstract-vector-spaces.gif" alt="3Blue1Brown Ch.16 abstract vector spaces visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/TgKwz5Ikpc8">3Blue1Brown Ch.16</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 지금까지는 벡터를 주로 화살표로 생각했습니다.
 
@@ -1749,7 +1819,9 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 이 글은 아래 자료들을 바탕으로 공부 내용을 정리한 것입니다.
 
 - [3Blue1Brown 한국어 선형대수학의 본질 재생목록](https://www.youtube.com/playlist?list=PLOEOa0pDLTZaglBDKWxV4t80Y3Psk_Hg4)
+- [3Blue1Brown Essence of Linear Algebra official playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
 - [3Blue1Brown About / FAQ - material usage guidance](https://www.3blue1brown.com/about/)
+- [3Blue1Brown - Vectors](https://youtu.be/fNk_zzaMoSs)
 - [3Blue1Brown - Linear combinations, span, and basis vectors](https://www.3blue1brown.com/lessons/span/)
 - [3Blue1Brown - Essence of linear algebra preview](https://www.3blue1brown.com/lessons/eola-preview/)
 - [3Blue1Brown - Linear transformations and matrices](https://www.3blue1brown.com/lessons/linear-transformations/)
@@ -1762,8 +1834,9 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 - [3Blue1Brown - Cross products](https://www.3blue1brown.com/lessons/cross-products/)
 - [3Blue1Brown - Cross products in the light of linear transformations](https://www.3blue1brown.com/lessons/cross-products-extended/)
 - [3Blue1Brown - Cramer's rule, explained geometrically](https://www.3blue1brown.com/lessons/cramers-rule/)
-- [3Blue1Brown - Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues/)
 - [3Blue1Brown - Change of basis](https://www.3blue1brown.com/lessons/change-of-basis/)
+- [3Blue1Brown - Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues/)
+- [3Blue1Brown - A quick trick for computing eigenvalues](https://youtu.be/e50Bj7jn9IQ)
 - [3Blue1Brown - Abstract vector spaces](https://www.3blue1brown.com/lessons/abstract-vector-spaces/)
 
 원 영상과 공식 글은 시각화가 핵심입니다. 이 글은 그 자료들을 대체하려는 것이 아니라, 원본 영상과 함께 보면서 개념을 다시 잡기 위한 내 공부용 정리입니다.
