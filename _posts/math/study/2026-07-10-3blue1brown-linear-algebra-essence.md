@@ -1,0 +1,1170 @@
+---
+title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
+date: 2026-07-10 16:21:54 +0900
+last_modified_at: 2026-07-10 16:21:54 +0900
+categories: [Math, Study]
+tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
+description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
+math: true
+---
+
+## **0. 이 글의 목표**
+
+선형대수는 처음 배우면 이상하게 느껴집니다.
+
+계산은 할 수 있습니다.
+
+```text
+행렬 곱하기
+역행렬 구하기
+determinant 계산하기
+eigenvalue 구하기
+```
+
+그런데 막상 질문을 바꾸면 흔들립니다.
+
+```text
+행렬은 대체 무엇인가?
+
+determinant가 0이라는 말은 공간에서 무슨 일이 일어났다는 뜻인가?
+
+eigenvector는 왜 그렇게 중요하게 나오는가?
+
+기저를 바꾼다는 것은 실제로 무엇을 바꾸는 것인가?
+```
+
+3Blue1Brown의 **Essence of Linear Algebra** 시리즈가 좋은 이유는 이 질문들을 계산 절차가 아니라 **공간의 움직임**으로 설명하기 때문입니다.
+
+이 글은 영상을 그대로 옮긴 transcript가 아닙니다. 영상의 핵심 관점을 바탕으로, 내가 선형대수를 다시 볼 때 필요한 개념을 공부용으로 재구성한 글입니다.
+
+목표는 하나입니다.
+
+> 선형대수를 숫자 계산 과목이 아니라, 벡터공간과 선형변환을 다루는 언어로 이해한다.
+
+## **1. 선형대수의 핵심 관점**
+
+선형대수의 중심에는 세 단어가 있습니다.
+
+```text
+vector
+space
+linear transformation
+```
+
+한국어로 쓰면 다음과 같습니다.
+
+```text
+벡터
+공간
+선형변환
+```
+
+여기서 가장 중요한 관점 전환은 이것입니다.
+
+> 행렬은 숫자 표가 아니라 공간을 움직이는 규칙이다.
+
+예를 들어 2차원 벡터
+
+$$
+\mathbf{x} =
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+$$
+
+가 있다고 합시다.
+
+행렬 $A$를 곱한다는 것은 단순히 계산을 하는 것이 아닙니다.
+
+$$
+A \mathbf{x}
+$$
+
+는 벡터 $\mathbf{x}$가 놓인 공간 전체를 어떤 방식으로 늘리고, 줄이고, 회전시키고, 기울이는 것입니다.
+
+그래서 선형대수를 제대로 이해하려면 다음 질문을 계속 해야 합니다.
+
+```text
+이 계산은 공간에서 무엇을 하고 있는가?
+
+이 수식은 벡터를 어디로 보내는가?
+
+이 값이 0이 된다는 것은 어떤 차원이 사라졌다는 뜻인가?
+```
+
+이 질문이 잡히면, determinant, inverse, basis, eigenvector 같은 개념들이 서로 따로 놀지 않습니다.
+
+하나의 흐름으로 이어집니다.
+
+## **2. 벡터란 무엇인가**
+
+벡터는 분야마다 조금씩 다르게 보입니다.
+
+물리에서는 벡터를 보통 화살표로 봅니다.
+
+```text
+힘
+속도
+가속도
+변위
+```
+
+컴퓨터공학에서는 벡터를 숫자 리스트로 봅니다.
+
+```text
+[1.2, -0.7, 3.1]
+```
+
+수학에서는 이 둘을 더 추상적으로 묶어서 봅니다.
+
+벡터는 어떤 공간 안의 원소이고, 그 공간에서는 적어도 다음 두 연산이 잘 정의되어 있어야 합니다.
+
+```text
+벡터 + 벡터
+스칼라 * 벡터
+```
+
+2차원에서 벡터
+
+$$
+\mathbf{v} =
+\begin{bmatrix}
+3 \\
+2
+\end{bmatrix}
+$$
+
+는 원점에서 오른쪽으로 3, 위로 2만큼 이동한 화살표로 볼 수 있습니다.
+
+하지만 더 중요한 것은 좌표값 자체가 아니라 이 벡터가 가지는 **방향과 크기**입니다.
+
+### **2.1 벡터 덧셈**
+
+벡터 덧셈은 이동을 이어 붙이는 것입니다.
+
+$$
+\mathbf{v} + \mathbf{w}
+$$
+
+는 먼저 $\mathbf{v}$만큼 이동하고, 그 끝에서 다시 $\mathbf{w}$만큼 이동한 결과입니다.
+
+예를 들어
+
+$$
+\begin{bmatrix}
+3 \\
+2
+\end{bmatrix}
++
+\begin{bmatrix}
+-1 \\
+4
+\end{bmatrix}
+=
+\begin{bmatrix}
+2 \\
+6
+\end{bmatrix}
+$$
+
+입니다.
+
+계산은 성분끼리 더하는 것이지만, 의미는 **두 이동의 합성**입니다.
+
+### **2.2 스칼라 곱**
+
+스칼라 곱은 벡터를 같은 방향으로 늘리거나 줄이는 것입니다.
+
+$$
+c \mathbf{v}
+$$
+
+여기서 $c$가 양수이면 방향은 유지됩니다.
+
+$c$가 1보다 크면 길어지고, 0과 1 사이이면 짧아집니다.
+
+$c$가 음수이면 방향이 반대로 뒤집힙니다.
+
+예를 들어
+
+$$
+-2
+\begin{bmatrix}
+3 \\
+2
+\end{bmatrix}
+=
+\begin{bmatrix}
+-6 \\
+-4
+\end{bmatrix}
+$$
+
+는 원래 벡터를 반대 방향으로 2배 늘린 것입니다.
+
+## **3. 선형결합, span, basis**
+
+벡터 $\mathbf{v}$와 $\mathbf{w}$가 있을 때,
+
+$$
+a\mathbf{v} + b\mathbf{w}
+$$
+
+처럼 스칼라를 곱해서 더한 것을 **선형결합(linear combination)**이라고 합니다.
+
+이 식은 단순한 수식이 아니라 이런 의미입니다.
+
+```text
+v 방향으로 a만큼 가고,
+w 방향으로 b만큼 간다.
+```
+
+### **3.1 span**
+
+두 벡터 $\mathbf{v}$, $\mathbf{w}$로 만들 수 있는 모든 선형결합의 집합을 span이라고 합니다.
+
+$$
+\operatorname{span}(\mathbf{v}, \mathbf{w})
+=
+\{a\mathbf{v} + b\mathbf{w} \mid a,b \in \mathbb{R}\}
+$$
+
+2차원에서 두 벡터가 같은 직선 위에 있지 않으면, 두 벡터의 span은 평면 전체입니다.
+
+반대로 두 벡터가 같은 직선 위에 있으면, 아무리 $a,b$를 바꿔도 그 직선 밖으로 나갈 수 없습니다.
+
+이때 두 벡터는 **linearly dependent**, 즉 선형종속입니다.
+
+### **3.2 basis**
+
+기저(basis)는 공간을 표현하기 위한 최소한의 방향 세트입니다.
+
+2차원에서 표준기저는 보통 다음 두 벡터입니다.
+
+$$
+\mathbf{e}_1 =
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix},
+\quad
+\mathbf{e}_2 =
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}
+$$
+
+그러면 어떤 벡터든 이렇게 표현할 수 있습니다.
+
+$$
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+x\mathbf{e}_1 + y\mathbf{e}_2
+$$
+
+여기서 좌표 $x,y$는 벡터 그 자체가 아닙니다.
+
+그 벡터를 특정 기저 $\mathbf{e}_1, \mathbf{e}_2$ 기준으로 표현한 숫자입니다.
+
+이 관점이 중요합니다.
+
+> 좌표는 벡터가 아니라, 어떤 기저로 벡터를 읽었을 때 나오는 표현이다.
+
+나중에 change of basis가 나올 때 이 말이 핵심이 됩니다.
+
+## **4. 행렬과 선형변환**
+
+선형변환(linear transformation)은 벡터를 다른 벡터로 보내는 함수입니다.
+
+$$
+T(\mathbf{x}) = A\mathbf{x}
+$$
+
+여기서 $A$가 행렬입니다.
+
+선형변환이라는 이름이 붙으려면 두 성질이 유지되어야 합니다.
+
+$$
+T(\mathbf{v} + \mathbf{w}) = T(\mathbf{v}) + T(\mathbf{w})
+$$
+
+$$
+T(c\mathbf{v}) = cT(\mathbf{v})
+$$
+
+기하학적으로 보면 선형변환은 다음 특징을 가집니다.
+
+```text
+원점은 원점에 남는다.
+직선은 직선으로 간다.
+격자선은 평행성과 균일한 간격 구조를 유지한다.
+```
+
+이 조건 때문에 선형변환은 공간을 제멋대로 구기는 변환이 아닙니다.
+
+공간 전체를 규칙적으로 움직이는 변환입니다.
+
+### **4.1 행렬의 열벡터가 중요한 이유**
+
+2차원 행렬을 보겠습니다.
+
+$$
+A =
+\begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+$$
+
+이 행렬의 첫 번째 열은
+
+$$
+A\mathbf{e}_1 =
+\begin{bmatrix}
+a \\
+c
+\end{bmatrix}
+$$
+
+입니다.
+
+두 번째 열은
+
+$$
+A\mathbf{e}_2 =
+\begin{bmatrix}
+b \\
+d
+\end{bmatrix}
+$$
+
+입니다.
+
+즉 행렬의 열벡터는 각각 표준기저가 변환 후 어디로 가는지를 말합니다.
+
+그리고 임의의 벡터
+
+$$
+\mathbf{x} =
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+= x\mathbf{e}_1 + y\mathbf{e}_2
+$$
+
+에 대해
+
+$$
+A\mathbf{x}
+= A(x\mathbf{e}_1 + y\mathbf{e}_2)
+= xA\mathbf{e}_1 + yA\mathbf{e}_2
+$$
+
+가 됩니다.
+
+그래서 행렬-벡터 곱은 이렇게 읽을 수 있습니다.
+
+> 변환된 기저벡터들을 기존 좌표 $x,y$만큼 선형결합한 것.
+
+이것이 3Blue1Brown 선형대수 시리즈의 가장 중요한 관점 중 하나입니다.
+
+행렬을 보면 이제 숫자 표가 아니라 다음을 봐야 합니다.
+
+```text
+첫 번째 basis vector는 어디로 갔는가?
+두 번째 basis vector는 어디로 갔는가?
+공간 전체는 어떻게 움직였는가?
+```
+
+## **5. 행렬곱은 변환의 합성**
+
+행렬곱은 계산으로 보면 복잡합니다.
+
+하지만 기하학적으로 보면 단순합니다.
+
+> 행렬곱은 선형변환을 연속으로 적용한 것이다.
+
+두 행렬 $A$, $B$가 있을 때
+
+$$
+AB\mathbf{x}
+$$
+
+는 보통 이렇게 읽습니다.
+
+```text
+먼저 B로 x를 변환한다.
+그 결과를 다시 A로 변환한다.
+```
+
+즉 $AB$는 $B$ 다음에 $A$를 적용한 합성변환입니다.
+
+$$
+AB\mathbf{x} = A(B\mathbf{x})
+$$
+
+이 관점으로 보면 행렬곱의 순서가 왜 중요한지도 자연스럽습니다.
+
+공간을 먼저 회전하고 나서 shear하는 것과, 먼저 shear하고 나서 회전하는 것은 일반적으로 다릅니다.
+
+그래서 보통
+
+$$
+AB \ne BA
+$$
+
+입니다.
+
+이것은 계산 규칙의 이상한 예외가 아닙니다.
+
+변환의 순서가 다르면 공간의 최종 상태가 달라지기 때문입니다.
+
+## **6. 3차원 선형변환**
+
+2차원에서 했던 이야기는 3차원에서도 그대로 이어집니다.
+
+3차원 표준기저는 다음입니다.
+
+$$
+\mathbf{e}_1 =
+\begin{bmatrix}
+1 \\
+0 \\
+0
+\end{bmatrix},
+\quad
+\mathbf{e}_2 =
+\begin{bmatrix}
+0 \\
+1 \\
+0
+\end{bmatrix},
+\quad
+\mathbf{e}_3 =
+\begin{bmatrix}
+0 \\
+0 \\
+1
+\end{bmatrix}
+$$
+
+3차원 행렬
+
+$$
+A =
+\begin{bmatrix}
+| & | & | \\
+\mathbf{a}_1 & \mathbf{a}_2 & \mathbf{a}_3 \\
+| & | & |
+\end{bmatrix}
+$$
+
+의 세 열벡터 $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$는 각각 변환된 basis vector입니다.
+
+즉,
+
+```text
+첫 번째 열: x축 basis가 어디로 갔는가
+두 번째 열: y축 basis가 어디로 갔는가
+세 번째 열: z축 basis가 어디로 갔는가
+```
+
+를 나타냅니다.
+
+3차원에서도 임의의 벡터는 변환된 세 basis vector의 선형결합으로 이동합니다.
+
+$$
+A
+\begin{bmatrix}
+x \\
+y \\
+z
+\end{bmatrix}
+=
+x\mathbf{a}_1 + y\mathbf{a}_2 + z\mathbf{a}_3
+$$
+
+로봇공학에서 3차원 회전행렬을 볼 때도 이 관점이 유용합니다.
+
+회전행렬의 각 열은 한 좌표계의 축이 다른 좌표계에서 어떻게 보이는지를 나타냅니다.
+
+즉 회전행렬은 단순히 각도를 담은 표가 아니라, frame의 basis가 다른 frame에서 어떻게 표현되는지 담고 있습니다.
+
+## **7. determinant는 면적과 부피의 스케일**
+
+determinant는 보통 계산 공식으로 먼저 배웁니다.
+
+2차원에서는
+
+$$
+\det
+\begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+= ad - bc
+$$
+
+입니다.
+
+하지만 공식보다 중요한 것은 의미입니다.
+
+> determinant는 선형변환이 면적 또는 부피를 몇 배로 바꾸는지 나타내는 값이다.
+
+2차원에서는 단위 정사각형의 면적이 변환 후 몇 배가 되는지를 말합니다.
+
+3차원에서는 단위 정육면체의 부피가 변환 후 몇 배가 되는지를 말합니다.
+
+### **7.1 determinant의 부호**
+
+$\det(A) > 0$이면 orientation이 유지됩니다.
+
+$\det(A) < 0$이면 orientation이 뒤집힙니다.
+
+2차원에서는 종이를 뒤집는 것처럼, 오른손 좌표계와 왼손 좌표계가 바뀌는 느낌으로 볼 수 있습니다.
+
+### **7.2 determinant가 0이라는 말**
+
+$\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니다.
+
+2차원 공간이 선 하나로 눌렸거나, 한 점으로 눌렸을 수 있습니다.
+
+3차원 공간이 평면, 선, 점으로 눌렸을 수 있습니다.
+
+이 말은 곧 어떤 방향의 정보가 사라졌다는 뜻입니다.
+
+그래서 determinant가 0이면 역변환을 만들 수 없습니다.
+
+공간이 한 번 낮은 차원으로 찌그러지면, 원래 어디서 왔는지 되돌릴 정보가 사라지기 때문입니다.
+
+## **8. 역행렬, column space, null space**
+
+행렬 $A$의 역행렬 $A^{-1}$은 $A$가 한 변환을 되돌리는 변환입니다.
+
+$$
+A^{-1}A = I
+$$
+
+여기서 $I$는 항등변환입니다.
+
+항등변환은 공간을 그대로 두는 변환입니다.
+
+### **8.1 역행렬이 존재한다는 뜻**
+
+역행렬이 존재하려면 $A$가 공간을 찌그러뜨려 차원을 잃어버리면 안 됩니다.
+
+즉 2차원에서는 평면을 선으로 누르면 안 되고, 3차원에서는 공간을 평면이나 선으로 누르면 안 됩니다.
+
+이 조건을 determinant로 보면 다음과 같습니다.
+
+$$
+\det(A) \ne 0
+$$
+
+determinant가 0이 아니면, 공간의 면적이나 부피가 완전히 사라지지는 않았습니다.
+
+그래서 되돌릴 수 있습니다.
+
+### **8.2 column space**
+
+column space는 행렬 $A$가 만들어낼 수 있는 모든 출력 벡터의 집합입니다.
+
+$$
+\operatorname{Col}(A)
+=
+\{A\mathbf{x} \mid \mathbf{x} \in \mathbb{R}^n\}
+$$
+
+행렬의 열벡터들이 span하는 공간이라고도 볼 수 있습니다.
+
+선형시스템
+
+$$
+A\mathbf{x} = \mathbf{b}
+$$
+
+가 해를 가지려면 $\mathbf{b}$가 column space 안에 있어야 합니다.
+
+즉 $\mathbf{b}$가 $A$라는 변환으로 도달 가능한 위치여야 합니다.
+
+### **8.3 null space**
+
+null space는 $A$를 곱했을 때 0으로 가는 입력들의 집합입니다.
+
+$$
+\operatorname{Null}(A)
+=
+\{\mathbf{x} \mid A\mathbf{x} = \mathbf{0}\}
+$$
+
+null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라지지 않습니다.
+
+하지만 null space 안에 0이 아닌 벡터가 있다면, 그 방향의 정보는 $A$를 통과하며 사라집니다.
+
+이때는 보통 determinant도 0이고, 역행렬도 존재하지 않습니다.
+
+## **9. 정방행렬이 아닌 행렬**
+
+행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
+
+예를 들어 $2 \times 3$ 행렬은 3차원 벡터를 2차원 벡터로 보냅니다.
+
+$$
+A \in \mathbb{R}^{2 \times 3}
+$$
+
+이면
+
+$$
+A : \mathbb{R}^3 \rightarrow \mathbb{R}^2
+$$
+
+로 볼 수 있습니다.
+
+반대로 $3 \times 2$ 행렬은 2차원 벡터를 3차원 벡터로 보냅니다.
+
+$$
+A : \mathbb{R}^2 \rightarrow \mathbb{R}^3
+$$
+
+이 관점은 projection과 embedding을 이해하는 데 좋습니다.
+
+예를 들어 카메라 모델에서는 3차원 공간의 점이 2차원 이미지 평면으로 투영됩니다.
+
+SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가는 mapping이 계속 나옵니다.
+
+정방행렬이 아닌 행렬을 보면 이렇게 질문하면 됩니다.
+
+```text
+이 변환은 몇 차원 입력을 몇 차원 출력으로 보내는가?
+
+정보가 줄어드는가?
+
+새로운 차원에 embedding되는가?
+
+어떤 방향의 정보가 관측되지 않는가?
+```
+
+## **10. 내적과 duality**
+
+내적(dot product)은 계산으로는 성분별 곱의 합입니다.
+
+$$
+\mathbf{v} \cdot \mathbf{w}
+=
+v_1w_1 + v_2w_2 + \cdots + v_nw_n
+$$
+
+하지만 기하학적으로는 projection과 관련이 있습니다.
+
+$$
+\mathbf{v} \cdot \mathbf{w}
+=
+\|\mathbf{v}\|\|\mathbf{w}\|\cos\theta
+$$
+
+여기서 $\theta$는 두 벡터 사이의 각도입니다.
+
+이 식은 내적이 다음 정보를 담고 있다는 뜻입니다.
+
+```text
+두 벡터가 얼마나 같은 방향을 보는가?
+한 벡터를 다른 벡터 방향으로 얼마나 투영할 수 있는가?
+```
+
+### **10.1 내적의 부호**
+
+내적이 양수이면 두 벡터가 대체로 같은 방향입니다.
+
+내적이 0이면 두 벡터는 서로 직교합니다.
+
+내적이 음수이면 두 벡터가 대체로 반대 방향입니다.
+
+### **10.2 duality**
+
+duality 관점에서는 벡터 하나를 숫자를 출력하는 선형함수로 볼 수 있습니다.
+
+예를 들어 고정된 벡터 $\mathbf{v}$가 있을 때,
+
+$$
+f(\mathbf{x}) = \mathbf{v} \cdot \mathbf{x}
+$$
+
+는 입력 벡터 $\mathbf{x}$를 받아 스칼라 하나를 출력합니다.
+
+즉 벡터 $\mathbf{v}$는 단순히 공간 안의 화살표이면서 동시에, 다른 벡터를 숫자로 보내는 선형함수처럼 행동합니다.
+
+이 관점은 최적화, 기계학습, 로봇공학에서 자주 나옵니다.
+
+예를 들어 residual이 어떤 방향으로 가장 크게 변하는지, gradient가 어떤 방향을 가리키는지 이해할 때 내적과 duality가 바탕에 있습니다.
+
+## **11. 외적**
+
+3차원에서 외적(cross product)은 두 벡터로부터 새로운 벡터를 만듭니다.
+
+$$
+\mathbf{v} \times \mathbf{w}
+$$
+
+이 벡터는 다음 성질을 가집니다.
+
+```text
+v와 w 모두에 수직이다.
+크기는 v와 w가 만드는 평행사변형의 넓이와 같다.
+방향은 오른손 법칙으로 정해진다.
+```
+
+즉 외적은 단순히 수직 벡터를 찾는 도구가 아닙니다.
+
+두 벡터가 만드는 oriented area를 벡터 형태로 표현한 것입니다.
+
+### **11.1 외적과 determinant**
+
+외적은 determinant와도 연결됩니다.
+
+두 벡터가 만드는 면적은 determinant의 면적 스케일 관점과 이어집니다.
+
+또한 어떤 벡터 $\mathbf{u}$에 대해
+
+$$
+\mathbf{u} \cdot (\mathbf{v} \times \mathbf{w})
+$$
+
+는 세 벡터가 만드는 평행육면체의 signed volume을 나타냅니다.
+
+즉 내적, 외적, determinant는 서로 따로 있는 공식이 아니라, 길이, 면적, 부피를 다루는 하나의 기하학적 언어입니다.
+
+## **12. Cramer's rule**
+
+Cramer's rule은 선형시스템
+
+$$
+A\mathbf{x} = \mathbf{b}
+$$
+
+의 해를 determinant 비율로 표현하는 방법입니다.
+
+예를 들어 2차원에서
+
+$$
+\mathbf{x} =
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+$$
+
+를 구할 때, $x$와 $y$를 determinant의 비율로 쓸 수 있습니다.
+
+중요한 것은 Cramer's rule이 실제 수치계산에서 가장 효율적인 방법이라는 뜻은 아니라는 점입니다.
+
+현대 수치선형대수에서는 큰 시스템을 풀 때 보통 LU, QR, Cholesky, iterative solver 등을 씁니다.
+
+하지만 Cramer's rule은 개념적으로 의미가 있습니다.
+
+> 선형시스템의 해를 determinant, 즉 공간의 면적/부피 변화 비율로 해석할 수 있게 해준다.
+
+다시 말해 $A\mathbf{x}=\mathbf{b}$는 어떤 좌표 조합 $\mathbf{x}$가 변환 $A$를 거쳐 $\mathbf{b}$에 도달하는 문제입니다.
+
+Cramer's rule은 그 좌표 조합을 공간의 signed area 또는 signed volume 비율로 읽게 해줍니다.
+
+## **13. 기저변환**
+
+기저변환(change of basis)은 처음에는 헷갈립니다.
+
+그 이유는 우리가 보통 벡터와 좌표를 같은 것으로 착각하기 때문입니다.
+
+하지만 엄밀히는 다릅니다.
+
+```text
+벡터: 공간 안의 실제 대상
+좌표: 특정 기저로 그 벡터를 표현한 숫자
+```
+
+같은 벡터라도 어떤 기저를 쓰느냐에 따라 좌표는 달라질 수 있습니다.
+
+### **13.1 다른 사람의 좌표계로 읽기**
+
+표준기저가 아닌 새로운 기저
+
+$$
+\mathbf{b}_1,\mathbf{b}_2
+$$
+
+가 있다고 합시다.
+
+어떤 벡터 $\mathbf{v}$가 이 새 기저에서 좌표
+
+$$
+\begin{bmatrix}
+\alpha \\
+\beta
+\end{bmatrix}
+$$
+
+를 가진다는 것은
+
+$$
+\mathbf{v}
+=
+\alpha \mathbf{b}_1 + \beta \mathbf{b}_2
+$$
+
+라는 뜻입니다.
+
+기저 행렬
+
+$$
+P =
+\begin{bmatrix}
+| & | \\
+\mathbf{b}_1 & \mathbf{b}_2 \\
+| & |
+\end{bmatrix}
+$$
+
+를 만들면, 새 기저 좌표를 표준기저 좌표로 바꾸는 과정은
+
+$$
+\mathbf{v}_{standard} = P\mathbf{v}_{basis}
+$$
+
+입니다.
+
+반대로 표준기저 좌표를 새 기저 좌표로 읽고 싶으면
+
+$$
+\mathbf{v}_{basis} = P^{-1}\mathbf{v}_{standard}
+$$
+
+를 사용합니다.
+
+### **13.2 같은 변환을 다른 좌표계에서 보기**
+
+변환 $A$를 새 기저 기준으로 표현하면 보통 다음 형태가 나옵니다.
+
+$$
+P^{-1}AP
+$$
+
+이 식은 이렇게 읽을 수 있습니다.
+
+```text
+P: 새 기저 좌표를 표준기저 좌표로 바꾼다.
+A: 표준기저에서 변환을 적용한다.
+P^{-1}: 결과를 다시 새 기저 좌표로 읽는다.
+```
+
+즉 $P^{-1}AP$는 새로운 변환이 아닙니다.
+
+같은 변환을 다른 좌표계에서 표현한 것입니다.
+
+로봇공학의 좌표계 변환도 이 관점과 닿아 있습니다.
+
+world frame에서 본 벡터, body frame에서 본 벡터, LiDAR frame에서 본 벡터는 실제 물리량은 같을 수 있지만 좌표 표현은 다릅니다.
+
+## **14. 고유벡터와 고유값**
+
+고유벡터(eigenvector)는 선형변환을 적용해도 방향이 바뀌지 않는 벡터입니다.
+
+방향은 유지되고, 길이만 늘어나거나 줄거나 반대로 뒤집힙니다.
+
+수식으로는 다음과 같습니다.
+
+$$
+A\mathbf{v} = \lambda \mathbf{v}
+$$
+
+여기서 $\mathbf{v}$가 고유벡터이고, $\lambda$가 고유값(eigenvalue)입니다.
+
+이 식의 의미는 간단합니다.
+
+```text
+A가 v를 변환해도,
+결과는 여전히 v가 놓인 직선 위에 있다.
+```
+
+즉 고유벡터는 선형변환이 공간을 움직일 때 변환의 핵심 방향을 알려줍니다.
+
+### **14.1 고유값의 의미**
+
+$\lambda = 2$이면 그 방향으로 2배 늘어납니다.
+
+$\lambda = 0.5$이면 그 방향으로 절반으로 줄어듭니다.
+
+$\lambda = -1$이면 같은 직선 위에서 방향이 반대로 뒤집힙니다.
+
+$\lambda = 0$이면 그 방향이 0으로 눌립니다.
+
+그래서 eigenvalue는 각 eigenvector 방향에서 변환이 얼마나 강하게 작용하는지 알려줍니다.
+
+### **14.2 왜 중요한가**
+
+어떤 행렬이 충분한 수의 독립적인 고유벡터를 가지면, 그 행렬은 고유벡터 기저에서 매우 단순하게 표현됩니다.
+
+대각행렬처럼 보일 수 있습니다.
+
+$$
+A = PDP^{-1}
+$$
+
+여기서 $D$는 고유값들이 대각에 놓인 행렬입니다.
+
+이 말은 복잡한 변환도 적절한 기저에서는 각 축을 독립적으로 늘리고 줄이는 변환처럼 보일 수 있다는 뜻입니다.
+
+이 관점은 다음 주제들과 연결됩니다.
+
+```text
+PCA
+covariance matrix
+stability analysis
+vibration mode
+optimization Hessian
+graph Laplacian
+SLAM normal equation
+```
+
+## **15. 고유값을 계산하는 trick**
+
+고유값은 다음 식에서 나옵니다.
+
+$$
+A\mathbf{v} = \lambda \mathbf{v}
+$$
+
+이를 정리하면
+
+$$
+(A - \lambda I)\mathbf{v} = \mathbf{0}
+$$
+
+입니다.
+
+고유벡터 $\mathbf{v}$는 0벡터가 아니어야 합니다.
+
+그런데 0이 아닌 벡터가 $(A-\lambda I)$를 통과해서 0이 되려면, 이 변환은 어떤 방향을 0으로 눌러야 합니다.
+
+즉 determinant가 0이어야 합니다.
+
+$$
+\det(A - \lambda I) = 0
+$$
+
+이 식이 characteristic equation입니다.
+
+여기서 중요한 점은 계산 절차보다 기하학적 의미입니다.
+
+```text
+A - lambda I가 어떤 방향을 0으로 누르는 lambda를 찾는다.
+그 방향이 eigenvector다.
+```
+
+고유값 계산은 갑자기 튀어나온 공식이 아닙니다.
+
+determinant가 0이면 차원이 collapse된다는 관점에서 자연스럽게 나옵니다.
+
+## **16. 추상 벡터공간**
+
+지금까지는 벡터를 주로 화살표로 생각했습니다.
+
+하지만 벡터공간은 더 넓은 개념입니다.
+
+다음 대상들도 조건만 맞으면 벡터처럼 다룰 수 있습니다.
+
+```text
+다항식
+함수
+신호
+이미지
+확률변수
+행렬
+```
+
+예를 들어 다항식
+
+$$
+p(x) = 1 + 2x + 3x^2
+$$
+
+을 벡터처럼 볼 수 있습니다.
+
+기저를
+
+$$
+1,\ x,\ x^2
+$$
+
+로 잡으면, 이 다항식은 좌표
+
+$$
+\begin{bmatrix}
+1 \\
+2 \\
+3
+\end{bmatrix}
+$$
+
+처럼 표현됩니다.
+
+함수도 마찬가지입니다.
+
+두 함수를 더할 수 있고, 스칼라를 곱할 수 있으며, 그 결과가 다시 같은 종류의 함수라면 함수들의 집합도 벡터공간이 될 수 있습니다.
+
+이 추상화 덕분에 선형대수는 단순히 2D, 3D 화살표에만 머무르지 않습니다.
+
+신호처리, 머신러닝, 최적화, 제어, SLAM에서도 같은 언어를 사용할 수 있습니다.
+
+## **17. SLAM과 로봇공학에서 왜 중요한가**
+
+내가 SLAM을 공부하는 입장에서 선형대수가 중요한 이유는 매우 직접적입니다.
+
+SLAM은 결국 다음을 반복합니다.
+
+```text
+pose를 표현한다.
+sensor measurement를 예측한다.
+예측과 실제의 residual을 계산한다.
+Jacobian으로 residual의 변화를 선형화한다.
+linear system을 풀어 state update를 구한다.
+좌표계를 바꾸며 map과 sensor frame을 연결한다.
+```
+
+여기서 거의 모든 단계가 선형대수입니다.
+
+### **17.1 pose와 frame**
+
+3D pose는 보통 회전 $R$과 이동 $\mathbf{t}$로 표현합니다.
+
+$$
+\mathbf{p}_{world}
+=
+R\mathbf{p}_{body} + \mathbf{t}
+$$
+
+여기서 $R$은 회전행렬이고, 회전행렬의 열벡터는 body frame의 basis가 world frame에서 어떻게 보이는지 나타냅니다.
+
+즉 frame 변환은 basis 변환과 매우 가깝습니다.
+
+### **17.2 Jacobian**
+
+비선형 함수 $f(\mathbf{x})$를 현재 추정값 근처에서 선형화하면
+
+$$
+f(\mathbf{x} + \delta\mathbf{x})
+\approx
+f(\mathbf{x}) + J\delta\mathbf{x}
+$$
+
+가 됩니다.
+
+여기서 $J$가 Jacobian입니다.
+
+Jacobian은 작은 state 변화가 measurement나 residual을 어느 방향으로 얼마나 바꾸는지 나타내는 선형변환입니다.
+
+즉 Jacobian도 숫자 표가 아니라, local하게 공간을 움직이는 변환입니다.
+
+### **17.3 normal equation과 eigenvalue**
+
+최소제곱 문제에서는 보통 다음 형태가 나옵니다.
+
+$$
+J^T J \delta\mathbf{x} = -J^T \mathbf{r}
+$$
+
+여기서 $J^TJ$는 Hessian approximation처럼 볼 수 있습니다.
+
+이 행렬의 eigenvalue는 어떤 방향이 잘 관측되는지, 어떤 방향이 약하게 관측되는지와 연결됩니다.
+
+eigenvalue가 매우 작으면 그 방향은 정보가 부족하거나 ill-conditioned일 수 있습니다.
+
+SLAM에서 corridor, 평면 벽, 반복 구조물 같은 환경에서 특정 방향 drift가 커지는 이유도 이런 관측 가능성 문제와 연결됩니다.
+
+### **17.4 covariance**
+
+확률적 추정에서는 covariance matrix가 중요합니다.
+
+covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue는 그 방향의 분산 크기를 나타냅니다.
+
+그래서 uncertainty ellipsoid를 이해하는 것도 결국 eigenvector와 eigenvalue의 기하학적 해석입니다.
+
+## **18. 한 장 요약**
+
+| 개념 | 기하학적 의미 | 수식 | 왜 중요한가 |
+|---|---|---|---|
+| Vector | 공간 안의 방향과 크기 | $\mathbf{v}$ | 상태, 위치, 속도, residual의 기본 단위 |
+| Linear combination | 여러 방향을 섞어 위치를 만든다 | $a\mathbf{v}+b\mathbf{w}$ | span, basis, coordinate의 출발점 |
+| Span | 만들 수 있는 모든 벡터의 집합 | $\operatorname{span}(\cdot)$ | 도달 가능한 공간을 이해 |
+| Basis | 공간을 재는 좌표축 | $\mathbf{e}_1,\mathbf{e}_2$ | 좌표 표현의 기준 |
+| Matrix | basis vector를 어디로 보내는지 담은 변환 | $A\mathbf{x}$ | 선형변환의 표현 |
+| Matrix multiplication | 변환의 합성 | $AB\mathbf{x}=A(B\mathbf{x})$ | 순서가 중요한 이유 설명 |
+| Determinant | 면적/부피 스케일 | $\det(A)$ | collapse, invertibility 판단 |
+| Inverse | 변환을 되돌리는 변환 | $A^{-1}$ | 선형시스템 해, 복원 가능성 |
+| Column space | 도달 가능한 출력 공간 | $\operatorname{Col}(A)$ | $A\mathbf{x}=\mathbf{b}$ 해 존재 조건 |
+| Null space | 0으로 사라지는 입력 방향 | $\operatorname{Null}(A)$ | 잃어버린 정보, 관측 불가능 방향 |
+| Dot product | projection과 방향 유사도 | $\mathbf{v}\cdot\mathbf{w}$ | gradient, residual, projection |
+| Cross product | oriented area와 수직 방향 | $\mathbf{v}\times\mathbf{w}$ | normal vector, geometry |
+| Change of basis | 같은 벡터를 다른 좌표계로 읽기 | $P^{-1}AP$ | frame 변환, diagonalization |
+| Eigenvector | 변환 후에도 방향이 유지되는 벡터 | $A\mathbf{v}=\lambda\mathbf{v}$ | 주된 방향, 안정성, PCA |
+| Eigenvalue | eigenvector 방향의 scale | $\lambda$ | conditioning, uncertainty, mode 분석 |
+| Abstract vector space | 화살표 밖의 벡터 개념 | functions, polynomials | 신호, 이미지, 함수공간까지 확장 |
+
+## **19. 공부 순서**
+
+3Blue1Brown 시리즈를 볼 때는 단순히 공식을 외우기보다, 각 장이 끝날 때 다음 질문에 답할 수 있는지 확인하는 게 좋습니다.
+
+```text
+1. 벡터
+   벡터를 화살표, 숫자 리스트, 추상 원소 관점에서 설명할 수 있는가?
+
+2. 선형결합, span, basis
+   어떤 벡터들이 공간 전체를 만들 수 있는지 판단할 수 있는가?
+
+3. 행렬과 선형변환
+   행렬의 각 열이 무엇을 의미하는지 설명할 수 있는가?
+
+4. 행렬곱
+   AB와 BA가 왜 일반적으로 다른지 공간 변환으로 설명할 수 있는가?
+
+5. determinant
+   determinant가 0이라는 말을 차원 collapse로 설명할 수 있는가?
+
+6. inverse, column space, null space
+   선형시스템의 해 존재성과 도달 가능한 공간을 연결할 수 있는가?
+
+7. dot product, cross product
+   내적과 외적을 길이, 면적, projection으로 해석할 수 있는가?
+
+8. Cramer's rule
+   해를 determinant 비율로 보는 기하학적 의미를 설명할 수 있는가?
+
+9. change of basis
+   벡터와 좌표 표현을 구분할 수 있는가?
+
+10. eigenvector, eigenvalue
+    변환의 핵심 방향과 scale을 설명할 수 있는가?
+
+11. abstract vector space
+    함수나 다항식도 벡터처럼 다룰 수 있는 이유를 설명할 수 있는가?
+```
+
+이 질문들에 답할 수 있으면, 선형대수는 공식 모음이 아니라 하나의 언어처럼 보이기 시작합니다.
+
+## **20. 참고 링크**
+
+이 글은 아래 자료들을 바탕으로 공부 내용을 정리한 것입니다.
+
+- [3Blue1Brown 한국어 선형대수학의 본질 재생목록](https://www.youtube.com/playlist?list=PLOEOa0pDLTZaglBDKWxV4t80Y3Psk_Hg4)
+- [3Blue1Brown - Essence of linear algebra preview](https://www.3blue1brown.com/lessons/eola-preview/)
+- [3Blue1Brown - Linear transformations and matrices](https://www.3blue1brown.com/lessons/linear-transformations/)
+- [3Blue1Brown - The determinant](https://www.3blue1brown.com/lessons/determinant/)
+- [3Blue1Brown - Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues/)
+- [3Blue1Brown - Change of basis](https://www.3blue1brown.com/lessons/change-of-basis/)
+- [3Blue1Brown - Abstract vector spaces](https://www.3blue1brown.com/lessons/abstract-vector-spaces/)
+
+원 영상과 공식 글은 시각화가 핵심입니다. 이 글은 그 자료들을 대체하려는 것이 아니라, 영상을 보고 난 뒤 개념을 다시 잡기 위한 내 공부용 정리입니다.
