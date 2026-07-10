@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 16:35:31 +0900
+last_modified_at: 2026-07-10 16:38:59 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -45,6 +45,41 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 목표는 하나입니다.
 
 > 선형대수를 숫자 계산 과목이 아니라, 벡터공간과 선형변환을 다루는 언어로 이해한다.
+
+### **0.1 이 글의 범위와 출처 사용 기준**
+
+2강부터 12강까지를 제대로 정리하려면 각 강의 핵심 질문이 분명해야 합니다.
+
+이 글에서 2강부터 12강은 다음 범위로 봅니다.
+
+| 3Blue1Brown 강 | 이 글의 섹션 | 핵심 질문 |
+|---|---|---|
+| 2강 | 선형결합, span, basis | 어떤 벡터 조합이 공간을 만들 수 있는가? |
+| 3강 | 행렬과 선형변환 | 행렬의 열벡터는 무엇을 의미하는가? |
+| 4강 | 행렬곱 | 행렬곱을 변환의 합성으로 볼 수 있는가? |
+| 5강 | 3차원 변환 | 2D 관점을 3D basis로 확장할 수 있는가? |
+| 6강 | determinant | 면적/부피 스케일과 차원 collapse를 설명할 수 있는가? |
+| 7강 | inverse, column space, null space | 선형시스템의 해 존재성을 기하학으로 볼 수 있는가? |
+| 8강 | non-square matrix | 행렬을 서로 다른 차원 사이의 map으로 볼 수 있는가? |
+| 9강 | dot product, duality | 내적을 projection과 linear functional로 볼 수 있는가? |
+| 10강 | cross product | 외적을 oriented area와 normal vector로 볼 수 있는가? |
+| 11강 | cross product와 선형변환 | 외적을 determinant와 duality로 다시 설명할 수 있는가? |
+| 12강 | Cramer's rule | 해의 좌표를 determinant 비율로 해석할 수 있는가? |
+
+3Blue1Brown 공식 FAQ 기준으로 still image나 짧은 clip 사용은 조건이 있습니다.
+
+그래서 원본 시각자료를 직접 가져다 쓸 때는 다음 기준을 지키는 쪽이 맞습니다.
+
+```text
+1. 60초 미만의 짧은 material만 사용
+2. 화면 또는 캡션에 3Blue1Brown 출처 명시
+3. 원본 영상이나 공식 글 링크 제공
+4. clip 자체를 통째로 재업로드하는 방식은 피함
+```
+
+즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
+
+이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 본문 GIF는 같은 개념을 블로그용으로 다시 그린 자체 제작 자료를 사용했습니다.
 
 ## **1. 선형대수의 핵심 관점**
 
@@ -255,7 +290,31 @@ $$
 
 이때 두 벡터는 **linearly dependent**, 즉 선형종속입니다.
 
-### **3.2 basis**
+### **3.2 선형독립과 선형종속**
+
+2강에서 중요한 감각은 이것입니다.
+
+```text
+새 벡터가 정말 새로운 방향을 추가하는가?
+아니면 이미 있던 방향들의 조합으로 만들 수 있는가?
+```
+
+예를 들어 $\mathbf{w}=2\mathbf{v}$라면, $\mathbf{w}$는 새 방향을 추가하지 않습니다.
+
+이 경우 두 벡터의 span은 평면 전체가 아니라 한 직선입니다.
+
+반대로 $\mathbf{v}$와 $\mathbf{w}$가 같은 직선 위에 있지 않으면, 두 벡터는 서로 독립적인 방향을 제공합니다.
+
+이때 두 벡터의 span은 2차원 평면 전체가 됩니다.
+
+정리하면 다음과 같습니다.
+
+| 상태 | 의미 | span |
+|---|---|---|
+| 선형독립 | 새 벡터가 새로운 방향을 추가함 | 더 높은 차원을 만들 수 있음 |
+| 선형종속 | 새 벡터가 기존 벡터 조합으로 표현됨 | 차원이 늘지 않음 |
+
+### **3.3 basis**
 
 기저(basis)는 공간을 표현하기 위한 최소한의 방향 세트입니다.
 
@@ -468,6 +527,52 @@ $$
 
 변환의 순서가 다르면 공간의 최종 상태가 달라지기 때문입니다.
 
+### **5.1 행렬곱의 열벡터 해석**
+
+행렬곱도 열벡터 관점으로 다시 읽을 수 있습니다.
+
+행렬 $B$의 열벡터를 $\mathbf{b}_1, \mathbf{b}_2$라고 하면,
+
+$$
+B =
+\begin{bmatrix}
+| & | \\
+\mathbf{b}_1 & \mathbf{b}_2 \\
+| & |
+\end{bmatrix}
+$$
+
+입니다.
+
+여기에 $A$를 곱하면
+
+$$
+AB =
+\begin{bmatrix}
+| & | \\
+A\mathbf{b}_1 & A\mathbf{b}_2 \\
+| & |
+\end{bmatrix}
+$$
+
+가 됩니다.
+
+즉 $AB$의 첫 번째 열은 $B$가 보낸 첫 번째 basis 방향을 다시 $A$로 보낸 결과입니다.
+
+두 번째 열도 마찬가지입니다.
+
+그래서 행렬곱은 “숫자표끼리 곱하는 이상한 규칙”이 아니라, 다음 질문으로 읽을 수 있습니다.
+
+> $B$가 만든 새 basis 방향들을 $A$가 다시 어디로 보내는가?
+
+이 해석을 잡으면 $AB$와 $BA$가 왜 다른지도 자연스럽습니다.
+
+$AB$는 $B$가 먼저 공간을 움직이고, 그 결과를 $A$가 다시 움직입니다.
+
+$BA$는 그 반대입니다.
+
+공간 변환 순서가 바뀌면 최종 grid가 달라지므로 두 행렬곱은 일반적으로 같지 않습니다.
+
 ## **6. 3차원 선형변환**
 
 3Blue1Brown 5강은 2차원에서 잡은 선형변환 관점을 3차원으로 확장합니다.
@@ -538,6 +643,24 @@ z
 =
 x\mathbf{a}_1 + y\mathbf{a}_2 + z\mathbf{a}_3
 $$
+
+2차원에서는 행렬의 두 열이 변환된 $\mathbf{e}_1,\mathbf{e}_2$를 담았습니다.
+
+3차원에서는 세 열이 변환된 $\mathbf{e}_1,\mathbf{e}_2,\mathbf{e}_3$를 담습니다.
+
+따라서 3D 행렬을 볼 때도 질문은 같습니다.
+
+```text
+x축 basis는 어디로 갔는가?
+y축 basis는 어디로 갔는가?
+z축 basis는 어디로 갔는가?
+```
+
+이 세 축이 변환 후에도 서로 독립적인 방향을 유지하면 3차원 부피가 남습니다.
+
+반대로 세 축 중 하나가 다른 축들의 span 안으로 들어가면 공간은 평면이나 선으로 눌립니다.
+
+이 관점이 바로 다음 강의 determinant로 이어집니다.
 
 로봇공학에서 3차원 회전행렬을 볼 때도 이 관점이 유용합니다.
 
@@ -680,6 +803,40 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 
 이때는 보통 determinant도 0이고, 역행렬도 존재하지 않습니다.
 
+### **8.4 rank와 해의 개수**
+
+7강에서 column space와 null space를 보는 이유는 선형시스템의 해를 단순 계산 문제가 아니라 구조 문제로 보기 위해서입니다.
+
+$$
+A\mathbf{x} = \mathbf{b}
+$$
+
+에서 가능한 경우는 크게 세 가지입니다.
+
+| 상황 | 기하학적 의미 | 해 |
+|---|---|---|
+| $\mathbf{b}$가 column space 밖에 있음 | 변환 $A$로는 $\mathbf{b}$에 도달 불가 | 해 없음 |
+| $\mathbf{b}$가 column space 안에 있고 null space가 0뿐임 | 도달 가능하고 입력이 하나로 정해짐 | 해 하나 |
+| $\mathbf{b}$가 column space 안에 있고 null space가 큼 | 도달 가능하지만 여러 입력이 같은 출력으로 감 | 해 무한히 많음 |
+
+rank는 column space의 차원입니다.
+
+즉 행렬이 실제로 출력 공간 안에서 몇 차원까지 만들어낼 수 있는지를 나타냅니다.
+
+nullity는 null space의 차원입니다.
+
+즉 입력 중에서 출력으로 보이지 않고 사라지는 자유도의 수입니다.
+
+이 둘은 서로 연결됩니다.
+
+$$
+\operatorname{rank}(A) + \operatorname{nullity}(A) = n
+$$
+
+여기서 $n$은 입력 차원입니다.
+
+이 식은 “입력 자유도는 출력으로 살아남는 방향과 0으로 사라지는 방향으로 나뉜다”는 뜻으로 볼 수 있습니다.
+
 ## **9. 정방행렬이 아닌 행렬**
 
 3Blue1Brown 8강은 정방행렬이 아닌 행렬을 차원 사이의 변환으로 봅니다.
@@ -689,6 +846,15 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 </div>
 
 행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
+
+행렬 크기 $m \times n$은 다음처럼 읽을 수 있습니다.
+
+```text
+n차원 입력을 받아서
+m차원 출력으로 보낸다.
+```
+
+즉 열의 개수는 입력 차원이고, 행의 개수는 출력 차원입니다.
 
 예를 들어 $2 \times 3$ 행렬은 3차원 벡터를 2차원 벡터로 보냅니다.
 
@@ -795,6 +961,47 @@ $$
 
 예를 들어 residual이 어떤 방향으로 가장 크게 변하는지, gradient가 어떤 방향을 가리키는지 이해할 때 내적과 duality가 바탕에 있습니다.
 
+### **10.3 row vector를 linear functional로 보기**
+
+내적과 duality를 더 직접적으로 쓰면, row vector는 벡터를 숫자로 보내는 선형함수입니다.
+
+예를 들어
+
+$$
+\begin{bmatrix}
+a & b
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+= ax + by
+$$
+
+입니다.
+
+왼쪽의 row vector $\begin{bmatrix}a & b\end{bmatrix}$는 2D 벡터를 받아 스칼라 하나를 내놓습니다.
+
+그런데 같은 계산은 벡터
+
+$$
+\mathbf{v} =
+\begin{bmatrix}
+a \\
+b
+\end{bmatrix}
+$$
+
+와의 내적으로도 볼 수 있습니다.
+
+$$
+\mathbf{v} \cdot \mathbf{x} = ax + by
+$$
+
+즉 어떤 linear functional은 하나의 벡터와 대응될 수 있습니다.
+
+이 대응이 11강에서 외적을 다시 해석할 때 중요해집니다.
+
 ## **11. 외적**
 
 3Blue1Brown 10강은 외적을 계산법과 기하학적 의미로 설명합니다.
@@ -843,6 +1050,75 @@ $$
 
 즉 내적, 외적, determinant는 서로 따로 있는 공식이 아니라, 길이, 면적, 부피를 다루는 하나의 기하학적 언어입니다.
 
+### **11.2 외적의 계산식**
+
+외적의 계산식은 보통 이렇게 씁니다.
+
+$$
+\mathbf{v} \times \mathbf{w}
+=
+\begin{bmatrix}
+v_2w_3 - v_3w_2 \\
+v_3w_1 - v_1w_3 \\
+v_1w_2 - v_2w_1
+\end{bmatrix}
+$$
+
+하지만 이 식을 외우는 것보다 중요한 것은 결과 벡터가 해야 하는 일입니다.
+
+```text
+1. v와 수직이어야 한다.
+2. w와 수직이어야 한다.
+3. 크기는 v와 w가 만드는 평행사변형 넓이여야 한다.
+4. 방향은 오른손 법칙을 따라야 한다.
+```
+
+즉 계산식은 이 네 조건을 만족하는 벡터를 성분으로 풀어 쓴 것입니다.
+
+### **11.3 11강의 핵심: 외적을 duality로 보기**
+
+11강의 더 깊은 포인트는 외적을 단순한 계산 trick이 아니라, determinant와 duality에서 나온 대상으로 보는 것입니다.
+
+두 벡터 $\mathbf{v}, \mathbf{w}$를 고정하고, 임의의 벡터 $\mathbf{u}$를 넣어서 다음 값을 만든다고 합시다.
+
+$$
+f(\mathbf{u}) =
+\det
+\begin{bmatrix}
+| & | & | \\
+\mathbf{v} & \mathbf{w} & \mathbf{u} \\
+| & | & |
+\end{bmatrix}
+$$
+
+이 값은 $\mathbf{v}, \mathbf{w}, \mathbf{u}$가 만드는 signed volume입니다.
+
+여기서 $\mathbf{v}, \mathbf{w}$는 고정되어 있고, $\mathbf{u}$만 입력입니다.
+
+그러면 $f$는 3D 벡터 $\mathbf{u}$를 숫자 하나로 보내는 linear functional입니다.
+
+duality 관점에 따르면 이런 linear functional은 어떤 벡터 $\mathbf{p}$와의 내적으로 표현할 수 있습니다.
+
+$$
+f(\mathbf{u}) = \mathbf{p} \cdot \mathbf{u}
+$$
+
+이때 그 $\mathbf{p}$가 바로
+
+$$
+\mathbf{v} \times \mathbf{w}
+$$
+
+입니다.
+
+따라서 외적은 이렇게 다시 정의할 수 있습니다.
+
+> $\mathbf{v} \times \mathbf{w}$는 모든 $\mathbf{u}$에 대해 $\mathbf{u}$와 내적했을 때, $\mathbf{v}, \mathbf{w}, \mathbf{u}$의 signed volume을 돌려주는 벡터다.
+
+이 설명이 중요한 이유는 외적, determinant, 내적이 한 구조 안에서 만난다는 점입니다.
+
+외적은 “3D에서만 나오는 이상한 공식”이 아니라, volume을 측정하는 linear functional을 벡터로 표현한 것입니다.
+
 ## **12. Cramer's rule**
 
 3Blue1Brown 12강은 Cramer's rule을 determinant의 비율로 보는 기하학적 설명입니다.
@@ -882,6 +1158,125 @@ $$
 다시 말해 $A\mathbf{x}=\mathbf{b}$는 어떤 좌표 조합 $\mathbf{x}$가 변환 $A$를 거쳐 $\mathbf{b}$에 도달하는 문제입니다.
 
 Cramer's rule은 그 좌표 조합을 공간의 signed area 또는 signed volume 비율로 읽게 해줍니다.
+
+### **12.1 2D에서 Cramer's rule이 왜 determinant 비율이 되는가**
+
+2차원에서 행렬 $A$의 두 열벡터를 $\mathbf{a}_1,\mathbf{a}_2$라고 합시다.
+
+$$
+A =
+\begin{bmatrix}
+| & | \\
+\mathbf{a}_1 & \mathbf{a}_2 \\
+| & |
+\end{bmatrix}
+$$
+
+방정식
+
+$$
+A\mathbf{x} = \mathbf{b}
+$$
+
+는 다음 말과 같습니다.
+
+$$
+x\mathbf{a}_1 + y\mathbf{a}_2 = \mathbf{b}
+$$
+
+즉 $\mathbf{b}$를 만들기 위해 $\mathbf{a}_1$ 방향을 $x$만큼, $\mathbf{a}_2$ 방향을 $y$만큼 섞는 문제입니다.
+
+이제 첫 번째 열을 $\mathbf{b}$로 바꾼 행렬을 봅니다.
+
+$$
+\begin{bmatrix}
+| & | \\
+\mathbf{b} & \mathbf{a}_2 \\
+| & |
+\end{bmatrix}
+$$
+
+여기서 $\mathbf{b}=x\mathbf{a}_1+y\mathbf{a}_2$이므로 determinant는
+
+$$
+\det(\mathbf{b}, \mathbf{a}_2)
+=
+\det(x\mathbf{a}_1 + y\mathbf{a}_2,\mathbf{a}_2)
+$$
+
+입니다.
+
+determinant는 각 열에 대해 선형적이므로,
+
+$$
+\det(x\mathbf{a}_1 + y\mathbf{a}_2,\mathbf{a}_2)
+=
+x\det(\mathbf{a}_1,\mathbf{a}_2)
++ y\det(\mathbf{a}_2,\mathbf{a}_2)
+$$
+
+가 됩니다.
+
+그런데 같은 벡터 두 개가 만드는 평행사변형의 면적은 0입니다.
+
+$$
+\det(\mathbf{a}_2,\mathbf{a}_2)=0
+$$
+
+따라서
+
+$$
+\det(\mathbf{b}, \mathbf{a}_2)
+=
+x\det(\mathbf{a}_1,\mathbf{a}_2)
+$$
+
+이고,
+
+$$
+x =
+\frac{\det(\mathbf{b}, \mathbf{a}_2)}
+{\det(\mathbf{a}_1,\mathbf{a}_2)}
+$$
+
+가 됩니다.
+
+같은 방식으로
+
+$$
+y =
+\frac{\det(\mathbf{a}_1, \mathbf{b})}
+{\det(\mathbf{a}_1,\mathbf{a}_2)}
+$$
+
+입니다.
+
+이것이 Cramer's rule입니다.
+
+여기서 핵심은 분모와 분자가 모두 면적이라는 점입니다.
+
+즉 Cramer's rule은 좌표 $x,y$를 면적 비율로 읽는 방법입니다.
+
+### **12.2 Cramer's rule을 강하게 주장하면 안 되는 지점**
+
+Cramer's rule은 개념적으로 매우 예쁩니다.
+
+하지만 실제 큰 선형시스템을 풀 때 좋은 알고리즘이라는 뜻은 아닙니다.
+
+계산량과 수치 안정성 때문에 실제 구현에서는 보통 다음 방법을 씁니다.
+
+```text
+LU decomposition
+QR decomposition
+Cholesky decomposition
+iterative solver
+```
+
+따라서 이 강의에서 가져갈 포인트는 “Cramer's rule로 계산하자”가 아닙니다.
+
+정확한 포인트는 다음입니다.
+
+> 선형시스템의 해는 변환된 basis가 만드는 면적/부피의 비율로 해석될 수 있다.
 
 ## **13. 기저변환**
 
@@ -1287,6 +1682,7 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 이 글은 아래 자료들을 바탕으로 공부 내용을 정리한 것입니다.
 
 - [3Blue1Brown 한국어 선형대수학의 본질 재생목록](https://www.youtube.com/playlist?list=PLOEOa0pDLTZaglBDKWxV4t80Y3Psk_Hg4)
+- [3Blue1Brown About / FAQ - material usage guidance](https://www.3blue1brown.com/about/)
 - [3Blue1Brown - Linear combinations, span, and basis vectors](https://www.3blue1brown.com/lessons/span/)
 - [3Blue1Brown - Essence of linear algebra preview](https://www.3blue1brown.com/lessons/eola-preview/)
 - [3Blue1Brown - Linear transformations and matrices](https://www.3blue1brown.com/lessons/linear-transformations/)
