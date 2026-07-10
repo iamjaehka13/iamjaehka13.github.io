@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 16:32:26 +0900
+last_modified_at: 2026-07-10 16:35:31 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -37,6 +37,10 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 3Blue1Brown의 **Essence of Linear Algebra** 시리즈가 좋은 이유는 이 질문들을 계산 절차가 아니라 **공간의 움직임**으로 설명하기 때문입니다.
 
 이 글은 영상을 그대로 옮긴 transcript가 아닙니다. 영상의 핵심 관점을 바탕으로, 내가 선형대수를 다시 볼 때 필요한 개념을 공부용으로 재구성한 글입니다.
+
+이번 수정에서는 3Blue1Brown 선형대수 2강부터 12강까지의 공식 YouTube 영상을 각 개념 섹션에 임베드했습니다.
+
+원본 영상의 캡처/GIF를 내 asset으로 복사한 것이 아니라, 공식 플레이어를 직접 연결해 원본 시각화를 함께 볼 수 있게 했습니다.
 
 목표는 하나입니다.
 
@@ -206,6 +210,12 @@ $$
 
 ## **3. 선형결합, span, basis**
 
+3Blue1Brown 2강은 선형결합, span, basis를 다룹니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/k7RM-ot2NWY" title="3Blue1Brown Chapter 2 - Linear combinations, span, and basis vectors" loading="lazy" allowfullscreen></iframe>
+</div>
+
 벡터 $\mathbf{v}$와 $\mathbf{w}$가 있을 때,
 
 $$
@@ -287,6 +297,12 @@ $$
 나중에 change of basis가 나올 때 이 말이 핵심이 됩니다.
 
 ## **4. 행렬과 선형변환**
+
+3Blue1Brown 3강은 행렬을 선형변환으로 보는 관점을 잡습니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/kYB8IZa5AuE" title="3Blue1Brown Chapter 3 - Linear transformations and matrices" loading="lazy" allowfullscreen></iframe>
+</div>
 
 선형변환(linear transformation)은 벡터를 다른 벡터로 보내는 함수입니다.
 
@@ -405,6 +421,12 @@ $$
 
 ## **5. 행렬곱은 변환의 합성**
 
+3Blue1Brown 4강은 행렬곱을 변환의 합성으로 해석합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/XkY2DOUCWMU" title="3Blue1Brown Chapter 4 - Matrix multiplication as composition" loading="lazy" allowfullscreen></iframe>
+</div>
+
 행렬곱은 계산으로 보면 복잡합니다.
 
 하지만 기하학적으로 보면 단순합니다.
@@ -447,6 +469,12 @@ $$
 변환의 순서가 다르면 공간의 최종 상태가 달라지기 때문입니다.
 
 ## **6. 3차원 선형변환**
+
+3Blue1Brown 5강은 2차원에서 잡은 선형변환 관점을 3차원으로 확장합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/rHLEWRxRGiM" title="3Blue1Brown Chapter 5 - Three-dimensional linear transformations" loading="lazy" allowfullscreen></iframe>
+</div>
 
 2차원에서 했던 이야기는 3차원에서도 그대로 이어집니다.
 
@@ -519,6 +547,12 @@ $$
 
 ## **7. determinant는 면적과 부피의 스케일**
 
+3Blue1Brown 6강은 determinant를 면적/부피 스케일로 설명합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/Ip3X9LOh2dk" title="3Blue1Brown Chapter 6 - The determinant" loading="lazy" allowfullscreen></iframe>
+</div>
+
 determinant는 보통 계산 공식으로 먼저 배웁니다.
 
 2차원에서는
@@ -575,6 +609,12 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 공간이 한 번 낮은 차원으로 찌그러지면, 원래 어디서 왔는지 되돌릴 정보가 사라지기 때문입니다.
 
 ## **8. 역행렬, column space, null space**
+
+3Blue1Brown 7강은 inverse, column space, null space를 선형시스템의 기하학으로 연결합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/uQhTuRlWMxw" title="3Blue1Brown Chapter 7 - Inverse matrices, column space, and null space" loading="lazy" allowfullscreen></iframe>
+</div>
 
 행렬 $A$의 역행렬 $A^{-1}$은 $A$가 한 변환을 되돌리는 변환입니다.
 
@@ -642,6 +682,12 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 
 ## **9. 정방행렬이 아닌 행렬**
 
+3Blue1Brown 8강은 정방행렬이 아닌 행렬을 차원 사이의 변환으로 봅니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/v8VSDg_WQlA" title="3Blue1Brown Chapter 8 - Nonsquare matrices as transformations between dimensions" loading="lazy" allowfullscreen></iframe>
+</div>
+
 행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
 
 예를 들어 $2 \times 3$ 행렬은 3차원 벡터를 2차원 벡터로 보냅니다.
@@ -683,6 +729,12 @@ SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가
 ```
 
 ## **10. 내적과 duality**
+
+3Blue1Brown 9강은 내적을 projection과 duality 관점으로 설명합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/LyGKycYT2v0" title="3Blue1Brown Chapter 9 - Dot products and duality" loading="lazy" allowfullscreen></iframe>
+</div>
 
 내적(dot product)은 계산으로는 성분별 곱의 합입니다.
 
@@ -745,6 +797,18 @@ $$
 
 ## **11. 외적**
 
+3Blue1Brown 10강은 외적을 계산법과 기하학적 의미로 설명합니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/eu6i7WJeinw" title="3Blue1Brown Chapter 10 - Cross products" loading="lazy" allowfullscreen></iframe>
+</div>
+
+3Blue1Brown 11강은 외적을 선형변환과 duality 관점에서 한 단계 더 깊게 봅니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/BaM7OCEm3G0" title="3Blue1Brown Chapter 11 - Cross products in the light of linear transformations" loading="lazy" allowfullscreen></iframe>
+</div>
+
 3차원에서 외적(cross product)은 두 벡터로부터 새로운 벡터를 만듭니다.
 
 $$
@@ -780,6 +844,12 @@ $$
 즉 내적, 외적, determinant는 서로 따로 있는 공식이 아니라, 길이, 면적, 부피를 다루는 하나의 기하학적 언어입니다.
 
 ## **12. Cramer's rule**
+
+3Blue1Brown 12강은 Cramer's rule을 determinant의 비율로 보는 기하학적 설명입니다.
+
+<div class="ratio ratio-16x9 my-3">
+  <iframe src="https://www.youtube-nocookie.com/embed/jBsC34PxzoM" title="3Blue1Brown Chapter 12 - Cramer's rule, explained geometrically" loading="lazy" allowfullscreen></iframe>
+</div>
 
 Cramer's rule은 선형시스템
 
@@ -1217,11 +1287,20 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 이 글은 아래 자료들을 바탕으로 공부 내용을 정리한 것입니다.
 
 - [3Blue1Brown 한국어 선형대수학의 본질 재생목록](https://www.youtube.com/playlist?list=PLOEOa0pDLTZaglBDKWxV4t80Y3Psk_Hg4)
+- [3Blue1Brown - Linear combinations, span, and basis vectors](https://www.3blue1brown.com/lessons/span/)
 - [3Blue1Brown - Essence of linear algebra preview](https://www.3blue1brown.com/lessons/eola-preview/)
 - [3Blue1Brown - Linear transformations and matrices](https://www.3blue1brown.com/lessons/linear-transformations/)
+- [3Blue1Brown - Matrix multiplication as composition](https://www.3blue1brown.com/lessons/matrix-multiplication/)
+- [3Blue1Brown - Three-dimensional linear transformations](https://www.3blue1brown.com/lessons/3d-transformations/)
 - [3Blue1Brown - The determinant](https://www.3blue1brown.com/lessons/determinant/)
+- [3Blue1Brown - Inverse matrices, column space, and null space](https://www.3blue1brown.com/lessons/inverse-matrices/)
+- [3Blue1Brown - Nonsquare matrices as transformations between dimensions](https://www.3blue1brown.com/lessons/nonsquare-matrices/)
+- [3Blue1Brown - Dot products and duality](https://www.3blue1brown.com/lessons/dot-products/)
+- [3Blue1Brown - Cross products](https://www.3blue1brown.com/lessons/cross-products/)
+- [3Blue1Brown - Cross products in the light of linear transformations](https://www.3blue1brown.com/lessons/cross-products-extended/)
+- [3Blue1Brown - Cramer's rule, explained geometrically](https://www.3blue1brown.com/lessons/cramers-rule/)
 - [3Blue1Brown - Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues/)
 - [3Blue1Brown - Change of basis](https://www.3blue1brown.com/lessons/change-of-basis/)
 - [3Blue1Brown - Abstract vector spaces](https://www.3blue1brown.com/lessons/abstract-vector-spaces/)
 
-원 영상과 공식 글은 시각화가 핵심입니다. 이 글은 그 자료들을 대체하려는 것이 아니라, 영상을 보고 난 뒤 개념을 다시 잡기 위한 내 공부용 정리입니다.
+원 영상과 공식 글은 시각화가 핵심입니다. 이 글은 그 자료들을 대체하려는 것이 아니라, 원본 영상과 함께 보면서 개념을 다시 잡기 위한 내 공부용 정리입니다.
