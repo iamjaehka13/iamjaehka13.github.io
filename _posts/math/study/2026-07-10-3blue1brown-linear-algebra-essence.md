@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 16:38:59 +0900
+last_modified_at: 2026-07-10 17:02:05 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -79,7 +79,9 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
-이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 본문 GIF는 같은 개념을 블로그용으로 다시 그린 자체 제작 자료를 사용했습니다.
+이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 2강부터 12강까지는 각 강마다 5초 이하의 원본 clip을 함께 넣었습니다.
+
+각 clip은 무음이고, 영상 내부에 `Source: 3Blue1Brown` 출처와 원본 링크가 보이도록 처리했습니다.
 
 ## **1. 선형대수의 핵심 관점**
 
@@ -251,6 +253,15 @@ $$
   <iframe src="https://www.youtube-nocookie.com/embed/k7RM-ot2NWY" title="3Blue1Brown Chapter 2 - Linear combinations, span, and basis vectors" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 벡터 $\mathbf{v}$와 $\mathbf{w}$가 있을 때,
 
 $$
@@ -266,9 +277,7 @@ v 방향으로 a만큼 가고,
 w 방향으로 b만큼 간다.
 ```
 
-![Linear combination animation](/assets/img/posts/math/linear-algebra-3b1b/01-vector-linear-combination.gif){: .d-block .mx-auto }
-
-위 GIF에서 봐야 할 것은 계산 순서가 아니라 **이동의 합성**입니다.
+위 원본 clip에서 봐야 할 것은 계산 순서가 아니라 **이동의 합성**입니다.
 
 $\mathbf{v}$만큼 이동하고, 그 끝에서 다시 $\mathbf{w}$만큼 이동하면 결과 벡터 $\mathbf{v}+\mathbf{w}$가 됩니다.
 
@@ -363,6 +372,15 @@ $$
   <iframe src="https://www.youtube-nocookie.com/embed/kYB8IZa5AuE" title="3Blue1Brown Chapter 3 - Linear transformations and matrices" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 선형변환(linear transformation)은 벡터를 다른 벡터로 보내는 함수입니다.
 
 $$
@@ -393,9 +411,7 @@ $$
 
 공간 전체를 규칙적으로 움직이는 변환입니다.
 
-![Linear transformation grid animation](/assets/img/posts/math/linear-algebra-3b1b/02-linear-transform-grid.gif){: .d-block .mx-auto }
-
-이 GIF에서 격자 전체가 한 번에 움직입니다.
+위 원본 clip에서처럼, 선형변환에서는 격자 전체가 한 번에 움직입니다.
 
 핵심은 파란색 basis vector와 초록색 basis vector입니다.
 
@@ -485,6 +501,15 @@ $$
 <div class="ratio ratio-16x9 my-3">
   <iframe src="https://www.youtube-nocookie.com/embed/XkY2DOUCWMU" title="3Blue1Brown Chapter 4 - Matrix multiplication as composition" loading="lazy" allowfullscreen></iframe>
 </div>
+
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/XkY2DOUCWMU">3Blue1Brown Ch.4</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
 
 행렬곱은 계산으로 보면 복잡합니다.
 
@@ -581,6 +606,15 @@ $BA$는 그 반대입니다.
   <iframe src="https://www.youtube-nocookie.com/embed/rHLEWRxRGiM" title="3Blue1Brown Chapter 5 - Three-dimensional linear transformations" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/rHLEWRxRGiM">3Blue1Brown Ch.5</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 2차원에서 했던 이야기는 3차원에서도 그대로 이어집니다.
 
 3차원 표준기저는 다음입니다.
@@ -676,6 +710,15 @@ z축 basis는 어디로 갔는가?
   <iframe src="https://www.youtube-nocookie.com/embed/Ip3X9LOh2dk" title="3Blue1Brown Chapter 6 - The determinant" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 determinant는 보통 계산 공식으로 먼저 배웁니다.
 
 2차원에서는
@@ -699,9 +742,7 @@ $$
 
 3차원에서는 단위 정육면체의 부피가 변환 후 몇 배가 되는지를 말합니다.
 
-![Determinant area scale animation](/assets/img/posts/math/linear-algebra-3b1b/03-determinant-area-scale.gif){: .d-block .mx-auto }
-
-위 그림에서 단위 정사각형은 선형변환을 거치며 평행사변형으로 바뀝니다.
+위 원본 clip에서 단위 정사각형은 선형변환을 거치며 평행사변형으로 바뀝니다.
 
 이때 determinant는 그 평행사변형의 면적이 원래 단위 정사각형보다 몇 배인지 말합니다.
 
@@ -738,6 +779,15 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 <div class="ratio ratio-16x9 my-3">
   <iframe src="https://www.youtube-nocookie.com/embed/uQhTuRlWMxw" title="3Blue1Brown Chapter 7 - Inverse matrices, column space, and null space" loading="lazy" allowfullscreen></iframe>
 </div>
+
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
 
 행렬 $A$의 역행렬 $A^{-1}$은 $A$가 한 변환을 되돌리는 변환입니다.
 
@@ -845,6 +895,15 @@ $$
   <iframe src="https://www.youtube-nocookie.com/embed/v8VSDg_WQlA" title="3Blue1Brown Chapter 8 - Nonsquare matrices as transformations between dimensions" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/v8VSDg_WQlA">3Blue1Brown Ch.8</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
 
 행렬 크기 $m \times n$은 다음처럼 읽을 수 있습니다.
@@ -902,6 +961,15 @@ SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가
   <iframe src="https://www.youtube-nocookie.com/embed/LyGKycYT2v0" title="3Blue1Brown Chapter 9 - Dot products and duality" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 내적(dot product)은 계산으로는 성분별 곱의 합입니다.
 
 $$
@@ -926,8 +994,6 @@ $$
 두 벡터가 얼마나 같은 방향을 보는가?
 한 벡터를 다른 벡터 방향으로 얼마나 투영할 수 있는가?
 ```
-
-![Dot product projection animation](/assets/img/posts/math/linear-algebra-3b1b/04-dot-product-projection.gif){: .d-block .mx-auto }
 
 내적은 단순히 성분끼리 곱해서 더한 값이 아닙니다.
 
@@ -1010,11 +1076,29 @@ $$
   <iframe src="https://www.youtube-nocookie.com/embed/eu6i7WJeinw" title="3Blue1Brown Chapter 10 - Cross products" loading="lazy" allowfullscreen></iframe>
 </div>
 
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/eu6i7WJeinw">3Blue1Brown Ch.10</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
+
 3Blue1Brown 11강은 외적을 선형변환과 duality 관점에서 한 단계 더 깊게 봅니다.
 
 <div class="ratio ratio-16x9 my-3">
   <iframe src="https://www.youtube-nocookie.com/embed/BaM7OCEm3G0" title="3Blue1Brown Chapter 11 - Cross products in the light of linear transformations" loading="lazy" allowfullscreen></iframe>
 </div>
+
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/BaM7OCEm3G0">3Blue1Brown Ch.11</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
 
 3차원에서 외적(cross product)은 두 벡터로부터 새로운 벡터를 만듭니다.
 
@@ -1126,6 +1210,15 @@ $$
 <div class="ratio ratio-16x9 my-3">
   <iframe src="https://www.youtube-nocookie.com/embed/jBsC34PxzoM" title="3Blue1Brown Chapter 12 - Cramer's rule, explained geometrically" loading="lazy" allowfullscreen></iframe>
 </div>
+
+<figure class="my-3">
+  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule-poster.jpg" style="width: 100%; border-radius: 6px;">
+    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.mp4" type="video/mp4">
+  </video>
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/jBsC34PxzoM">3Blue1Brown Ch.12</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+  </figcaption>
+</figure>
 
 Cramer's rule은 선형시스템
 
@@ -1293,11 +1386,9 @@ iterative solver
 
 같은 벡터라도 어떤 기저를 쓰느냐에 따라 좌표는 달라질 수 있습니다.
 
-![Change of basis animation](/assets/img/posts/math/linear-algebra-3b1b/05-change-of-basis.gif){: .d-block .mx-auto }
+change of basis에서 실제 벡터 자체가 움직이는 것은 아닙니다.
 
-이 GIF에서 주황색 벡터는 움직이지 않습니다.
-
-움직이는 것은 basis입니다.
+움직이는 것은 basis, 즉 그 벡터를 읽는 좌표계입니다.
 
 하지만 오른쪽의 coordinate 숫자는 변합니다.
 
@@ -1404,11 +1495,9 @@ A가 v를 변환해도,
 결과는 여전히 v가 놓인 직선 위에 있다.
 ```
 
-![Eigenvector animation](/assets/img/posts/math/linear-algebra-3b1b/06-eigenvectors.gif){: .d-block .mx-auto }
-
 대부분의 벡터는 선형변환을 거치면 방향이 바뀝니다.
 
-하지만 GIF의 강조된 두 방향처럼, 어떤 특수한 방향은 변환 후에도 같은 직선 위에 남습니다.
+하지만 어떤 특수한 방향은 변환 후에도 같은 직선 위에 남습니다.
 
 그 방향이 eigenvector이고, 그 방향으로 얼마나 늘거나 줄었는지를 나타내는 값이 eigenvalue입니다.
 
