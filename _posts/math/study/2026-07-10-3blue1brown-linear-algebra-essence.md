@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 17:02:05 +0900
+last_modified_at: 2026-07-10 17:41:29 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -71,17 +71,17 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 그래서 원본 시각자료를 직접 가져다 쓸 때는 다음 기준을 지키는 쪽이 맞습니다.
 
 ```text
-1. 60초 미만의 짧은 material만 사용
-2. 화면 또는 캡션에 3Blue1Brown 출처 명시
-3. 원본 영상이나 공식 글 링크 제공
-4. clip 자체를 통째로 재업로드하는 방식은 피함
+1. 각 원본 영상에서 필요한 장면만 짧게 발췌
+2. GIF 화면 안에 3Blue1Brown 출처를 직접 표시
+3. caption에 원본 영상 링크 제공
+4. 주변 본문에서 개념 해석을 덧붙여, clip 자체만 통째로 재업로드하는 형태는 피함
 ```
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
-이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 2강부터 12강까지는 각 강마다 5초 이하의 원본 clip을 함께 넣었습니다.
+이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 2강부터 12강까지는 각 강마다 원본 영상에서 짧게 발췌한 GIF clip을 함께 넣었습니다.
 
-각 clip은 무음이고, 영상 내부에 `Source: 3Blue1Brown` 출처와 원본 링크가 보이도록 처리했습니다.
+각 GIF는 각 원본 영상에서 60초보다 훨씬 짧게 발췌했습니다. GIF 내부에는 짧은 `Source: 3Blue1Brown` attribution band만 넣고, 원본 링크는 바로 아래 caption에 연결했습니다.
 
 ## **1. 선형대수의 핵심 관점**
 
@@ -254,11 +254,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination.gif" alt="3Blue1Brown Ch.2 linear combination visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -373,11 +371,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.gif" alt="3Blue1Brown Ch.3 linear transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -503,11 +499,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.gif" alt="3Blue1Brown Ch.4 matrix composition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/XkY2DOUCWMU">3Blue1Brown Ch.4</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/XkY2DOUCWMU">3Blue1Brown Ch.4</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -607,11 +601,9 @@ $BA$는 그 반대입니다.
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.gif" alt="3Blue1Brown Ch.5 3D transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/rHLEWRxRGiM">3Blue1Brown Ch.5</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/rHLEWRxRGiM">3Blue1Brown Ch.5</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -711,11 +703,9 @@ z축 basis는 어디로 갔는가?
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.gif" alt="3Blue1Brown Ch.6 determinant visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -781,11 +771,9 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.gif" alt="3Blue1Brown Ch.7 inverse column space null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -896,11 +884,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.gif" alt="3Blue1Brown Ch.8 nonsquare matrix visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/v8VSDg_WQlA">3Blue1Brown Ch.8</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/v8VSDg_WQlA">3Blue1Brown Ch.8</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -962,11 +948,9 @@ SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product.gif" alt="3Blue1Brown Ch.9 dot product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -1077,11 +1061,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.gif" alt="3Blue1Brown Ch.10 cross product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/eu6i7WJeinw">3Blue1Brown Ch.10</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/eu6i7WJeinw">3Blue1Brown Ch.10</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -1092,11 +1074,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.gif" alt="3Blue1Brown Ch.11 cross product duality visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/BaM7OCEm3G0">3Blue1Brown Ch.11</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/BaM7OCEm3G0">3Blue1Brown Ch.11</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
@@ -1212,11 +1192,9 @@ $$
 </div>
 
 <figure class="my-3">
-  <video controls playsinline preload="metadata" poster="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.gif" alt="3Blue1Brown Ch.12 Cramer's rule visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/jBsC34PxzoM">3Blue1Brown Ch.12</a>. 원본 영상에서 5초 이하로 발췌한 study용 시각 clip입니다.
+    Source: <a href="https://youtu.be/jBsC34PxzoM">3Blue1Brown Ch.12</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
   </figcaption>
 </figure>
 
