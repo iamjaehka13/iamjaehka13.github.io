@@ -1,10 +1,11 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 16:21:54 +0900
+last_modified_at: 2026-07-10 16:32:26 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
+image: /assets/img/posts/math/linear-algebra-3b1b/00-linear-algebra-preview.png
 math: true
 ---
 
@@ -220,6 +221,14 @@ v 방향으로 a만큼 가고,
 w 방향으로 b만큼 간다.
 ```
 
+![Linear combination animation](/assets/img/posts/math/linear-algebra-3b1b/01-vector-linear-combination.gif){: .d-block .mx-auto }
+
+위 GIF에서 봐야 할 것은 계산 순서가 아니라 **이동의 합성**입니다.
+
+$\mathbf{v}$만큼 이동하고, 그 끝에서 다시 $\mathbf{w}$만큼 이동하면 결과 벡터 $\mathbf{v}+\mathbf{w}$가 됩니다.
+
+즉 선형결합은 숫자를 섞는 계산이 아니라, 여러 방향의 이동을 조합해서 새로운 위치를 만드는 과정입니다.
+
 ### **3.1 span**
 
 두 벡터 $\mathbf{v}$, $\mathbf{w}$로 만들 수 있는 모든 선형결합의 집합을 span이라고 합니다.
@@ -308,6 +317,18 @@ $$
 이 조건 때문에 선형변환은 공간을 제멋대로 구기는 변환이 아닙니다.
 
 공간 전체를 규칙적으로 움직이는 변환입니다.
+
+![Linear transformation grid animation](/assets/img/posts/math/linear-algebra-3b1b/02-linear-transform-grid.gif){: .d-block .mx-auto }
+
+이 GIF에서 격자 전체가 한 번에 움직입니다.
+
+핵심은 파란색 basis vector와 초록색 basis vector입니다.
+
+행렬은 모든 점의 이동을 따로 저장하지 않습니다.
+
+대신 **basis vector가 어디로 가는지**만 저장합니다.
+
+나머지 모든 벡터는 그 변환된 basis vector들의 선형결합으로 자동 결정됩니다.
 
 ### **4.1 행렬의 열벡터가 중요한 이유**
 
@@ -521,6 +542,16 @@ $$
 
 3차원에서는 단위 정육면체의 부피가 변환 후 몇 배가 되는지를 말합니다.
 
+![Determinant area scale animation](/assets/img/posts/math/linear-algebra-3b1b/03-determinant-area-scale.gif){: .d-block .mx-auto }
+
+위 그림에서 단위 정사각형은 선형변환을 거치며 평행사변형으로 바뀝니다.
+
+이때 determinant는 그 평행사변형의 면적이 원래 단위 정사각형보다 몇 배인지 말합니다.
+
+뒤쪽에서 도형이 거의 선처럼 눌리는 장면은 $\det(A) \rightarrow 0$인 상황입니다.
+
+이 경우 면적이 사라지므로, 원래 2차원 정보가 낮은 차원으로 collapse됩니다.
+
 ### **7.1 determinant의 부호**
 
 $\det(A) > 0$이면 orientation이 유지됩니다.
@@ -678,6 +709,14 @@ $$
 한 벡터를 다른 벡터 방향으로 얼마나 투영할 수 있는가?
 ```
 
+![Dot product projection animation](/assets/img/posts/math/linear-algebra-3b1b/04-dot-product-projection.gif){: .d-block .mx-auto }
+
+내적은 단순히 성분끼리 곱해서 더한 값이 아닙니다.
+
+한 벡터를 다른 벡터 방향으로 projection했을 때, 그 방향 성분이 얼마나 남는지를 나타냅니다.
+
+그래서 같은 방향이면 양수, 직교하면 0, 반대 방향이면 음수가 됩니다.
+
 ### **10.1 내적의 부호**
 
 내적이 양수이면 두 벡터가 대체로 같은 방향입니다.
@@ -789,6 +828,16 @@ Cramer's rule은 그 좌표 조합을 공간의 signed area 또는 signed volume
 
 같은 벡터라도 어떤 기저를 쓰느냐에 따라 좌표는 달라질 수 있습니다.
 
+![Change of basis animation](/assets/img/posts/math/linear-algebra-3b1b/05-change-of-basis.gif){: .d-block .mx-auto }
+
+이 GIF에서 주황색 벡터는 움직이지 않습니다.
+
+움직이는 것은 basis입니다.
+
+하지만 오른쪽의 coordinate 숫자는 변합니다.
+
+즉 change of basis는 실제 벡터를 바꾸는 것이 아니라, 같은 벡터를 다른 좌표계의 언어로 다시 읽는 과정입니다.
+
 ### **13.1 다른 사람의 좌표계로 읽기**
 
 표준기저가 아닌 새로운 기저
@@ -889,6 +938,14 @@ $$
 A가 v를 변환해도,
 결과는 여전히 v가 놓인 직선 위에 있다.
 ```
+
+![Eigenvector animation](/assets/img/posts/math/linear-algebra-3b1b/06-eigenvectors.gif){: .d-block .mx-auto }
+
+대부분의 벡터는 선형변환을 거치면 방향이 바뀝니다.
+
+하지만 GIF의 강조된 두 방향처럼, 어떤 특수한 방향은 변환 후에도 같은 직선 위에 남습니다.
+
+그 방향이 eigenvector이고, 그 방향으로 얼마나 늘거나 줄었는지를 나타내는 값이 eigenvalue입니다.
 
 즉 고유벡터는 선형변환이 공간을 움직일 때 변환의 핵심 방향을 알려줍니다.
 
