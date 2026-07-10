@@ -40,7 +40,9 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 이번 수정에서는 3Blue1Brown 공식 **Essence of Linear Algebra** playlist 기준으로 1강부터 16강까지의 공식 YouTube 영상을 각 개념 섹션에 임베드했습니다.
 
-각 섹션에는 공식 YouTube embed를 먼저 두고, 바로 아래에는 원본 영상에서 짧게 발췌한 study용 GIF를 붙였습니다.
+각 섹션에는 공식 YouTube embed를 먼저 두고, 바로 아래에는 원본 영상에서 짧게 발췌한 대표 study용 GIF를 붙였습니다. 그리고 글로만 읽으면 다시 헷갈릴 만한 지점에는 보조 GIF를 추가했습니다.
+
+이 글의 1차 목적은 성능 최적화나 모바일 최적화가 아닙니다. 내가 다시 볼 때 “아, 이 개념이 공간에서 이렇게 움직이는 거였지”를 바로 떠올리기 위한 개인 study notebook입니다.
 
 목표는 하나입니다.
 
@@ -84,7 +86,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
-이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 1강부터 16강까지는 각 강마다 원본 영상에서 짧게 발췌한 GIF clip을 함께 넣었습니다.
+이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 1강부터 16강까지는 각 강마다 원본 영상에서 짧게 발췌한 대표 GIF clip을 함께 넣었습니다. 추가로 개념상 중요한 곳에는 보조 GIF clip을 더 넣었습니다.
 
 각 GIF는 각 원본 영상에서 60초보다 훨씬 짧게 발췌했습니다. GIF 자체에는 별도 글자를 덮지 않고, 바로 아래 caption에 출처와 원본 링크를 연결했습니다.
 
@@ -232,6 +234,13 @@ $$
 
 계산은 성분끼리 더하는 것이지만, 의미는 **두 이동의 합성**입니다.
 
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-vector-addition-detail.gif" alt="3Blue1Brown Ch.1 vector addition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 벡터 덧셈을 이동의 합성으로 보기 위한 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 ### **2.2 스칼라 곱**
 
 스칼라 곱은 벡터를 같은 방향으로 늘리거나 줄이는 것입니다.
@@ -245,6 +254,13 @@ $$
 $c$가 1보다 크면 길어지고, 0과 1 사이이면 짧아집니다.
 
 $c$가 음수이면 방향이 반대로 뒤집힙니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-scalar-multiplication-detail.gif" alt="3Blue1Brown Ch.1 scalar multiplication visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 스칼라 곱이 벡터의 길이와 방향을 바꾸는 과정을 보여주는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 예를 들어
 
@@ -314,6 +330,13 @@ $$
 반대로 두 벡터가 같은 직선 위에 있으면, 아무리 $a,b$를 바꿔도 그 직선 밖으로 나갈 수 없습니다.
 
 이때 두 벡터는 **linearly dependent**, 즉 선형종속입니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-span-dependent-detail.gif" alt="3Blue1Brown Ch.2 span and linear dependence visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. span이 직선이나 평면으로 제한될 때 선형종속이 무엇을 뜻하는지 보여주는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 ### **3.2 선형독립과 선형종속**
 
@@ -434,6 +457,13 @@ $$
 대신 **basis vector가 어디로 가는지**만 저장합니다.
 
 나머지 모든 벡터는 그 변환된 basis vector들의 선형결합으로 자동 결정됩니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-basis-grid-detail.gif" alt="3Blue1Brown Ch.3 basis vectors determine the grid visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. basis vector의 이동이 격자 전체의 이동을 결정하는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 ### **4.1 행렬의 열벡터가 중요한 이유**
 
@@ -776,6 +806,13 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 
 이 말은 곧 어떤 방향의 정보가 사라졌다는 뜻입니다.
 
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-collapse.gif" alt="3Blue1Brown Ch.6 determinant collapse visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. determinant가 0에 가까워질 때 면적이 낮은 차원으로 collapse되는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 그래서 determinant가 0이면 역변환을 만들 수 없습니다.
 
 공간이 한 번 낮은 차원으로 찌그러지면, 원래 어디서 왔는지 되돌릴 정보가 사라지기 때문입니다.
@@ -858,6 +895,13 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 하지만 null space 안에 0이 아닌 벡터가 있다면, 그 방향의 정보는 $A$를 통과하며 사라집니다.
 
 이때는 보통 determinant도 0이고, 역행렬도 존재하지 않습니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-column-null-detail.gif" alt="3Blue1Brown Ch.7 column space and null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. column space와 null space를 선형변환의 출력 가능 영역과 사라지는 입력 방향으로 보는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 ### **8.4 rank와 해의 개수**
 
@@ -1000,6 +1044,13 @@ $$
 내적은 단순히 성분끼리 곱해서 더한 값이 아닙니다.
 
 한 벡터를 다른 벡터 방향으로 projection했을 때, 그 방향 성분이 얼마나 남는지를 나타냅니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-projection-detail.gif" alt="3Blue1Brown Ch.9 dot product projection visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 내적을 projection 길이와 방향성으로 해석하는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 그래서 같은 방향이면 양수, 직교하면 0, 반대 방향이면 음수가 됩니다.
 
@@ -1395,6 +1446,13 @@ iterative solver
 
 같은 벡터라도 어떤 기저를 쓰느냐에 따라 좌표는 달라질 수 있습니다.
 
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-coordinate-language-detail.gif" alt="3Blue1Brown Ch.13 same vector different coordinates visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/P2LTAUO1TdA">3Blue1Brown Ch.13</a>. 같은 벡터가 좌표계에 따라 다른 숫자로 읽히는 것을 보여주는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
+
 change of basis에서 실제 벡터 자체가 움직이는 것은 아닙니다.
 
 움직이는 것은 basis, 즉 그 벡터를 읽는 좌표계입니다.
@@ -1520,6 +1578,13 @@ A가 v를 변환해도,
 대부분의 벡터는 선형변환을 거치면 방향이 바뀝니다.
 
 하지만 어떤 특수한 방향은 변환 후에도 같은 직선 위에 남습니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigen-direction-detail.gif" alt="3Blue1Brown Ch.14 eigenvector direction survives transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/PFDu9oVAE-g">3Blue1Brown Ch.14</a>. 선형변환 뒤에도 방향이 유지되는 eigenvector를 보여주는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 그 방향이 eigenvector이고, 그 방향으로 얼마나 늘거나 줄었는지를 나타내는 값이 eigenvalue입니다.
 
@@ -1670,6 +1735,13 @@ $$
 $$
 
 처럼 표현됩니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch16-polynomial-basis-detail.gif" alt="3Blue1Brown Ch.16 polynomial basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">
+    Source: <a href="https://youtu.be/TgKwz5Ikpc8">3Blue1Brown Ch.16</a>. 다항식을 basis function의 선형결합으로 보는 보조 study용 GIF clip입니다.
+  </figcaption>
+</figure>
 
 함수도 마찬가지입니다.
 
