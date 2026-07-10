@@ -1,10 +1,11 @@
 ---
 title: "[SLAM Study 6주차] LIO 내부 데이터 흐름 추적"
 date: 2026-07-08 16:04:24 +0900
-last_modified_at: 2026-07-08 16:04:24 +0900
+last_modified_at: 2026-07-10 15:08:11 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lio, lidar-inertial-odometry, imu, deskew, fast-lio, lio-sam, loam, state-estimation, residual, mapping, ros2]
 description: "SLAM 공부 6주차에 LIO 내부에서 IMU propagation, scan pose prediction, deskew, point-to-map residual, state update, map insertion, odometry output이 어떻게 연결되는지 정리한다."
+image: /assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_trace_overview.png
 math: true
 ---
 
@@ -940,7 +941,122 @@ odometry.txt 또는 TUM format trajectory
 13. loop closure 영향을 제거한 odometry 결과를 하나 재현했다.
 ```
 
-## **17. Claim Boundary**
+## **17. 추가 실험: FAST-LIO2로 UNIST Bag Trace**
+
+위에서 정리한 logging 위치를 실제 FAST-LIO2 ROS2 코드에 붙여 봤습니다.
+
+사용한 데이터는 4~5주차에서 계속 사용한 UNIST Livox bag입니다.
+
+```text
+bag:
+  /home/iamjaehka13/unist_rosbag/6_24_204_2_0-001.mcap
+
+LiDAR:
+  /livox/lidar
+  livox_ros_driver2/msg/CustomMsg
+
+IMU:
+  /livox/imu
+  sensor_msgs/msg/Imu
+
+replay duration:
+  20 s
+
+logged update rows:
+  197
+```
+
+이번 trace에서 저장한 값은 다음입니다.
+
+```text
+scan_count
+lidar_beg_time
+lidar_end_time
+raw_point_count
+undistorted_point_count
+downsampled_point_count
+map_point_count
+effective_feature_count
+residual_mean_m
+residual_p95_m
+pose_before_lidar_update
+pose_after_lidar_update
+pose_update_translation_norm_m
+pose_update_rotation_deg
+processing_total_ms
+```
+
+대표 그림은 scan 단위로 pose update, residual, processing time을 함께 본 것입니다.
+
+![FAST-LIO2 UNIST scan-level trace overview](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_trace_overview.png){: .d-block .mx-auto }
+
+이 그림에서 중요한 점은 `pose update norm`이 LiDAR update가 IMU prediction을 얼마나 보정했는지를 보여준다는 것입니다.
+
+```text
+pose_before_lidar_update:
+  IMU propagation 이후, LiDAR residual update 직전 state
+
+pose_after_lidar_update:
+  point-to-map residual로 iterated Kalman update가 끝난 뒤 state
+```
+
+이번 20초 smoke trace의 요약은 다음입니다.
+
+| metric | median | max |
+|---|---:|---:|
+| pose update translation | 0.002952 m | 0.012996 m |
+| pose update rotation | 0.134982 deg | 0.401171 deg |
+| residual mean | 0.020984 m | 0.036172 m |
+| residual p95 | 0.074801 m | 0.152885 m |
+| effective feature count | 836 | 1086 |
+| processing time | 4.636264 ms | 7.008083 ms |
+
+다음 그림은 residual tail과 update magnitude를 직접 비교한 것입니다.
+
+![FAST-LIO2 UNIST residual update scatter](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_update_residual_scatter.png){: .d-block .mx-auto }
+
+이 그림은 residual이 커졌을 때 update도 항상 같이 커진다고 단순하게 말하기 어렵다는 점을 보여줍니다.
+
+즉 residual, effective feature count, map geometry, initial prediction이 같이 작용합니다. 그래서 이후 실험에서는 residual 하나만 보지 말고 pose update norm과 feature count도 같이 봐야 합니다.
+
+마지막으로 FAST-LIO2가 낸 odometry trace를 residual p95 색으로 칠했습니다.
+
+![FAST-LIO2 UNIST odometry trace colored by residual p95](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_odometry_trace.png){: .d-block .mx-auto }
+
+이 trajectory 그림은 보기에는 odometry 결과처럼 보이지만, 아직 평가 결과로 쓰면 안 됩니다.
+
+이유는 다음입니다.
+
+```text
+LiDAR-IMU extrinsic:
+  아직 UNIST bag에 맞게 정확히 calibration한 값이 아님
+
+MCAP replay:
+  rosbag2 MCAP plugin이 없어 Python helper로 /livox/lidar, /livox/imu를 publish함
+
+ground truth:
+  trajectory ground truth와 비교하지 않음
+```
+
+따라서 이번 추가 실험의 안전한 결론은 다음입니다.
+
+```text
+FAST-LIO2 ROS2를 UNIST Livox bag으로 실행했고,
+scan별 LiDAR update 전후 pose, point-to-map residual,
+effective feature count, processing time을 CSV로 기록했다.
+```
+
+아직 이렇게 쓰면 안 됩니다.
+
+```text
+FAST-LIO2가 이 bag에서 정확한 trajectory를 냈다.
+FAST-LIO2가 deskew 문제를 해결했다.
+odometry drift가 줄었다.
+```
+
+이번 결과의 의미는 성능 검증이 아니라, 6주차 목표였던 LIO 내부 변수 추적을 실제 코드에서 시작했다는 것입니다.
+
+## **18. Claim Boundary**
 
 6주차 글에서 조심할 점은 명확합니다.
 
@@ -965,9 +1081,11 @@ deskew가 odometry drift를 줄였다는 것을 검증했다.
 
 아직은 그런 claim을 할 단계가 아닙니다.
 
-다음 단계에서 실제 코드에 logging을 넣고, 같은 bag에서 scan별 residual, inlier, pose update, map insertion 변화를 뽑아야 합니다.
+이번 추가 실험에서는 실제 FAST-LIO2 코드에 logging을 넣고, 같은 bag에서 scan별 residual, pose update, map insertion 관련 값을 뽑았습니다.
 
-## **18. 이번 주 정리**
+다만 아직 calibration sensitivity, time offset sweep, ground-truth trajectory 비교는 하지 않았습니다.
+
+## **19. 이번 주 정리**
 
 6주차를 한 문장으로 정리하면 다음입니다.
 
