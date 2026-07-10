@@ -1,7 +1,7 @@
 ---
 title: "[SLAM Study 6주차] LIO 내부 데이터 흐름 추적"
 date: 2026-07-08 16:04:24 +0900
-last_modified_at: 2026-07-10 15:08:11 +0900
+last_modified_at: 2026-07-10 15:20:12 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lio, lidar-inertial-odometry, imu, deskew, fast-lio, lio-sam, loam, state-estimation, residual, mapping, ros2]
 description: "SLAM 공부 6주차에 LIO 내부에서 IMU propagation, scan pose prediction, deskew, point-to-map residual, state update, map insertion, odometry output이 어떻게 연결되는지 정리한다."
@@ -1022,6 +1022,45 @@ pose_after_lidar_update:
 마지막으로 FAST-LIO2가 낸 odometry trace를 residual p95 색으로 칠했습니다.
 
 ![FAST-LIO2 UNIST odometry trace colored by residual p95](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_odometry_trace.png){: .d-block .mx-auto }
+
+정적 그림만으로는 흐름이 잘 안 보이기 때문에, 블로그용 animation 후보도 같이 만들었습니다.
+
+GIF로도 뽑았지만 본문에는 용량이 작은 animated WebP를 넣었습니다.
+
+후보 판단은 다음처럼 했습니다.
+
+| animation candidate | 판단 |
+|---|---|
+| fixed-map residual orbit | 가장 보기 좋음. 3D point cloud와 residual 색이 바로 보임 |
+| FAST-LIO2 pipeline loop | 개념 설명용으로 좋음. 용량도 가장 작음 |
+| FAST-LIO2 trajectory build-up | 실제 trace 기반이라 의미는 있음. 다만 20초 smoke run이라 시각적 임팩트는 약함 |
+| controlled yaw scan sweep | synthetic distortion 설명용. 본문 메인으로 쓰기에는 claim 관리가 필요함 |
+| raw-to-gyro-deskew morph | deskew 설명용. 실제 차이가 작아서 영상으로는 덜 극적임 |
+
+제일 괜찮은 것은 아래 residual orbit입니다.
+
+다만 이 animation은 FAST-LIO2가 만든 map이 아닙니다. 5주차 fixed-map evaluator에서 만든 residual-colored PLY를 3D로 돌려 본 것입니다.
+
+즉, 의미는 다음 정도로 제한해야 합니다.
+
+```text
+UNIST 대표 scan을 fixed map 후보에 대응시켰을 때,
+residual이 공간적으로 어디에 분포하는지 보기 위한 시각화다.
+```
+
+![UNIST fixed-map residual orbit animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fixed_map_residual_orbit.webp){: .d-block .mx-auto }
+
+다음 animation은 FAST-LIO2 내부 흐름을 설명하기 위한 loop입니다.
+
+아래 숫자는 이번 20초 trace에서 나온 median 값입니다. 그래서 완전한 concept art가 아니라, 실제 logging 결과를 섞은 설명용 animation입니다.
+
+![FAST-LIO2 scan-level pipeline loop animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_pipeline_loop.webp){: .d-block .mx-auto }
+
+마지막으로 실제 FAST-LIO2 odometry trace를 시간에 따라 누적한 animation입니다.
+
+이건 데이터 기반이라는 장점이 있지만, 20초 smoke run이라 경로 자체는 짧습니다. 그래서 대표 시각자료보다는 보조 시각자료로 보는 것이 맞습니다.
+
+![FAST-LIO2 UNIST trajectory build-up animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_trajectory_build_up.webp){: .d-block .mx-auto }
 
 이 trajectory 그림은 보기에는 odometry 결과처럼 보이지만, 아직 평가 결과로 쓰면 안 됩니다.
 
