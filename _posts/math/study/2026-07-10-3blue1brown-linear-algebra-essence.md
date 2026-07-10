@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-10 17:41:29 +0900
+last_modified_at: 2026-07-10 17:49:27 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -72,7 +72,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 ```text
 1. 각 원본 영상에서 필요한 장면만 짧게 발췌
-2. GIF 화면 안에 3Blue1Brown 출처를 직접 표시
+2. 각 GIF 바로 아래 caption에 3Blue1Brown 출처 명시
 3. caption에 원본 영상 링크 제공
 4. 주변 본문에서 개념 해석을 덧붙여, clip 자체만 통째로 재업로드하는 형태는 피함
 ```
@@ -81,7 +81,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 2강부터 12강까지는 각 강마다 원본 영상에서 짧게 발췌한 GIF clip을 함께 넣었습니다.
 
-각 GIF는 각 원본 영상에서 60초보다 훨씬 짧게 발췌했습니다. GIF 내부에는 짧은 `Source: 3Blue1Brown` attribution band만 넣고, 원본 링크는 바로 아래 caption에 연결했습니다.
+각 GIF는 각 원본 영상에서 60초보다 훨씬 짧게 발췌했습니다. GIF 자체에는 별도 글자를 덮지 않고, 바로 아래 caption에 출처와 원본 링크를 연결했습니다.
 
 ## **1. 선형대수의 핵심 관점**
 
