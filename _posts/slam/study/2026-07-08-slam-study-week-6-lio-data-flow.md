@@ -1,11 +1,11 @@
 ---
 title: "[SLAM Study 6주차] LIO 내부 데이터 흐름 추적"
 date: 2026-07-08 16:04:24 +0900
-last_modified_at: 2026-07-10 15:20:12 +0900
+last_modified_at: 2026-07-10 15:47:18 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lio, lidar-inertial-odometry, imu, deskew, fast-lio, lio-sam, loam, state-estimation, residual, mapping, ros2]
 description: "SLAM 공부 6주차에 LIO 내부에서 IMU propagation, scan pose prediction, deskew, point-to-map residual, state update, map insertion, odometry output이 어떻게 연결되는지 정리한다."
-image: /assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_trace_overview.png
+image: /assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_trace_overview.png
 math: true
 ---
 
@@ -960,10 +960,10 @@ IMU:
   sensor_msgs/msg/Imu
 
 replay duration:
-  20 s
+  192.36 s full bag
 
 logged update rows:
-  197
+  1920
 ```
 
 이번 trace에서 저장한 값은 다음입니다.
@@ -988,7 +988,7 @@ processing_total_ms
 
 대표 그림은 scan 단위로 pose update, residual, processing time을 함께 본 것입니다.
 
-![FAST-LIO2 UNIST scan-level trace overview](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_trace_overview.png){: .d-block .mx-auto }
+![FAST-LIO2 UNIST full-bag scan-level trace overview](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_trace_overview.png){: .d-block .mx-auto }
 
 이 그림에서 중요한 점은 `pose update norm`이 LiDAR update가 IMU prediction을 얼마나 보정했는지를 보여준다는 것입니다.
 
@@ -1000,20 +1000,39 @@ pose_after_lidar_update:
   point-to-map residual로 iterated Kalman update가 끝난 뒤 state
 ```
 
-이번 20초 smoke trace의 요약은 다음입니다.
+처음에는 20초 smoke run으로 실행 여부만 확인했습니다.
+
+블로그용 시각화는 너무 짧은 구간보다 full bag이 맞기 때문에, 이후 전체 bag을 다시 replay했습니다.
+
+full bag trace의 요약은 다음입니다.
 
 | metric | median | max |
 |---|---:|---:|
-| pose update translation | 0.002952 m | 0.012996 m |
-| pose update rotation | 0.134982 deg | 0.401171 deg |
-| residual mean | 0.020984 m | 0.036172 m |
-| residual p95 | 0.074801 m | 0.152885 m |
-| effective feature count | 836 | 1086 |
-| processing time | 4.636264 ms | 7.008083 ms |
+| pose update translation | 0.003400 m | 0.012996 m |
+| pose update rotation | 0.142695 deg | 0.722269 deg |
+| residual mean | 0.019931 m | 0.036172 m |
+| residual p95 | 0.065171 m | 0.152885 m |
+| effective feature count | 601.5 | 1086 |
+| processing time | 3.943529 ms | 6.753265 ms |
+
+전체 odometry trace의 span은 다음 정도였습니다.
+
+```text
+duration:
+  191.90 s logged trace
+
+path length:
+  102.09 m
+
+trajectory span:
+  x: 14.99 m
+  y: 10.85 m
+  z: 2.93 m
+```
 
 다음 그림은 residual tail과 update magnitude를 직접 비교한 것입니다.
 
-![FAST-LIO2 UNIST residual update scatter](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_update_residual_scatter.png){: .d-block .mx-auto }
+![FAST-LIO2 UNIST full-bag residual update scatter](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_update_residual_scatter.png){: .d-block .mx-auto }
 
 이 그림은 residual이 커졌을 때 update도 항상 같이 커진다고 단순하게 말하기 어렵다는 점을 보여줍니다.
 
@@ -1021,9 +1040,9 @@ pose_after_lidar_update:
 
 마지막으로 FAST-LIO2가 낸 odometry trace를 residual p95 색으로 칠했습니다.
 
-![FAST-LIO2 UNIST odometry trace colored by residual p95](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_unist_odometry_trace.png){: .d-block .mx-auto }
+![FAST-LIO2 UNIST full-bag odometry trace colored by residual p95](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_odometry_trace.png){: .d-block .mx-auto }
 
-정적 그림만으로는 흐름이 잘 안 보이기 때문에, 블로그용 animation 후보도 같이 만들었습니다.
+정적 그림만으로는 흐름이 잘 안 보이기 때문에, full bag 기준 animation 후보도 같이 만들었습니다.
 
 GIF로도 뽑았지만 본문에는 용량이 작은 animated WebP를 넣었습니다.
 
@@ -1031,36 +1050,54 @@ GIF로도 뽑았지만 본문에는 용량이 작은 animated WebP를 넣었습�
 
 | animation candidate | 판단 |
 |---|---|
-| fixed-map residual orbit | 가장 보기 좋음. 3D point cloud와 residual 색이 바로 보임 |
-| FAST-LIO2 pipeline loop | 개념 설명용으로 좋음. 용량도 가장 작음 |
-| FAST-LIO2 trajectory build-up | 실제 trace 기반이라 의미는 있음. 다만 20초 smoke run이라 시각적 임팩트는 약함 |
-| controlled yaw scan sweep | synthetic distortion 설명용. 본문 메인으로 쓰기에는 claim 관리가 필요함 |
-| raw-to-gyro-deskew morph | deskew 설명용. 실제 차이가 작아서 영상으로는 덜 극적임 |
+| full-bag registered cloud orbit | 제일 보기 좋음. FAST-LIO2가 publish한 registered cloud와 path를 같이 보여줌 |
+| full-bag trajectory build-up | full trace 흐름을 가장 안전하게 보여줌 |
+| 70-100s local map build | 자동 점수 기준 1등 구간. local scan 누적 흐름을 보기 좋게 보여줌 |
+| fixed-map residual orbit | 5주차 evaluator 시각화라 예쁘지만 FAST-LIO2 output은 아님 |
+| FAST-LIO2 pipeline loop | 개념 설명용으로 좋지만 실제 3D 결과물은 아님 |
 
-제일 괜찮은 것은 아래 residual orbit입니다.
+제일 괜찮은 것은 아래 full-bag registered cloud orbit입니다.
 
-다만 이 animation은 FAST-LIO2가 만든 map이 아닙니다. 5주차 fixed-map evaluator에서 만든 residual-colored PLY를 3D로 돌려 본 것입니다.
+이 animation은 `/cloud_registered`와 `/Odometry`를 직접 수집해서 만들었습니다.
 
-즉, 의미는 다음 정도로 제한해야 합니다.
+즉, FAST-LIO2가 full bag replay 중 publish한 registered cloud와 path를 같이 보여주는 그림입니다.
 
 ```text
-UNIST 대표 scan을 fixed map 후보에 대응시켰을 때,
-residual이 공간적으로 어디에 분포하는지 보기 위한 시각화다.
+registered cloud:
+  /cloud_registered
+
+path:
+  /Odometry
+
+collector output:
+  odom: 1920
+  cloud snapshots: 960
+  sampled cloud points: 937609
 ```
 
-![UNIST fixed-map residual orbit animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fixed_map_residual_orbit.webp){: .d-block .mx-auto }
+![FAST-LIO2 full-bag registered cloud orbit animation](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_registered_cloud_orbit.webp){: .d-block .mx-auto }
 
-다음 animation은 FAST-LIO2 내부 흐름을 설명하기 위한 loop입니다.
+다음은 full bag 전체 trajectory를 시간에 따라 누적한 animation입니다.
 
-아래 숫자는 이번 20초 trace에서 나온 median 값입니다. 그래서 완전한 concept art가 아니라, 실제 logging 결과를 섞은 설명용 animation입니다.
+이 그림은 path가 시간에 따라 어떻게 쌓이는지 보기 좋습니다. residual p95를 같이 붙였기 때문에, 단순 경로 그림보다 LIO 내부 update trace와 연결해서 볼 수 있습니다.
 
-![FAST-LIO2 scan-level pipeline loop animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_pipeline_loop.webp){: .d-block .mx-auto }
+![FAST-LIO2 full-bag trajectory build-up animation](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_trajectory_build_up.webp){: .d-block .mx-auto }
 
-마지막으로 실제 FAST-LIO2 odometry trace를 시간에 따라 누적한 animation입니다.
+마지막으로, full bag에서 30초 window를 sliding하면서 보기 좋은 구간을 자동으로 골랐습니다.
 
-이건 데이터 기반이라는 장점이 있지만, 20초 smoke run이라 경로 자체는 짧습니다. 그래서 대표 시각자료보다는 보조 시각자료로 보는 것이 맞습니다.
+선정 점수는 path length, x/y/z span, residual p95 range, pose update 크기를 섞어서 계산했습니다.
 
-![FAST-LIO2 UNIST trajectory build-up animation](/assets/img/posts/slam/study/week-6-lio-data-flow/fast_lio2_trajectory_build_up.webp){: .d-block .mx-auto }
+상위 구간은 다음이었습니다.
+
+| rank | window | path length | span x/y/z | residual p95 range |
+|---:|---|---:|---:|---:|
+| 1 | 70-100 s | 18.98 m | 9.96 / 9.36 / 1.74 m | 0.0178 m |
+| 2 | 110-140 s | 17.97 m | 12.15 / 5.45 / 2.57 m | 0.0160 m |
+| 3 | 75-105 s | 18.70 m | 10.82 / 7.74 / 1.67 m | 0.0212 m |
+
+아래는 1등 구간인 70-100초 local map build animation입니다.
+
+![FAST-LIO2 full-bag best 70-100s local map build animation](/assets/img/posts/slam/study/week-6-lio-data-flow/full_bag_segment_070_100_map_build.webp){: .d-block .mx-auto }
 
 이 trajectory 그림은 보기에는 odometry 결과처럼 보이지만, 아직 평가 결과로 쓰면 안 됩니다.
 
