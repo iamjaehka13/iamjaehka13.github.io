@@ -1,12 +1,12 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-15 22:51:47 +0900
+last_modified_at: 2026-07-15 23:01:11 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
 image:
-  path: /assets/img/posts/math/linear-algebra-3b1b/00-linear-algebra-preview-3b1b-ch13.png
+  path: /assets/img/posts/math/linear-algebra-3b1b/00-linear-algebra-preview-3b1b-ch13-hd.png
   alt: "3Blue1Brown Ch.13 Change of basis 원본 영상에서 발췌한 대표 이미지."
 math: true
 ---
