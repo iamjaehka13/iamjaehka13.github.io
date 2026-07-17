@@ -79,16 +79,15 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 ```text
 1. 각 원본 영상에서 필요한 장면만 짧게 발췌
-2. 각 GIF 바로 아래 caption에 3Blue1Brown 출처 명시
-3. caption에 원본 영상 링크 제공
-4. 주변 본문에서 개념 해석을 덧붙여, clip 자체만 통째로 재업로드하는 형태는 피함
+2. 글 마지막 참고자료에 3Blue1Brown 원본 영상 링크 제공
+3. 주변 본문에서 개념 해석을 덧붙여, clip 자체만 통째로 재업로드하는 형태는 피함
 ```
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
 이 글에서는 1강부터 16강까지 각 강마다 원본 영상에서 짧게 발췌한 대표 GIF clip을 넣었습니다. 추가로 개념상 중요한 곳에는 보조 GIF clip을 더 넣었습니다.
 
-각 GIF는 각 원본 영상에서 60초 미만으로 발췌했습니다. 너무 짧아서 개념 흐름이 잘리는 장면은 조금 더 길게 잡고, 느리게 늘어지는 장면은 빠르게 압축했습니다. GIF 자체에는 별도 글자를 덮지 않고, 바로 아래 caption에 출처와 원본 링크를 연결했습니다.
+각 GIF는 각 원본 영상에서 60초 미만으로 발췌했습니다. 너무 짧아서 개념 흐름이 잘리는 장면은 조금 더 길게 잡고, 느리게 늘어지는 장면은 빠르게 압축했습니다. GIF 자체에는 별도 글자를 덮지 않았으며, 원본 링크는 글 마지막 참고자료에 정리했습니다.
 
 ## **1. 선형대수의 핵심 관점**
 
@@ -152,9 +151,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-vectors.gif" alt="3Blue1Brown Ch.1 vectors visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 벡터는 분야마다 조금씩 다르게 보입니다.
@@ -232,9 +228,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-vector-addition-detail.gif" alt="3Blue1Brown Ch.1 vector addition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 벡터 덧셈을 이동의 합성으로 보기 위한 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 ### **2.2 스칼라 곱**
@@ -253,9 +246,6 @@ $c$가 음수이면 방향이 반대로 뒤집힙니다.
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-scalar-multiplication-detail.gif" alt="3Blue1Brown Ch.1 scalar multiplication visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/fNk_zzaMoSs">3Blue1Brown Ch.1</a>. 스칼라 곱이 벡터의 길이와 방향을 바꾸는 과정을 보여주는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 예를 들어
@@ -281,9 +271,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination.gif" alt="3Blue1Brown Ch.2 linear combination visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 벡터 $\mathbf{v}$와 $\mathbf{w}$가 있을 때,
@@ -325,9 +312,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-span-dependent-detail.gif" alt="3Blue1Brown Ch.2 span and linear dependence visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/k7RM-ot2NWY">3Blue1Brown Ch.2</a>. span이 직선이나 평면으로 제한될 때 선형종속이 무엇을 뜻하는지 보여주는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 ### **3.2 선형독립과 선형종속**
@@ -401,9 +385,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.gif" alt="3Blue1Brown Ch.3 linear transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 선형변환(linear transformation)은 벡터를 다른 벡터로 보내는 함수입니다.
@@ -448,9 +429,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-basis-grid-detail.gif" alt="3Blue1Brown Ch.3 basis vectors determine the grid visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/kYB8IZa5AuE">3Blue1Brown Ch.3</a>. basis vector의 이동이 격자 전체의 이동을 결정하는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 ### **4.1 행렬의 열벡터가 중요한 이유**
@@ -532,9 +510,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.gif" alt="3Blue1Brown Ch.4 matrix composition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/XkY2DOUCWMU">3Blue1Brown Ch.4</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 행렬곱은 계산으로 보면 복잡합니다.
@@ -630,9 +605,6 @@ $BA$는 그 반대입니다.
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.gif" alt="3Blue1Brown Ch.5 3D transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/rHLEWRxRGiM">3Blue1Brown Ch.5</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 2차원에서 했던 이야기는 3차원에서도 그대로 이어집니다.
@@ -728,9 +700,6 @@ z축 basis는 어디로 갔는가?
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.gif" alt="3Blue1Brown Ch.6 determinant visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 determinant는 보통 계산 공식으로 먼저 배웁니다.
@@ -784,9 +753,6 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-collapse.gif" alt="3Blue1Brown Ch.6 determinant collapse visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/Ip3X9LOh2dk">3Blue1Brown Ch.6</a>. determinant가 0에 가까워질 때 면적이 낮은 차원으로 collapse되는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 그래서 determinant가 0이면 역변환을 만들 수 없습니다.
@@ -799,9 +765,6 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.gif" alt="3Blue1Brown Ch.7 inverse column space null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 행렬 $A$의 역행렬 $A^{-1}$은 $A$가 한 변환을 되돌리는 변환입니다.
@@ -870,9 +833,6 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-column-null-detail.gif" alt="3Blue1Brown Ch.7 column space and null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/uQhTuRlWMxw">3Blue1Brown Ch.7</a>. column space와 null space를 선형변환의 출력 가능 영역과 사라지는 입력 방향으로 보는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 ### **8.4 rank와 해의 개수**
@@ -1142,9 +1102,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.gif" alt="3Blue1Brown Ch.8 nonsquare matrix visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/v8VSDg_WQlA">3Blue1Brown Ch.8</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
@@ -1202,9 +1159,6 @@ SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product.gif" alt="3Blue1Brown Ch.9 dot product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 내적(dot product)은 계산으로는 성분별 곱의 합입니다.
@@ -1238,9 +1192,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-projection-detail.gif" alt="3Blue1Brown Ch.9 dot product projection visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/LyGKycYT2v0">3Blue1Brown Ch.9</a>. 내적을 projection 길이와 방향성으로 해석하는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 그래서 같은 방향이면 양수, 직교하면 0, 반대 방향이면 음수가 됩니다.
@@ -1318,18 +1269,12 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.gif" alt="3Blue1Brown Ch.10 cross product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/eu6i7WJeinw">3Blue1Brown Ch.10</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 3Blue1Brown 11강은 외적을 선형변환과 duality 관점에서 한 단계 더 깊게 봅니다.
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.gif" alt="3Blue1Brown Ch.11 cross product duality visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/BaM7OCEm3G0">3Blue1Brown Ch.11</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 3차원에서 외적(cross product)은 두 벡터로부터 새로운 벡터를 만듭니다.
@@ -1441,9 +1386,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.gif" alt="3Blue1Brown Ch.12 Cramer's rule visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/jBsC34PxzoM">3Blue1Brown Ch.12</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 Cramer's rule은 선형시스템
@@ -1603,9 +1545,6 @@ iterative solver
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-change-of-basis.gif" alt="3Blue1Brown Ch.13 change of basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/P2LTAUO1TdA">3Blue1Brown Ch.13</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 기저변환(change of basis)은 처음에는 헷갈립니다.
@@ -1623,9 +1562,6 @@ iterative solver
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-coordinate-language-detail.gif" alt="3Blue1Brown Ch.13 same vector different coordinates visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/P2LTAUO1TdA">3Blue1Brown Ch.13</a>. 같은 벡터가 좌표계에 따라 다른 숫자로 읽히는 것을 보여주는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 change of basis에서 실제 벡터 자체가 움직이는 것은 아닙니다.
@@ -1755,9 +1691,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigenvectors.gif" alt="3Blue1Brown Ch.14 eigenvectors and eigenvalues visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/PFDu9oVAE-g">3Blue1Brown Ch.14</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 고유벡터(eigenvector)는 선형변환을 적용해도 방향이 바뀌지 않는 벡터입니다.
@@ -1785,9 +1718,6 @@ A가 v를 변환해도,
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigen-direction-detail.gif" alt="3Blue1Brown Ch.14 eigenvector direction survives transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/PFDu9oVAE-g">3Blue1Brown Ch.14</a>. 선형변환 뒤에도 방향이 유지되는 eigenvector를 보여주는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 그 방향이 eigenvector이고, 그 방향으로 얼마나 늘거나 줄었는지를 나타내는 값이 eigenvalue입니다.
@@ -2046,9 +1976,6 @@ SLAM normal equation
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch15-eigenvalue-trick.gif" alt="3Blue1Brown Ch.15 eigenvalue trick visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/e50Bj7jn9IQ">3Blue1Brown Ch.15</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 고유값은 다음 식에서 나옵니다.
@@ -2596,9 +2523,6 @@ eigenvector가 있다는 말은,
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch16-abstract-vector-spaces.gif" alt="3Blue1Brown Ch.16 abstract vector spaces visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/TgKwz5Ikpc8">3Blue1Brown Ch.16</a>. 원본 영상에서 짧게 발췌한 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 지금까지는 벡터를 주로 화살표로 생각했습니다.
@@ -2644,9 +2568,6 @@ $$
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch16-polynomial-basis-detail.gif" alt="3Blue1Brown Ch.16 polynomial basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center text-muted small mt-2">
-    Source: <a href="https://youtu.be/TgKwz5Ikpc8">3Blue1Brown Ch.16</a>. 다항식을 basis function의 선형결합으로 보는 보조 study용 GIF clip입니다.
-  </figcaption>
 </figure>
 
 함수도 마찬가지입니다.
