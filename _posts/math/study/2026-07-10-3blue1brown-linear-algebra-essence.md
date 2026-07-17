@@ -7,7 +7,6 @@ tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eig
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
 image:
   path: /assets/img/posts/math/linear-algebra-3b1b/00-linear-algebra-preview-3b1b-ch13-hd.png
-  alt: "3Blue1Brown Ch.13 Change of basis 원본 영상에서 발췌한 대표 이미지."
 math: true
 ---
 
@@ -2860,71 +2859,3 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 | Eigenspace | 같은 eigenvalue를 공유하는 방향 공간 | $\operatorname{ker}(A-\lambda I)$ | 여러 고유벡터를 하나의 공간으로 이해 |
 | Eigenbasis | 고유벡터들로 만든 basis | $P^{-1}AP=D$ | 복잡한 변환을 축별 scale로 분리 |
 | Abstract vector space | 화살표 밖의 벡터 개념 | functions, polynomials | 신호, 이미지, 함수공간까지 확장 |
-
-## **19. 공부 순서**
-
-3Blue1Brown 시리즈를 볼 때는 단순히 공식을 외우기보다, 각 장이 끝날 때 다음 질문에 답할 수 있는지 확인하는 게 좋습니다.
-
-```text
-1. 벡터
-   벡터를 화살표, 숫자 리스트, 추상 원소 관점에서 설명할 수 있는가?
-
-2. 선형결합, span, basis
-   어떤 벡터들이 공간 전체를 만들 수 있는지 판단할 수 있는가?
-
-3. 행렬과 선형변환
-   행렬의 각 열이 무엇을 의미하는지 설명할 수 있는가?
-
-4. 행렬곱
-   AB와 BA가 왜 일반적으로 다른지 공간 변환으로 설명할 수 있는가?
-
-5. determinant
-   determinant가 0이라는 말을 차원 collapse로 설명할 수 있는가?
-
-6. inverse, column space, null space
-   선형시스템의 해 존재성과 도달 가능한 공간을 연결할 수 있는가?
-
-7. dot product, cross product
-   내적과 외적을 길이, 면적, projection으로 해석할 수 있는가?
-
-8. Cramer's rule
-   해를 determinant 비율로 보는 기하학적 의미를 설명할 수 있는가?
-
-9. change of basis
-   벡터와 좌표 표현을 구분할 수 있는가?
-
-10. eigenvector, eigenvalue
-    변환의 핵심 방향과 scale을 설명할 수 있는가?
-
-11. abstract vector space
-    함수나 다항식도 벡터처럼 다룰 수 있는 이유를 설명할 수 있는가?
-```
-
-이 질문들에 답할 수 있으면, 선형대수는 공식 모음이 아니라 하나의 언어처럼 보이기 시작합니다.
-
-## **20. 참고 링크**
-
-이 글은 아래 자료들을 바탕으로 공부 내용을 정리한 것입니다.
-
-- [3Blue1Brown 한국어 선형대수학의 본질 재생목록](https://www.youtube.com/playlist?list=PLOEOa0pDLTZaglBDKWxV4t80Y3Psk_Hg4)
-- [3Blue1Brown Essence of Linear Algebra official playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
-- [3Blue1Brown About / FAQ - material usage guidance](https://www.3blue1brown.com/about/)
-- [3Blue1Brown - Vectors](https://youtu.be/fNk_zzaMoSs)
-- [3Blue1Brown - Linear combinations, span, and basis vectors](https://www.3blue1brown.com/lessons/span/)
-- [3Blue1Brown - Essence of linear algebra preview](https://www.3blue1brown.com/lessons/eola-preview/)
-- [3Blue1Brown - Linear transformations and matrices](https://www.3blue1brown.com/lessons/linear-transformations/)
-- [3Blue1Brown - Matrix multiplication as composition](https://www.3blue1brown.com/lessons/matrix-multiplication/)
-- [3Blue1Brown - Three-dimensional linear transformations](https://www.3blue1brown.com/lessons/3d-transformations/)
-- [3Blue1Brown - The determinant](https://www.3blue1brown.com/lessons/determinant/)
-- [3Blue1Brown - Inverse matrices, column space, and null space](https://www.3blue1brown.com/lessons/inverse-matrices/)
-- [3Blue1Brown - Nonsquare matrices as transformations between dimensions](https://www.3blue1brown.com/lessons/nonsquare-matrices/)
-- [3Blue1Brown - Dot products and duality](https://www.3blue1brown.com/lessons/dot-products/)
-- [3Blue1Brown - Cross products](https://www.3blue1brown.com/lessons/cross-products/)
-- [3Blue1Brown - Cross products in the light of linear transformations](https://www.3blue1brown.com/lessons/cross-products-extended/)
-- [3Blue1Brown - Cramer's rule, explained geometrically](https://www.3blue1brown.com/lessons/cramers-rule/)
-- [3Blue1Brown - Change of basis](https://www.3blue1brown.com/lessons/change-of-basis/)
-- [3Blue1Brown - Eigenvectors and eigenvalues](https://www.3blue1brown.com/lessons/eigenvalues/)
-- [3Blue1Brown - A quick trick for computing eigenvalues](https://youtu.be/e50Bj7jn9IQ)
-- [3Blue1Brown - Abstract vector spaces](https://www.3blue1brown.com/lessons/abstract-vector-spaces/)
-
-원 영상과 공식 글은 시각화가 핵심입니다. 이 글은 그 자료들을 대체하려는 것이 아니라, 원본 영상과 함께 보면서 개념을 다시 잡기 위한 내 공부용 정리입니다.
