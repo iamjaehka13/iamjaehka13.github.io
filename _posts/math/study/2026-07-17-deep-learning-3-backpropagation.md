@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 3] Backpropagation은 Gradient를 어떻게 계산하는가"
+title: "[Deep Learning 3] Backpropagation과 Gradient 계산"
 date: 2026-07-17 19:43:54 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, neural-network, 3blue1brown, backpropagation, gradient, chain-rule, computational-graph, partial-derivative, mini-batch]

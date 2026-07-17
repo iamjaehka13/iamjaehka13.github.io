@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 4] Transformer는 어떤 순서로 작동하는가"
+title: "[Deep Learning 4] Transformer의 전체 계산 흐름"
 date: 2026-07-17 19:59:00 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, transformer, llm, 3blue1brown, tokenization, embedding, attention, mlp, unembedding, softmax, logits]

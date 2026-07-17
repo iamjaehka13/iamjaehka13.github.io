@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 6] 학습된 지식은 모델 내부에 어떻게 표현되는가"
+title: "[Deep Learning 6] 모델 내부의 학습된 지식 표현"
 date: 2026-07-17 20:20:45 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, transformer, llm, 3blue1brown, mlp, feed-forward-network, neuron, feature, superposition, interpretability]

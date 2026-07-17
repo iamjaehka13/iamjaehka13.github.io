@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 1] 신경망은 어떤 계산 구조인가"
+title: "[Deep Learning 1] 신경망의 계산 구조"
 date: 2026-07-17 16:54:08 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, neural-network, 3blue1brown, neuron, activation, weight, bias, sigmoid, mnist, forward-pass]

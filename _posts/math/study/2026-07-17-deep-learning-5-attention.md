@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 5] Attention 내부에서는 어떤 계산이 일어나는가"
+title: "[Deep Learning 5] Attention의 내부 계산"
 date: 2026-07-17 20:13:20 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, transformer, attention, self-attention, 3blue1brown, query, key, value, softmax, causal-mask, multi-head-attention]

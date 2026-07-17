@@ -1,5 +1,5 @@
 ---
-title: "[Deep Learning 2] Gradient Descent는 신경망을 어떻게 학습시키는가"
+title: "[Deep Learning 2] Gradient Descent와 신경망 학습"
 date: 2026-07-17 17:28:51 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, neural-network, 3blue1brown, gradient-descent, cost-function, loss-function, gradient, learning-rate, optimization, mnist]
