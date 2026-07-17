@@ -132,6 +132,97 @@ $$
 
 Embedding은 discrete한 token을 연속적인 vector 공간의 점으로 바꾸는 첫 단계입니다.
 
+### **5.1 가까운 vector는 비슷한 사용 패턴을 가질 수 있다**
+
+Embedding matrix의 값은 처음에는 random하게 시작하지만 training data를 이용한 학습 과정에서 계속 수정됩니다. 비슷한 문맥에서 비슷한 역할로 등장하는 token들은 model이 다음 token을 예측할 때 비슷하게 다루는 편이 유리하므로, embedding space에서도 가까운 위치에 놓이는 경향이 생길 수 있습니다.
+
+두 embedding $\mathbf{u}$와 $\mathbf{v}$의 가까움을 단순한 Euclidean distance로 볼 수도 있고, 방향의 유사성을 cosine similarity로 볼 수도 있습니다.
+
+$$
+\operatorname{cosine}(\mathbf{u},\mathbf{v})
+=
+\frac{\mathbf{u}\cdot\mathbf{v}}
+{\lVert\mathbf{u}\rVert\lVert\mathbf{v}\rVert}
+$$
+
+값이 1에 가까우면 두 vector가 비슷한 방향을 가리키고, 0에 가까우면 거의 직교하며, 음수이면 반대 방향 성분이 강합니다.
+
+여기서 “가깝다”는 것은 사람이 정의한 사전적 의미가 그대로 좌표에 저장됐다는 뜻이 아닙니다. **training data 안에서의 사용 패턴을 model이 예측에 유용한 방식으로 압축한 결과**에 가깝습니다.
+
+### **5.2 공간의 방향이 관계를 나타내기도 한다**
+
+Embedding 하나는 공간의 점이고, 두 embedding의 차이는 한 점에서 다른 점으로 향하는 방향입니다.
+
+$$
+\mathbf{d}_{\text{gender}}
+\approx
+\operatorname{Embed}(\text{woman})
+-
+\operatorname{Embed}(\text{man})
+$$
+
+이와 비슷한 방향이 다른 단어 관계에서도 반복된다면 다음과 같은 vector arithmetic이 어느 정도 성립할 수 있습니다.
+
+$$
+\operatorname{Embed}(\text{king})
++
+\left(
+\operatorname{Embed}(\text{woman})
+-
+\operatorname{Embed}(\text{man})
+\right)
+\approx
+\operatorname{Embed}(\text{queen})
+$$
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-4-transformer/06a-semantic-directions.gif" alt="embedding space에서 단어 사이의 차이 vector가 의미 관계의 방향으로 나타나는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
+
+이 예제의 핵심은 `king - man + woman = queen`이라는 공식을 외우는 것이 아닙니다. 학습 과정에서 model이 어떤 관계를 여러 좌표에 흩어진 **방향**으로 표현할 수 있다는 점입니다.
+
+또한 영상의 해당 시각화는 이해를 돕기 위한 단순한 word-to-vector model의 예입니다. 모든 embedding model에서 동일한 관계가 정확히 나타나거나, 하나의 방향이 오직 하나의 의미만 담당한다고 보장할 수는 없습니다.
+
+### **5.3 Dot product는 특정 방향과의 정렬을 측정한다**
+
+어떤 관계를 나타내는 방향 $\mathbf{d}$를 가정하면, token embedding $\mathbf{e}_i$와의 dot product로 그 방향과 얼마나 정렬되는지 측정할 수 있습니다.
+
+$$
+s_i
+=
+\mathbf{d}^{T}\mathbf{e}_i
+$$
+
+예를 들어
+
+$$
+\mathbf{d}_{\text{plural}}
+=
+\operatorname{Embed}(\text{cats})
+-
+\operatorname{Embed}(\text{cat})
+$$
+
+라고 두고 여러 단어의 embedding과 dot product를 계산하면, 복수형 단어가 단수형보다 이 방향에 더 크게 정렬되는지 확인할 수 있습니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-4-transformer/06b-dot-product-directions.gif" alt="단수형과 복수형 embedding 차이 방향에 다른 단어 vector가 얼마나 정렬되는지 dot product로 비교하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
+
+이 dot product 관점은 다음 5편의 attention 계산으로 그대로 이어집니다. Attention도 query와 key의 dot product를 이용해 두 token 사이의 관련도를 수치화합니다.
+
+### **5.4 고차원 vector가 화면에서 움직인다는 의미**
+
+실제 embedding은 화면에 그릴 수 없는 고차원 vector입니다. 영상에 보이는 2D 또는 3D 점은 고차원 공간의 일부 방향을 선택해 투영한 결과입니다.
+
+$$
+\mathbf{e}\in\mathbb{R}^{d_{model}}
+\quad\longrightarrow\quad
+P\mathbf{e}\in\mathbb{R}^{2\text{ or }3}
+$$
+
+따라서 화면에서 두 점이 가까워 보이는 모습은 embedding 전체를 완벽하게 보여주는 것이 아닙니다. 선택한 projection에서 드러나는 일부 관계를 시각화한 것입니다.
+
 ## **6. 위치 정보도 필요하다**
 
 같은 token이라도 문장 안의 위치가 다르면 역할이 달라질 수 있습니다.
@@ -270,6 +361,45 @@ Layer normalization은 각 sublayer 주변에서 activation의 scale을 조절�
 마지막 layer의 vector
 ≈ 현재 문맥에서 다음 token 예측에 필요한 정보가 반영된 표현
 ```
+
+여기서 구분해야 할 두 vector가 있습니다.
+
+- **Token embedding**: embedding matrix에서 처음 조회한 고정된 시작 vector
+- **Contextual hidden vector**: attention과 MLP를 통과하며 현재 문장에 맞게 계속 갱신되는 vector
+
+같은 token ID라면 시작 embedding은 같습니다. 하지만 주변 문장이 다르면 attention에서 받아오는 정보가 달라지므로 이후 hidden vector의 이동 방향도 달라집니다.
+
+예를 들어 `model`이라는 token의 초기 embedding을 $\mathbf{e}_{model}$이라고 하면 두 문장에서 시작점은 같습니다.
+
+$$
+\mathbf{h}_{model}^{(0)}
+=
+\mathbf{e}_{model}+\mathbf{p}_{t}
+$$
+
+그러나 layer $l$에서 attention과 MLP가 계산하는 변화량은 문맥에 의존합니다.
+
+$$
+\mathbf{h}_{model}^{(l)}
+=
+\mathbf{h}_{model}^{(l-1)}
++
+\Delta\mathbf{h}_{attention}^{(l)}
++
+\Delta\mathbf{h}_{MLP}^{(l)}
+$$
+
+```text
+"machine learning model"
+→ model vector가 neural network, training, prediction과 관련된 방향으로 수정
+
+"fashion model"
+→ model vector가 person, clothing, photography와 관련된 방향으로 수정
+```
+
+즉 embedding table 안의 `model` vector 자체를 매 문장마다 다시 쓰는 것이 아닙니다. 그 vector를 복사해 만든 현재 sequence의 hidden state가 layer를 통과하면서 이동합니다.
+
+이 이동은 사람이 미리 지정한 규칙이 아닙니다. 다음 token prediction loss를 줄이도록 attention과 MLP의 parameter를 학습한 결과입니다.
 
 “의미가 vector에 들어 있다”는 표현은 특정 좌표 하나가 명확한 단어 뜻 하나를 가진다는 뜻은 아닙니다. 정보는 많은 차원과 여러 layer에 분산되어 표현될 수 있습니다.
 
