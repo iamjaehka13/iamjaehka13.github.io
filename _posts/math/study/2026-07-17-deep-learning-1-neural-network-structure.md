@@ -529,4 +529,4 @@ $$
 
 > 신경망은 벡터를 입력받아, affine transformation과 nonlinear activation을 반복하고, 새로운 벡터를 출력하는 parameterized function이다.
 
-다음 글에서는 이 13,002개의 parameter를 무작정 바꾸는 대신, 오차를 가장 빠르게 줄이는 방향을 어떻게 찾는지 gradient descent를 중심으로 정리합니다.
+다음 [2편](/posts/deep-learning-2-gradient-descent/)에서는 이 13,002개의 parameter를 무작정 바꾸는 대신, 오차를 가장 빠르게 줄이는 방향을 어떻게 찾는지 gradient descent를 중심으로 정리합니다.
