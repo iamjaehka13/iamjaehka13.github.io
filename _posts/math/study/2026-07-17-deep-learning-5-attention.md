@@ -736,4 +736,4 @@ A × V
 8. 영상의 $K^TQ$와 일반적인 구현의 $QK^T$가 모두 가능하려면 무엇을 확인해야 하는가?
 9. Standard attention의 context length 비용이 quadratic인 이유는 무엇인가?
 
-다음 6편에서는 Transformer의 다른 핵심 block인 MLP를 열어보고, 학습된 지식과 feature가 model 내부에 어떤 방식으로 표현될 수 있는지 정리합니다.
+다음 [6편](/posts/deep-learning-6-knowledge-representation/)에서는 Transformer의 다른 핵심 block인 MLP를 열어보고, 학습된 지식과 feature가 model 내부에 어떤 방식으로 표현될 수 있는지 정리합니다.
