@@ -584,4 +584,4 @@ tokenize
 7. Unembedding의 출력과 softmax의 출력은 어떻게 다른가?
 8. 다음 token을 하나 선택한 뒤 text generation은 어떻게 계속되는가?
 
-다음 5편에서는 이번 글에서 하나의 block으로 남겨 둔 attention을 열어보고, query, key, value가 어떤 계산을 거쳐 token 사이의 정보 이동을 만드는지 단계별로 정리합니다.
+다음 [5편](/posts/deep-learning-5-attention/)에서는 이번 글에서 하나의 block으로 남겨 둔 attention을 열어보고, query, key, value가 어떤 계산을 거쳐 token 사이의 정보 이동을 만드는지 단계별로 정리합니다.
