@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-17 15:51:48 +0900
+last_modified_at: 2026-07-17 15:59:52 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -939,6 +939,58 @@ $$
 
 이 식은 “입력 자유도는 출력으로 살아남는 방향과 0으로 사라지는 방향으로 나뉜다”는 뜻으로 볼 수 있습니다.
 
+### **8.4.1 용어를 공간, 숫자, 벡터로 분리하기**
+
+이 지점에서 헷갈리는 이유는 보통 수학이 어려워서라기보다, 서로 다른 종류의 말이 한꺼번에 섞이기 때문입니다.
+
+특히 다음 세 가지를 분리해서 봐야 합니다.
+
+```text
+벡터: 공간 안의 원소 하나
+공간: 벡터들이 모여서 이루는 집합
+숫자: 그 공간의 차원, 배율, 부피 변화율 같은 측정값
+```
+
+예를 들어 column space는 공간입니다.
+
+행렬이 만들어낼 수 있는 모든 출력 벡터의 집합입니다.
+
+반면 rank는 숫자입니다.
+
+column space의 차원을 나타내는 값입니다.
+
+null space도 공간입니다.
+
+행렬을 통과했을 때 0으로 사라지는 입력 벡터들의 집합입니다.
+
+nullity는 숫자입니다.
+
+null space의 차원입니다.
+
+정리하면 다음처럼 볼 수 있습니다.
+
+| 용어 | 종류 | 의미 |
+|---|---|---|
+| vector $\mathbf{v}$ | 벡터 하나 | 방향과 크기를 가진 원소 |
+| span | 공간 | 주어진 벡터들의 선형결합으로 만들 수 있는 전체 집합 |
+| basis | 벡터들의 집합 | 공간을 만드는 최소 독립 벡터들 |
+| dimension | 숫자 | basis vector가 몇 개 필요한지 |
+| column space | 공간 | 행렬이 만들 수 있는 모든 출력 |
+| rank | 숫자 | column space의 차원 |
+| null space, kernel | 공간 | 출력이 0이 되는 모든 입력 |
+| nullity | 숫자 | null space의 차원 |
+| determinant | 숫자 | 전체 면적/부피 변화율 |
+
+이 구분이 잡히면 뒤의 eigenvalue도 훨씬 덜 헷갈립니다.
+
+eigenvector는 벡터입니다.
+
+eigenspace는 공간입니다.
+
+eigenvalue는 숫자입니다.
+
+즉 eigenvalue를 “고유벡터의 길이”처럼 보면 안 되고, eigenspace를 “벡터 하나”처럼 봐도 안 됩니다.
+
 ### **8.5 rank가 낮으면 무엇이 사라지는가**
 
 여기서 내가 헷갈렸던 핵심은 이것입니다.
@@ -1718,6 +1770,39 @@ P^{-1}: 결과를 다시 새 기저 좌표로 읽는다.
 
 world frame에서 본 벡터, body frame에서 본 벡터, LiDAR frame에서 본 벡터는 실제 물리량은 같을 수 있지만 좌표 표현은 다릅니다.
 
+### **13.3 행렬은 변환 자체가 아니라 좌표 표현이다**
+
+이 장에서 가장 중요한 결론은 다음입니다.
+
+```text
+선형변환은 실제 작용이고,
+행렬은 그 작용을 특정 basis에서 적은 숫자표다.
+```
+
+같은 선형변환이라도 basis를 바꾸면 행렬 모양은 달라질 수 있습니다.
+
+하지만 변환 자체가 바뀐 것은 아닙니다.
+
+예를 들어 어떤 회전이나 stretching이 있다고 합시다.
+
+표준기저에서 보면 행렬이 $A$일 수 있습니다.
+
+하지만 고유벡터로 만든 기저에서 보면 같은 변환이 $D$처럼 훨씬 단순하게 보일 수 있습니다.
+
+그 관계가 바로
+
+$$
+D = P^{-1}AP
+$$
+
+입니다.
+
+여기서 $P$는 변환을 새로 만드는 행렬이 아니라, 좌표 언어를 바꾸는 행렬입니다.
+
+이 관점이 잡히면 diagonalization이 덜 이상하게 보입니다.
+
+대각화는 행렬을 억지로 예쁜 표로 바꾸는 조작이 아니라, 변환이 가장 단순하게 보이는 basis를 찾는 과정입니다.
+
 ## **14. 고유벡터와 고유값**
 
 3Blue1Brown 14강은 eigenvector를 선형변환 이후에도 같은 직선 위에 남는 특수한 방향으로 설명합니다.
@@ -1894,6 +1979,97 @@ $$
 ```text
 하나의 고유값에는 그 고유값에 대응하는 고유공간이 있다.
 그 고유공간 안의 0이 아닌 모든 벡터가 고유벡터다.
+```
+
+### **14.2.1 고유벡터를 방향 공간으로 보기**
+
+고유벡터를 이해할 때는 “딱 하나의 화살표”보다 “방향을 나타내는 공간”으로 보는 편이 좋습니다.
+
+예를 들어
+
+$$
+A
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+=
+3
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+$$
+
+라면 $\begin{bmatrix}1 \\ 0\end{bmatrix}$ 하나만 고유벡터인 것이 아닙니다.
+
+다음 벡터들도 모두 같은 고유값 3에 대한 고유벡터입니다.
+
+$$
+\begin{bmatrix}
+2 \\
+0
+\end{bmatrix},
+\qquad
+\begin{bmatrix}
+-5 \\
+0
+\end{bmatrix},
+\qquad
+\begin{bmatrix}
+100 \\
+0
+\end{bmatrix}
+$$
+
+전부 같은 $x$축 위에 있기 때문입니다.
+
+그래서 이 경우 고유공간은
+
+$$
+E_3
+=
+\operatorname{span}
+\left\{
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+\right\}
+$$
+
+입니다.
+
+여기서 0벡터는 eigenspace 안에는 들어가지만 eigenvector라고 부르지는 않습니다.
+
+eigenvector 정의에서 $\mathbf{v}\ne\mathbf{0}$ 조건이 붙기 때문입니다.
+
+0벡터는 모든 방향에 동시에 속하는 애매한 대상이라서, “방향이 유지된다”는 정보를 주지 못합니다.
+
+더 특수한 경우도 있습니다.
+
+$$
+A = 2I
+$$
+
+이면 모든 벡터에 대해
+
+$$
+A\mathbf{v}=2\mathbf{v}
+$$
+
+입니다.
+
+이때는 $x$축만 고유공간인 것이 아니라, $\mathbb{R}^2$ 전체가 고유값 2에 대한 고유공간입니다.
+
+즉 하나의 고유값이 여러 독립적인 방향을 동시에 가질 수도 있습니다.
+
+이 차이를 이렇게 기억하면 좋습니다.
+
+```text
+고유벡터 하나 = 방향을 찍는 대표 화살표
+고유공간 = 같은 고유값을 공유하는 방향들의 전체 공간
+고유값 = 그 공간 안에서 적용되는 배율
 ```
 
 ### **14.3 왜 중요한가**
@@ -2131,6 +2307,30 @@ A\mathbf{v}
 =
 0
 $$
+
+여기서 $\det(A-\lambda I)=0$은 $A-\lambda I$가 전체 공간을 한 점으로 보낸다는 뜻이 아닙니다.
+
+더 정확히는 적어도 하나의 0이 아닌 방향을 0으로 보낸다는 뜻입니다.
+
+즉
+
+$$
+\operatorname{rank}(A-\lambda I) < n
+$$
+
+이 되고, 그 결과 null space가 0벡터만 있는 공간보다 커집니다.
+
+그 새로 생긴 null space가 바로 해당 $\lambda$의 eigenspace입니다.
+
+정리하면 계산의 목적은 다음입니다.
+
+```text
+lambda를 아무 숫자나 넣으면 A - lambda I는 대개 invertible이다.
+그때는 kernel이 0뿐이라 eigenvector가 없다.
+
+특별한 lambda를 넣으면 A - lambda I가 singular해진다.
+그때 0이 아닌 kernel이 생기고, 그 kernel이 eigenspace가 된다.
+```
 
 ### **15.3 실제 예제로 보기**
 
@@ -2421,6 +2621,37 @@ eigenbasis = 고유벡터들로 만든 좌표계
 diagonalization = 그 좌표계에서 행렬을 다시 표현하는 것
 ```
 
+### **15.5 대각화가 안 되는 경우도 있다**
+
+모든 행렬이 eigenbasis를 가지는 것은 아닙니다.
+
+대각화를 하려면 전체 공간을 채울 만큼 충분히 많은 독립적인 고유벡터가 필요합니다.
+
+$n$차원 공간에서는 독립적인 고유벡터가 $n$개 있어야 eigenbasis가 됩니다.
+
+예를 들어 어떤 행렬이 고유값은 있어도 고유벡터 방향이 하나밖에 없다면, 그 고유벡터들만으로 전체 공간을 표현할 수 없습니다.
+
+이 경우에는
+
+```text
+eigenvalue는 구할 수 있지만,
+eigenbasis는 만들 수 없고,
+P^{-1}AP = D 꼴의 완전한 대각화도 안 된다.
+```
+
+또 2D에서 순수 회전처럼 모든 벡터의 방향을 바꿔버리는 변환은 실수 범위에서 고유벡터가 없을 수 있습니다.
+
+예를 들어 원점을 중심으로 90도 회전시키면, 0이 아닌 어떤 실수 벡터도 자기 원래 직선 위에 남지 않습니다.
+
+따라서 실수 평면에서는 eigenvector가 없습니다.
+
+이런 경우까지 생각하면 eigenvalue/eigenvector의 의미가 더 선명해집니다.
+
+```text
+eigenvector가 있다는 말은,
+그 변환이 적어도 어떤 방향은 섞지 않고 자기 직선 위에 남긴다는 뜻이다.
+```
+
 ## **16. 추상 벡터공간**
 
 3Blue1Brown 16강은 벡터공간을 2D/3D 화살표에서 벗어나 함수, 다항식, 신호 같은 대상으로 확장합니다.
@@ -2491,6 +2722,192 @@ $$
 이 추상화 덕분에 선형대수는 단순히 2D, 3D 화살표에만 머무르지 않습니다.
 
 신호처리, 머신러닝, 최적화, 제어, SLAM에서도 같은 언어를 사용할 수 있습니다.
+
+### **16.1 미분도 행렬처럼 볼 수 있다**
+
+추상 벡터공간에서 특히 중요한 예시는 다항식 공간입니다.
+
+3차 이하 다항식들의 공간을
+
+$$
+P_3
+=
+\{a_0+a_1x+a_2x^2+a_3x^3\}
+$$
+
+라고 합시다.
+
+이 공간의 basis를
+
+$$
+B=\{1,x,x^2,x^3\}
+$$
+
+로 잡으면, 다항식
+
+$$
+p(x)=5+4x+5x^2+x^3
+$$
+
+은 좌표로
+
+$$
+[p]_B
+=
+\begin{bmatrix}
+5 \\
+4 \\
+5 \\
+1
+\end{bmatrix}
+$$
+
+처럼 표현됩니다.
+
+이제 미분 연산자 $D$를 생각해봅니다.
+
+$$
+D(1)=0,\qquad
+D(x)=1,\qquad
+D(x^2)=2x,\qquad
+D(x^3)=3x^2
+$$
+
+선형변환의 행렬은 basis vector들이 변환된 결과를 열에 넣어서 만듭니다.
+
+따라서 이 basis에서 미분 연산자는 다음 행렬로 표현됩니다.
+
+$$
+[D]_B
+=
+\begin{bmatrix}
+0 & 1 & 0 & 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 \\
+0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+실제로 곱해보면
+
+$$
+[D]_B[p]_B
+=
+\begin{bmatrix}
+0 & 1 & 0 & 0 \\
+0 & 0 & 2 & 0 \\
+0 & 0 & 0 & 3 \\
+0 & 0 & 0 & 0
+\end{bmatrix}
+\begin{bmatrix}
+5 \\
+4 \\
+5 \\
+1
+\end{bmatrix}
+=
+\begin{bmatrix}
+4 \\
+10 \\
+3 \\
+0
+\end{bmatrix}
+$$
+
+입니다.
+
+이 좌표는 함수
+
+$$
+4+10x+3x^2
+$$
+
+를 뜻합니다.
+
+실제로
+
+$$
+\frac{d}{dx}(5+4x+5x^2+x^3)
+=
+4+10x+3x^2
+$$
+
+이므로 정확히 일치합니다.
+
+즉 미분이라는 연산도 basis를 정하면 행렬곱으로 표현할 수 있습니다.
+
+여기서 다시 중요한 결론이 나옵니다.
+
+```text
+행렬은 선형변환 그 자체가 아니라,
+특정 basis에서 그 선형변환을 적은 좌표 표현이다.
+```
+
+### **16.2 고유벡터에서 고유함수로**
+
+고유벡터 개념도 함수공간으로 그대로 확장됩니다.
+
+행렬에서 고유벡터는
+
+$$
+A\mathbf{v}
+=
+\lambda\mathbf{v}
+$$
+
+를 만족하는 벡터였습니다.
+
+미분 연산자에서는 같은 구조가
+
+$$
+D(f)
+=
+\lambda f
+$$
+
+가 됩니다.
+
+즉
+
+$$
+f'(x)
+=
+\lambda f(x)
+$$
+
+를 만족하는 함수를 찾는 문제입니다.
+
+대표적인 해는
+
+$$
+f(x)=e^{\lambda x}
+$$
+
+입니다.
+
+왜냐하면
+
+$$
+\frac{d}{dx}e^{\lambda x}
+=
+\lambda e^{\lambda x}
+$$
+
+이기 때문입니다.
+
+따라서 $e^{\lambda x}$는 미분 연산자 $D$의 eigenfunction이고, $\lambda$는 그 eigenvalue입니다.
+
+이 예시는 eigenvalue/eigenvector가 단순히 2D 화살표에만 붙는 개념이 아니라는 것을 보여줍니다.
+
+핵심 구조는 항상 같습니다.
+
+```text
+변환을 적용했는데,
+대상의 형태나 방향은 유지되고,
+scale만 바뀐다.
+```
+
+행렬에서는 그 대상이 벡터이고, 미분에서는 그 대상이 함수입니다.
 
 ## **17. SLAM과 로봇공학에서 왜 중요한가**
 
@@ -2578,12 +2995,15 @@ covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue�
 | Determinant | 면적/부피 스케일 | $\det(A)$ | collapse, invertibility 판단 |
 | Inverse | 변환을 되돌리는 변환 | $A^{-1}$ | 선형시스템 해, 복원 가능성 |
 | Column space | 도달 가능한 출력 공간 | $\operatorname{Col}(A)$ | $A\mathbf{x}=\mathbf{b}$ 해 존재 조건 |
+| Rank | column space의 차원 | $\operatorname{rank}(A)$ | 살아남은 독립 방향 수 |
 | Null space | 0으로 사라지는 입력 방향 | $\operatorname{Null}(A)$ | 잃어버린 정보, 관측 불가능 방향 |
 | Dot product | projection과 방향 유사도 | $\mathbf{v}\cdot\mathbf{w}$ | gradient, residual, projection |
 | Cross product | oriented area와 수직 방향 | $\mathbf{v}\times\mathbf{w}$ | normal vector, geometry |
 | Change of basis | 같은 벡터를 다른 좌표계로 읽기 | $P^{-1}AP$ | frame 변환, diagonalization |
 | Eigenvector | 변환 후에도 방향이 유지되는 벡터 | $A\mathbf{v}=\lambda\mathbf{v}$ | 주된 방향, 안정성, PCA |
 | Eigenvalue | eigenvector 방향의 scale | $\lambda$ | conditioning, uncertainty, mode 분석 |
+| Eigenspace | 같은 eigenvalue를 공유하는 방향 공간 | $\operatorname{ker}(A-\lambda I)$ | 여러 고유벡터를 하나의 공간으로 이해 |
+| Eigenbasis | 고유벡터들로 만든 basis | $P^{-1}AP=D$ | 복잡한 변환을 축별 scale로 분리 |
 | Abstract vector space | 화살표 밖의 벡터 개념 | functions, polynomials | 신호, 이미지, 함수공간까지 확장 |
 
 ## **19. 공부 순서**
