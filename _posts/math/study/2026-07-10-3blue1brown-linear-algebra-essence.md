@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-15 23:01:11 +0900
+last_modified_at: 2026-07-17 15:51:48 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -939,6 +939,181 @@ $$
 
 이 식은 “입력 자유도는 출력으로 살아남는 방향과 0으로 사라지는 방향으로 나뉜다”는 뜻으로 볼 수 있습니다.
 
+### **8.5 rank가 낮으면 무엇이 사라지는가**
+
+여기서 내가 헷갈렸던 핵심은 이것입니다.
+
+```text
+det(A) = 0이면 역행렬이 없다고 하는데,
+그러면 남아 있는 정보까지 전부 못 쓰는 것인가?
+```
+
+정확히는 그렇지 않습니다.
+
+전체 공간에서의 역행렬은 없지만, 정보가 실제로 남아 있는 더 낮은 차원의 부분공간에서는 역변환처럼 다룰 수 있습니다.
+
+예를 들어
+
+$$
+A =
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 2 & 0 & 0 \\
+0 & 0 & 3 & 0 \\
+0 & 0 & 0 & 0
+\end{bmatrix}
+$$
+
+라고 합시다.
+
+이 행렬은
+
+$$
+(x_1, x_2, x_3, x_4)
+\mapsto
+(x_1, 2x_2, 3x_3, 0)
+$$
+
+로 작용합니다.
+
+여기서 $x_4$ 정보는 완전히 사라집니다.
+
+따라서 전체 4차원에서는 출력만 보고 $x_4$를 복원할 수 없습니다.
+
+그래서
+
+$$
+\det(A)=0, \qquad \operatorname{rank}(A)=3
+$$
+
+이고, 전체 $4 \times 4$ 역행렬은 존재하지 않습니다.
+
+하지만 앞의 세 좌표만 보면
+
+$$
+A_{\text{reduced}}
+=
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & 2 & 0 \\
+0 & 0 & 3
+\end{bmatrix}
+$$
+
+이고,
+
+$$
+A_{\text{reduced}}^{-1}
+=
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \frac{1}{2} & 0 \\
+0 & 0 & \frac{1}{3}
+\end{bmatrix}
+$$
+
+는 존재합니다.
+
+즉, 중요한 구분은 다음입니다.
+
+```text
+전체 4차원 정보를 전부 복원할 수 있는가?  -> 아니오
+살아남은 3차원 정보 안에서는 되돌릴 수 있는가? -> 가능
+```
+
+그래서 rank가 $r$인 행렬은 적절한 좌표계에서 보면 본질적으로
+
+$$
+r\text{차원} \rightarrow r\text{차원}
+$$
+
+의 가역 변환과, 나머지 방향을 0으로 보내는 collapse가 섞인 것으로 볼 수 있습니다.
+
+이 관점은 뒤에서 eigenvalue를 볼 때 그대로 다시 나옵니다.
+
+어떤 eigenvalue가 0이라는 말은 그 eigenvector 방향이 완전히 사라졌다는 뜻입니다.
+
+반대로 0이 아닌 eigenvalue 방향은 적어도 그 방향의 scale 정보가 살아 있다는 뜻입니다.
+
+### **8.6 covariance, PCA, 의사역행렬**
+
+데이터 관점에서도 같은 일이 일어납니다.
+
+4차원 데이터의 covariance matrix를
+
+$$
+C \in \mathbb{R}^{4 \times 4}
+$$
+
+라고 합시다.
+
+만약
+
+$$
+\det(C)=0
+$$
+
+이면 covariance의 rank가 4보다 작다는 뜻입니다.
+
+예를 들어 데이터가 항상
+
+$$
+x_4 = x_1 + x_2
+$$
+
+를 만족한다면, 좌표는 4개지만 $x_4$는 이미 $x_1, x_2$로 결정됩니다.
+
+따라서 데이터는 $\mathbb{R}^4$ 전체에 퍼져 있는 것이 아니라, 그 안의 3차원 부분공간에 놓입니다.
+
+이 경우 전체 covariance는 역행렬이 없을 수 있습니다.
+
+하지만 데이터가 실제로 놓인 3차원 부분공간의 좌표로 바꾸면 reduced covariance를 만들 수 있고, 그 안에서 모든 방향의 분산이 0이 아니라면 역행렬을 가질 수 있습니다.
+
+대칭 covariance matrix는 보통 다음처럼 고유분해됩니다.
+
+$$
+C = U \Lambda U^T
+$$
+
+예를 들어
+
+$$
+\Lambda = \operatorname{diag}(5, 2, 1, 0)
+$$
+
+이면 마지막 eigenvector 방향의 분산이 0이라는 뜻입니다.
+
+PCA는 바로 이런 구조를 사용합니다.
+
+0이 아닌 eigenvalue 방향만 남기면
+
+$$
+\Lambda_r = \operatorname{diag}(5, 2, 1)
+$$
+
+이고, 이 reduced space에서는
+
+$$
+\Lambda_r^{-1}
+=
+\operatorname{diag}
+\left(
+\frac{1}{5},
+\frac{1}{2},
+1
+\right)
+$$
+
+처럼 역을 취할 수 있습니다.
+
+4차원 형식을 유지하면서 낮은 rank 구조를 다루고 싶을 때는 Moore-Penrose 의사역행렬을 씁니다.
+
+다만 의사역행렬은 사라진 원래 정보를 복원하는 도구가 아닙니다.
+
+사라진 방향은 이미 관측되지 않았기 때문에 복원할 수 없습니다.
+
+의사역행렬은 살아남은 column space 안에서 가능한 대표적인 해를 선택하는 도구에 가깝습니다.
+
 ## **9. 정방행렬이 아닌 행렬**
 
 3Blue1Brown 8강은 정방행렬이 아닌 행렬을 차원 사이의 변환으로 봅니다.
@@ -1604,7 +1779,124 @@ $\lambda = 0$이면 그 방향이 0으로 눌립니다.
 
 그래서 eigenvalue는 각 eigenvector 방향에서 변환이 얼마나 강하게 작용하는지 알려줍니다.
 
-### **14.2 왜 중요한가**
+### **14.2 헷갈리기 쉬운 지점**
+
+내가 처음 헷갈렸던 부분은 고유벡터, 고유값, 고유공간, 길이가 서로 섞였다는 점입니다.
+
+정리하면 다음과 같습니다.
+
+| 용어 | 무엇인가 | 의미 |
+|---|---|---|
+| eigenvector | 0이 아닌 벡터 | 변환 후에도 자기 span을 벗어나지 않는 방향 |
+| eigenvalue | 숫자 | 그 방향을 몇 배로 늘리거나 줄이는 배율 |
+| eigenspace | 공간 | 같은 eigenvalue를 갖는 eigenvector들의 집합 |
+| normalized eigenvector | 길이가 1인 eigenvector | 계산 편의를 위해 크기만 맞춘 것 |
+
+가장 중요한 오해는 이것입니다.
+
+```text
+고유벡터는 특별히 긴 벡터가 아니다.
+고유값은 고유벡터의 길이가 아니다.
+```
+
+고유벡터의 본질은 길이가 아니라 방향입니다.
+
+만약 $\mathbf{v}$가 고유벡터라면, $2\mathbf{v}$, $-5\mathbf{v}$, $100\mathbf{v}$도 모두 같은 고유값을 갖는 고유벡터입니다.
+
+왜냐하면
+
+$$
+A(c\mathbf{v})
+=
+cA\mathbf{v}
+=
+c\lambda \mathbf{v}
+=
+\lambda(c\mathbf{v})
+$$
+
+이기 때문입니다.
+
+즉 고유벡터 하나가 중요하다기보다, 그 벡터가 가리키는 방향 전체가 중요합니다.
+
+계산할 때 고유벡터를
+
+$$
+\|\mathbf{v}\| = 1
+$$
+
+이 되도록 정규화하는 경우가 많습니다.
+
+하지만 이것은 고유벡터의 길이를 1로 맞춘 것이지, 고유값을 1로 만든 것이 아닙니다.
+
+예를 들어
+
+$$
+\|\mathbf{v}\| = 1,
+\qquad
+\lambda = 100
+$$
+
+도 가능합니다.
+
+이 경우 고유벡터는 단위길이지만, 행렬은 그 방향을 100배로 늘립니다.
+
+또 하나 중요한 점은, 같은 eigenvalue에 대응하는 eigenvector가 하나만 있는 것이 아니라는 점입니다.
+
+어떤 고유값 $\lambda$에 대해
+
+$$
+E_\lambda
+=
+\operatorname{ker}(A-\lambda I)
+$$
+
+를 그 고유값의 eigenspace라고 합니다.
+
+여기서 0벡터를 제외한 모든 벡터가 그 고유값에 대한 고유벡터입니다.
+
+예를 들어
+
+$$
+E_3
+=
+\operatorname{span}
+\left\{
+\begin{bmatrix}
+1 \\
+0
+\end{bmatrix}
+\right\}
+$$
+
+라면, $x$축 위의 모든 0이 아닌 벡터가 고유값 3에 대한 고유벡터입니다.
+
+심지어
+
+$$
+A = 2I
+$$
+
+라면 모든 벡터에 대해
+
+$$
+A\mathbf{v} = 2\mathbf{v}
+$$
+
+이므로, $\mathbb{R}^2$ 전체가 고유값 2에 대한 eigenspace가 됩니다.
+
+이 경우에는 한 직선뿐 아니라 평면 전체의 모든 0이 아닌 벡터가 고유벡터입니다.
+
+그래서 “하나의 고유값에는 고유벡터 하나”라고 보면 안 됩니다.
+
+정확히는 다음에 가깝습니다.
+
+```text
+하나의 고유값에는 그 고유값에 대응하는 고유공간이 있다.
+그 고유공간 안의 0이 아닌 모든 벡터가 고유벡터다.
+```
+
+### **14.3 왜 중요한가**
 
 어떤 행렬이 충분한 수의 독립적인 고유벡터를 가지면, 그 행렬은 고유벡터 기저에서 매우 단순하게 표현됩니다.
 
@@ -1681,6 +1973,453 @@ A - lambda I가 어떤 방향을 0으로 누르는 lambda를 찾는다.
 고유값 계산은 갑자기 튀어나온 공식이 아닙니다.
 
 determinant가 0이면 차원이 collapse된다는 관점에서 자연스럽게 나옵니다.
+
+### **15.1 $A-\lambda I$가 0행렬이어야 한다는 뜻이 아니다**
+
+여기서 헷갈리기 쉬운 표현이 있습니다.
+
+```text
+A - lambda I가 0이어야 한다.
+```
+
+이렇게 말하면 부정확합니다.
+
+필요한 것은 행렬 $A-\lambda I$ 전체가 0행렬이 되는 것이 아닙니다.
+
+정확히 필요한 것은 다음입니다.
+
+$$
+(A-\lambda I)\mathbf{v}
+=
+\mathbf{0},
+\qquad
+\mathbf{v} \ne \mathbf{0}
+$$
+
+즉 $A-\lambda I$가 어떤 0이 아닌 방향을 0으로 보내야 합니다.
+
+왜냐하면 고유벡터의 정의가
+
+$$
+A\mathbf{v}=\lambda\mathbf{v}
+$$
+
+이고, 오른쪽은
+
+$$
+\lambda \mathbf{v}
+=
+\lambda I\mathbf{v}
+$$
+
+로 쓸 수 있기 때문입니다.
+
+따라서
+
+$$
+A\mathbf{v}-\lambda I\mathbf{v}
+=
+\mathbf{0}
+$$
+
+이고,
+
+$$
+(A-\lambda I)\mathbf{v}
+=
+\mathbf{0}
+$$
+
+가 됩니다.
+
+이 말은 다음과 같습니다.
+
+```text
+A와 lambda I가 v 방향에서는 같은 일을 한다.
+그래서 그 둘의 차이인 A - lambda I는 v 방향을 0으로 보낸다.
+```
+
+즉 $A-\lambda I$의 kernel 안에 고유벡터가 들어갑니다.
+
+$$
+\mathbf{v}
+\in
+\operatorname{ker}(A-\lambda I)
+$$
+
+### **15.2 왜 determinant가 0이어야 하는가**
+
+다시
+
+$$
+B = A-\lambda I
+$$
+
+라고 두겠습니다.
+
+우리는
+
+$$
+B\mathbf{v}=\mathbf{0},
+\qquad
+\mathbf{v}\ne\mathbf{0}
+$$
+
+인 벡터를 찾고 있습니다.
+
+만약 $\det(B)\ne0$이면 $B$는 역행렬을 가집니다.
+
+그러면 양변에 $B^{-1}$을 곱해서
+
+$$
+\mathbf{v}
+=
+B^{-1}\mathbf{0}
+=
+\mathbf{0}
+$$
+
+만 나오게 됩니다.
+
+하지만 고유벡터는 0벡터가 될 수 없습니다.
+
+따라서 0이 아닌 해가 존재하려면 $B$는 역행렬을 가지면 안 됩니다.
+
+즉
+
+$$
+\det(B)=0
+$$
+
+이어야 합니다.
+
+다시 $B=A-\lambda I$를 넣으면
+
+$$
+\det(A-\lambda I)=0
+$$
+
+입니다.
+
+여기서 중요한 점은 이것입니다.
+
+```text
+A 자체의 determinant가 0이어야 하는 것이 아니다.
+A - lambda I의 determinant가 0이어야 한다.
+```
+
+$A$ 자체는 역행렬을 가질 수도 있습니다.
+
+하지만 특정 $\lambda$를 골랐을 때 $A-\lambda I$가 어떤 방향을 collapse시키면, 그 방향이 고유벡터가 됩니다.
+
+전체 흐름은 다음 한 줄로 정리됩니다.
+
+$$
+A\mathbf{v}
+=
+\lambda\mathbf{v}
+\Rightarrow
+(A-\lambda I)\mathbf{v}
+=
+\mathbf{0}
+\Rightarrow
+\mathbf{v}
+\in
+\operatorname{ker}(A-\lambda I)
+\Rightarrow
+\det(A-\lambda I)
+=
+0
+$$
+
+### **15.3 실제 예제로 보기**
+
+예를 들어
+
+$$
+A =
+\begin{bmatrix}
+3 & 0 \\
+1 & 2
+\end{bmatrix}
+$$
+
+라고 합시다.
+
+고유값은
+
+$$
+\det(A-\lambda I)=0
+$$
+
+에서 구합니다.
+
+먼저
+
+$$
+A-\lambda I
+=
+\begin{bmatrix}
+3-\lambda & 0 \\
+1 & 2-\lambda
+\end{bmatrix}
+$$
+
+이고,
+
+$$
+\det(A-\lambda I)
+=
+(3-\lambda)(2-\lambda)
+$$
+
+입니다.
+
+따라서
+
+$$
+(3-\lambda)(2-\lambda)=0
+$$
+
+이므로
+
+$$
+\lambda=3
+\quad \text{or} \quad
+\lambda=2
+$$
+
+입니다.
+
+이제 각 고유값을 다시 넣어서 kernel을 구합니다.
+
+먼저 $\lambda=3$이면
+
+$$
+A-3I
+=
+\begin{bmatrix}
+0 & 0 \\
+1 & -1
+\end{bmatrix}
+$$
+
+입니다.
+
+따라서
+
+$$
+\begin{bmatrix}
+0 & 0 \\
+1 & -1
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\
+0
+\end{bmatrix}
+$$
+
+를 풀면
+
+$$
+x-y=0
+$$
+
+이므로 $y=x$입니다.
+
+즉
+
+$$
+\mathbf{v}
+=
+x
+\begin{bmatrix}
+1 \\
+1
+\end{bmatrix}
+$$
+
+이고,
+
+$$
+E_3
+=
+\operatorname{span}
+\left\{
+\begin{bmatrix}
+1 \\
+1
+\end{bmatrix}
+\right\}
+$$
+
+입니다.
+
+다음으로 $\lambda=2$이면
+
+$$
+A-2I
+=
+\begin{bmatrix}
+1 & 0 \\
+1 & 0
+\end{bmatrix}
+$$
+
+입니다.
+
+따라서
+
+$$
+\begin{bmatrix}
+1 & 0 \\
+1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\
+0
+\end{bmatrix}
+$$
+
+를 풀면 $x=0$이고, $y$는 자유롭게 정할 수 있습니다.
+
+즉
+
+$$
+\mathbf{v}
+=
+y
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}
+$$
+
+이고,
+
+$$
+E_2
+=
+\operatorname{span}
+\left\{
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}
+\right\}
+$$
+
+입니다.
+
+이 예제에서 순서는 항상 같습니다.
+
+```text
+1. det(A - lambda I) = 0으로 eigenvalue를 찾는다.
+2. 각 lambda를 A - lambda I에 다시 넣는다.
+3. ker(A - lambda I)를 구한다.
+4. 그 kernel의 0이 아닌 벡터들이 eigenvector다.
+```
+
+### **15.4 eigenbasis와 대각화**
+
+eigenbasis는 “행렬을 대각행렬로 바꿔주는 마법의 물체”라기보다, 고유벡터들로 만든 새로운 좌표계입니다.
+
+위 예제에서는 두 고유벡터 방향
+
+$$
+\begin{bmatrix}
+1 \\
+1
+\end{bmatrix},
+\qquad
+\begin{bmatrix}
+0 \\
+1
+\end{bmatrix}
+$$
+
+이 서로 독립입니다.
+
+따라서 이 둘은 $\mathbb{R}^2$의 기저가 될 수 있습니다.
+
+이 고유벡터들을 열로 모으면
+
+$$
+P =
+\begin{bmatrix}
+1 & 0 \\
+1 & 1
+\end{bmatrix}
+$$
+
+입니다.
+
+이 $P$는 표준 좌표계와 고유벡터 좌표계 사이를 바꿔주는 행렬입니다.
+
+고유벡터 좌표계에서 $A$를 보면
+
+$$
+P^{-1}AP
+=
+D
+=
+\begin{bmatrix}
+3 & 0 \\
+0 & 2
+\end{bmatrix}
+$$
+
+처럼 대각행렬이 됩니다.
+
+왜냐하면 고유벡터 방향에서는 $A$가 복잡하게 방향을 섞는 것이 아니라, 각 축을 독립적으로 3배, 2배 하는 일만 하기 때문입니다.
+
+그래서
+
+$$
+A=PDP^{-1}
+$$
+
+이고,
+
+$$
+A^n
+=
+(PDP^{-1})^n
+=
+PD^nP^{-1}
+$$
+
+로 계산할 수 있습니다.
+
+대각행렬의 거듭제곱은 쉽습니다.
+
+$$
+D^n
+=
+\begin{bmatrix}
+3^n & 0 \\
+0 & 2^n
+\end{bmatrix}
+$$
+
+이기 때문입니다.
+
+따라서 eigenbasis를 이해하는 핵심은 다음입니다.
+
+```text
+eigenbasis = 고유벡터들로 만든 좌표계
+diagonalization = 그 좌표계에서 행렬을 다시 표현하는 것
+```
 
 ## **16. 추상 벡터공간**
 
