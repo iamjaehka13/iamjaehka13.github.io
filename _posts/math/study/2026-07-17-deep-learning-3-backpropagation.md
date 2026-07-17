@@ -410,33 +410,55 @@ $$
 
 이 공유가 핵심입니다. backpropagation은 chain rule 자체가 아니라, 계산 그래프의 공통 부분을 재사용하며 chain rule을 적용하는 효율적인 방법입니다.
 
-## **15. 여러 output 경로의 영향은 더한다**
+## **15. 다음 layer에서 오는 영향을 모두 더한다**
 
-한 neuron의 값이 여러 다음 neuron에 영향을 준다면 cost까지 가는 경로도 여러 개입니다.
+layer $l$의 $k$번째 neuron은 다음 layer의 여러 neuron과 연결됩니다. 따라서 $a_k^{(l)}$이 cost에 미치는 영향은 다음 layer의 각 연결을 통해 전달되는 영향을 모두 더해 구해야 합니다.
 
-이때 이전 activation에 대한 derivative는 각 경로의 기여를 모두 더합니다.
+다음 layer의 neuron 수를 $n_{l+1}$이라고 하면
 
 $$
 \frac{\partial C_0}{\partial a_k^{(l)}}
 =
-\sum_j
+\sum_{j=1}^{n_{l+1}}
 \frac{\partial C_0}{\partial z_j^{(l+1)}}
 \frac{\partial z_j^{(l+1)}}{\partial a_k^{(l)}}
-$$
-
-$$
 =
-\sum_j
-\delta_j^{(l+1)}w_{jk}^{(l+1)}
+\sum_{j=1}^{n_{l+1}}
+w_{jk}^{(l+1)}\delta_j^{(l+1)}
 $$
 
-이 합을 모든 neuron에 대해 한꺼번에 계산한 것이
+입니다.
+
+- $k$: 현재 layer $l$에서 영향받는 neuron의 index
+- $j$: 다음 layer $l+1$에서 error signal을 보내는 neuron의 index
+- $w_{jk}^{(l+1)}$: 현재 layer의 $k$번째 neuron에서 다음 layer의 $j$번째 neuron으로 가는 weight
+- $\delta_j^{(l+1)}$: 다음 layer의 $j$번째 neuron이 가진 error signal
+
+즉 다음 layer의 각 error signal에 해당 연결 weight를 곱하고, 그 결과를 $j=1$부터 $n_{l+1}$까지 모두 더합니다.
+
+이 계산을 현재 layer의 모든 neuron $k$에 대해 한꺼번에 쓰면
 
 $$
+\frac{\partial C_0}{\partial \mathbf{a}^{(l)}}
+=
 \left(W^{(l+1)}\right)^T\boldsymbol{\delta}^{(l+1)}
 $$
 
-입니다. matrix multiplication은 단순한 표기 축약이 아니라 여러 경로의 영향을 동시에 모으는 계산입니다.
+입니다. 여기서 activation function의 derivative까지 element-wise로 곱하면 현재 layer의 error signal을 얻습니다.
+
+$$
+\boldsymbol{\delta}^{(l)}
+=
+\frac{\partial C_0}{\partial \mathbf{a}^{(l)}}
+\odot
+\sigma'\left(\mathbf{z}^{(l)}\right)
+=
+\left(W^{(l+1)}\right)^T\boldsymbol{\delta}^{(l+1)}
+\odot
+\sigma'\left(\mathbf{z}^{(l)}\right)
+$$
+
+따라서 matrix multiplication은 단순한 표기 축약이 아니라, 다음 layer의 여러 경로에서 오는 영향을 현재 layer의 각 neuron별로 모으는 계산입니다.
 
 ## **16. Mini-batch에서는 gradient를 평균낸다**
 
