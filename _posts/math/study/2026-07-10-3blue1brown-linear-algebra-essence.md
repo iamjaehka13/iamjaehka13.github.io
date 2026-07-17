@@ -2763,78 +2763,67 @@ scale만 바뀐다.
 
 행렬에서는 그 대상이 벡터이고, 미분에서는 그 대상이 함수입니다.
 
-## **17. SLAM과 로봇공학에서 왜 중요한가**
+## **17. 선형대수는 어디에 응용되는가**
 
-내가 SLAM을 공부하는 입장에서 선형대수가 중요한 이유는 매우 직접적입니다.
+선형대수는 벡터와 행렬을 계산하는 과목을 넘어, 많은 데이터를 표현하고 변환하며 그 안의 구조를 찾는 데 사용됩니다.
 
-SLAM은 결국 다음을 반복합니다.
+서로 달라 보이는 분야도 다음과 같은 공통 문제를 다룹니다.
 
 ```text
-pose를 표현한다.
-sensor measurement를 예측한다.
-예측과 실제의 residual을 계산한다.
-Jacobian으로 residual의 변화를 선형화한다.
-linear system을 풀어 state update를 구한다.
-좌표계를 바꾸며 map과 sensor frame을 연결한다.
+대상을 벡터로 표현한다.
+행렬로 변환을 표현한다.
+연립방정식이나 최소제곱 문제를 푼다.
+고유값과 고유벡터로 중요한 방향을 찾는다.
+기저를 바꾸어 문제를 더 단순하게 본다.
 ```
 
-여기서 거의 모든 단계가 선형대수입니다.
+### **17.1 컴퓨터 그래픽스와 영상 처리**
 
-### **17.1 pose와 frame**
+컴퓨터 그래픽스에서는 물체의 이동, 회전, 확대와 축소를 행렬로 표현합니다.
 
-3D pose는 보통 회전 $R$과 이동 $\mathbf{t}$로 표현합니다.
+3차원 공간의 점을 카메라 좌표계로 옮기고, 다시 2차원 화면에 투영하는 과정도 여러 선형변환의 합성입니다.
 
-$$
-\mathbf{p}_{world}
-=
-R\mathbf{p}_{body} + \mathbf{t}
-$$
+영상 역시 각 pixel 값을 모은 벡터나 행렬로 볼 수 있습니다. 그래서 image filtering, compression, feature extraction 같은 작업에도 행렬 연산과 기저변환이 사용됩니다.
 
-여기서 $R$은 회전행렬이고, 회전행렬의 열벡터는 body frame의 basis가 world frame에서 어떻게 보이는지 나타냅니다.
+### **17.2 데이터 분석과 인공지능**
 
-즉 frame 변환은 basis 변환과 매우 가깝습니다.
+데이터 분석에서는 하나의 sample을 feature vector로 표현하고, 전체 dataset을 행렬로 구성합니다.
 
-### **17.2 Jacobian**
+PCA는 covariance matrix의 eigenvector를 이용해 데이터가 가장 크게 퍼져 있는 방향을 찾습니다. 이를 통해 데이터의 중요한 구조를 유지하면서 차원을 줄일 수 있습니다.
 
-비선형 함수 $f(\mathbf{x})$를 현재 추정값 근처에서 선형화하면
+신경망의 layer도 기본적으로 입력 벡터에 weight matrix를 곱하고 bias를 더하는 연산으로 시작합니다.
 
 $$
-f(\mathbf{x} + \delta\mathbf{x})
-\approx
-f(\mathbf{x}) + J\delta\mathbf{x}
+\mathbf{y} = W\mathbf{x} + \mathbf{b}
 $$
 
-가 됩니다.
+학습 과정에서는 이 변환이 여러 층에 걸쳐 반복되고, gradient를 이용해 행렬의 값이 갱신됩니다.
 
-여기서 $J$가 Jacobian입니다.
+### **17.3 로봇공학과 SLAM**
 
-Jacobian은 작은 state 변화가 measurement나 residual을 어느 방향으로 얼마나 바꾸는지 나타내는 선형변환입니다.
+로봇공학에서는 위치, 속도, 힘, sensor measurement를 벡터로 표현합니다. 회전과 좌표계 변환은 행렬로 표현하며, robot frame과 world frame 사이의 관계를 계산할 때 기저변환의 관점이 사용됩니다.
 
-즉 Jacobian도 숫자 표가 아니라, local하게 공간을 움직이는 변환입니다.
+SLAM에서는 sensor measurement와 예측값의 차이를 residual로 만들고, Jacobian으로 이를 현재 추정값 근처에서 선형화합니다. 이후 linear system을 풀어 pose와 map을 갱신합니다.
 
-### **17.3 normal equation과 eigenvalue**
+covariance matrix의 eigenvector와 eigenvalue는 추정값의 uncertainty가 어느 방향으로 얼마나 큰지를 해석하는 데 사용됩니다.
 
-최소제곱 문제에서는 보통 다음 형태가 나옵니다.
+### **17.4 신호 처리와 통신**
 
-$$
-J^T J \delta\mathbf{x} = -J^T \mathbf{r}
-$$
+소리, 진동, 전파 같은 신호도 시간에 따라 나열된 값의 벡터로 볼 수 있습니다.
 
-여기서 $J^TJ$는 Hessian approximation처럼 볼 수 있습니다.
+Fourier transform은 신호를 시간 영역의 표현에서 주파수 성분을 기준으로 한 표현으로 바꾸는 기저변환입니다. 이 관점을 이용하면 noise 제거, 압축, 주파수 분석이 쉬워집니다.
 
-이 행렬의 eigenvalue는 어떤 방향이 잘 관측되는지, 어떤 방향이 약하게 관측되는지와 연결됩니다.
+통신에서는 여러 신호가 섞인 관계를 행렬로 표현하고, 원하는 신호를 복원하거나 간섭을 줄이기 위해 inverse, least squares, singular value decomposition 같은 도구를 사용합니다.
 
-eigenvalue가 매우 작으면 그 방향은 정보가 부족하거나 ill-conditioned일 수 있습니다.
+### **17.5 과학과 공학의 수치 계산**
 
-SLAM에서 corridor, 평면 벽, 반복 구조물 같은 환경에서 특정 방향 drift가 커지는 이유도 이런 관측 가능성 문제와 연결됩니다.
+물리 현상이나 공학 시스템을 계산하려면 미분방정식을 유한한 개수의 변수로 근사하는 경우가 많습니다. 이 과정에서 거대한 linear system이 만들어집니다.
 
-### **17.4 covariance**
+구조 해석, 유체 해석, 열전달, 회로 해석에서는 이 linear system을 안정적이고 효율적으로 푸는 것이 핵심입니다.
 
-확률적 추정에서는 covariance matrix가 중요합니다.
+행렬의 rank, condition number, eigenvalue는 해가 존재하는지, 계산이 얼마나 민감한지, 시스템이 안정적인지를 판단하는 기준이 됩니다.
 
-covariance matrix의 eigenvector는 uncertainty의 주된 방향을, eigenvalue는 그 방향의 분산 크기를 나타냅니다.
-
-그래서 uncertainty ellipsoid를 이해하는 것도 결국 eigenvector와 eigenvalue의 기하학적 해석입니다.
+결국 선형대수는 복잡한 현실의 문제를 벡터와 변환의 언어로 바꾸고, 계산 가능한 형태로 다루게 해주는 공통 도구입니다.
 
 ## **18. 한 장 요약**
 
