@@ -576,4 +576,4 @@ backpropagation을 외울 때는 식보다 정보의 흐름을 먼저 잡는 것
 
 이제 신경망이 parameter를 학습하는 기본 흐름이 완성되었습니다. forward pass가 예측을 만들고, backpropagation이 gradient를 계산하며, gradient descent가 parameter를 수정합니다.
 
-다음 4편에서는 이 기본 계산 구조가 Transformer에서는 어떤 순서로 확장되는지 정리합니다.
+다음 [4편](/posts/deep-learning-4-transformer/)에서는 이 기본 계산 구조가 Transformer에서는 어떤 순서로 확장되는지 정리합니다.
