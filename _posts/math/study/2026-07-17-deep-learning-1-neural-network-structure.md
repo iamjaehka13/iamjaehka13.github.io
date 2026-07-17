@@ -4,6 +4,8 @@ date: 2026-07-17 16:54:08 +0900
 categories: [AI, Deep Learning]
 tags: [deep-learning, neural-network, 3blue1brown, neuron, activation, weight, bias, sigmoid, mnist, forward-pass]
 description: "3Blue1Brown Deep Learning Chapter 1을 바탕으로 neuron, activation, weight, bias, layer와 forward pass를 연결해 신경망의 계산 구조를 정리한다."
+image:
+  path: /assets/img/posts/ai/deep-learning-1-neural-network-structure/00-preview.png
 math: true
 ---
 
@@ -59,6 +61,10 @@ $$
 ```
 
 즉 신경망은 이미지를 그림 그대로 받는 것이 아닙니다. 이미지를 표현하는 784차원 벡터를 입력으로 받습니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/01-input-activation.gif" alt="손글씨 이미지의 pixel 밝기가 input neuron의 activation으로 변환되는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
 
 출력은 숫자 0부터 9까지 총 10개의 값입니다.
 
@@ -121,6 +127,10 @@ Chapter 1의 손글씨 분류 예시는 다음 구조를 사용합니다.
 784 → 16 → 16 → 10
 ```
 
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/02-network-layers.gif" alt="784개의 input neuron과 두 hidden layer, 10개의 output neuron으로 구성된 신경망" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
+
 첫 번째 layer는 입력 데이터를 담기 때문에 input layer라고 합니다.
 
 마지막 layer는 최종 결과를 만들기 때문에 output layer라고 합니다.
@@ -149,6 +159,10 @@ z_j^{(l)}
 \sum_k w_{jk}^{(l)}a_k^{(l-1)}
 $$
 
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/03-weighted-sum.gif" alt="이전 layer의 activation과 weight를 이용해 weighted sum을 계산하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
+
 weight의 부호와 크기는 각 입력의 영향 방향을 나타냅니다.
 
 ```text
@@ -170,6 +184,10 @@ z_j^{(l)}
 =
 \sum_k w_{jk}^{(l)}a_k^{(l-1)} + b_j^{(l)}
 $$
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/05-bias.gif" alt="weighted sum에 bias를 더해 neuron의 활성화 기준을 조절하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
 
 bias는 neuron이 얼마나 쉽게 또는 어렵게 활성화될지를 조절하는 값으로 볼 수 있습니다.
 
@@ -197,6 +215,10 @@ $$
 =
 \frac{1}{1+e^{-z}}
 $$
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/04-sigmoid.gif" alt="실수 입력을 0과 1 사이로 변환하는 sigmoid function" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
 
 따라서 neuron 하나의 최종 activation은 다음과 같습니다.
 
@@ -246,6 +268,10 @@ neuron별 식을 하나씩 쓰면 연결 수가 늘어날수록 표현이 복잡
 
 이를 행렬과 벡터로 묶으면 한 layer의 계산을 간단히 나타낼 수 있습니다.
 
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/06-weight-matrix.gif" alt="neuron별 weight를 하나의 weight matrix로 정리하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
+
 $$
 \mathbf{a}^{(l)}
 =
@@ -255,6 +281,10 @@ W^{(l)}\mathbf{a}^{(l-1)}
 \mathbf{b}^{(l)}
 \right)
 $$
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/07-layer-vector-form.gif" alt="weight matrix와 activation vector, bias vector로 layer 계산을 표현하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
 
 예를 들어 784개의 입력을 16개의 hidden neuron으로 바꾸는 첫 번째 layer의 shape은 다음과 같습니다.
 
@@ -391,6 +421,10 @@ $$
 ```
 
 따라서 신경망 전체는 여러 함수가 순서대로 합성된 하나의 함수입니다.
+
+<figure class="my-3">
+  <img src="/assets/img/posts/ai/deep-learning-1-neural-network-structure/08-network-function.gif" alt="784개의 입력을 10개의 출력으로 변환하는 하나의 함수로서의 신경망" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+</figure>
 
 ## **10. hidden layer는 무엇을 표현하는가**
 
