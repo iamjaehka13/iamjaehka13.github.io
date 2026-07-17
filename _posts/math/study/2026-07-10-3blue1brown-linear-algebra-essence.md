@@ -1,7 +1,7 @@
 ---
 title: "[Linear Algebra] 3Blue1Brown 선형대수학의 본질 정리"
 date: 2026-07-10 16:21:54 +0900
-last_modified_at: 2026-07-17 15:59:52 +0900
+last_modified_at: 2026-07-17 16:04:25 +0900
 categories: [Math, Study]
 tags: [linear-algebra, 3blue1brown, vector, matrix, determinant, eigenvalue, eigenvector, basis, dot-product, cross-product, cramer-rule]
 description: "3Blue1Brown의 선형대수학의 본질 시리즈를 바탕으로 벡터, 선형결합, 기저, 행렬, 행렬곱, determinant, 역행렬, 내적, 외적, 고유값, 고유벡터, 추상 벡터공간을 시각적 관점에서 정리한다."
@@ -2001,7 +2001,7 @@ A
 \end{bmatrix}
 $$
 
-라면 $\begin{bmatrix}1 \\ 0\end{bmatrix}$ 하나만 고유벡터인 것이 아닙니다.
+라면 위 벡터 하나만 고유벡터인 것이 아닙니다.
 
 다음 벡터들도 모두 같은 고유값 3에 대한 고유벡터입니다.
 
