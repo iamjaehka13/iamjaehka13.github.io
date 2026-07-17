@@ -33,7 +33,7 @@ Chapter 1의 신경망에는 13,002개의 parameter가 있습니다. 사람이 �
 
 이 글은 3Blue1Brown의 **Deep Learning Chapter 2: Gradient descent, how neural networks learn**을 바탕으로 이 질문에 답합니다.
 
-이번 글에서는 gradient를 실제로 어떻게 효율적으로 계산하는지는 다루지 않습니다. 그 계산 알고리즘인 backpropagation은 3편에서 이어집니다.
+이번 글에서는 gradient를 실제로 어떻게 효율적으로 계산하는지는 다루지 않습니다. 그 계산 알고리즘인 backpropagation은 [3편](/posts/deep-learning-3-backpropagation/)에서 이어집니다.
 
 ## **1. 신경망이 학습한다는 것**
 
@@ -632,4 +632,4 @@ $$
 
 > Gradient Descent는 cost를 가장 빠르게 줄이는 방향을 따라 신경망의 weight와 bias를 반복적으로 수정하는 방법이다.
 
-다음 글에서는 이 update에 필요한 $\nabla_{\theta}C$를 각 layer를 거꾸로 따라가며 어떻게 계산하는지 backpropagation의 직관과 calculus를 함께 정리합니다.
+다음 [3편](/posts/deep-learning-3-backpropagation/)에서는 이 update에 필요한 $\nabla_{\theta}C$를 각 layer를 거꾸로 따라가며 어떻게 계산하는지 backpropagation의 직관과 calculus를 함께 정리합니다.
