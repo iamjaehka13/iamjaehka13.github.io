@@ -40,9 +40,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 이 글은 영상을 그대로 옮긴 transcript가 아닙니다. 영상의 핵심 관점을 바탕으로, 내가 선형대수를 다시 볼 때 필요한 개념을 공부용으로 재구성한 글입니다.
 
-이번 수정에서는 3Blue1Brown 공식 **Essence of Linear Algebra** playlist 기준으로 1강부터 16강까지의 공식 YouTube 영상을 각 개념 섹션에 임베드했습니다.
-
-각 섹션에는 공식 YouTube embed를 먼저 두고, 바로 아래에는 원본 영상에서 짧게 발췌한 대표 study용 GIF를 붙였습니다. 그리고 글로만 읽으면 다시 헷갈릴 만한 지점에는 보조 GIF를 추가했습니다.
+각 섹션에는 원본 영상에서 짧게 발췌한 대표 study용 GIF를 붙였습니다. 그리고 글로만 읽으면 다시 헷갈릴 만한 지점에는 보조 GIF를 추가했습니다.
 
 이 글의 1차 목적은 성능 최적화나 모바일 최적화가 아닙니다. 내가 다시 볼 때 “아, 이 개념이 공간에서 이렇게 움직이는 거였지”를 바로 떠올리기 위한 개인 study notebook입니다.
 
@@ -88,7 +86,7 @@ eigenvector는 왜 그렇게 중요하게 나오는가?
 
 즉 단순히 “출처 적었으니 아무거나 써도 된다”는 뜻은 아닙니다.
 
-이 글에서는 원본 영상은 공식 YouTube embed로 연결하고, 1강부터 16강까지는 각 강마다 원본 영상에서 짧게 발췌한 대표 GIF clip을 함께 넣었습니다. 추가로 개념상 중요한 곳에는 보조 GIF clip을 더 넣었습니다.
+이 글에서는 1강부터 16강까지 각 강마다 원본 영상에서 짧게 발췌한 대표 GIF clip을 넣었습니다. 추가로 개념상 중요한 곳에는 보조 GIF clip을 더 넣었습니다.
 
 각 GIF는 각 원본 영상에서 60초 미만으로 발췌했습니다. 너무 짧아서 개념 흐름이 잘리는 장면은 조금 더 길게 잡고, 느리게 늘어지는 장면은 빠르게 압축했습니다. GIF 자체에는 별도 글자를 덮지 않고, 바로 아래 caption에 출처와 원본 링크를 연결했습니다.
 
@@ -151,10 +149,6 @@ $$
 ## **2. 벡터란 무엇인가**
 
 3Blue1Brown 1강은 벡터를 화살표, 숫자 리스트, 추상적인 공간의 원소라는 세 관점으로 연결합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/fNk_zzaMoSs" title="3Blue1Brown Chapter 1 - Vectors" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch01-vectors.gif" alt="3Blue1Brown Ch.1 vectors visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -285,10 +279,6 @@ $$
 
 3Blue1Brown 2강은 선형결합, span, basis를 다룹니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/k7RM-ot2NWY" title="3Blue1Brown Chapter 2 - Linear combinations, span, and basis vectors" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-linear-combination.gif" alt="3Blue1Brown Ch.2 linear combination visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -408,10 +398,6 @@ $$
 ## **4. 행렬과 선형변환**
 
 3Blue1Brown 3강은 행렬을 선형변환으로 보는 관점을 잡습니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/kYB8IZa5AuE" title="3Blue1Brown Chapter 3 - Linear transformations and matrices" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.gif" alt="3Blue1Brown Ch.3 linear transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -544,10 +530,6 @@ $$
 
 3Blue1Brown 4강은 행렬곱을 변환의 합성으로 해석합니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/XkY2DOUCWMU" title="3Blue1Brown Chapter 4 - Matrix multiplication as composition" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.gif" alt="3Blue1Brown Ch.4 matrix composition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -645,10 +627,6 @@ $BA$는 그 반대입니다.
 ## **6. 3차원 선형변환**
 
 3Blue1Brown 5강은 2차원에서 잡은 선형변환 관점을 3차원으로 확장합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/rHLEWRxRGiM" title="3Blue1Brown Chapter 5 - Three-dimensional linear transformations" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.gif" alt="3Blue1Brown Ch.5 3D transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -748,10 +726,6 @@ z축 basis는 어디로 갔는가?
 
 3Blue1Brown 6강은 determinant를 면적/부피 스케일로 설명합니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/Ip3X9LOh2dk" title="3Blue1Brown Chapter 6 - The determinant" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.gif" alt="3Blue1Brown Ch.6 determinant visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -822,10 +796,6 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 ## **8. 역행렬, column space, null space**
 
 3Blue1Brown 7강은 inverse, column space, null space를 선형시스템의 기하학으로 연결합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/uQhTuRlWMxw" title="3Blue1Brown Chapter 7 - Inverse matrices, column space, and null space" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.gif" alt="3Blue1Brown Ch.7 inverse column space null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -1170,10 +1140,6 @@ $$
 
 3Blue1Brown 8강은 정방행렬이 아닌 행렬을 차원 사이의 변환으로 봅니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/v8VSDg_WQlA" title="3Blue1Brown Chapter 8 - Nonsquare matrices as transformations between dimensions" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.gif" alt="3Blue1Brown Ch.8 nonsquare matrix visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -1233,10 +1199,6 @@ SLAM에서도 3D point, camera pixel, LiDAR point, state vector 사이를 오가
 ## **10. 내적과 duality**
 
 3Blue1Brown 9강은 내적을 projection과 duality 관점으로 설명합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/LyGKycYT2v0" title="3Blue1Brown Chapter 9 - Dot products and duality" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch09-dot-product.gif" alt="3Blue1Brown Ch.9 dot product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -1354,10 +1316,6 @@ $$
 
 3Blue1Brown 10강은 외적을 계산법과 기하학적 의미로 설명합니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/eu6i7WJeinw" title="3Blue1Brown Chapter 10 - Cross products" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.gif" alt="3Blue1Brown Ch.10 cross product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -1366,10 +1324,6 @@ $$
 </figure>
 
 3Blue1Brown 11강은 외적을 선형변환과 duality 관점에서 한 단계 더 깊게 봅니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/BaM7OCEm3G0" title="3Blue1Brown Chapter 11 - Cross products in the light of linear transformations" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.gif" alt="3Blue1Brown Ch.11 cross product duality visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -1484,10 +1438,6 @@ $$
 ## **12. Cramer's rule**
 
 3Blue1Brown 12강은 Cramer's rule을 determinant의 비율로 보는 기하학적 설명입니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/jBsC34PxzoM" title="3Blue1Brown Chapter 12 - Cramer's rule, explained geometrically" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.gif" alt="3Blue1Brown Ch.12 Cramer's rule visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -1651,10 +1601,6 @@ iterative solver
 
 3Blue1Brown 13강은 change of basis를 “벡터를 움직이는 것”이 아니라 “같은 벡터를 다른 좌표계 언어로 읽는 것”으로 설명합니다.
 
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/P2LTAUO1TdA" title="3Blue1Brown Chapter 13 - Change of basis" loading="lazy" allowfullscreen></iframe>
-</div>
-
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-change-of-basis.gif" alt="3Blue1Brown Ch.13 change of basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">
@@ -1806,10 +1752,6 @@ $$
 ## **14. 고유벡터와 고유값**
 
 3Blue1Brown 14강은 eigenvector를 선형변환 이후에도 같은 직선 위에 남는 특수한 방향으로 설명합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/PFDu9oVAE-g" title="3Blue1Brown Chapter 14 - Eigenvectors and eigenvalues" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigenvectors.gif" alt="3Blue1Brown Ch.14 eigenvectors and eigenvalues visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -2101,10 +2043,6 @@ SLAM normal equation
 ## **15. 고유값을 계산하는 trick**
 
 3Blue1Brown 15강은 2x2 행렬에서 eigenvalue를 빠르게 계산하는 방법을 다루지만, 핵심은 여전히 $\det(A-\lambda I)=0$이 어떤 방향의 collapse를 뜻한다는 점입니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/e50Bj7jn9IQ" title="3Blue1Brown Chapter 15 - A quick trick for computing eigenvalues" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch15-eigenvalue-trick.gif" alt="3Blue1Brown Ch.15 eigenvalue trick visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
@@ -2655,10 +2593,6 @@ eigenvector가 있다는 말은,
 ## **16. 추상 벡터공간**
 
 3Blue1Brown 16강은 벡터공간을 2D/3D 화살표에서 벗어나 함수, 다항식, 신호 같은 대상으로 확장합니다.
-
-<div class="ratio ratio-16x9 my-3">
-  <iframe src="https://www.youtube-nocookie.com/embed/TgKwz5Ikpc8" title="3Blue1Brown Chapter 16 - Abstract vector spaces" loading="lazy" allowfullscreen></iframe>
-</div>
 
 <figure class="my-3">
   <img src="/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch16-abstract-vector-spaces.gif" alt="3Blue1Brown Ch.16 abstract vector spaces visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
