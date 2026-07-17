@@ -5,7 +5,7 @@ categories: [AI, Deep Learning]
 tags: [deep-learning, neural-network, 3blue1brown, neuron, activation, weight, bias, sigmoid, mnist, forward-pass]
 description: "3Blue1Brown Deep Learning Chapter 1을 바탕으로 neuron, activation, weight, bias, layer와 forward pass를 연결해 신경망의 계산 구조를 정리한다."
 image:
-  path: /assets/img/posts/ai/deep-learning-1-neural-network-structure/00-preview.png
+  path: /assets/img/posts/ai/deep-learning-1-neural-network-structure/00-preview-color.png
 math: true
 ---
 
