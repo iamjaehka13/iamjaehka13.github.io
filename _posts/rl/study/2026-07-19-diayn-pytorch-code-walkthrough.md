@@ -427,52 +427,40 @@ z = 19 고정 → 한 episode
 
 여기서 "서 있기", "앞으로 가기", "뒤로 가기"는 사람이 결과를 보고 붙인 설명입니다. 학습 중에 그런 이름이나 task reward를 제공한 것은 아닙니다.
 
-## **10. 대표 skill 영상**
+## **10. 대표 skill GIF**
 
-아래 영상은 제공된 checkpoint에서 각 `z`를 고정해 실행한 한 번의 sampled rollout입니다. 정량 표는 별도의 5회 평가 평균이므로 영상 한 개의 정확한 변위와 일치할 필요는 없습니다.
+아래 GIF는 제공된 checkpoint에서 각 `z`를 고정해 실행한 한 번의 sampled rollout 중 앞부분을 반복한 것입니다. 정량 표는 별도의 5회 평가 평균이므로 GIF 한 개의 정확한 변위와 일치할 필요는 없습니다.
 
 <div class="row g-4">
   <div class="col-md-6">
     <p><strong>Skill 0 — 거의 제자리에서 자세 유지</strong></p>
-    <video controls playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill0-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill0.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill0.gif" alt="Skill 0: 거의 제자리에서 자세를 유지하는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
   <div class="col-md-6">
     <p><strong>Skill 3 — 빠른 termination</strong></p>
-    <video controls loop playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill3-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill3.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill3.gif" alt="Skill 3: 빠르게 termination되는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
 </div>
 
 <div class="row g-4 mt-1">
   <div class="col-md-6">
     <p><strong>Skill 8 — 양의 x 방향 이동 경향</strong></p>
-    <video controls playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill8-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill8.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill8.gif" alt="Skill 8: 양의 x 방향으로 이동하는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
   <div class="col-md-6">
     <p><strong>Skill 9 — 음의 x 방향 이동 경향</strong></p>
-    <video controls playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill9-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill9.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill9.gif" alt="Skill 9: 음의 x 방향으로 이동하는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
 </div>
 
 <div class="row g-4 mt-1">
   <div class="col-md-6">
     <p><strong>Skill 17 — 긴 episode의 양의 x 이동</strong></p>
-    <video controls playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill17-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill17.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill17.gif" alt="Skill 17: 긴 episode 동안 양의 x 방향으로 이동하는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
   <div class="col-md-6">
     <p><strong>Skill 19 — 변동이 큰 음의 x 이동</strong></p>
-    <video controls playsinline preload="metadata" poster="/assets/img/posts/rl/diayn-pytorch/skill19-poster.jpg" style="width: 100%; border-radius: 8px;">
-      <source src="/assets/video/posts/rl/diayn-pytorch/skill19.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill19.gif" alt="Skill 19: 변동이 크지만 음의 x 방향으로 이동하는 Hopper" decoding="async" style="width: 100%; border-radius: 8px;">
   </div>
 </div>
 
