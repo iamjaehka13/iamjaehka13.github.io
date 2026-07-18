@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">DIAYN의 한 번의 gradient update</title>
+  <desc id="desc">판별기 보상 계산과 SAC 및 판별기 최적화 경로를 분리해 나타낸 그림</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111c31"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#94a3b8"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#020617" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="820" rx="32" fill="url(#background)"/>
+  <text x="700" y="76" text-anchor="middle" fill="#f8fafc" font-family="Inter, Pretendard, sans-serif" font-size="40" font-weight="700">agent.train() 한 번에 일어나는 일</text>
+  <text x="700" y="116" text-anchor="middle" fill="#94a3b8" font-family="Inter, Pretendard, sans-serif" font-size="22">Discriminator는 reward를 만들고, SAC와는 별도의 loss로 학습한다</text>
+
+  <g filter="url(#shadow)" font-family="Inter, Pretendard, sans-serif">
+    <rect x="70" y="205" width="250" height="140" rx="22" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+    <text x="195" y="257" text-anchor="middle" fill="#cbd5e1" font-size="21">Replay batch</text>
+    <text x="195" y="302" text-anchor="middle" fill="#ffffff" font-size="25" font-weight="700">s, z, a, s′, done</text>
+
+    <rect x="415" y="175" width="315" height="165" rx="22" fill="#4a044e" stroke="#e879f9" stroke-width="2"/>
+    <text x="572" y="228" text-anchor="middle" fill="#f5d0fe" font-size="21">Discriminator on s′</text>
+    <text x="572" y="274" text-anchor="middle" fill="#ffffff" font-size="26" font-weight="700">log qφ(z | s′)</text>
+    <text x="572" y="310" text-anchor="middle" fill="#f0abfc" font-size="18">one-hot z는 입력에서 제거</text>
+
+    <rect x="830" y="175" width="440" height="165" rx="22" fill="#7c2d12" stroke="#fb923c" stroke-width="2"/>
+    <text x="1050" y="228" text-anchor="middle" fill="#fed7aa" font-size="21">DIAYN intrinsic reward</text>
+    <text x="1050" y="276" text-anchor="middle" fill="#ffffff" font-size="27" font-weight="700">r = log qφ(z | s′) − log p(z)</text>
+    <text x="1050" y="311" text-anchor="middle" fill="#fdba74" font-size="18">detach: RL loss는 φ까지 역전파하지 않음</text>
+
+    <rect x="800" y="480" width="500" height="185" rx="22" fill="#172554" stroke="#60a5fa" stroke-width="2"/>
+    <text x="1050" y="535" text-anchor="middle" fill="#bfdbfe" font-size="21">SAC path</text>
+    <text x="1050" y="580" text-anchor="middle" fill="#ffffff" font-size="25" font-weight="700">Q target → Q / Value / Policy loss</text>
+    <text x="1050" y="617" text-anchor="middle" fill="#93c5fd" font-size="18">intrinsic return을 크게 만드는 action 학습</text>
+    <text x="1050" y="646" text-anchor="middle" fill="#93c5fd" font-size="18">target value network soft update</text>
+
+    <rect x="260" y="480" width="390" height="185" rx="22" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+    <text x="455" y="535" text-anchor="middle" fill="#a7f3d0" font-size="21">Discriminator path</text>
+    <text x="455" y="580" text-anchor="middle" fill="#ffffff" font-size="25" font-weight="700">CrossEntropy(logits, z)</text>
+    <text x="455" y="617" text-anchor="middle" fill="#6ee7b7" font-size="18">현재 physical state에서 skill 분류</text>
+    <text x="455" y="646" text-anchor="middle" fill="#6ee7b7" font-size="18">discriminator_opt.step()</text>
+  </g>
+
+  <g fill="none" stroke="#94a3b8" stroke-width="4" marker-end="url(#arrow)">
+    <path d="M320 260 H403"/>
+    <path d="M730 257 H818"/>
+    <path d="M1050 340 V468"/>
+    <path d="M195 345 V405 Q195 430 220 430 H430 Q455 430 455 468"/>
+    <path d="M320 290 H360 Q385 290 385 315 V390 Q385 415 410 415 H980 Q1005 415 1005 468"/>
+  </g>
+
+  <line x1="786" y1="360" x2="786" y2="440" stroke="#fb7185" stroke-width="5" stroke-dasharray="9 9"/>
+  <rect x="714" y="374" width="144" height="48" rx="20" fill="#3f1724" stroke="#fb7185" stroke-width="2"/>
+  <text x="786" y="405" text-anchor="middle" fill="#fecdd3" font-family="Inter, Pretendard, sans-serif" font-size="18" font-weight="700">gradient stop</text>
+
+  <text x="700" y="755" text-anchor="middle" fill="#64748b" font-family="Inter, Pretendard, sans-serif" font-size="18">두 optimizer 경로가 분리되어 있어 reward를 잘 만드는 판별기와 reward를 크게 만드는 policy가 함께 개선된다</text>
+</svg>

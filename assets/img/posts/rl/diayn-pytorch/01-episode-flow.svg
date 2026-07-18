@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" role="img" aria-labelledby="title desc">
+  <title id="title">DIAYN 에피소드 실행 흐름</title>
+  <desc id="desc">스킬 선택부터 행동, 환경 전이, 리플레이 버퍼 저장, 학습 업데이트까지의 순서</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111c31"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#020617" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="780" rx="32" fill="url(#background)"/>
+  <text x="700" y="76" text-anchor="middle" fill="#f8fafc" font-family="Inter, Pretendard, sans-serif" font-size="40" font-weight="700">한 episode가 흐르는 순서</text>
+  <text x="700" y="116" text-anchor="middle" fill="#94a3b8" font-family="Inter, Pretendard, sans-serif" font-size="22">skill z는 시작할 때 한 번 뽑고 episode가 끝날 때까지 유지한다</text>
+
+  <g filter="url(#shadow)" font-family="Inter, Pretendard, sans-serif">
+    <rect x="70" y="205" width="230" height="150" rx="22" fill="#312e81" stroke="#818cf8" stroke-width="2"/>
+    <text x="185" y="258" text-anchor="middle" fill="#c7d2fe" font-size="21">Episode start</text>
+    <text x="185" y="307" text-anchor="middle" fill="#ffffff" font-size="29" font-weight="700">z ~ p(z)</text>
+    <text x="185" y="337" text-anchor="middle" fill="#a5b4fc" font-size="18">uniform skill sampling</text>
+
+    <rect x="355" y="205" width="275" height="150" rx="22" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+    <text x="492" y="258" text-anchor="middle" fill="#bae6fd" font-size="21">Policy input</text>
+    <text x="492" y="304" text-anchor="middle" fill="#ffffff" font-size="27" font-weight="700">[ s, one_hot(z) ]</text>
+    <text x="492" y="337" text-anchor="middle" fill="#7dd3fc" font-size="18">11 + 20 = 31 dimensions</text>
+
+    <rect x="685" y="205" width="235" height="150" rx="22" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+    <text x="802" y="258" text-anchor="middle" fill="#a7f3d0" font-size="21">Policy network</text>
+    <text x="802" y="306" text-anchor="middle" fill="#ffffff" font-size="29" font-weight="700">action a</text>
+    <text x="802" y="337" text-anchor="middle" fill="#6ee7b7" font-size="18">a ~ π(a | s, z)</text>
+
+    <rect x="975" y="205" width="350" height="150" rx="22" fill="#7c2d12" stroke="#fb923c" stroke-width="2"/>
+    <text x="1150" y="258" text-anchor="middle" fill="#fed7aa" font-size="21">Hopper environment</text>
+    <text x="1150" y="306" text-anchor="middle" fill="#ffffff" font-size="27" font-weight="700">next state s′, done</text>
+    <text x="1150" y="337" text-anchor="middle" fill="#fdba74" font-size="18">env.step(action)</text>
+
+    <rect x="795" y="500" width="350" height="150" rx="22" fill="#4a044e" stroke="#e879f9" stroke-width="2"/>
+    <text x="970" y="552" text-anchor="middle" fill="#f5d0fe" font-size="21">Replay buffer</text>
+    <text x="970" y="599" text-anchor="middle" fill="#ffffff" font-size="25" font-weight="700">(s+z, z, done, a, s′+z)</text>
+    <text x="970" y="632" text-anchor="middle" fill="#f0abfc" font-size="18">환경 reward는 저장하지 않는다</text>
+
+    <rect x="255" y="500" width="440" height="150" rx="22" fill="#172554" stroke="#60a5fa" stroke-width="2"/>
+    <text x="475" y="552" text-anchor="middle" fill="#bfdbfe" font-size="21">agent.train()</text>
+    <text x="475" y="597" text-anchor="middle" fill="#ffffff" font-size="26" font-weight="700">intrinsic reward → SAC update</text>
+    <text x="475" y="632" text-anchor="middle" fill="#93c5fd" font-size="18">batch가 256개 이상 쌓인 뒤 매 step 실행</text>
+  </g>
+
+  <g fill="none" stroke="#94a3b8" stroke-width="4" marker-end="url(#arrow)">
+    <path d="M300 280 H343"/>
+    <path d="M630 280 H673"/>
+    <path d="M920 280 H963"/>
+    <path d="M1150 355 V425 Q1150 455 1120 455 H1000 V488"/>
+    <path d="M795 575 H707"/>
+    <path d="M255 575 H170 Q140 575 140 545 V415 Q140 385 170 385 H492 V367"/>
+  </g>
+
+  <text x="700" y="730" text-anchor="middle" fill="#64748b" font-family="Inter, Pretendard, sans-serif" font-size="18">바깥쪽 episode loop 안에서 환경 step과 network update가 반복된다</text>
+</svg>
