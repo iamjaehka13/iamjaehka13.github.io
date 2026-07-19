@@ -725,7 +725,7 @@ Learning rate, update ratio, normalization, capacity가 결과에 직접 영향�
 
 ### **15.5 실험은 simulated benchmark 중심이다**
 
-논문은 당시의 MuJoCo/Gym benchmark에서 실험했으며 real robot 결과는 없습니다. Contact uncertainty, actuator limit, latency, sensor noise, hardware safety가 포함된 quadruped Sim2Real 검증으로 읽으면 안 됩니다.
+논문은 당시의 MuJoCo/Gym benchmark에서 실험했으며 real robot 결과는 없습니다. Contact uncertainty, actuator limit, latency, sensor noise, perception error, hardware safety가 포함된 실제 로봇 검증으로 읽으면 안 됩니다.
 
 ### **15.6 Downstream 결과의 비용과 supervision을 구분해야 한다**
 
@@ -735,70 +735,166 @@ Learning rate, update ratio, normalization, capacity가 결과에 직접 영향�
 
 따라서 "완전한 무감독 학습만으로 모든 downstream task를 해결했다"는 결론은 과합니다.
 
-## **16. Go2에 적용한다면 무엇이 달라져야 하는가?**
+## **16. 로봇에 적용한다면 무엇이 달라져야 하는가?**
 
-원 논문은 SAC를 사용하지만, PPO 기반 vectorized locomotion 환경에도 구조는 옮길 수 있습니다.
+DIAYN의 수학적 구조는 특정 로봇 형태에 묶여 있지 않습니다.
 
-### **16.1 PPO에 필요한 구조 변경**
+$$
+\pi_\theta(a\mid s,z),
+\qquad
+q_\phi(z\mid f(s)),
+\qquad
+r=\log q_\phi(z\mid f(s))-\log p(z)
+$$
+
+다족보행 로봇, 휴머노이드, 바퀴형 이동로봇, 매니퓰레이터, 드론 모두 같은 구조를 사용할 수 있습니다. 달라지는 것은 $s$, $a$, $f(s)$가 실제로 무엇을 뜻하는지와 어떤 행동을 허용할지입니다.
+
+> **DIAYN 자체는 embodiment-agnostic이지만, 발견되는 skill의 의미와 안전성은 embodiment와 observation 설계에 강하게 의존합니다.**
+
+### **16.1 공통으로 유지되는 학습 구조**
+
+원 논문은 maximum-entropy off-policy 알고리즘인 SAC를 사용했습니다. 그러나 핵심 구조는 다른 Actor-Critic 알고리즘에도 옮길 수 있습니다.
 
 ```text
-Episode reset
--> 각 environment별 skill z sampling
+Skill 시작
+-> z ~ Uniform({1, ..., K})
 
-Actor observation
--> proprioception + one_hot(z)
+Policy / Critic 입력
+-> physical state s + one_hot(z)
 
-Discriminator observation
--> 선택한 physical state feature만
--> z와 command는 절대 포함하지 않음
+Discriminator 입력
+-> 선택한 physical feature f(s)
+-> z는 절대 포함하지 않음
 
-Rollout
--> obs, z, action, next_skill_obs, intrinsic_reward 저장
+Intrinsic reward
+-> log q(z | f(s')) - log p(z)
 
 Update
--> intrinsic reward로 PPO update
--> (skill_obs, z)로 discriminator classification update
+-> intrinsic reward로 Actor-Critic update
+-> (f(s), z)로 Discriminator classification update
 ```
 
-각 vectorized environment가 reset될 때만 해당 environment의 $z$를 다시 뽑아야 합니다. 매 step마다 $z$를 바꾸면 한 skill이 일관된 state distribution을 만드는 원래 문제와 달라집니다.
+SAC라면 replay buffer에서 과거 transition을 재사용하고, PPO라면 현재 rollout 안에 `z`, `skill_obs`, intrinsic reward를 함께 저장합니다. 강화학습 알고리즘은 달라질 수 있지만 다음 조건은 유지되어야 합니다.
 
-### **16.2 로봇개에서는 pure DIAYN이 위험할 수 있다**
+1. Actor와 Critic은 현재 skill $z$를 알아야 합니다.
+2. Discriminator는 $z$를 입력으로 받지 않고 physical state에서 추측해야 합니다.
+3. 하나의 skill 구간에서는 같은 $z$가 유지되어야 합니다.
+4. Discriminator loss와 RL loss의 gradient 경계가 분리되어야 합니다.
 
-Go2에서 full state로 skill을 구별하면 다음 행동도 좋은 skill로 평가될 수 있습니다.
+원 논문은 episode 시작에 $z$를 뽑아 종료까지 유지합니다. 실제 로봇에서는 episode가 매우 길거나 명확한 reset이 없을 수 있으므로, 일정한 **skill horizon**을 정의해 구간마다 $z$를 바꾸는 설계도 가능합니다. 다만 매 control step마다 $z$를 바꾸면 하나의 skill이 일관된 상태분포를 만드는 원래 목적과 달라집니다.
 
-- 특정 방향으로 넘어지기
-- 관절 limit에 붙기
-- 몸통을 강하게 흔들기
-- contact impulse를 크게 만들기
-- 에너지 소모가 큰 진동
+### **16.2 로봇 종류에 따라 달라지는 $s$, $a$, $f(s)$**
 
-실전에서는 최소한 다음 제약을 고려해야 합니다.
+같은 DIAYN이라도 로봇의 상태와 행동 공간이 다르면 발견되는 skill도 달라집니다.
 
-| 항목 | 이유 |
-|---|---|
-| termination와 fall constraint | 넘어짐 자체가 쉬운 skill signature가 되는 것을 막음 |
-| joint/torque/velocity limit | actuator와 hardware 보호 |
-| contact와 base orientation constraint | 비정상 충돌 및 자세 방지 |
-| energy 또는 action-rate regularization | 고주파 진동과 과도한 동작 억제 |
-| task-relevant $f(s)$ | base velocity, heading, gait phase 등 원하는 diversity에 집중 |
-| domain randomization | simulator artifact가 skill identity가 되는 것을 줄임 |
+**다족보행·휴머노이드**
 
-이렇게 auxiliary reward나 constraint를 추가하면 더 이상 논문 그대로의 "reward-free DIAYN"은 아닙니다. 하지만 real quadruped에서는 purity보다 안전하고 유용한 skill repertoire가 더 중요합니다.
+- Policy state: 관절각, 관절속도, 몸통 자세, 접촉
+- Action: joint target 또는 torque
+- Discriminator feature: base velocity, heading, contact pattern, end-effector 궤적
 
-### **16.3 가장 먼저 확인할 구현 오류**
+**바퀴형 이동로봇**
 
-Actor input에는 $z$가 들어가지만 discriminator input에는 절대 들어가면 안 됩니다.
+- Policy state: odometry, velocity, LiDAR·vision feature
+- Action: linear·angular velocity 또는 wheel command
+- Discriminator feature: 이동 방향, 경로 형태, 도달 영역, map coverage
+
+**매니퓰레이터**
+
+- Policy state: joint state, end-effector pose, object state
+- Action: joint position, velocity 또는 torque
+- Discriminator feature: end-effector 궤적, object pose, grasp·contact mode
+
+**드론**
+
+- Policy state: attitude, body rate, velocity, altitude
+- Action: thrust 또는 body-rate command
+- Discriminator feature: 비행 방향, 고도 변화, trajectory shape, 공간 coverage
+
+여기서 $f(s)$는 단순한 classifier 입력이 아니라 **무엇을 다른 행동으로 간주할지 정하는 behavior specification**입니다.
+
+- 이동 위치와 속도를 주면 서로 다른 이동 방향이나 경로가 만들어지기 쉽습니다.
+- 접촉과 end-effector pose를 주면 grasp나 manipulation mode가 나뉘기 쉽습니다.
+- 모든 joint state를 그대로 주면 사람이 보기 어려운 미세 자세 차이에 skill label이 할당될 수 있습니다.
+- 센서 bias, episode time, reset artifact를 주면 실제 행동이 아니라 nuisance feature로 skill을 구별할 수 있습니다.
+
+따라서 로봇 종류만 바꾸고 같은 $f(s)$를 기계적으로 재사용하면 안 됩니다. 원하는 skill이 task-space behavior인지, 자세 diversity인지, 탐색 coverage인지 먼저 정해야 합니다.
+
+### **16.3 실제 로봇에서는 pure DIAYN이 위험할 수 있다**
+
+DIAYN은 유용성이나 안전성이 아니라 구별 가능성을 보상합니다. 로봇 종류에 따라 다음과 같은 행동도 쉽게 구별되는 skill이 될 수 있습니다.
+
+- 다족보행·휴머노이드: 넘어짐, 과도한 충격, 불안정한 진동
+- 이동로봇: 벽이나 장애물에 반복적으로 충돌, 제자리 고속 회전
+- 매니퓰레이터: self-collision, joint limit 고착, 물체를 작업공간 밖으로 밀기
+- 드론: 급격한 자세 변화, geofence 이탈, 위험한 고도 접근
+- 공통: actuator saturation, 큰 action-rate, 과도한 전류·에너지·열 발생
+
+실제 시스템에서는 최소한 다음 안전 계층을 함께 고려해야 합니다.
+
+- **Hard state/action limit**: joint, velocity, torque, thrust, workspace 범위를 제한합니다.
+- **Collision·fall·geofence constraint**: 로봇과 주변 환경의 물리적 손상을 방지합니다.
+- **Safety controller 또는 action filter**: 학습 Policy의 위험한 명령을 실행 전에 차단합니다.
+- **Termination과 safe reset**: 위험 상태에서 episode를 중단하고 복구합니다.
+- **Energy·smoothness regularization**: 고주파 진동, 급격한 명령, hardware wear를 억제합니다.
+- **Domain randomization과 sensor noise**: simulator artifact나 특정 sensor bias가 skill identity가 되는 것을 줄입니다.
+
+여기서는 hard constraint와 auxiliary reward를 구분해야 합니다.
+
+- **Hard constraint / safety shield**는 가능한 행동 집합을 제한합니다.
+- **Energy·smoothness penalty**는 최적화 목적함수 자체를 바꿉니다.
+
+후자를 추가하면 논문 그대로의 pure reward-free DIAYN은 아니지만, 여전히 **task reward 없이 skill을 발견한다**는 목적은 유지할 수 있습니다. 실제 로봇에서는 방법의 순수성보다 안전하고 재사용 가능한 repertoire를 얻는 것이 더 중요합니다.
+
+### **16.4 Discriminator feature는 로봇 간 범용성을 결정한다**
+
+Simulator의 privileged state를 그대로 사용하면 real robot에서 관측할 수 없는 feature에 skill이 의존할 수 있습니다. 반대로 raw sensor 전체를 넣으면 배경, 조명, sensor drift처럼 행동과 무관한 정보로 분류할 수 있습니다.
+
+범용적인 로봇 skill을 원한다면 다음 기준이 필요합니다.
+
+1. **관측 가능성**: 배포 시 실제 sensor로 얻을 수 있는 feature인가?
+2. **행동 관련성**: 로봇의 motion이나 interaction 결과를 나타내는가?
+3. **불변성**: 배경, sensor ID, reset seed 같은 nuisance variable에 과도하게 민감하지 않은가?
+4. **좌표계 선택**: world-frame 위치가 필요한지, body/object-relative feature가 필요한지 명확한가?
+5. **Downstream 관련성**: 나중에 선택하거나 조합할 가치가 있는 차이를 표현하는가?
+
+예를 들어 object manipulation skill을 원한다면 joint angle만 분류하는 것보다 object-relative end-effector pose와 contact state를 사용하는 편이 목적에 가깝습니다. 장소에 무관한 이동 skill을 원한다면 절대 world position보다 body-frame velocity와 local trajectory feature가 더 적합할 수 있습니다.
+
+### **16.5 Real-world data 비용과 reset 문제**
+
+Simulation에서는 수백만 transition과 실패 reset이 비교적 저렴하지만 실제 로봇에서는 그렇지 않습니다.
+
+- 위험한 탐색이 hardware 손상과 운영 중단으로 이어질 수 있습니다.
+- 자동 reset이 어려우면 특정 실패 상태의 데이터가 과도하게 쌓일 수 있습니다.
+- Battery, temperature, payload, floor condition 변화가 Discriminator의 shortcut이 될 수 있습니다.
+- Skill 수 $K$가 커질수록 skill당 실제 데이터가 줄어듭니다.
+
+따라서 실제 적용은 보통 다음과 같은 단계적 구성이 더 현실적입니다.
+
+```text
+Simulation 또는 offline data에서 skill pretraining
+-> sensor와 dynamics randomization
+-> 안전 제약 안에서 real-world adaptation
+-> skill quality와 redundancy 평가
+-> downstream selection / hierarchy / fine-tuning
+```
+
+이 과정에서 simulation에서만 분리되던 skill이 실제 sensor에서는 겹칠 수 있고, 반대로 hardware의 미세 편차가 새로운 shortcut을 만들 수도 있습니다. 그래서 real-world adaptation에서는 diversity 점수뿐 아니라 안전성, 재현성, 에너지, task usefulness를 함께 측정해야 합니다.
+
+### **16.6 가장 먼저 확인할 구현 오류**
+
+로봇 형태와 관계없이 Actor input에는 $z$가 들어가지만 Discriminator input에는 절대 들어가면 안 됩니다.
 
 ```python
 # Correct
 actor_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
-disc_obs = select_skill_features(robot_state)
+disc_obs = select_behavior_features(robot_state)
 
 # Wrong: label leakage
 disc_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
 ```
 
-Label leakage가 생기면 discriminator accuracy와 intrinsic reward는 매우 높아지지만 policy는 서로 다른 행동을 만들 필요가 없습니다.
+Label leakage가 생기면 Discriminator accuracy와 intrinsic reward는 매우 높아지지만 Policy는 서로 다른 행동을 만들 필요가 없습니다. Vectorized environment나 여러 로봇에서 병렬 수집할 때는 각 environment의 reset 시점과 `z` 갱신도 따로 관리해야 합니다.
 
 ## **17. 구현 체크리스트**
 
@@ -849,7 +945,7 @@ Learned skill repertoire
 
 > **분류하기 쉬운 차이가 반드시 유용하고 안전한 차이는 아니다.**
 
-그래서 DIAYN은 완성된 locomotion solution이라기보다, task reward 이전에 behavior repertoire를 만드는 강력한 출발점으로 보는 것이 정확합니다. 실제 로봇에 적용할 때는 어떤 state feature를 다양화할지, 어떤 행동을 금지할지, 발견한 skill의 quality를 어떻게 평가할지가 다음 문제입니다.
+그래서 DIAYN은 완성된 robot control solution이라기보다, task reward 이전에 behavior repertoire를 만드는 강력한 출발점으로 보는 것이 정확합니다. 실제 로봇에 적용할 때는 어떤 state feature를 다양화할지, 어떤 행동을 금지할지, 발견한 skill의 quality를 어떻게 평가할지가 다음 문제입니다.
 
 ## **참고 자료**
 
