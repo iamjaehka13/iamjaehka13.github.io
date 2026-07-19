@@ -434,6 +434,235 @@ for episode in range(num_episodes):
         obs = next_obs
 ```
 
+### **8.1 SAC의 기본 개념**
+
+위 알고리즘의 7번에는 "SAC가 actor와 critic을 업데이트한다"는 문장이 들어갑니다. 로봇 강화학습에서 PPO를 주로 접했다면 이 부분부터 낯설 수 있습니다.
+
+**[Soft Actor-Critic, SAC](https://arxiv.org/abs/1801.01290)**는 연속 제어를 위해 설계된 **off-policy maximum-entropy Actor-Critic** 알고리즘입니다. 일반적인 강화학습이 discounted reward를 최대화한다면 SAC는 reward와 Policy entropy를 함께 최대화합니다.
+
+$$
+J_{\text{SAC}}(\pi)
+=
+\mathbb{E}_{\pi}
+\left[
+\sum_{t=0}^{\infty}
+\gamma^t
+\left(
+r(s_t,a_t)
++
+\alpha
+\mathcal{H}\bigl(\pi(\cdot\mid s_t)\bigr)
+\right)
+\right]
+$$
+
+Policy entropy는 다음과 같습니다.
+
+$$
+\mathcal{H}\bigl(\pi(\cdot\mid s)\bigr)
+=
+\mathbb{E}_{a\sim\pi}
+\left[
+-\log\pi(a\mid s)
+\right]
+$$
+
+따라서 한 action sample의 관점에서는 SAC가 대략 다음 값을 크게 만드는 Policy를 찾는다고 볼 수 있습니다.
+
+$$
+r(s,a)-\alpha\log\pi(a\mid s)
+$$
+
+- Reward가 크면 task를 잘 수행합니다.
+- $-\log\pi(a\mid s)$가 크면 한 action에 지나치게 확정적으로 수렴하지 않습니다.
+- Temperature $\alpha$는 reward와 entropy의 상대적 비중을 조절합니다.
+
+$\alpha$가 크면 Policy가 더 넓은 action distribution을 유지하고, 너무 크면 유용한 동작보다 randomness가 강해질 수 있습니다. $\alpha$가 작아지면 일반적인 reward maximization에 가까워지고 Policy가 더 결정적으로 변합니다.
+
+여기서 **Soft**는 action을 부드럽게 움직인다는 뜻이 아닙니다. Bellman backup과 Policy objective에 entropy가 포함되어, 단 하나의 최고 action만 보는 hard maximum 대신 여러 가능성의 가치를 함께 반영한다는 뜻입니다.
+
+SAC의 핵심 구성은 다음과 같습니다.
+
+| 구성 | 역할 |
+|---|---|
+| Stochastic Actor $\pi_\theta(a\mid s)$ | 평균과 분산을 출력하고 continuous action을 sampling |
+| Twin Critic $Q_{\psi_1},Q_{\psi_2}$ | action의 장기 return을 추정하고 작은 값을 사용해 과대평가 완화 |
+| Target network | Critic이 따라갈 TD target의 급격한 변화를 완화 |
+| Replay buffer | 과거와 최근 transition을 섞어 반복 학습 |
+| Temperature $\alpha$ | reward와 Policy entropy 사이의 균형 조절 |
+
+현대 SAC의 Critic target은 보통 다음처럼 씁니다.
+
+$$
+\begin{aligned}
+a'
+&\sim
+\pi_\theta(\cdot\mid s'), \\
+y
+&=
+r
++
+\gamma(1-d)
+\left[
+\min_i \bar Q_i(s',a')
+-
+\alpha\log\pi_\theta(a'\mid s')
+\right]
+\end{aligned}
+$$
+
+Critic은 $Q_i(s,a)$가 이 target $y$에 가까워지도록 학습합니다. Actor는 다음 loss를 최소화합니다.
+
+$$
+J_\pi
+=
+\mathbb{E}_{s\sim\mathcal{D},\,a\sim\pi_\theta}
+\left[
+\alpha\log\pi_\theta(a\mid s)
+-
+\min_i Q_{\psi_i}(s,a)
+\right]
+$$
+
+즉 Actor는 Critic이 높게 평가하는 action을 만들면서도 Policy entropy를 유지합니다. Replay buffer $\mathcal{D}$의 과거 transition을 다시 사용하므로 SAC는 off-policy입니다.
+
+> **초기 SAC와 현대 SAC는 코드 모양이 다릅니다.**
+>
+> DIAYN 논문 시기의 초기 SAC와 이 글의 참고 구현은 별도의 Value network와 target Value network를 사용합니다. 이후 널리 쓰이는 SAC는 explicit Value network를 제거하고 target Q를 사용하며, $\alpha$를 자동 조절하는 구성을 자주 사용합니다. 네트워크 배치는 달라도 off-policy replay와 maximum-entropy Actor-Critic이라는 핵심은 같습니다.
+
+### **8.2 로봇 강화학습에서 익숙한 PPO와 무엇이 다른가?**
+
+로봇 강화학습, 특히 수천 개 환경을 병렬로 실행하는 simulation 기반 locomotion에서는 [PPO](https://arxiv.org/abs/1707.06347)가 널리 사용됩니다. 새 rollout을 빠르게 대량 생성할 수 있고, clipped objective가 큰 Policy update를 제한하며, vectorized environment 구조와 결합하기 쉽기 때문입니다.
+
+SAC가 PPO보다 항상 좋거나, PPO가 SAC보다 항상 안정적인 것은 아닙니다. 두 알고리즘은 데이터가 비싼지, 병렬 simulation을 얼마나 사용할 수 있는지, replay에서 생기는 non-stationarity를 감당할 수 있는지에 따라 장단점이 달라집니다.
+
+**학습 분류**
+
+- PPO: On-policy Actor-Critic
+- SAC: Off-policy Actor-Critic
+
+**데이터 사용**
+
+- PPO: 현재 Policy로 모은 rollout을 여러 epoch 사용한 뒤 교체
+- SAC: Replay buffer의 과거·현재 transition을 반복 사용
+
+**Policy update**
+
+- PPO: Probability ratio를 clipped surrogate objective로 제한
+- SAC: Soft Q-value와 entropy로 stochastic Actor update
+
+**Critic 역할**
+
+- PPO: Return과 advantage 추정을 위한 Value function
+- SAC: Actor가 선택할 action의 soft Q-value 학습
+
+**Entropy**
+
+- PPO: 보조 bonus로 자주 추가
+- SAC: Maximum-entropy objective의 핵심 항
+
+**강점이 드러나는 조건**
+
+- PPO: 대규모 병렬 simulation과 높은 rollout throughput
+- SAC: Interaction이 비싸고 경험 재사용이 중요한 조건
+
+**주요 부담**
+
+- PPO: Policy가 바뀔 때마다 새 rollout이 계속 필요
+- SAC: Replay distribution, Q-function, target 안정성 관리
+
+PPO도 stochastic Policy를 사용할 수 있고 entropy bonus를 자주 넣습니다. 따라서 차이를 "PPO는 탐색하지 않고 SAC만 탐색한다"로 이해하면 안 됩니다. 본질적인 차이는 **현재 Policy의 rollout을 중심으로 학습하는가**, 아니면 **Replay buffer의 off-policy transition으로 soft Q-learning을 하는가**입니다.
+
+데이터 흐름을 나란히 놓으면 차이가 더 선명합니다.
+
+```text
+PPO
+parallel rollout 수집
+-> reward와 value로 advantage 계산
+-> 같은 rollout에서 clipped objective를 여러 epoch 최적화
+-> 다음 Policy의 새 rollout로 교체
+```
+
+```text
+SAC
+transition을 replay buffer에 계속 저장
+-> 과거와 최근 경험이 섞인 mini-batch sampling
+-> soft Bellman target으로 Twin Critic update
+-> Critic과 entropy를 사용해 Actor update
+-> target network를 천천히 갱신
+```
+
+대규모 simulator에서는 sample을 새로 만드는 비용이 상대적으로 작아 PPO의 제한된 데이터 재사용이 큰 문제가 아닐 수 있습니다. 반대로 실제 interaction이나 고비용 simulation에서는 같은 transition을 반복 사용하는 SAC의 sample efficiency가 중요해질 수 있습니다.
+
+### **8.3 DIAYN은 왜 PPO가 아니라 SAC를 선택했는가?**
+
+첫 번째 이유는 DIAYN의 목적함수와 maximum-entropy SAC가 직접 연결되기 때문입니다.
+
+$$
+\mathcal{F}(\theta)
+=
+H(Z)
+-
+H(Z\mid S)
++
+H(A\mid S,Z)
+$$
+
+마지막 항은 skill $z$와 state $s$가 주어졌을 때도 Policy가 action entropy를 유지하라는 뜻입니다.
+
+$$
+H(A\mid S,Z)
+=
+\mathbb{E}_{s,z}
+\left[
+\mathcal{H}\bigl(\pi_\theta(\cdot\mid s,z)\bigr)
+\right]
+$$
+
+SAC의 state를 $(s,z)$로 확장하면 SAC가 원래 최적화하던 Policy entropy가 바로 $H(A\mid S,Z)$에 대응합니다. DIAYN이 필요로 하는 행동 엔트로피를 별도의 알고리즘으로 새로 만들 필요가 없습니다.
+
+두 번째 이유는 Discriminator reward를 일반적인 scalar reward처럼 SAC에 전달할 수 있기 때문입니다.
+
+$$
+r_{\text{DIAYN}}(s,z)
+=
+\log q_\phi(z\mid s)
+-
+\log p(z)
+$$
+
+SAC는 이 값이 task reward인지, 사람이 설계한 reward인지, Discriminator가 만든 intrinsic reward인지 구분하지 않습니다. Critic은 주어진 reward의 discounted return을 학습하고 Actor는 그 Q-value를 높이는 action distribution을 학습합니다.
+
+세 번째로 SAC를 사용할 때 얻는 실용적 이점은 Replay buffer에서 여러 skill의 transition을 재사용할 수 있다는 점입니다. 이것은 $H(A\mid S,Z)$에서 직접 강제되는 이유라기보다 off-policy 구현이 주는 장점입니다.
+
+```text
+z=1 transition
+z=2 transition
+z=3 transition
+...
+-> 하나의 replay buffer
+-> [s, z, a, s'] batch
+-> skill-conditioned Critic과 Policy 학습
+```
+
+DIAYN은 연속 제어 benchmark에서 많은 skill을 동시에 학습합니다. Off-policy SAC는 각 skill이 만든 경험을 버리지 않고 다시 사용할 수 있습니다.
+
+그렇다고 DIAYN을 PPO로 구현할 수 없다는 뜻은 아닙니다.
+
+```text
+PPO 기반 DIAYN
+-> rollout 동안 z 고정
+-> Discriminator reward를 rollout에 기록
+-> intrinsic reward로 advantage와 return 계산
+-> PPO clipped update + entropy bonus
+```
+
+이 구조도 가능하지만 원 논문의 구현과는 다릅니다. Replay buffer를 사용하지 않으므로 Discriminator와 Policy는 현재 rollout을 중심으로 학습하며, maximum-entropy 목적도 SAC와 같은 soft Bellman 구조가 아니라 PPO objective의 entropy regularization으로 들어갑니다.
+
+> **DIAYN이 SAC를 선택한 이유는 SAC가 PPO보다 항상 우수해서가 아닙니다. DIAYN의 $H(A\mid S,Z)$ 항과 maximum-entropy SAC가 자연스럽게 맞고, 여러 skill의 연속 제어 경험을 off-policy replay로 재사용할 수 있기 때문입니다.**
+
+실제 초기 SAC의 Value, Q, Policy update가 DIAYN reward와 연결되는 코드는 [DIAYN PyTorch 구현 흐름](/posts/diayn-pytorch-code-walkthrough/)에서 이어서 확인할 수 있습니다.
+
 ## **9. Actor, Critic, Discriminator는 무엇이 다른가?**
 
 세 network가 모두 무언가를 "평가"하는 것처럼 보여 헷갈리기 쉽습니다.
@@ -490,6 +719,8 @@ Actor
 Discriminator는 별도의 classification loss로 업데이트합니다. 구현 시 critic loss가 discriminator parameter까지 의도치 않게 흘러가지 않도록 reward 계산 경계를 명확히 해야 합니다.
 
 ## **10. 일반 SAC와 DIAYN의 구현 차이**
+
+앞 절에서는 SAC 자체와 PPO의 차이를 설명했습니다. 이제 SAC를 기준으로 일반 task 학습과 DIAYN 구현이 정확히 어디서 달라지는지 비교하겠습니다.
 
 DIAYN은 완전히 새로운 policy optimizer라기보다 **SAC의 조건 변수와 reward source를 바꾼 구조**입니다.
 
@@ -955,3 +1186,5 @@ Learned skill repertoire
 - [Official DIAYN implementation note](https://github.com/ben-eysenbach/sac/blob/master/DIAYN.md)
 - [Variational Intrinsic Control](https://arxiv.org/abs/1611.07507)
 - [Soft Actor-Critic](https://arxiv.org/abs/1801.01290)
+- [Soft Actor-Critic Algorithms and Applications](https://arxiv.org/abs/1812.05905)
+- [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
