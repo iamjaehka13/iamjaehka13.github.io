@@ -98,7 +98,7 @@ policy 자체는 추가 학습하지 않음
 
 따라서 DADS의 zero-shot 주장은 **새 task에서 policy gradient 학습을 다시 하지 않는다**는 뜻이다. Downstream goal이나 후보 trajectory를 평가할 reward까지 필요 없다는 뜻은 아니다.
 
-## 2. DIAYN 다음에 왜 DADS가 필요한가?
+## 2. DIAYN과 DADS는 무엇을 다르게 보는가?
 
 DIAYN과 DADS를 가장 짧게 비교하면 다음과 같다.
 
