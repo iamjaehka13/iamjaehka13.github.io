@@ -37,32 +37,16 @@ DADS에는 두 개의 학습 대상이 있다.
 | Skill policy $\pi_\theta(a\mid s,z)$ | 현재 상태와 skill을 받아 실제 action을 만든다. |
 | Skill dynamics $q_\phi(s'\mid s,z)$ | 현재 상태에서 해당 skill이 만들 다음 상태를 예측한다. |
 
-학습 흐름은 다음과 같다.
+전체 과정은 두 단계로 나뉜다.
 
 ```text
-skill z와 현재 상태 s
-          ↓
-policy π(a | s, z)
-          ↓
-environment에서 transition s → s' 생성
-          ↓
-skill dynamics q(s' | s, z)가 transition 평가
-          ↓
-현재 z에는 잘 맞고 다른 z에는 잘 맞지 않으면 높은 reward
-          ↓
-SAC가 policy를 업데이트
-```
+Unsupervised pretraining
+policy와 skill dynamics를 함께 학습
 
-학습이 끝나면 역할이 하나 더 생긴다.
+                ↓
 
-```text
-downstream goal 또는 reward
-          ↓
-여러 z sequence를 skill dynamics로 미리 전개
-          ↓
-가장 좋은 sequence 선택
-          ↓
-첫 번째 z를 실행하고 다시 계획
+Downstream planning
+skill dynamics로 z sequence를 평가하고 실행
 ```
 
 즉 DADS는 **model-free RL로 저수준 skill을 학습**하지만, downstream task에서는 **learned model로 고수준 planning**을 수행한다.
@@ -83,18 +67,7 @@ downstream goal 또는 reward
 | Skill space | Discrete와 continuous latent 모두 실험 |
 | Source | [arXiv](https://arxiv.org/abs/1907.01657), [OpenReview](https://openreview.net/forum?id=HJgLZR4KvH), [Official code](https://github.com/google-research/dads), [Google Research overview](https://research.google/blog/dads-unsupervised-reinforcement-learning-for-skill-discovery/) |
 
-논문은 학습과 활용을 명확히 분리한다.
-
-```text
-Unsupervised pretraining
-task reward 없이 policy와 skill dynamics 학습
-
-                    ↓
-
-Downstream planning
-새 task reward를 사용해 z sequence를 선택
-policy 자체는 추가 학습하지 않음
-```
+이 표에서 중요한 것은 task reward가 없는 pretraining과, task reward를 planning 기준으로만 사용하는 downstream phase가 분리된다는 점이다.
 
 따라서 DADS의 zero-shot 주장은 **새 task에서 policy gradient 학습을 다시 하지 않는다**는 뜻이다. Downstream goal이나 후보 trajectory를 평가할 reward까지 필요 없다는 뜻은 아니다.
 
@@ -112,17 +85,17 @@ DIAYN과 DADS를 가장 짧게 비교하면 다음과 같다.
 
 여기서 DIAYN을 "최종 상태만 보는 방법"이라고 설명하면 부정확하다. DIAYN discriminator는 trajectory에서 방문한 상태를 이용해 skill-conditioned state distribution을 구별한다. DADS의 차이는 단순히 중간 상태를 더 본다는 것이 아니라, **현재 상태를 조건으로 두고 다음 상태의 변화를 모델링한다**는 데 있다.
 
-예를 들어 두 skill이 모두 오른쪽 영역에 도달한다고 하자.
+예를 들어 다음 두 skill을 생각해보자.
 
 ```text
 z = 1
-같은 시작점에서 실행할 때마다 거의 같은 방향과 거리로 이동
+오른쪽 영역으로 가지만 경로와 이동량이 실행마다 크게 달라짐
 
 z = 2
-오른쪽 영역에는 도달하지만 경로와 이동량이 매번 크게 달라짐
+왼쪽 영역으로 이동
 ```
 
-두 skill 모두 현재 위치만 보면 다른 skill과 구별될 수 있다. 하지만 두 번째 skill은 미래 결과를 안정적으로 예측하기 어려워 planning primitive로 사용하기 힘들다.
+두 skill은 방문하는 상태 영역이 달라 DIAYN의 discriminator로 구별될 수 있다. 그러나 DIAYN 목적함수에는 $z=1$의 반복 trajectory가 얼마나 흔들리는지 직접 줄이는 항이 없다. DADS는 현재 상태와 skill이 정해졌을 때 다음 상태의 불확실성을 줄여 이 predictability를 직접 요구한다.
 
 DADS의 문제의식은 다음과 같다.
 
@@ -270,7 +243,7 @@ $$
 q_\phi(s'-s\mid s,z)
 $$
 
-현재 절대 위치 자체보다 skill이 만든 변화를 중심으로 학습하기 쉽기 때문이다. 모델 출력은 네 개의 Gaussian expert를 사용한 Mixture-of-Experts로 구성되지만, 이 세부 구조는 DADS의 핵심 정의가 아니라 논문 구현 선택이다.
+현재 절대 위치 자체보다 skill이 만든 변화를 중심으로 학습하기 쉽기 때문이다. Mixture-of-Experts와 같은 출력 구조는 논문 구현 선택이며 DADS 목적함수의 필수 조건은 아니다.
 
 ## 6. Skill dynamics가 intrinsic reward를 만드는 방법
 
@@ -347,35 +320,7 @@ SAC
 4. 현재 $q_\phi$로 각 transition의 intrinsic reward를 계산한다.
 5. 그 reward를 사용해 SAC policy와 critic을 업데이트한다.
 
-```text
-collect transitions with current policy
-                ↓
-fit qφ(s' | s, z)
-                ↓
-compute DADS reward
-                ↓
-update SAC actor and critics
-                ↓
-repeat
-```
-
-### 7.1 SAC인데 논문은 왜 on-policy sample이라고 쓰는가?
-
-SAC 자체는 replay data를 재사용할 수 있는 off-policy actor-critic이다. 그러나 원 DADS 학습 절차는 현재 policy로 새 batch를 모으고, 그 최근 batch를 중심으로 skill dynamics와 policy를 갱신하는 방식을 사용했다. 논문과 공식 코드도 이를 on-policy optimization scheme으로 표현한다.
-
-이 둘은 모순이라기보다 구분해야 할 층이 다르다.
-
-```text
-RL optimizer의 성격
-→ SAC는 off-policy update가 가능한 알고리즘
-
-원 DADS의 데이터 운용 방식
-→ 오래된 policy의 transition을 광범위하게 재사용하지 않고 최근 batch 중심으로 학습
-```
-
-후속 연구 off-DADS는 과거 데이터를 재사용하기 위한 relabeling과 off-policy 학습을 본격적으로 다룬다.
-
-> 중요한 정정: 원 DADS의 저수준 skill policy를 PPO로 학습했다고 쓰면 틀린다. PPO는 논문의 discrete-skill hierarchical meta-controller 비교에서 사용되며, 핵심 DADS skill discovery 실험은 EC-SAC를 사용한다.
+> 구현 메모: SAC는 off-policy update가 가능한 알고리즘이지만, 원 DADS는 현재 policy로 모은 최근 batch 중심의 학습 절차를 사용했다. 후속 off-DADS가 과거 transition의 본격적인 재사용을 다룬다. 또한 원 DADS의 저수준 skill policy는 EC-SAC로 학습했으며, PPO는 discrete-skill hierarchical meta-controller 비교에서 사용됐다.
 
 ## 8. 학습된 model을 planning에 다시 사용한다
 
@@ -391,19 +336,17 @@ $$
 (z_1,z_2,\ldots,z_{H_P})
 $$
 
-각 sequence를 skill dynamics 안에서 전개해 미래 상태를 예측한다.
+각 후보를 평가할 때는 하나의 $z_i$를 $H_Z$ model step 동안 고정해 미래 상태를 전개한다.
 
 $$
-s_0
-\xrightarrow{z_1}
-\hat{s}_1
-\xrightarrow{z_2}
-\hat{s}_2
-\xrightarrow{z_3}
-\cdots
+\hat{s}_{t+h+1}
+\sim
+q_\phi(\cdot\mid \hat{s}_{t+h},z_i),
+\qquad
+h=0,\ldots,H_Z-1
 $$
 
-그다음 downstream reward가 가장 높은 sequence를 고른다. 논문은 이 탐색에 MPPI를 사용한다.
+그다음 다음 $z_{i+1}$로 바꾸고 같은 과정을 반복한다. 이렇게 예측한 전체 trajectory에서 downstream reward가 가장 높은 sequence를 고르며, 논문은 이 탐색에 MPPI를 사용한다.
 
 ![Latent-space MPC with learned DADS skills](/assets/img/posts/rl/dads/02-dads-latent-space-mpc.png){: width="920" .d-block .mx-auto }
 _위쪽 planner는 skill dynamics로 후보 $z$ sequence를 평가한다. 선택한 첫 skill은 아래쪽 실제 environment에서 policy가 실행하고, 새로운 상태에서 다시 계획한다. 출처: [Sharma et al., Figure 3](https://arxiv.org/abs/1907.01657)._
@@ -422,7 +365,7 @@ DADS는 저수준 action을 policy에 맡기고, planner는 더 느린 시간 �
 z0, z1, z2, ..., zK
 ```
 
-Skill 하나는 $H_Z$ environment step 동안 유지된다. Planner는 선택한 $z$를 policy에 전달해 $H_Z$ step 실행하고, 바뀐 실제 상태에서 다시 계획한다.
+Planner는 선택한 첫 $z$를 실제 policy에 전달해 $H_Z$ environment step 동안 실행하고, 바뀐 실제 상태에서 다시 계획한다.
 
 이것이 temporal abstraction이다.
 
@@ -442,7 +385,27 @@ Skill policy
 
 > **Task reward 없이 skill repertoire를 사전학습하고, 새 task에서는 그 reward를 planning 기준으로만 사용한다.**
 
-## 9. Continuous latent skill은 무엇을 추가하는가?
+## 9. 실험을 읽기 전에: x-y prior
+
+Ant navigation의 주요 정량 실험에서는 skill dynamics가 관심을 두는 observation을 Cartesian coordinate $(x,y)$로 제한했다. 논문은 이를 **x-y prior**라고 부른다.
+
+```text
+q가 몸 전체의 모든 상태 차이를 예측하도록 두는 대신
+→ x-y 이동을 잘 예측하고 구별하도록 학습
+```
+
+따라서 이동 방향 중심의 skill이 나타난 것은 DADS 목적함수만의 결과가 아니다. 연구자가 prediction target을 통해 "어떤 차이를 behavior diversity로 볼 것인가"라는 inductive bias를 넣었다.
+
+이 지점은 DIAYN의 discriminator feature 선택과 연결된다.
+
+| 방법 | Behavior를 정의하는 입력 |
+|---|---|
+| DIAYN | Discriminator가 보는 $f(s)$ |
+| DADS | Skill dynamics가 예측하는 state feature 또는 delta |
+
+비지도 skill discovery라도 representation 선택까지 완전히 비지도인 것은 아니다. 이 조건을 먼저 알고 다음 continuous latent와 trajectory variance 결과를 읽어야 한다.
+
+## 10. Continuous latent skill은 무엇을 추가하는가?
 
 DADS는 discrete skill과 continuous skill을 모두 사용할 수 있다. Ant 실험에서는 다음 2차원 continuous latent를 사용했다.
 
@@ -450,7 +413,7 @@ $$
 z\in[-1,1]^2
 $$
 
-Discrete skill 20개와 달리 continuous space에는 이론적으로 무한한 $z$가 있다. 논문은 latent 좌표를 부드럽게 바꾸면 Ant trajectory의 방향도 비교적 부드럽게 변하는 결과를 보여준다.
+Discrete skill 20개와 달리 continuous space에는 이론적으로 무한한 $z$가 있다. x-y prior를 사용한 Ant 실험에서는 latent 좌표를 부드럽게 바꾸면 trajectory 방향도 비교적 부드럽게 변하는 결과가 나타났다.
 
 ![Continuous DADS Ant trajectories](/assets/img/posts/rl/dads/03-dads-continuous-trajectories.png){: width="880" .d-block .mx-auto }
 _2차원 continuous latent에서 sampling한 Ant의 x-y trajectory. 다양한 이동 방향이 하나의 compact latent space에 배치된다. 출처: [Sharma et al., Figure 5](https://arxiv.org/abs/1907.01657)._
@@ -472,7 +435,7 @@ DADS 목적함수는 latent 좌표축에 "전후 이동"이나 "좌우 이동"�
 
 논문의 실험적 주장은 **interpolation에 따라 behavior가 부드럽게 변했다**는 것이다. 임의의 두 skill을 더하면 의미 있는 조합이 된다는 주장이 아니다. 실제 downstream control은 latent arithmetic보다 learned dynamics 위에서의 planning을 사용한다.
 
-## 10. 실험에서 DIAYN과 무엇이 달랐는가?
+## 11. 실험에서 DIAYN과 무엇이 달랐는가?
 
 논문은 Ant navigation에서 동일한 skill을 여러 번 실행했을 때 x-y trajectory의 표준편차를 측정했다.
 
@@ -502,69 +465,29 @@ DADS + MPPI
 
 논문은 DADS+MPPI가 새 goal에서 추가 policy training 없이 동작했음을 강조한다. 그렇다고 planning 계산이 공짜이거나 dynamics model error가 사라지는 것은 아니다.
 
-## 11. x-y prior는 숨기면 안 되는 조건이다
+## 12. 한계와 비판적으로 읽을 지점
 
-Ant navigation의 주요 정량 실험에서는 skill dynamics가 관심을 두는 observation을 Cartesian coordinate $(x,y)$로 제한했다. 논문은 이를 **x-y prior**라고 부른다.
-
-이 선택은 다음 의미를 가진다.
-
-```text
-q가 몸 전체의 모든 상태 차이를 구별하도록 두는 대신
-→ x-y 이동을 잘 예측하고 구별하도록 학습
-```
-
-따라서 발견되는 skill이 이동 방향 중심으로 정리되는 것은 목적함수만의 결과가 아니다. 연구자가 skill dynamics의 prediction target을 통해 "어떤 차이를 behavior diversity로 볼 것인가"라는 inductive bias를 넣었다.
-
-이 지점은 DIAYN의 discriminator feature 선택과 연결된다.
-
-| 방법 | Behavior를 정의하는 입력 |
-|---|---|
-| DIAYN | Discriminator가 보는 $f(s)$ |
-| DADS | Skill dynamics가 예측하는 state feature 또는 delta |
-
-비지도 skill discovery라도 representation 선택까지 완전히 비지도인 것은 아니다.
-
-## 12. 논문의 강점
-
-### 12.1 Diversity와 predictability를 하나의 목적함수로 연결한다
-
-DADS는 skill 간 차이와 skill 내부의 일관성을 별도의 handcrafted score로 나누지 않고 conditional mutual information으로 묶는다.
-
-### 12.2 Reward model이 downstream dynamics model로 남는다
-
-$q_\phi$는 학습 중 intrinsic reward만 만들고 버려지는 network가 아니다. 같은 model이 latent-space planning에 사용된다. Skill discovery의 목적과 downstream 활용이 직접 연결된다.
-
-### 12.3 Continuous behavior space를 planning에 사용할 수 있다
-
-Continuous $z$는 제한된 categorical skill 목록보다 촘촘한 behavior repertoire를 표현한다. 논문에서는 continuous primitives가 discrete primitives보다 downstream planning에서 더 좋은 결과를 보였다.
-
-### 12.4 Low-level control과 high-level planning을 분리한다
-
-복잡한 contact dynamics와 저수준 action은 model-free policy가 처리하고, planner는 예측 가능한 skill dynamics 위에서 더 긴 horizon을 다룬다.
-
-## 13. 한계와 비판적으로 읽을 지점
-
-### 13.1 Predictable은 useful과 같은 말이 아니다
+### 12.1 Predictable은 useful과 같은 말이 아니다
 
 가만히 있기, 느리게 움직이기처럼 단순한 behavior는 예측하기 쉽다. Diversity 항이 모든 skill의 collapse를 막더라도 안전성, 에너지 효율, 인간에게 유용한 동작은 별도 목적이 없으면 보장되지 않는다.
 
-### 13.2 Planner는 발견하지 못한 skill을 만들어내지 못한다
+### 12.2 Planner는 발견하지 못한 skill을 만들어내지 못한다
 
 MPC는 현재 repertoire에서 좋은 sequence를 고른다. 낭떠러미를 뛰어넘는 behavior가 pretraining에서 발견되지 않았다면 planner가 latent sequence만으로 새 점프 policy를 발명할 수는 없다.
 
-### 13.3 One-step model error가 누적된다
+### 12.3 One-step model error가 누적된다
 
 $q_\phi(s'\mid s,z)$를 여러 번 적용해 긴 미래를 예측하면 작은 오차가 쌓인다. Model mismatch가 큰 영역에서 planner가 실제로는 불가능한 trajectory를 선택할 수도 있다. Receding-horizon replanning이 오차를 줄여주지만 제거하지는 않는다.
 
-### 13.4 발견되는 skill은 state representation에 의존한다
+### 12.4 발견되는 skill은 state representation에 의존한다
 
 x-y prior처럼 prediction target을 바꾸면 어떤 behavior가 서로 다르다고 평가되는지도 달라진다. Representation 선택은 단순한 구현 세부가 아니라 behavior specification이다.
 
-### 13.5 원 DADS는 data reuse가 제한적이다
+### 12.5 원 DADS는 data reuse가 제한적이다
 
 원 논문은 최근 policy batch 중심으로 학습한다. 실제 로봇처럼 interaction 비용이 큰 환경에서는 이 sample efficiency가 문제가 된다. 후속 off-DADS가 과거 transition 재사용과 real-world skill discovery를 다룬 이유다.
 
-### 13.6 Sim-to-real에서는 policy뿐 아니라 model도 옮겨야 한다
+### 12.6 Sim-to-real에서는 policy뿐 아니라 model도 옮겨야 한다
 
 DADS planning은 learned skill dynamics를 신뢰한다. Simulation에서 예측한 이동량과 실제 로봇의 이동량이 다르면 policy가 어느 정도 동작하더라도 planner의 sequence 선택은 틀릴 수 있다.
 
@@ -578,36 +501,7 @@ DADS planning transfer
  + planner robustness 검증
 ```
 
-## 14. DIAYN과 DADS 최종 비교
-
-| 항목 | DIAYN | DADS |
-|---|---|---|
-| Skill policy | $\pi(a\mid s,z)$ | $\pi(a\mid s,z)$ |
-| 핵심 모델 | $q(z\mid s)$ | $q(s'\mid s,z)$ |
-| 구별 기준 | 방문 상태 | 현재 상태에서 만든 변화 |
-| 목적함수 | $I(S;Z)$ | $I(S';Z\mid S)$ |
-| 직접 요구하는 성질 | Discriminability | Diversity와 predictability |
-| Intrinsic reward | $\log q(z\mid s)-\log p(z)$ | 현재 $z$와 다른 $z$의 transition likelihood ratio |
-| 원 논문 optimizer | SAC | EC-SAC |
-| Learned model의 downstream 사용 | Discriminator는 주로 reward 생성 | Skill dynamics를 planning에 재사용 |
-| Hierarchical control | Meta-controller가 결과를 경험하며 학습 | Meta-controller 또는 model-based planner 사용 가능 |
-| Continuous latent | 원 논문은 categorical | Discrete와 continuous 모두 실험 |
-| 핵심 한계 | Diversity가 quality와 predictability를 보장하지 않음 | Predictability가 usefulness를 보장하지 않고 model error가 누적됨 |
-
-둘의 관계는 다음 한 줄로 정리할 수 있다.
-
-```text
-DIAYN
-서로 구별되는 state distribution을 만들자
-
-                ↓ 다음 질문
-
-DADS
-서로 다르고 예측 가능한 state transition을 만들고
-그 transition model로 계획하자
-```
-
-## 15. 최종 정리
+## 13. 최종 정리
 
 DADS에서 반드시 남겨야 할 개념은 다섯 가지다.
 
