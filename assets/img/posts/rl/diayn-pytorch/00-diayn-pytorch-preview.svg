@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">DIAYN PyTorch code walkthrough</title>
+  <desc id="desc">Three Hopper skills and the discriminator intrinsic reward equation</desc>
+
+  <defs>
+    <clipPath id="skill-0">
+      <rect x="0" y="292" width="400" height="338"/>
+    </clipPath>
+    <clipPath id="skill-8">
+      <rect x="400" y="292" width="400" height="338"/>
+    </clipPath>
+    <clipPath id="skill-9">
+      <rect x="800" y="292" width="400" height="338"/>
+    </clipPath>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1018" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0b1018" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0b1018"/>
+  <rect x="0" y="0" width="10" height="292" fill="#2dd4bf"/>
+
+  <text x="58" y="92" fill="#5eead4" font-family="Inter, Pretendard, sans-serif" font-size="24" font-weight="700" letter-spacing="2">PYTORCH CODE WALKTHROUGH</text>
+  <text x="54" y="184" fill="#f8fafc" font-family="Inter, Pretendard, sans-serif" font-size="82" font-weight="800">DIAYN</text>
+  <text x="58" y="239" fill="#aeb9c8" font-family="Inter, Pretendard, sans-serif" font-size="30">latent skill에서 intrinsic reward까지</text>
+
+  <line x1="705" y1="70" x2="705" y2="236" stroke="#334155" stroke-width="2"/>
+  <text x="756" y="118" fill="#94a3b8" font-family="Inter, Pretendard, sans-serif" font-size="22">DISCRIMINATOR REWARD</text>
+  <text x="754" y="183" fill="#f8fafc" font-family="STIX Two Math, Times New Roman, serif" font-size="36" font-style="italic">r = log q(z | s′) − log p(z)</text>
+  <text x="756" y="226" fill="#cbd5e1" font-family="Inter, Pretendard, sans-serif" font-size="21">same policy · different skill condition</text>
+
+  <image href="skill0-poster.jpg" x="0" y="292" width="400" height="338" preserveAspectRatio="xMidYMid slice" clip-path="url(#skill-0)"/>
+  <image href="skill8-poster.jpg" x="400" y="292" width="400" height="338" preserveAspectRatio="xMidYMid slice" clip-path="url(#skill-8)"/>
+  <image href="skill9-poster.jpg" x="800" y="292" width="400" height="338" preserveAspectRatio="xMidYMid slice" clip-path="url(#skill-9)"/>
+  <rect x="0" y="470" width="1200" height="160" fill="url(#fade)"/>
+
+  <rect x="0" y="292" width="400" height="6" fill="#facc15"/>
+  <rect x="400" y="292" width="400" height="6" fill="#2dd4bf"/>
+  <rect x="800" y="292" width="400" height="6" fill="#fb7185"/>
+  <line x1="400" y1="292" x2="400" y2="630" stroke="#0b1018" stroke-width="6"/>
+  <line x1="800" y1="292" x2="800" y2="630" stroke="#0b1018" stroke-width="6"/>
+
+  <text x="30" y="587" fill="#fef08a" font-family="Inter, Pretendard, sans-serif" font-size="25" font-weight="700">z = 0</text>
+  <text x="104" y="587" fill="#e2e8f0" font-family="Inter, Pretendard, sans-serif" font-size="22">balance</text>
+  <text x="430" y="587" fill="#99f6e4" font-family="Inter, Pretendard, sans-serif" font-size="25" font-weight="700">z = 8</text>
+  <text x="504" y="587" fill="#e2e8f0" font-family="Inter, Pretendard, sans-serif" font-size="22">positive x</text>
+  <text x="830" y="587" fill="#fecdd3" font-family="Inter, Pretendard, sans-serif" font-size="25" font-weight="700">z = 9</text>
+  <text x="904" y="587" fill="#e2e8f0" font-family="Inter, Pretendard, sans-serif" font-size="22">negative x</text>
+</svg>
