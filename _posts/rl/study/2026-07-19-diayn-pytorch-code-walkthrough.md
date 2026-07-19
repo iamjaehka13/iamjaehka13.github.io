@@ -585,7 +585,70 @@ def _get_obs(self):
 
 이 분류는 학습 label이 아니라 관찰 후 붙인 설명이다. 실제 Discriminator가 사용하는 경계는 x 변위 하나가 아니라 11차원 state feature 전체에 놓인다.
 
-### 8.3. GIF 한 개와 정량 평균은 다른 자료다
+### 8.3. 유사한 행동이 여러 `z`에 할당되는 현상
+
+20개의 label이 있다고 해서 사람이 구별할 수 있는 의미 있는 행동도 반드시 20개가 되는 것은 아니다. 실제 영상을 함께 놓고 보면 서로 다른 `z`인데도 같은 행동 범주로 보이는 경우가 있다.
+
+정량 지표까지 가까운 세 쌍을 골라 비교하면 다음과 같다.
+
+| Skill pair | 평균 x 변위 | 평균 step | 사람이 보는 공통점 |
+|---|---:|---:|---|
+| `z=0` / `z=5` | +0.254 / +0.278 | 1000 / 1000 | 거의 제자리에서 자세 유지 |
+| `z=6` / `z=16` | -0.021 / -0.055 | 1000 / 1000 | 수평 이동 없이 오래 유지 |
+| `z=17` / `z=18` | +2.910 / +2.987 | 1000 / 1000 | 양의 x 방향으로 지속 이동 |
+
+각 GIF는 같은 시간 구간을 좌우에 배치했다.
+
+<figure class="mb-4">
+  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill0-skill5.gif" alt="제자리 자세 유지로 비슷해 보이는 Skill 0과 Skill 5 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center mt-2"><strong>왼쪽 z=0 · 오른쪽 z=5</strong> — 둘 다 작은 x 변위로 1000 step을 유지한다.</figcaption>
+</figure>
+
+<figure class="mb-4">
+  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill6-skill16.gif" alt="수평 이동 없이 자세를 유지하는 Skill 6과 Skill 16 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center mt-2"><strong>왼쪽 z=6 · 오른쪽 z=16</strong> — x 변위와 생존 길이만 보면 가장 유사한 쌍이다.</figcaption>
+</figure>
+
+<figure class="mb-4">
+  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill17-skill18.gif" alt="양의 x 방향으로 이동하는 Skill 17과 Skill 18 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <figcaption class="text-center mt-2"><strong>왼쪽 z=17 · 오른쪽 z=18</strong> — 모두 끝까지 양의 x 방향 이동을 유지한다.</figcaption>
+</figure>
+
+이 현상은 DIAYN의 목적함수가 **사람이 이해하는 행동 의미의 차이**를 직접 최적화하지 않기 때문에 생길 수 있다. DIAYN이 요구하는 것은 다음 조건이다.
+
+$$
+q_\phi(z\mid s)
+\text{가 서로 다른 }z\text{를 구별할 수 있을 것}
+$$
+
+사람에게는 둘 다 "제자리에서 균형 잡기"로 보이더라도 Discriminator는 몸통 각도, 발의 자세, 관절속도처럼 영상에서 잘 드러나지 않는 차이를 사용할 수 있다. 그러면 두 skill은 같은 semantic category에 속해 보여도 11차원 state space에서는 분류 가능한 서로 다른 영역을 차지할 수 있다.
+
+```text
+사람의 행동 의미
+z=6  → 제자리 유지
+z=16 → 제자리 유지
+
+Discriminator가 볼 수 있는 차이
+z=6  → 자세 A + 속도 패턴 A
+z=16 → 자세 B + 속도 패턴 B
+```
+
+따라서 이 결과를 바로 **mode collapse**라고 부르는 것은 과하다. 정확히 같은 상태분포로 붕괴했다면 Discriminator도 두 skill을 구별하기 어려워야 한다. 현재 영상과 `x displacement`, `episode length`만으로는 11차원 전체 상태분포가 같은지 판단할 수 없다.
+
+현재 증거로 안전하게 말할 수 있는 것은 다음이다.
+
+> **서로 다른 latent skill이 사람 기준으로는 유사한 행동 의미를 갖는 semantic redundancy가 관찰된다.**
+
+이것은 DIAYN의 중요한 한계 중 하나다.
+
+1. $I(S;Z)$가 커도 각 skill이 사람에게 유용하거나 의미적으로 고유하다는 보장은 없다.
+2. 정해진 skill 수 $K$가 환경에 존재하는 의미 있는 행동 mode 수보다 크면, 하나의 행동 범주가 미세한 state 차이로 여러 label에 나뉠 수 있다.
+3. Downstream task 관점에서는 20개 label 중 실제로 필요한 행동 repertoire가 더 작을 수 있다.
+4. Discriminator가 task와 무관한 미세 feature를 사용하면 분류 성능과 체감 diversity가 어긋날 수 있다.
+
+더 강한 결론을 내려면 영상 비교를 넘어 skill별 전체 state trajectory를 저장하고, pairwise state-distribution distance와 Discriminator confusion matrix를 확인해야 한다. 그 전까지는 **"20개 skill을 학습했다"와 "의미가 다른 유용한 행동 20개를 얻었다"를 구분해야 한다.**
+
+### 8.4. GIF 한 개와 정량 평균은 다른 자료다
 
 각 GIF는 고정된 `z`로 실행한 sampled rollout 하나의 앞부분이다. 표는 skill마다 5회 실행한 평균이다. 이 구현은 Policy를 `eval()` 모드로 바꾼 뒤에도 Gaussian 평균 action만 고정해서 쓰지 않고 계속 sample한다.
 
@@ -667,7 +730,7 @@ Discriminator의 분류 경계
 intrinsic reward와 Critic target
 ```
 
-이 연결을 이해하면 왜 label leakage가 치명적인지, 왜 reward가 non-stationary한지, 왜 전진과 후진뿐 아니라 제자리 유지와 빠른 종료도 발견되는지 코드 수준에서 설명할 수 있다.
+이 연결을 이해하면 왜 label leakage가 치명적인지, 왜 reward가 non-stationary한지, 왜 전진과 후진뿐 아니라 제자리 유지와 빠른 종료가 발견되는지 설명할 수 있다. 또한 **latent label의 개수와 사람이 구별하는 semantic skill의 개수는 같지 않을 수 있다**는 한계도 코드 수준에서 이해할 수 있다.
 
 ## 참고 자료
 
