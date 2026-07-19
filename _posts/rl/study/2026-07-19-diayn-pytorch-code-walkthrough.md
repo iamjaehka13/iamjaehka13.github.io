@@ -3,7 +3,7 @@ title: "[DIAYN 코드 읽기] PyTorch 구현 흐름"
 date: 2026-07-19 04:05:00 +0900
 categories: [RL, Study]
 tags: [diayn, pytorch, soft-actor-critic, mujoco, hopper, skill-discovery]
-description: "DIAYN-PyTorch의 episode loop부터 replay buffer, discriminator intrinsic reward, SAC update까지 transition 하나의 흐름을 코드와 Hopper 결과로 연결한다."
+description: "DIAYN-PyTorch의 transition 흐름을 추적하고 robot_obs, behavior_features, skill horizon, safety constraint를 갖춘 범용 로봇 구조로 연결한다."
 math: true
 image:
   path: /assets/img/posts/rl/diayn-pytorch/00-diayn-pytorch-preview.png
@@ -20,6 +20,8 @@ image:
 4. 왜 결과에 전진, 후진뿐 아니라 제자리 유지와 빠른 termination도 함께 나타나는가?
 
 이 글은 [akazemipour/DIAYN-PyTorch](https://github.com/akazemipour/DIAYN-PyTorch)를 **논문과 코드를 연결하는 작은 참고 구현**으로 사용한다. 저장소의 Hopper checkpoint를 현재 환경에서 다시 실행했고, 대표 GIF와 5-seed 측정값은 그 checkpoint에서 얻었다. 최신 DIAYN 기준 구현이나 논문 결과의 완전한 재현으로 해석해서는 안 된다.
+
+코드를 읽을 때는 **저장소의 실제 변수명**과 **다른 로봇에도 재사용할 인터페이스 이름**을 구분한다. 예를 들어 저장소의 `state`는 문맥에 따라 physical state만 뜻하기도 하고 `[state, one_hot(z)]`를 뜻하기도 한다. 범용 구조에서는 이를 `robot_obs`, `policy_obs`, `behavior_features`로 분리해 부르겠다.
 
 ## 0. 결과부터 보기: 같은 Policy, 다른 `z`
 
@@ -70,6 +72,20 @@ image:
 | Q network 1, 2 | `[s, one_hot(z), a]` → scalar Q-value. 장기 intrinsic return을 추정한다. |
 | Value network | `[s, one_hot(z)]` → scalar V-value. 초기 SAC 구조의 soft state value를 추정한다. |
 | Discriminator | physical state `s` 11차원 → 20개 skill logits. 상태에서 실행된 skill을 분류한다. |
+
+### 1.1. Hopper 변수와 범용 로봇 인터페이스 대응
+
+이 저장소의 코드를 그대로 설명하는 부분에서는 원래 이름을 사용한다. 범용 로봇 구조를 설명할 때는 다음 이름을 사용한다.
+
+| 범용 용어 | 이 저장소에서 대응하는 값 |
+|---|---|
+| `robot_obs` | one-hot skill을 붙이기 전 Hopper physical state 11차원 |
+| `policy_obs` | `concat_state_latent()`가 만든 `[robot_obs, one_hot(z)]` 31차원 |
+| `behavior_features` | Discriminator에 전달하는 `physical_states` 또는 `physical_next_states`. 이 구현에서는 `robot_obs` 전체와 같다. |
+| `skill_horizon` | 별도 변수가 없으며 episode 길이가 그 역할을 한다. |
+| `safety_constraint` | 별도 계층이 없다. MuJoCo action 범위와 environment termination만 존재한다. |
+
+`robot_obs`와 `behavior_features`가 현재 Hopper에서는 같지만 개념적으로는 다르다. Policy는 제어에 필요한 상태를 받아야 하고, Discriminator는 **어떤 차이를 서로 다른 behavior로 간주할지**에 필요한 feature만 받아야 한다.
 
 이 저장소는 별도의 Value network와 target Value network를 사용하는 **초기 형태의 SAC**를 구현한다. 최근 SAC 구현에서 흔한 `twin Q + target Q` 구성과 모양이 다르지만, DIAYN에서 중요한 `z` 조건, discriminator reward, maximum-entropy Policy의 연결은 그대로 확인할 수 있다.
 
@@ -144,6 +160,40 @@ Policy input         [ 31 values ]
 ```
 
 별도의 Policy 20개를 만드는 것이 아니다. 하나의 network가 `z`를 조건으로 받아 20개의 behavior mode를 표현한다.
+
+### 2.3. Episode와 `skill_horizon`은 같은가?
+
+이 저장소에서는 episode 시작에 `z`를 뽑고 `done`까지 유지하므로 다음 두 경계가 같다.
+
+```text
+Hopper episode boundary = skill boundary
+```
+
+하지만 실제 로봇은 수동 reset 없이 오랫동안 계속 동작할 수 있다. 이때는 한 skill을 유지할 control step 수를 `skill_horizon = H`로 따로 정의할 수 있다.
+
+```python
+if env_reset or skill_age >= skill_horizon:
+    z = sample_uniform_skill(num_skills)
+    skill_age = 0
+
+policy_obs = torch.cat([robot_obs, one_hot(z)], dim=-1)
+action = actor.sample(policy_obs)
+skill_age += 1
+```
+
+여기서 지켜야 할 조건은 세 가지다.
+
+1. `z`는 control step마다 바꾸지 않고 최소 $H$ step 동안 유지한다.
+2. 병렬 환경에서는 `skill_age`와 `z`를 environment별로 따로 관리한다.
+3. Skill 경계에서 $z$가 바뀐다면 Critic의 bootstrap 경계도 명시한다.
+
+세 번째 조건이 특히 중요하다. 이전 skill의 마지막 transition에서 다음 skill의 value를 그대로 bootstrap하면 서로 다른 조건부 Policy의 return이 섞인다. 각 horizon을 독립된 low-level option으로 취급한다면 다음처럼 구분하는 편이 안전하다.
+
+```python
+bootstrap_done = env_done | safety_done | skill_boundary
+```
+
+반대로 episode 전체에서 같은 `z`를 유지하면 원 논문과 가장 가까운 설정이다. `skill_horizon`을 도입하는 순간 continuing control 또는 option termination이라는 추가 설계가 생긴다는 점을 숨기면 안 된다.
 
 ## 3. Environment step과 replay buffer
 
@@ -267,6 +317,28 @@ Policy가 서로 다른 상태를 만들 필요가 없음
 ```
 
 분류 정확도와 intrinsic reward는 높아지지만 skill diversity는 생기지 않는다. 이것이 **label leakage**다. DIAYN 구현을 볼 때 가장 먼저 확인해야 할 입력 분리다.
+
+### 4.3. Physical state와 `behavior_features`는 항상 같지 않다
+
+Hopper 참고 구현은 11차원 physical state 전체를 Discriminator에 넣는다. 범용 로봇 코드에서는 이 slicing을 별도 함수로 드러내는 편이 낫다.
+
+```python
+robot_obs = build_robot_obs(sensor_data)
+policy_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
+
+# z, episode time, reset ID 같은 shortcut은 제외한다.
+behavior_features = select_behavior_features(robot_obs)
+logits = discriminator(behavior_features)
+```
+
+`behavior_features`는 단순한 입력 축소가 아니라 behavior specification이다.
+
+- 이동 skill을 원하면 body velocity, heading, local trajectory를 사용할 수 있다.
+- Manipulation skill을 원하면 object-relative end-effector pose와 contact를 사용할 수 있다.
+- 자세 diversity가 목적이면 joint configuration과 orientation을 사용할 수 있다.
+- 장소에 무관한 skill이 필요하면 절대 world position보다 body-relative feature가 적합할 수 있다.
+
+Policy에 필요한 sensor를 모두 Discriminator에도 넣으면 배경, sensor bias, battery state처럼 행동과 무관한 shortcut으로 skill을 분리할 수 있다. 반대로 feature를 지나치게 줄이면 실제로 다른 행동도 같은 것으로 취급된다. 따라서 `robot_obs`와 `behavior_features`는 목적이 다른 두 인터페이스로 관리해야 한다.
 
 ## 5. 핵심: Discriminator 출력이 reward가 되는 순간
 
@@ -676,7 +748,127 @@ z=16 → 자세 B + 속도 패턴 B
 
 이 한계들은 DIAYN 식이 틀렸다는 뜻이 아니다. **논문에서 반드시 유지해야 할 구조와 참고 구현의 세부 선택을 분리해서 읽어야 한다**는 뜻이다.
 
-## 10. Transition 하나로 전체 흐름 다시 연결하기
+## 10. Hopper 구현을 범용 로봇 코드로 번역하기
+
+[이론 글의 범용 로봇 적용 절](/posts/diayn-diversity-is-all-you-need/#16-로봇에-적용한다면-무엇이-달라져야-하는가)에서 정리한 원칙을 코드로 옮겨 보자. 앞의 Hopper 코드를 다른 로봇으로 옮길 때는 네트워크 구조보다 먼저 다음 네 인터페이스를 분리하는 편이 안전하다.
+
+### 10.1. `robot_obs`와 `behavior_features`
+
+`robot_obs`는 Actor와 Critic이 제어에 사용하는 관측값이다. `behavior_features`는 Discriminator가 skill identity를 판별하는 관측값이다.
+
+```python
+robot_obs = observation_builder(sensor_data)
+policy_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
+behavior_features = behavior_encoder(robot_obs)
+```
+
+두 값의 shape, normalization 통계, 좌표계는 별도로 관리해야 한다. 특히 `behavior_features`에는 `z`, environment ID, episode time, reset flag가 들어가면 안 된다.
+
+### 10.2. `skill_horizon`과 skill별 데이터 경계
+
+Episode reset이 자연스럽지 않은 로봇에서는 `skill_horizon` 동안 같은 `z`를 유지한다. Replay transition에는 **그 action을 실제로 생성한 `z`**를 저장해야 한다.
+
+```python
+transition = {
+    "robot_obs": robot_obs,
+    "skill_id": z,
+    "action": executed_action,
+    "next_robot_obs": next_robot_obs,
+    "env_done": env_done,
+    "safety_done": safety_done,
+    "skill_done": skill_boundary,
+}
+```
+
+`env_done`, `safety_done`, `skill_done`을 분리하면 environment 종료, safety 계층의 강제 중단, latent skill 교체를 혼동하지 않을 수 있다. Low-level Critic이 한 skill 구간의 return만 학습한다면 TD target에는 세 종료 조건을 모두 반영한다.
+
+### 10.3. `safety_constraint`는 intrinsic reward와 다른 계층이다
+
+DIAYN reward는 구별 가능성을 높일 뿐 안전을 보장하지 않는다. 실제 로봇에서는 Policy 출력과 actuator command 사이에 hard limit 또는 safety filter가 필요할 수 있다.
+
+```python
+raw_action = actor.sample(policy_obs)
+
+executed_action, safety_info = safety_filter(
+    raw_action,
+    robot_state=robot_state,
+    action_limits=action_limits,
+)
+safety_done = safety_info.emergency_stop
+
+next_robot_obs, env_done = robot.step(executed_action)
+```
+
+여기서 replay buffer에는 `raw_action`이 아니라 **실제로 적용된 `executed_action`**을 저장해야 한다. Safety filter가 action을 바꿨는데 raw action을 저장하면 Critic은 실행되지 않은 action이 다음 상태를 만들었다고 학습한다.
+
+Hard safety constraint와 auxiliary penalty도 구분해야 한다.
+
+- Hard limit, collision shield, geofence, emergency stop은 가능한 action이나 state를 제한한다.
+- Energy, smoothness, action-rate penalty는 최적화할 reward 자체를 바꾼다.
+
+후자를 DIAYN reward에 더하면 논문 그대로의 pure objective는 아니지만 task reward 없이 안전하고 재사용 가능한 skill을 찾는 실용적 변형은 될 수 있다.
+
+$$
+r_{\text{total}}
+=
+r_{\text{DIAYN}}
+-\lambda_E c_{\text{energy}}
+-\lambda_S c_{\text{smoothness}}
+$$
+
+Penalty를 추가할 때는 어떤 행동을 억제하는지, 새로운 reward hacking 경로가 생기는지, exploration이 과도하게 줄지 따로 검증해야 한다.
+
+### 10.4. 네 인터페이스를 합친 학습 루프
+
+먼저 control loop는 skill을 유지하고, safety filter를 통과한 action으로 transition을 수집한다.
+
+```python
+for control_step in range(total_steps):
+    if env_reset or skill_manager.at_boundary(skill_horizon):
+        skill_manager.sample_uniform(num_skills)
+
+    z = skill_manager.skill_id
+    robot_obs = observation_builder(sensor_data)
+    policy_obs = torch.cat([robot_obs, one_hot(z)], dim=-1)
+
+    raw_action = actor.sample(policy_obs)
+    executed_action, safety_info = safety_filter(raw_action)
+    safety_done = safety_info.emergency_stop
+```
+
+Safety filter를 통과한 action으로 환경을 진행한 뒤, 실제 실행 action과 두 종류의 종료 조건을 저장한다.
+
+```python
+next_sensor_data, env_done = robot.step(executed_action)
+next_robot_obs = observation_builder(next_sensor_data)
+skill_done = skill_manager.advance(skill_horizon)
+
+replay.add(robot_obs, z, executed_action, next_robot_obs,
+           env_done, safety_done, skill_done)
+```
+
+학습할 때는 replay batch의 `robot_obs`에서 `behavior_features`를 만들고, Discriminator 분류와 intrinsic reward 계산에만 사용한다.
+
+```python
+batch = replay.sample(batch_size)
+
+behavior_features = behavior_encoder(batch.robot_obs)
+next_behavior_features = behavior_encoder(batch.next_robot_obs)
+
+disc_logits = discriminator(behavior_features)
+disc_loss = cross_entropy(disc_logits, batch.skill_id)
+
+with torch.no_grad():
+    next_log_q = log_softmax(discriminator(next_behavior_features), dim=-1)
+    intrinsic_reward = (
+        gather_skill_log_prob(next_log_q, batch.skill_id)
+        - log_prior(batch.skill_id)
+    )
+```
+
+이 코드는 특정 로봇의 완성된 구현이 아니라 ownership boundary를 보여주는 구조다. 실제 시스템에서는 observation timestamp, control frequency, action unit, actuator limit, sensor latency를 기존 로봇 stack과 일치시켜야 한다.
+
+## 11. Transition 하나로 전체 흐름 다시 연결하기
 
 마지막으로 `z=8`인 transition 하나가 학습 신호가 되는 과정을 압축해 보자.
 
@@ -731,6 +923,8 @@ intrinsic reward와 Critic target
 ```
 
 이 연결을 이해하면 왜 label leakage가 치명적인지, 왜 reward가 non-stationary한지, 왜 전진과 후진뿐 아니라 제자리 유지와 빠른 종료가 발견되는지 설명할 수 있다. 또한 **latent label의 개수와 사람이 구별하는 semantic skill의 개수는 같지 않을 수 있다**는 한계도 코드 수준에서 이해할 수 있다.
+
+Hopper 구현을 다른 로봇에 그대로 복사하는 것이 핵심은 아니다. `robot_obs`, `behavior_features`, `skill_horizon`, `safety_constraint`를 독립된 인터페이스로 만들고, 어떤 값이 Policy·Discriminator·Critic·실제 actuator에 전달되는지 명시하는 것이 범용화의 핵심이다.
 
 ## 참고 자료
 
