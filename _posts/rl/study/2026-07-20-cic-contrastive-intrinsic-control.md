@@ -304,6 +304,8 @@ _Replay transition에서 particle entropy와 contrastive representation을 계�
 
 이 구분은 공식 코드에서도 확인된다. [`update_cic()`](https://github.com/rll-research/cic/blob/b523c3884256346cb585bf06e52a7aadc127dcfc/agent/cic.py#L171-L184)는 contrastive encoder를 갱신하고, reward-free [`update()`](https://github.com/rll-research/cic/blob/b523c3884256346cb585bf06e52a7aadc127dcfc/agent/cic.py#L204-L249)는 k-NN 기반 `compute_apt_reward()`의 출력을 critic reward로 사용한다.
 
+여기에는 논문 설명과 공개 코드 사이의 구현상 세부 차이가 있다. 이 commit의 default update는 transition key `pred_net([s,s'])`가 아니라 `state_net(next_obs)` embedding끼리의 k-NN 거리를 reward로 사용한다. 정확한 tensor와 gradient 경로는 [공식 코드 분석 글](/posts/cic-official-code-walkthrough/)에서 별도로 추적했다.
+
 정리하면 `contrastive loss는 표현 학습용`, `particle entropy는 actor-critic 보상용`이다. 이 구분을 잡고 나면 뒤의 DDPG 학습 흐름은 일반적인 off-policy actor-critic과 크게 다르지 않다.
 
 ## 7. 실제 학습은 DDPG로 어떻게 이어지는가?
@@ -500,9 +502,9 @@ CIC의 논리를 처음부터 다시 연결하면 다음과 같다.
 
 DIAYN이 `서로 구별되는 상태`, DADS가 `서로 다르고 예측 가능한 상태 변화`를 강조했다면, CIC는 `구별되는 행동을 넓게 탐색해 큰 continuous skill space에 담는 방법`을 보여준다. 다만 이것은 zero-shot 명령 controller의 완성이 아니라, downstream adaptation을 위한 reward-free pretraining이다.
 
-## 다음 글: 공식 코드에서는 어떻게 구현됐는가?
+## 후속 글: 공식 코드에서는 어떻게 구현됐는가?
 
-논문에서는 목적함수와 실험 해석에 집중했다. 다음 코드 분석에서는 공식 [`rll-research/cic`](https://github.com/rll-research/cic) 저장소의 `compute_cpc_loss()`, `update_cic()`, `compute_apt_reward()`, `CICAgent.update()`를 따라가며 tensor shape, gradient 경로, 50-step skill resampling과 DDPG update 순서를 분리해서 확인할 예정이다.
+논문에서는 목적함수와 실험 해석에 집중했다. [CIC 공식 코드 분석](/posts/cic-official-code-walkthrough/)에서는 [`rll-research/cic`](https://github.com/rll-research/cic)의 `compute_cpc_loss()`, `update_cic()`, `compute_apt_reward()`, `CICAgent.update()`를 따라가며 tensor shape, gradient 경로, 50-step skill resampling과 DDPG update 순서를 분리해 확인한다.
 
 ## 참고 자료
 
