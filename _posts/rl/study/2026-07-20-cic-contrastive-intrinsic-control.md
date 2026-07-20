@@ -10,52 +10,44 @@ image:
   alt: CIC의 mutual information 목적과 Quadruped의 서로 다른 latent skill 방향
 ---
 
-[DIAYN](/posts/diayn-diversity-is-all-you-need/)은 상태에서 실행된 skill을 맞힐 수 있도록 서로 구별되는 상태 분포를 만들었다. [DADS](/posts/dads-dynamics-aware-skill-discovery/)는 한 걸음 더 나아가, 현재 상태에서 skill이 만들 다음 상태를 예측하는 dynamics model을 학습했다.
+[DIAYN](/posts/diayn-diversity-is-all-you-need/)은 상태만 보고도 실행된 skill을 맞힐 수 있도록 서로 다른 상태 분포를 만들었다. [DADS](/posts/dads-dynamics-aware-skill-discovery/)는 현재 상태에서 각 skill이 만들 다음 상태를 모델링해, 서로 다르면서도 예측 가능한 변화를 학습했다.
 
-그런데 더 어려운 환경에서는 또 다른 문제가 나타난다.
+CIC, **Contrastive Intrinsic Control**은 여기서 질문을 하나 더 던진다.
 
-```text
-skill을 서로 구별하는 것만으로
-환경의 넓은 행동 공간을 실제로 탐색할 수 있는가?
-```
+> Skill을 서로 구별할 수 있다는 사실만으로, 복잡한 환경의 행동 공간을 충분히 넓게 탐색했다고 말할 수 있는가?
 
-기존 competence-based skill discovery는 비교적 간단한 환경에서는 다양한 행동을 만들었지만, DeepMind Control처럼 넘어져도 episode가 즉시 끝나지 않는 환경에서는 data-based exploration 방법보다 성능이 낮았다. CIC는 이 문제를 mutual information 자체보다 **그 mutual information을 추정하는 방법의 문제**로 본다.
+답은 반드시 그렇지는 않다. 여러 skill이 좁은 상태 영역 안에서 작은 차이만 만들어도 분류기는 그들을 구별할 수 있다. 반대로 새로운 상태를 많이 방문하는 탐색 정책이 있더라도, 그 행동을 나중에 특정 skill로 다시 호출할 수 없다면 재사용 가능한 repertoire라고 보기 어렵다.
 
-> **CIC는 latent skill과 state transition을 contrastive하게 연결하고, 그 표현 공간의 entropy를 높여 넓은 행동 탐색과 호출 가능한 skill repertoire를 함께 학습한다.**
+CIC는 이 두 문제를 분리해 해결한다.
+
+> **Contrastive learning으로 skill과 state transition의 관계를 정리하고, particle entropy로 그 transition 공간을 넓게 탐색한다.**
 
 ![CIC가 발견한 Walker, Quadruped, Jaco skill](/assets/img/posts/rl/cic/00-cic-discovered-skills.png){: width="1000" .d-block .mx-auto }
 _같은 reward-free pretraining에서 발견된 Walker의 leap·jog, Quadruped의 일어나기·좌측 이동, Jaco의 물체 밀기 행동. 사람이 이 이름을 미리 부여한 것이 아니라 학습 후 관찰해 붙인 의미다. 출처: [Laskin et al., Figure 2](https://arxiv.org/abs/2202.00161)._
 
 ## 0. 먼저 보는 전체 구조
 
-CIC에는 두 개의 학습 경로가 동시에 존재한다.
+CIC의 전체 학습은 다음 한 흐름으로 정리할 수 있다.
 
 ```text
-Representation learning
-(z, transition)을 contrastive learning으로 연결
-                    ↓
-행동 차이를 측정할 embedding 공간 형성
-
-Exploration
-embedding에서 k-NN entropy reward 계산
-                    ↓
-DDPG actor-critic이 새로운 transition을 탐색
+continuous skill z 샘플링
+          ↓
+policy π(a | s, z)가 transition τ=(s, s') 생성
+          ↓
+contrastive learning으로 z와 τ의 embedding 학습
+          ↓
+embedding의 k-NN 거리로 particle entropy 계산
+          ↓
+그 값을 intrinsic reward로 DDPG actor-critic 업데이트
 ```
 
-이를 구성 요소별로 나누면 다음과 같다.
+여기서 역할을 섞어 읽으면 CIC가 불필요하게 복잡해진다.
 
-| 구성 요소 | 역할 |
-|---|---|
-| Skill-conditioned policy $\pi_\theta(a\mid s,z)$ | 현재 상태와 skill을 받아 action을 만든다. |
-| Transition encoder $g_\tau(s,s')$ | 한 step의 상태 변화를 embedding으로 바꾼다. |
-| Skill encoder $g_z(z)$ | continuous skill vector를 같은 비교 공간으로 투영한다. |
-| Contrastive loss | 실제로 대응된 $z$와 transition은 가깝게, 다른 pair는 멀게 학습한다. |
-| Particle entropy | embedding의 k-nearest neighbor 거리를 novelty reward로 사용한다. |
-| DDPG actor-critic | intrinsic reward를 최대화하는 policy를 학습한다. |
+- **Contrastive learning**은 어떤 transition이 어떤 skill과 연결되는지 학습한다.
+- **Particle entropy**는 이미 본 transition과 다른 행동을 찾도록 보상을 만든다.
+- **DDPG**는 그 보상의 장기 누적값이 커지는 action을 학습한다.
 
-핵심은 contrastive learning과 entropy exploration이 따로 노는 것이 아니라는 점이다.
-
-> Contrastive learning은 **무엇을 서로 다른 행동으로 볼지** 정하고, particle entropy는 **그 공간을 얼마나 넓게 탐색할지** 정한다.
+즉 표현 학습은 행동 차이를 측정할 공간을 만들고, 강화학습은 그 공간을 실제로 넓혀 간다.
 
 ## 1. 논문 정보
 
@@ -73,74 +65,26 @@ DDPG actor-critic이 새로운 transition을 탐색
 | 평가 | state-based URLB, 2M-step pretraining + 100K-step downstream adaptation |
 | Source | [NeurIPS](https://proceedings.neurips.cc/paper_files/paper/2022/hash/debf482a7dbdc401f9052dbe15702837-Abstract.html), [arXiv](https://arxiv.org/abs/2202.00161), [Official code](https://github.com/rll-research/cic) |
 
-CIC가 말하는 unsupervised RL도 pretraining과 downstream adaptation으로 나뉜다.
+CIC의 `reward-free`는 **pretraining 중 task reward를 사용하지 않는다**는 뜻이다. 이후 downstream task에서는 extrinsic reward로 후보 skill을 평가하고 policy를 추가로 fine-tuning한다. 따라서 task reward 없이 완성된 범용 controller를 만드는 방법이 아니라, 새 task에 적응하기 좋은 policy initialization과 행동 repertoire를 만드는 방법이다.
 
-```text
-Reward-free pretraining
-intrinsic reward로 다양한 skill 학습
+## 2. 앞선 방법과 CIC의 차이
 
-              ↓
+CIC는 DIAYN이나 DADS를 반드시 대체하는 방법이 아니다. 세 방법은 skill diversity를 어디에서 측정하고, 발견한 skill을 무엇에 사용하려는지가 다르다. CIC의 위치를 APT·APS까지 함께 놓으면 다음과 같다.
 
-Downstream adaptation
-새 task의 extrinsic reward로 skill을 고르고
-actor-critic을 추가 fine-tuning
-```
+| 방법 | 행동 다양성을 측정하는 기준 | 얻는 구조 | 남는 질문 |
+|---|---|---|---|
+| DIAYN | 상태에서 $z$를 분류하는 $q(z\mid s)$ | 구별되는 categorical skill | 좁은 영역의 작은 차이만 배울 수 있음 |
+| DADS | $q(s'\mid s,z)$의 조건부 likelihood | 예측 가능한 transition과 planning model | 고차원 conditional density model의 부담 |
+| APT | learned state representation의 k-NN 거리 | 넓은 탐색 | 행동을 특정 $z$로 다시 호출할 수 없음 |
+| APS | particle entropy와 successor feature | 탐색 가능한 continuous skill | 큰 skill space를 안정적으로 구별할 방법 |
+| CIC | $z$-transition contrastive representation의 거리 | 넓은 탐색과 64D continuous skill | task-to-skill mapping과 latent 해석은 별도 문제 |
 
-따라서 CIC는 task reward 없이 완성된 범용 controller를 만드는 논문이 아니다. **새 task에 빠르게 적응할 수 있는 policy initialization과 behavior repertoire를 만드는 방법**이다.
+CIC가 선택한 변화는 두 가지다.
 
-## 2. DIAYN·DADS에서 CIC까지
+1. **상태가 아니라 transition을 구별한다.** 같은 위치를 지나더라도 전진과 후진처럼 변화 방향이 다른 행동을 나눌 수 있다.
+2. **분류 확률이나 명시적 density model 대신 contrastive learning을 사용한다.** 실제 $z$와 transition pair를 batch 안의 다른 pair와 비교하므로 큰 continuous skill space에도 적용하기 쉽다.
 
-CIC가 등장한 이유는 앞선 방법을 틀렸다고 선언하기 위해서가 아니다. 각 방법이 diversity를 정의하고 추정하는 방식에서 다음 질문이 이어진다.
-
-### 2.1 DIAYN: 구별 가능하지만 넓게 탐색하는가?
-
-DIAYN은 다음 목적을 사용한다.
-
-$$
-I(S;Z)=H(Z)-H(Z\mid S)
-$$
-
-상태를 보고 skill을 맞히기 쉬우면 높은 reward를 준다. 하지만 $H(S)$를 직접 최대화하지 않기 때문에, skill들이 좁은 상태 영역 안에서 작은 차이만 만들어도 구별될 수 있다.
-
-### 2.2 DADS: 예측 가능하지만 density model이 확장되는가?
-
-DADS는 다음 conditional mutual information을 사용한다.
-
-$$
-I(S';Z\mid S)
-$$
-
-그리고 $q(s'\mid s,z)$를 학습해 서로 다르고 예측 가능한 transition을 만든다. 이 model은 downstream planning에도 쓸 수 있다. 반면 high-dimensional state와 skill에서 conditional density를 직접 모델링하는 일은 어려워질 수 있다.
-
-### 2.3 APT와 APS: explicit exploration을 추가하다
-
-APT는 learned state representation의 particle entropy를 높여 환경을 넓게 탐색한다. 다만 policy에 $z$가 없으므로 발견한 행동을 특정 skill로 호출하는 구조는 만들지 않는다.
-
-APS는 particle entropy와 successor-feature 기반 skill conditioning을 결합한다. 탐색과 callable skill을 함께 다루지만, CIC 논문의 실험 설정에서는 10차원 continuous skill을 사용했다.
-
-### 2.4 CIC: exploration과 skill discrimination을 함께 확장하다
-
-CIC가 선택한 조합은 다음과 같다.
-
-```text
-APT 계열의 particle entropy
-                +
-APS 계열의 forward MI decomposition
-                +
-z-transition contrastive discriminator
-```
-
-이를 간단히 비교하면 다음과 같다.
-
-| 방법 | Diversity를 보는 기준 | Explicit entropy exploration | Skill 구조 | 주요 downstream 방식 |
-|---|---|---:|---|---|
-| DIAYN | 상태에서 $z$ 분류 | 아니오 | categorical | 선택·fine-tuning·meta-controller |
-| DADS | $q(s'\mid s,z)$ likelihood | 예 | discrete/continuous | learned dynamics 기반 planning |
-| APT | state embedding의 k-NN 거리 | 예 | 없음 | policy fine-tuning |
-| APS | particle entropy + successor feature | 예 | continuous | task vector 추정과 fine-tuning |
-| CIC | transition-skill contrastive representation | 예 | 64D continuous | skill 선택 후 policy fine-tuning |
-
-이 표를 논문의 우열표로 읽으면 안 된다. 각각 exploration, predictability, planning, transfer 중 어디에 구조를 더 많이 부여하는지가 다르다.
+여기에 particle entropy를 결합해, skill끼리 구별되는 데서 멈추지 않고 transition 공간 자체를 넓게 방문하도록 만든다. 이 관계를 이해하려면 먼저 CIC가 말하는 transition이 정확히 무엇인지 봐야 한다.
 
 ## 3. $\tau$는 긴 trajectory가 아니다
 
@@ -280,9 +224,9 @@ CIC는 $z$와 transition을 연결하도록 학습된 representation에서 거�
 
 > 정확한 표현은 **observation을 버린다**가 아니라, **observation으로 만든 transition representation에서 행동 차이를 측정한다**이다.
 
-## 6. Particle entropy가 exploration reward를 만든다
+## 6. Particle entropy로 표현 공간을 넓게 탐색하기
 
-Contrastive representation만 학습한다고 새로운 행동을 적극적으로 찾아가는 것은 아니다. Policy가 embedding 공간의 이미 알려진 영역을 반복해도 positive pair를 구별할 수 있기 때문이다.
+Contrastive representation은 `어떤 transition이 어떤 skill과 대응하는가`를 학습한다. 그러나 이것만으로 policy가 새로운 행동을 적극적으로 찾는 것은 아니다. 이미 방문한 좁은 영역에서도 positive pair와 negative pair를 구별할 수 있기 때문이다.
 
 CIC는 현재 transition embedding $h_i$와 가까운 $k$개 이웃 사이의 거리를 사용한다.
 
@@ -301,7 +245,7 @@ $$
 | 가까운 이웃이 많음 | 이미 자주 본 transition | 낮음 |
 | 가장 가까운 이웃도 멂 | 기존과 다른 transition | 높음 |
 
-따라서 actor는 다음 순환을 만든다.
+Policy는 이 값을 intrinsic reward로 받아 다음 순환을 만든다.
 
 ```text
 새로운 transition 생성
@@ -315,11 +259,11 @@ DDPG가 해당 행동을 강화
 새 데이터로 representation을 다시 학습
 ```
 
-Raw state entropy와 달리 여기서 거리의 의미는 contrastive encoder가 계속 바꾼다. 이것이 CIC의 장점이면서 동시에 reward가 learned representation에 의존한다는 위험이기도 하다.
+Raw state에서 바로 거리를 재는 것과 달리, 여기서 거리의 의미는 contrastive encoder가 만든다. 따라서 `skill과 관련된 행동 차이`를 반영할 수 있지만, encoder가 바뀌면 같은 transition의 novelty도 바뀔 수 있다.
 
-## 7. 가장 헷갈리는 부분: InfoNCE가 actor reward인가?
+### 6.1 Contrastive score도 actor reward로 쓰는가?
 
-논문의 이론식만 보면 actor reward를 다음처럼 만들 것 같다.
+앞에서 본 mutual information lower bound를 그대로 옮기면 intrinsic reward는 두 항의 합처럼 보인다.
 
 $$
 r^{\mathrm{int}}
@@ -329,7 +273,7 @@ H_{\mathrm{particle}}(\tau)
 \lambda F_{\mathrm{CIC}}(\tau,z)
 $$
 
-실제로 논문은 discriminator, similarity, uncertainty, entropy-only 등 여러 reward 구성을 비교했다. 그러나 이후 모든 주요 실험에 사용한 practical variant는 **entropy-only reward + CIC representation learning**이었다.
+논문은 이 아이디어에서 출발해 discriminator, similarity, uncertainty, entropy-only 등 여러 reward 구성을 비교했다. 그러나 주요 실험에서 최종적으로 사용한 형태는 **CIC representation learning + entropy-only actor reward**였다.
 
 ```text
 Encoder update
@@ -339,7 +283,7 @@ Actor-critic update
 k-NN particle entropy를 reward로 사용
 ```
 
-즉 contrastive loss의 gradient가 environment를 거쳐 actor까지 직접 전달되는 것은 아니다.
+즉 contrastive loss의 gradient가 environment를 지나 actor까지 직접 전달되는 것은 아니다. 두 학습은 다음 경로로 연결된다.
 
 $$
 L_{\mathrm{CIC}}
@@ -353,20 +297,16 @@ Q
 \pi
 $$
 
-Contrastive learning은 actor가 받는 reward의 **좌표계**를 만들고, actor는 그 좌표계에서 novelty를 최대화한다.
-
-논문은 entropy-only가 가장 잘 나온 이유를 다음과 같이 해석한다.
-
-1. CPC representation learning이 비슷한 행동을 clustering한다.
-2. 그 공간의 entropy만 높여도 서로 다른 행동을 탐색할 수 있다.
-3. Particle entropy는 정확한 entropy가 아닌 비례량이므로 두 reward를 합치면 scale 조정이 필요하다.
+Contrastive learning이 비슷한 행동을 가까이 모으는 **거리 공간**을 만들면, actor는 그 공간에서 novelty를 최대화한다. 논문은 particle entropy가 정확한 entropy가 아니라 비례량이기 때문에 contrastive score와 직접 더할 경우 reward scale을 맞추기 어렵다는 점도 지적한다.
 
 ![CIC practical architecture](/assets/img/posts/rl/cic/01-cic-architecture.png){: width="1050" .d-block .mx-auto }
 _Replay transition에서 particle entropy와 contrastive representation을 계산하는 CIC 구조. 이 그림은 두 목적을 함께 보여주지만, 주요 실험의 선택된 RL reward는 entropy-only이며 contrastive term은 auxiliary representation loss로 사용됐다. 출처: [Laskin et al., Figure 3](https://arxiv.org/abs/2202.00161)._
 
 이 구분은 공식 코드에서도 확인된다. [`update_cic()`](https://github.com/rll-research/cic/blob/b523c3884256346cb585bf06e52a7aadc127dcfc/agent/cic.py#L171-L184)는 contrastive encoder를 갱신하고, reward-free [`update()`](https://github.com/rll-research/cic/blob/b523c3884256346cb585bf06e52a7aadc127dcfc/agent/cic.py#L204-L249)는 k-NN 기반 `compute_apt_reward()`의 출력을 critic reward로 사용한다.
 
-## 8. 실제 학습은 DDPG로 어떻게 이어지는가?
+정리하면 `contrastive loss는 표현 학습용`, `particle entropy는 actor-critic 보상용`이다. 이 구분을 잡고 나면 뒤의 DDPG 학습 흐름은 일반적인 off-policy actor-critic과 크게 다르지 않다.
+
+## 7. 실제 학습은 DDPG로 어떻게 이어지는가?
 
 DIAYN과 DADS의 주요 구현은 SAC였지만 CIC는 DDPG를 사용한다. CIC 목적함수가 DDPG를 반드시 요구해서가 아니다. URLB의 모든 baseline과 같은 RL backbone으로 비교하고, state-based DeepMind Control에서 사용된 설정을 맞추기 위한 선택이다.
 
@@ -400,7 +340,7 @@ sample z → collect transition → CPC encoder update
 
 Actor는 contrastive loss를 직접 미분하지 않는다. 대신 critic이 예측한 장기 particle-entropy return을 높이는 action을 학습한다.
 
-## 9. 왜 64차원 continuous skill인가?
+## 8. 왜 64차원 continuous skill인가?
 
 Skill 수가 실제 행동 종류보다 적으면 하나의 skill이 여러 behavior를 담당할 수 있다. 그러면 같은 $z$가 서로 다른 transition을 만들고 skill의 의미가 불안정해질 수 있다.
 
@@ -410,7 +350,7 @@ $$
 z\in[0,1]^{64}
 $$
 
-여기서 64차원은 64개의 사람이 해석 가능한 동작 축을 뜻하지 않는다. Contrastive discriminator가 많은 behavior를 서로 다른 latent 영역에 담을 수 있도록 capacity를 늘린 것이다.
+여기서 64차원은 사람이 해석할 수 있는 동작 축 64개를 뜻하지 않는다. 많은 행동을 서로 다른 latent 영역에 담을 수 있도록 skill space의 용량을 늘린 것이다.
 
 논문의 ablation에서는 다음 경향이 나타났다.
 
@@ -421,7 +361,7 @@ $$
 ![CIC skill dimension and adaptation ablations](/assets/img/posts/rl/cic/03-cic-design-ablations.png){: width="1100" .d-block .mx-auto }
 _Skill projection, latent dimension, adaptation 방법, grid sweep 위치에 따른 ablation. 64차원 skill과 grid sweep이 해당 실험 조건에서 가장 높은 결과를 보였다. 출처: [Laskin et al., Figure 6](https://arxiv.org/abs/2202.00161)._
 
-### 9.1 Continuous latent면 행동을 더하거나 섞을 수 있는가?
+### 8.1 Continuous latent면 행동을 더하거나 섞을 수 있는가?
 
 보장되지 않는다.
 
@@ -431,13 +371,13 @@ z_{\mathrm{forward}}+z_{\mathrm{right}}
 z_{\mathrm{diagonal}}
 $$
 
-CIC objective에는 latent의 덧셈이 행동의 합성이 되도록 만드는 항이 없다. Continuous space는 interpolation과 dense sampling의 가능성을 주지만, 좌표축의 의미·선형성·disentanglement를 보장하지 않는다.
+CIC 목적함수에는 latent의 덧셈이 행동의 합성이 되도록 만드는 항이 없다. Continuous space는 interpolation과 촘촘한 sampling의 가능성을 주지만, 각 좌표축의 의미·선형성·disentanglement를 보장하지 않는다.
 
 따라서 정확한 결론은 다음과 같다.
 
 > CIC는 많은 행동을 큰 continuous space에 대응시키지만, 그 공간을 사람이 해석하거나 선형적으로 조합할 수 있게 만들지는 않는다.
 
-## 10. URLB 실험에서 확인한 것
+## 9. URLB 실험에서 확인한 것
 
 CIC는 state-based Unsupervised Reinforcement Learning Benchmark에서 평가됐다.
 
@@ -456,32 +396,34 @@ _12개 URLB downstream task의 aggregate statistics. Optimality Gap은 낮을수
 
 논문이 보고한 IQM 기준으로 CIC는 다음 결과를 보였다.
 
-- 다음 competence-based 방법인 APS보다 79% 높은 score
+- 비교한 competence-based 방법 중 다음 성능인 APS보다 79% 높은 score
 - 전체 차선 방법인 ProtoRL보다 18% 높은 score
 
 이 결과를 `CIC가 모든 환경에서 항상 우수하다`로 일반화하면 안 된다. 정확한 범위는 **state observation을 사용하는 URLB, 2M-step pretraining, 100K-step adaptation 조건**이다.
 
-### 10.1 왜 두 구성 요소가 모두 필요한가?
+### 9.1 왜 두 구성 요소가 모두 필요한가?
 
 논문은 Quadruped Stand의 zero-shot extrinsic reward를 모니터링해 두 요소를 제거한 ablation을 비교했다.
 
 ![CIC representation and entropy ablation](/assets/img/posts/rl/cic/04-cic-representation-ablation.png){: width="760" .d-block .mx-auto }
 _Particle entropy와 CIC representation learning을 함께 사용한 경우만 높은 reward를 유지했다. 이 extrinsic reward는 학습에 사용한 보상이 아니라 reward-free pretraining 중 행동을 진단하기 위한 지표다. 출처: [Laskin et al., Figure 7](https://arxiv.org/abs/2202.00161)._
 
+결과의 해석은 앞의 구조와 정확히 이어진다.
+
 ```text
 Particle entropy만 사용
-→ 탐색할 representation의 행동 구조가 부족해 collapse
+→ 넓게 움직일 이유는 있지만 행동을 정리할 representation이 약함
 
 Contrastive representation만 사용
-→ discriminator reward만으로 넓은 탐색을 만들지 못해 collapse
+→ skill-transition 관계는 배우지만 넓게 탐색할 압력이 약함
 
 둘을 함께 사용
-→ 행동적으로 구조화된 공간을 넓게 탐색
+→ 행동적으로 정리된 공간을 넓게 탐색
 ```
 
-이 ablation이 CIC의 핵심 주장과 가장 직접적으로 연결된다. Contrastive learning과 entropy는 둘 중 하나를 선택하는 대체재가 아니라 서로 다른 역할을 맡는다.
+두 요소는 대체재가 아니다. Contrastive learning이 거리의 의미를 만들고, particle entropy가 그 거리 공간의 coverage를 넓힌다.
 
-## 11. Downstream adaptation은 zero-shot 명령 수행이 아니다
+## 10. Downstream adaptation은 zero-shot 명령 수행이 아니다
 
 Pretraining이 끝나면 다음 policy를 얻는다.
 
@@ -495,7 +437,7 @@ $$
 \text{task command}\longrightarrow z
 $$
 
-새 task에서 논문은 먼저 4,000 environment interaction 동안 candidate skill을 시험한다. 제한된 budget에서 다음과 같은 단순 grid sweep이 가장 잘 작동했다.
+새 task에서 논문은 먼저 4,000 environment interaction 동안 후보 skill을 시험한다. 제한된 budget에서는 다음과 같은 단순한 grid sweep이 가장 잘 작동했다.
 
 $$
 z=(v,v,\ldots,v),
@@ -515,7 +457,7 @@ pretrained skill repertoire
 96K step task-specific policy fine-tuning
 ```
 
-따라서 CIC의 강점은 즉시 정답 skill을 찾아주는 것이 아니라, random initialization보다 downstream adaptation에 유리한 행동 구조를 미리 학습한다는 데 있다.
+따라서 CIC의 강점은 명령을 받자마자 정답 skill을 찾아주는 데 있지 않다. Random initialization보다 downstream adaptation에 유리한 행동 구조를 미리 학습한다는 데 있다.
 
 DADS와 비교하면 활용 방식도 다르다.
 
@@ -525,70 +467,42 @@ DADS와 비교하면 활용 방식도 다르다.
 | Policy 추가 학습 없이 MPC 가능 | 선택한 $z$로 actor-critic fine-tuning |
 | Task cost로 model rollout 평가 | Extrinsic reward로 skill과 policy 평가 |
 
-## 12. CIC가 해결하지 않은 문제
+## 11. CIC가 해결하지 않은 문제
 
-### 12.1 Task-to-skill mapping이 없다
+CIC의 실험 결과가 좋다고 해서 continuous skill space가 곧바로 범용 행동 인터페이스가 되는 것은 아니다.
 
-`오른쪽으로 빠르게 이동` 같은 command를 적절한 $z$로 즉시 바꾸는 controller는 별도로 필요하다. 논문의 grid sweep은 평가 protocol이지 범용 task encoder가 아니다.
-
-### 12.2 Latent composition을 보장하지 않는다
-
-두 $z$의 평균이나 합이 두 행동의 의미 있는 조합이 된다는 보장이 없다. 연속 latent와 compositional latent는 다른 성질이다.
-
-### 12.3 Full-state MDP에 한정됐다
-
-논문은 state-based URLB만 다뤘다. Camera image처럼 부분 관측·고차원 pixel 입력에서 같은 결과가 유지되는지는 검증하지 않았다.
-
-### 12.4 행동의 의미와 안전을 보장하지 않는다
-
-Entropy를 높이는 과정에서는 불안정하거나 거친 동작도 발견된다. 논문도 Walker와 Quadruped의 chaotic exploration을 실제 로봇에 그대로 적용하면 손상 위험이 있다고 명시한다.
-
-실제 시스템에서는 최소한 다음 제약이 필요하다.
-
-```text
-joint / torque / velocity limits
-fall and collision constraints
-workspace and contact safety
-unsafe transition filtering
-reset and emergency-stop policy
-```
-
-### 12.5 Reward가 learned geometry에 의존한다
-
-Encoder가 어떤 특징을 강조하는지에 따라 k-NN distance의 의미도 달라진다. Representation shortcut이나 학습 중 geometry 변화는 critic이 보는 reward distribution을 바꿀 수 있다.
-
-## 13. 공식 코드 분석은 별도 글로 보는 것이 좋은 이유
-
-논문 글에서는 `왜 이런 objective를 선택했는가`가 중심이다. 공식 저장소 분석에서는 다음 실제 경로를 확인해야 한다.
-
-| 파일·함수 | 확인할 내용 |
+| 남은 문제 | 정확한 의미 |
 |---|---|
-| `agent/cic.py::CIC.forward()` | $s$, $s'$, $z$가 query와 key로 변환되는 과정 |
-| `compute_cpc_loss()` | Batch similarity matrix와 positive diagonal 구성 |
-| `update_cic()` | Contrastive encoder만 갱신되는 gradient 경로 |
-| `compute_apt_reward()` | k-NN 거리, RMS normalization, clipping, log reward |
-| `CICAgent.update()` | Encoder update와 DDPG critic·actor update 연결 |
-| `update_meta()` | 64D skill을 50 step마다 다시 sampling하는 과정 |
-| `agent/ddpg.py` | Skill-conditioned observation이 actor와 critic으로 들어가는 과정 |
+| Task-to-skill mapping | `오른쪽으로 빠르게 이동` 같은 command를 적절한 $z$로 바꾸는 controller가 없다. Grid sweep은 평가 절차이지 범용 task encoder가 아니다. |
+| Latent 해석과 합성 | 두 $z$의 평균이나 합이 두 행동의 의미 있는 조합이 된다는 보장이 없다. Continuous latent와 compositional latent는 다른 성질이다. |
+| State-based 검증 | 논문은 full-state URLB를 다뤘다. 부분 관측이나 고차원 camera image에서도 같은 결과가 유지되는지는 검증하지 않았다. |
+| Representation 의존성 | Encoder가 강조하는 특징에 따라 k-NN 거리와 intrinsic reward의 의미가 달라진다. 학습 중 embedding geometry 변화는 critic의 reward distribution도 바꾼다. |
+| 행동의 유용성과 안전 | Diversity는 안정성, 에너지 효율, 충돌 회피를 뜻하지 않는다. 불안정하거나 거친 행동도 새로운 transition이면 높은 보상을 받을 수 있다. |
 
-특히 논문 수준에서는 $h_i$를 transition embedding으로 설명하지만, 공식 코드의 default k-NN reward 경로가 어떤 tensor를 실제로 사용하는지는 코드에서 따로 추적할 가치가 있다. 이 부분은 수식 설명과 섞기보다 companion post에서 tensor shape와 line-by-line flow로 확인하는 편이 정확하다.
+마지막 항은 실제 로봇 적용에서 특히 중요하다. 논문도 Walker와 Quadruped의 거친 탐색을 물리 시스템에 그대로 적용하면 손상 위험이 있다고 명시한다. 최소한 joint·torque·velocity limit, fall·collision constraint, workspace 제한, 안전한 reset과 emergency stop을 별도 계층으로 두어야 한다.
 
-## 14. 최종 정리
+즉 CIC가 학습하는 것은 **다양한 행동의 후보 공간**이다. 어떤 행동이 유용하고 안전한지는 downstream objective와 constraint가 추가로 결정해야 한다.
 
-CIC에서 남겨야 할 핵심은 여섯 가지다.
+## 12. 최종 정리
 
-1. CIC의 $\tau=(s,s')$는 긴 trajectory가 아니라 한 step의 state transition이다.
-2. $I(\tau;Z)=H(\tau)-H(\tau\mid Z)$로 diversity와 skill consistency를 함께 본다.
-3. Contrastive learning은 skill과 transition을 연결하는 representation을 만든다.
-4. Actor-critic은 그 representation의 k-NN particle entropy를 intrinsic reward로 최대화한다.
-5. 64차원 continuous skill은 큰 repertoire를 담지만 해석 가능성이나 선형 composition을 보장하지 않는다.
-6. CIC는 zero-shot command controller가 아니라 downstream fine-tuning을 위한 reward-free pretraining 방법이다.
+CIC의 논리를 처음부터 다시 연결하면 다음과 같다.
 
-한 문장으로 다시 압축하면 다음과 같다.
+1. $\tau=(s,s')$는 긴 trajectory가 아니라 한 step의 state transition이다.
+2. $I(\tau;Z)=H(\tau)-H(\tau\mid Z)$는 전체 transition diversity와 skill별 일관성을 함께 요구한다.
+3. Contrastive learning은 skill과 transition을 비교할 representation을 만든다.
+4. Particle entropy는 그 representation에서 드문 transition에 높은 intrinsic reward를 준다.
+5. DDPG는 이 reward의 장기 return을 높이는 skill-conditioned policy를 학습한다.
+6. 64D continuous skill은 큰 repertoire를 담지만 해석 가능성, 합성 가능성, task-to-skill mapping을 보장하지 않는다.
 
-> **CIC는 contrastive learning으로 행동을 skill에 정리하고, particle entropy로 그 행동 공간을 넓게 탐색한다.**
+한 문장으로 압축하면 다음과 같다.
 
-DIAYN이 `서로 구별되는 상태`, DADS가 `서로 다르고 예측 가능한 상태 변화`를 강조했다면, CIC는 `명시적으로 넓게 탐색하면서 큰 continuous skill space에 행동을 정리하는 방법`을 보여준다.
+> **CIC는 contrastive learning으로 행동을 skill에 정리하고, particle entropy로 그 행동 공간의 coverage를 넓힌다.**
+
+DIAYN이 `서로 구별되는 상태`, DADS가 `서로 다르고 예측 가능한 상태 변화`를 강조했다면, CIC는 `구별되는 행동을 넓게 탐색해 큰 continuous skill space에 담는 방법`을 보여준다. 다만 이것은 zero-shot 명령 controller의 완성이 아니라, downstream adaptation을 위한 reward-free pretraining이다.
+
+## 다음 글: 공식 코드에서는 어떻게 구현됐는가?
+
+논문에서는 목적함수와 실험 해석에 집중했다. 다음 코드 분석에서는 공식 [`rll-research/cic`](https://github.com/rll-research/cic) 저장소의 `compute_cpc_loss()`, `update_cic()`, `compute_apt_reward()`, `CICAgent.update()`를 따라가며 tensor shape, gradient 경로, 50-step skill resampling과 DDPG update 순서를 분리해서 확인할 예정이다.
 
 ## 참고 자료
 
