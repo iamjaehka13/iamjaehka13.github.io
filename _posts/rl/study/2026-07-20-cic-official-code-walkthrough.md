@@ -478,14 +478,135 @@ obs index / action index / next_obs index
 
 2M-step 학습 전에 다음 검증부터 하는 편이 안전하다.
 
-1. $B=8$ batch에서 `query`, `key`, `cov`, `reward` shape를 assert한다.
+1. $B=32$ batch에서 `query`, `key`, `cov`, `reward` shape를 assert한다. Official k-NN의 $k=16$보다 작은 batch는 사용할 수 없다.
 2. `update_cic()` 후 actor·critic parameter가 변하지 않는지 확인한다.
 3. `compute_apt_reward()`가 finite한 $[B,1]$을 반환하는지 확인한다.
 4. TensorBoard를 켠 10-step run으로 metric branch를 검사한다.
 5. 48~52 step의 skill ID를 출력해 replay boundary 정렬을 확인한다.
 6. CPC loss와 k-NN reward histogram을 따로 기록한다.
 
-## 12. 최종 정리
+## 12. 실습: 공식 코드로 smoke test 돌리기
+
+위 내용이 정적 코드 해석에 그치지 않도록 공식 module을 직접 import하는 smoke test를 실행했다. 전체 URLB environment를 설치하지 않고도 CPC tensor, parameter update, k-NN reward와 replay index를 확인하도록 범위를 제한했다.
+
+### 12.1 실행 환경과 방법
+
+실행 조건은 다음과 같다.
+
+| 항목 | 값 |
+|---|---|
+| Official source | commit `b523c3884256346cb585bf06e52a7aadc127dcfc` |
+| Python environment | Isaac Lab conda environment |
+| PyTorch | 2.7.0+cu128 |
+| Device | CPU, `CUDA_VISIBLE_DEVICES=""` |
+| Random seed | 7 |
+| Synthetic observation | $[32,24]$ |
+| Action | $[32,6]$ |
+| Skill | $[32,64]$ |
+| Hidden dimension | 128, smoke-test용 축소 설정 |
+
+실습 script는 official `agent/cic.py`와 `agent/ddpg.py`를 직접 import한다. Environment를 만들지 않으므로 없는 `dm_env.specs`만 작은 stub으로 대체했고, CIC·DDPG 계산 자체는 공식 class와 method를 호출했다.
+
+```bash
+git clone https://github.com/rll-research/cic.git /tmp/cic-official
+git -C /tmp/cic-official checkout b523c3884256346cb585bf06e52a7aadc127dcfc
+
+CUDA_VISIBLE_DEVICES="" python scripts/cic_official_code_practice.py \
+  --repo /tmp/cic-official \
+  --output-dir assets/data/posts/rl/cic-code \
+  --plot-path assets/img/posts/rl/cic-code/02-cic-practice-results.png
+```
+
+실행한 script와 원본 결과는 다음에서 확인할 수 있다.
+
+- [실습 script](https://github.com/iamjaehka13/iamjaehka13.github.io/blob/main/scripts/cic_official_code_practice.py)
+- [결과 JSON](/assets/data/posts/rl/cic-code/summary.json)
+
+### 12.2 결과 한눈에 보기
+
+![CIC official code smoke practice results](/assets/img/posts/rl/cic-code/02-cic-practice-results.png){: width="1150" .d-block .mx-auto }
+_왼쪽 위부터 CPC $32\times32$ similarity, k-NN reward 분포, `update_cic()` 직후 parameter 변화, 50-step skill boundary의 replay mismatch. 이 값은 학습 성능이 아니라 코드 경로 검증 결과다._
+
+Tensor shape와 scalar 출력은 다음과 같았다.
+
+| 검사 항목 | 결과 |
+|---|---:|
+| `query` | `[32, 64]` |
+| `key` | `[32, 64]` |
+| Similarity matrix | `[32, 32]` |
+| Intrinsic reward | `[32, 1]` |
+| CPC loss mean | 3.192155 |
+| CPC loss range | 2.754947 ~ 3.647458 |
+| k-NN reward mean | 2.194391 |
+| k-NN reward range | 2.020775 ~ 2.406512 |
+| Finite check | CPC와 reward 모두 통과 |
+| Nearest self-distance max | 0.0 |
+
+아직 학습되지 않은 random network와 synthetic state를 사용했으므로 reward 절댓값 자체에는 연구적 의미가 없다. 여기서 확인한 것은 shape, finite 여부, self-neighbor 포함과 실제 method 호출 경로다.
+
+### 12.3 CPC loss의 gradient는 어디로 갔는가?
+
+`update_cic()` 한 번 전후의 parameter L2 차이는 다음과 같았다.
+
+| Module | Parameter change |
+|---|---:|
+| `state_net` | 0.016563 |
+| `next_state_net` | **0.000000** |
+| `skill_net` | 0.016054 |
+| `pred_net` | 0.018993 |
+| Actor | **0.000000** |
+| Critic | **0.000000** |
+
+이 결과로 세 가지를 확인했다.
+
+1. CPC loss는 `state_net`, `skill_net`, `pred_net`을 실제로 갱신한다.
+2. Forward path에서 호출되지 않는 `next_state_net`은 바뀌지 않는다.
+3. `update_cic()`만 실행했을 때 actor와 critic에는 직접 parameter update가 없다.
+
+이후 `CICAgent.update()` 전체를 한 번 실행하면 변화량은 다음처럼 바뀌었다.
+
+| Module | Full update parameter change |
+|---|---:|
+| CIC module | 0.029241 |
+| Actor | 0.016969 |
+| Critic | 0.021285 |
+
+즉 full path에서는 먼저 CPC module이 바뀌고, k-NN reward를 받은 critic과 actor도 각각 자신의 optimizer로 갱신된다. 앞에서 그린 두 gradient path가 실제 parameter 변화로 확인된 셈이다.
+
+### 12.4 코드에서 의심했던 두 문제도 재현되는가?
+
+첫 번째는 logging 변수명 문제다. Default처럼 TensorBoard와 W&B를 끄면 update가 완료됐다. 하지만 `use_tb=True`로 같은 batch를 실행하면 다음 오류가 발생했다.
+
+```text
+NameError: name 'apt_reward' is not defined
+```
+
+정적 코드에서 본 `intr_reward`와 `apt_reward`의 이름 불일치가 실제 실행 branch에서도 재현됐다.
+
+두 번째는 skill boundary 정렬이다. `pretrain.py`의 meta 저장 순서와 `replay_buffer.py`의 `idx-1` sampling을 그대로 모사한 index audit에서는 다음 transition이 mismatch로 표시됐다.
+
+```text
+transition 1   : reset skill ↔ z@0
+transition 51  : z@0        ↔ z@50
+transition 101 : z@50       ↔ z@100
+```
+
+즉 시작 직후와 50-step skill 교체 직후의 action이 replay에서 이전 meta와 연결되는 패턴이 확인됐다. 다만 이 실습은 실제 `dm_control` rollout이 아니라 공식 loop와 buffer index를 재현한 deterministic audit다. Environment를 포함한 최종 확인에서는 action을 만들 때 사용한 skill ID를 transition에 함께 기록해 다시 검증해야 한다.
+
+### 12.5 이 실습이 검증한 것과 검증하지 않은 것
+
+| 검증한 것 | 아직 검증하지 않은 것 |
+|---|---|
+| Official CIC·DDPG module import와 한 batch 실행 | 2M-step URLB 성능 재현 |
+| CPC와 k-NN tensor shape | Walker·Quadruped·Jaco에서 발견되는 행동 |
+| CPC-only와 full update의 parameter 변화 | 장기 reward·representation 안정성 |
+| Self-distance가 k-NN 후보에 들어가는 구조 | 다른 seed와 domain의 통계적 일관성 |
+| Logging branch의 `NameError` | 수정 후 TensorBoard 장기 logging |
+| 50-step boundary index mismatch | 실제 dm_control transition trace |
+
+따라서 이 결과를 `CIC 성능 재현`이라고 부르면 안 된다. 정확한 표현은 **공식 코드 경로에 대한 CPU smoke practice**다. 장기 학습 전에 코드가 어떤 tensor와 gradient를 실제로 사용하는지 검증했다는 데 의미가 있다.
+
+## 13. 최종 정리
 
 공식 코드를 한 replay batch 기준으로 다시 연결하면 다음과 같다.
 

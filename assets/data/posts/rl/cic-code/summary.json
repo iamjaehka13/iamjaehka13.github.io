@@ -1,0 +1,64 @@
+{
+  "source_commit": "b523c3884256346cb585bf06e52a7aadc127dcfc",
+  "seed": 7,
+  "device": "cpu",
+  "batch_size": 32,
+  "obs_dim": 24,
+  "action_dim": 6,
+  "skill_dim": 64,
+  "tensor_shapes": {
+    "query": [
+      32,
+      64
+    ],
+    "key": [
+      32,
+      64
+    ],
+    "similarity": [
+      32,
+      32
+    ],
+    "intrinsic_reward": [
+      32,
+      1
+    ]
+  },
+  "cpc_loss": {
+    "mean": 3.192154884338379,
+    "min": 2.754946708679199,
+    "max": 3.6474578380584717,
+    "finite": true
+  },
+  "intrinsic_reward": {
+    "mean": 2.1943905353546143,
+    "min": 2.020775079727173,
+    "max": 2.4065115451812744,
+    "finite": true,
+    "nearest_self_distance_max": 0.0
+  },
+  "parameter_delta_after_update_cic": {
+    "state_net": 0.01656335748581214,
+    "next_state_net": 0.0,
+    "skill_net": 0.016053915287591994,
+    "pred_net": 0.018992798366012996,
+    "actor": 0.0,
+    "critic": 0.0
+  },
+  "parameter_delta_after_full_update": {
+    "cic": 0.02924063004923562,
+    "actor": 0.01696926568795699,
+    "critic": 0.021285443550128267
+  },
+  "logging_branch_error": "NameError: name 'apt_reward' is not defined",
+  "skill_boundary_mismatch_indices": [
+    1,
+    51,
+    101
+  ],
+  "notes": [
+    "Official modules are imported directly from the pinned repository.",
+    "dm_env.specs is stubbed because this smoke test does not create an environment.",
+    "The boundary audit mirrors pretrain.py storage timing and replay_buffer.py indexing."
+  ]
+}
