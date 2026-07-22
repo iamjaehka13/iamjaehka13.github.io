@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="t d">
+<title id="t">Raw pixel distance versus temporal distance</title><desc id="d">Pixel changes can be large in one step, while temporal distance measures transition count.</desc>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#8b949e"/></marker></defs>
+<rect width="1200" height="620" fill="#0d1117"/>
+<style>text{font-family:Arial,sans-serif;letter-spacing:0}.h{font-size:28px;font-weight:700;fill:#f0f3f6}.t{font-size:20px;fill:#c9d1d9}.s{font-size:17px;fill:#8b949e}.m{font:19px monospace;fill:#f2cc60}</style>
+<text x="40" y="52" class="h">The same visual change can mean very different control distances</text>
+<rect x="35" y="82" width="545" height="485" rx="6" fill="#161b22" stroke="#30363d"/><text x="65" y="125" class="h" fill="#ff7b72">Raw pixel L2</text>
+<rect x="70" y="155" width="205" height="205" rx="6" fill="#2f6f68"/><rect x="340" y="155" width="205" height="205" rx="6" fill="#71485f"/>
+<g stroke="#f2cc60" stroke-width="10" stroke-linecap="round" fill="#f2cc60"><circle cx="172" cy="248" r="28"/><path d="M145 249 112 221M145 254 111 283M198 249 232 221M198 254 233 283"/><circle cx="442" cy="248" r="28"/><path d="M415 249 382 221M415 254 381 283M468 249 502 221M468 254 503 283"/></g>
+<path d="M285 258H328" stroke="#8b949e" stroke-width="3" marker-end="url(#a)"/><text x="307" y="403" text-anchor="middle" class="t">same pose, different lighting</text><text x="307" y="447" text-anchor="middle" class="m">||I' - I|| can be huge</text><text x="307" y="490" text-anchor="middle" class="s">Pixel change is not a control distance.</text>
+<rect x="620" y="82" width="545" height="485" rx="6" fill="#161b22" stroke="#30363d"/><text x="650" y="125" class="h" fill="#39d0d8">Temporal metric</text>
+<g stroke="#39d0d8" stroke-width="4" fill="#0d1117"><circle cx="690" cy="235" r="24"/><circle cx="780" cy="235" r="24"/><circle cx="870" cy="235" r="24"/><circle cx="960" cy="235" r="24"/><circle cx="1050" cy="235" r="24"/><path d="M716 235H752M806 235H842M896 235H932M986 235H1022" marker-end="url(#a)"/></g>
+<g class="s" text-anchor="middle"><text x="690" y="242">s0</text><text x="780" y="242">s1</text><text x="870" y="242">s2</text><text x="960" y="242">s3</text><text x="1050" y="242">s4</text></g>
+<text x="870" y="300" text-anchor="middle" class="m">each transition: ||Delta phi|| &lt;= 1</text><path d="M690 345C790 405 950 405 1050 345" fill="none" stroke="#56d364" stroke-width="4" marker-end="url(#a)"/><text x="870" y="435" text-anchor="middle" class="m">4 steps: ||phi(s4)-phi(s0)|| &lt;= 4</text><text x="870" y="478" text-anchor="middle" class="s">Large displacement must accumulate over time.</text>
+</svg>
