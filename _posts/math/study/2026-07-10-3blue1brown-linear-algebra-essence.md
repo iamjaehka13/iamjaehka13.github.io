@@ -310,7 +310,7 @@ $$
 이때 두 벡터는 **linearly dependent**, 즉 선형종속입니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-span-dependent-detail.gif" alt="3Blue1Brown Ch.2 span and linear dependence visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch02-span-dependent-detail.gif" alt="3Blue1Brown Ch.2 span and linear dependence visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 ### **3.2 선형독립과 선형종속**
@@ -383,7 +383,7 @@ $$
 3Blue1Brown 3강은 행렬을 선형변환으로 보는 관점을 잡습니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.gif" alt="3Blue1Brown Ch.3 linear transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-linear-transform.gif" alt="3Blue1Brown Ch.3 linear transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 선형변환(linear transformation)은 벡터를 다른 벡터로 보내는 함수입니다.
@@ -427,7 +427,7 @@ $$
 나머지 모든 벡터는 그 변환된 basis vector들의 선형결합으로 자동 결정됩니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-basis-grid-detail.gif" alt="3Blue1Brown Ch.3 basis vectors determine the grid visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch03-basis-grid-detail.gif" alt="3Blue1Brown Ch.3 basis vectors determine the grid visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 ### **4.1 행렬의 열벡터가 중요한 이유**
@@ -508,7 +508,7 @@ $$
 3Blue1Brown 4강은 행렬곱을 변환의 합성으로 해석합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.gif" alt="3Blue1Brown Ch.4 matrix composition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch04-matrix-composition.gif" alt="3Blue1Brown Ch.4 matrix composition visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 행렬곱은 계산으로 보면 복잡합니다.
@@ -603,7 +603,7 @@ $BA$는 그 반대입니다.
 3Blue1Brown 5강은 2차원에서 잡은 선형변환 관점을 3차원으로 확장합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.gif" alt="3Blue1Brown Ch.5 3D transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch05-three-d-transform.gif" alt="3Blue1Brown Ch.5 3D transformation visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 2차원에서 했던 이야기는 3차원에서도 그대로 이어집니다.
@@ -698,7 +698,7 @@ z축 basis는 어디로 갔는가?
 3Blue1Brown 6강은 determinant를 면적/부피 스케일로 설명합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.gif" alt="3Blue1Brown Ch.6 determinant visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant.gif" alt="3Blue1Brown Ch.6 determinant visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 determinant는 보통 계산 공식으로 먼저 배웁니다.
@@ -751,7 +751,7 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 이 말은 곧 어떤 방향의 정보가 사라졌다는 뜻입니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-collapse.gif" alt="3Blue1Brown Ch.6 determinant collapse visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch06-determinant-collapse.gif" alt="3Blue1Brown Ch.6 determinant collapse visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 그래서 determinant가 0이면 역변환을 만들 수 없습니다.
@@ -763,7 +763,7 @@ $\det(A) = 0$이면 면적이나 부피가 0으로 찌그러졌다는 뜻입니�
 3Blue1Brown 7강은 inverse, column space, null space를 선형시스템의 기하학으로 연결합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.gif" alt="3Blue1Brown Ch.7 inverse column space null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-inverse-column-null.gif" alt="3Blue1Brown Ch.7 inverse column space null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 행렬 $A$의 역행렬 $A^{-1}$은 $A$가 한 변환을 되돌리는 변환입니다.
@@ -831,7 +831,7 @@ null space가 0벡터만 포함하면, 어떤 비영벡터도 완전히 사라�
 이때는 보통 determinant도 0이고, 역행렬도 존재하지 않습니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-column-null-detail.gif" alt="3Blue1Brown Ch.7 column space and null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch07-column-null-detail.gif" alt="3Blue1Brown Ch.7 column space and null space visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 ### **8.4 rank와 해의 개수**
@@ -1100,7 +1100,7 @@ $$
 3Blue1Brown 8강은 정방행렬이 아닌 행렬을 차원 사이의 변환으로 봅니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.gif" alt="3Blue1Brown Ch.8 nonsquare matrix visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch08-nonsquare-map.gif" alt="3Blue1Brown Ch.8 nonsquare matrix visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 행렬은 꼭 $n \times n$ 정방행렬일 필요가 없습니다.
@@ -1267,13 +1267,13 @@ $$
 3Blue1Brown 10강은 외적을 계산법과 기하학적 의미로 설명합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.gif" alt="3Blue1Brown Ch.10 cross product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch10-cross-product.gif" alt="3Blue1Brown Ch.10 cross product visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 3Blue1Brown 11강은 외적을 선형변환과 duality 관점에서 한 단계 더 깊게 봅니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.gif" alt="3Blue1Brown Ch.11 cross product duality visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch11-cross-product-duality.gif" alt="3Blue1Brown Ch.11 cross product duality visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 3차원에서 외적(cross product)은 두 벡터로부터 새로운 벡터를 만듭니다.
@@ -1384,7 +1384,7 @@ $$
 3Blue1Brown 12강은 Cramer's rule을 determinant의 비율로 보는 기하학적 설명입니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.gif" alt="3Blue1Brown Ch.12 Cramer's rule visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch12-cramers-rule.gif" alt="3Blue1Brown Ch.12 Cramer's rule visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 Cramer's rule은 선형시스템
@@ -1543,7 +1543,7 @@ iterative solver
 3Blue1Brown 13강은 change of basis를 “벡터를 움직이는 것”이 아니라 “같은 벡터를 다른 좌표계 언어로 읽는 것”으로 설명합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-change-of-basis.gif" alt="3Blue1Brown Ch.13 change of basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-change-of-basis.gif" alt="3Blue1Brown Ch.13 change of basis visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 기저변환(change of basis)은 처음에는 헷갈립니다.
@@ -1560,7 +1560,7 @@ iterative solver
 같은 벡터라도 어떤 기저를 쓰느냐에 따라 좌표는 달라질 수 있습니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-coordinate-language-detail.gif" alt="3Blue1Brown Ch.13 same vector different coordinates visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch13-coordinate-language-detail.gif" alt="3Blue1Brown Ch.13 same vector different coordinates visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 change of basis에서 실제 벡터 자체가 움직이는 것은 아닙니다.
@@ -1689,7 +1689,7 @@ $$
 3Blue1Brown 14강은 eigenvector를 선형변환 이후에도 같은 직선 위에 남는 특수한 방향으로 설명합니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigenvectors.gif" alt="3Blue1Brown Ch.14 eigenvectors and eigenvalues visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch14-eigenvectors.gif" alt="3Blue1Brown Ch.14 eigenvectors and eigenvalues visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 고유벡터(eigenvector)는 선형변환을 적용해도 방향이 바뀌지 않는 벡터입니다.
@@ -1974,7 +1974,7 @@ SLAM normal equation
 3Blue1Brown 15강은 2x2 행렬에서 eigenvalue를 빠르게 계산하는 방법을 다루지만, 핵심은 여전히 $\det(A-\lambda I)=0$이 어떤 방향의 collapse를 뜻한다는 점입니다.
 
 <figure class="my-3">
-  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch15-eigenvalue-trick.gif" alt="3Blue1Brown Ch.15 eigenvalue trick visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://media.iamjaehka13.blog/assets/img/posts/math/linear-algebra-3b1b/original/3b1b-ch15-eigenvalue-trick.gif" alt="3Blue1Brown Ch.15 eigenvalue trick visual clip" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 고유값은 다음 식에서 나옵니다.

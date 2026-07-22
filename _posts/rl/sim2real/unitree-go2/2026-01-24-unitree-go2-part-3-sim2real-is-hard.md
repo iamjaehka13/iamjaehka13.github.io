@@ -5,7 +5,7 @@ last_modified_at: 2026-03-24 00:00:13 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: reward 수정으로 MuJoCo 보행은 개선되었지만, 실제 Go2 deploy에서 다시 드러난 real gap과 torque 문제를 정리한다.
-image: https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif
+image: https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif
 math: true
 ---
 
@@ -13,7 +13,7 @@ math: true
 
 발을 들도록 유도하는 reward를 여러 방식으로 추가한 결과, 이제는 MuJoCo에서는 Go2가 걸을 수 있게 되었습니다.
 
-![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/329cbb7d-7937-805c-8183-fc646408590c.gif)
+![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/329cbb7d-7937-805c-8183-fc646408590c.gif)
 
 이번에 사용한 reward는 크게 세 가지였습니다.
 
@@ -137,7 +137,7 @@ reward를 추가하면서 simulation에서는 분명히 개선이 있었습니�
 
 다양한 모델을 학습한 뒤 실제 로봇에 deploy했지만, 결과는 아직 충분하지 않았습니다. 이전과 마찬가지로 앞뒤좌우 command에 따라 몸을 기울이기만 할 뿐, 발을 제대로 드는 동작은 거의 보이지 않았습니다.
 
-   [![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
+   [![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
    {: .text-center}
 
 
@@ -145,7 +145,7 @@ reward를 추가하면서 simulation에서는 분명히 개선이 있었습니�
 
 `last_action`에는 ONNX 모델의 raw action이 들어가야 했지만, deploy 코드에서는 scale과 offset이 적용된 target position에 가까운 값이 들어가고 있었습니다. 이 때문에 policy가 training 때와 다른 형태의 action history를 보고 있었고, 이전 action이 지나치게 보수적으로 들어가는 문제가 생겼습니다. 이 부분을 수정하자 로봇 다리가 펴지는 것을 확인할 수 있었습니다.
 
-![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-806c-8f0e-cd1ed2ba67cc.gif)
+![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-806c-8f0e-cd1ed2ba67cc.gif)
 
 
 
@@ -163,9 +163,9 @@ Go2에 deploy된 모델의 torque 값을 확인해보니, 뒷다리 torque가 �
 deploy 시 뒷다리 stiffness를 `25`에서 `40`으로 변경하자, 로봇이 앞뒤좌우로 조금씩 걷기 시작했습니다.
 
 
-![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif)
+![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/32acbb7d-7937-80c8-abcc-f2453c1ca817.gif)
 
-![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1586.gif)
+![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1586.gif)
 
 
 

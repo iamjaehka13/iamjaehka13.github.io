@@ -3,7 +3,7 @@
 set -euo pipefail
 
 readonly BUCKET="iamjaehka13-blog-media"
-readonly PUBLIC_BASE_URL="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev"
+readonly PUBLIC_BASE_URL="https://media.iamjaehka13.blog"
 
 if (( $# == 0 )); then
   printf 'Usage: %s assets/path/to/file [...]\n' "$0" >&2

@@ -84,7 +84,7 @@ ros2 topic list
 카메라 graph가 정상이라면 설정한 image topic이 topic list에 나타납니다. RViz2에서 `Image` display를 추가하고 해당 topic을 선택하면 Isaac Sim camera image를 볼 수 있습니다.
 
 <video controls preload="metadata" poster="/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera-preview.jpg" style="width: 100%; border-radius: 6px;">
-  <source src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera.mp4" type="video/mp4">
+  <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac-sim-ros2-cameras/07-rviz-camera.mp4" type="video/mp4">
 </video>
 
 카메라가 두 개라면 같은 구조의 graph를 하나 더 만들고 topic name을 분리하면 됩니다. 예를 들어 `camera1`, `camera2`에 대해 각각 render product와 ROS2 Camera Helper를 만들면 앞뒤 카메라를 따로 받을 수 있습니다.
