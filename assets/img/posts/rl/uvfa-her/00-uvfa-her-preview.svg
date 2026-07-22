@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#101820"/>
+  <path d="M130 390 C290 205 425 490 590 302 S905 175 1072 245" fill="none" stroke="#47c5d5" stroke-width="12" stroke-linecap="round"/>
+  <path d="M130 390 C290 205 425 490 590 302 S905 175 1072 245" fill="none" stroke="#d5eef1" stroke-width="3" stroke-dasharray="12 20" opacity="0.65"/>
+  <circle cx="130" cy="390" r="18" fill="#f5b642"/>
+  <circle cx="590" cy="302" r="22" fill="#74c69d"/>
+  <circle cx="1072" cy="245" r="22" fill="#ef6f6c"/>
+  <path d="M1072 190v110M1017 245h110" stroke="#ef6f6c" stroke-width="6" opacity="0.28"/>
+  <text x="80" y="115" fill="#f7f9fa" font-family="Arial, sans-serif" font-size="66" font-weight="700">UVFA + HER</text>
+  <text x="83" y="174" fill="#bac7ce" font-family="Arial, sans-serif" font-size="28">Goal-conditioned value learning from failed experience</text>
+  <g font-family="Arial, sans-serif" font-size="23" font-weight="600">
+    <rect x="82" y="505" width="225" height="54" rx="6" fill="#1d2a33" stroke="#47c5d5"/>
+    <text x="112" y="540" fill="#d5eef1">Q(s, a, g)</text>
+    <rect x="329" y="505" width="260" height="54" rx="6" fill="#1d2a33" stroke="#f5b642"/>
+    <text x="360" y="540" fill="#ffe0a3">Sparse reward</text>
+    <rect x="611" y="505" width="390" height="54" rx="6" fill="#1d2a33" stroke="#74c69d"/>
+    <text x="641" y="540" fill="#c9f0d9">Goal relabel + replay</text>
+  </g>
+</svg>

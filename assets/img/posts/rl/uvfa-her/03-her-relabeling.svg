@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="690" viewBox="0 0 1200 690">
+  <rect width="1200" height="690" fill="#f7f9fa"/>
+  <text x="600" y="52" text-anchor="middle" fill="#1d2a33" font-family="Arial, sans-serif" font-size="30" font-weight="700">HER: 실패한 궤적을 실제 달성한 목표로 다시 읽는다</text>
+  <g font-family="Arial, sans-serif">
+    <text x="72" y="120" fill="#a24743" font-size="26" font-weight="700">원래 경험: desired goal g</text>
+    <line x1="120" y1="215" x2="1030" y2="215" stroke="#9aa8b0" stroke-width="7"/>
+    <g fill="#47c5d5">
+      <circle cx="150" cy="215" r="16"/><circle cx="340" cy="215" r="16"/><circle cx="530" cy="215" r="16"/><circle cx="720" cy="215" r="16"/><circle cx="910" cy="215" r="16"/>
+    </g>
+    <g fill="#34444d" font-size="21">
+      <text x="150" y="255" text-anchor="middle">s0</text><text x="340" y="255" text-anchor="middle">s1</text><text x="530" y="255" text-anchor="middle">s2</text><text x="720" y="255" text-anchor="middle">s3</text><text x="910" y="255" text-anchor="middle">s4</text>
+    </g>
+    <circle cx="1060" cy="215" r="23" fill="#ef6f6c"/>
+    <text x="1060" y="175" text-anchor="middle" fill="#a24743" font-size="22" font-weight="700">g</text>
+    <text x="600" y="305" text-anchor="middle" fill="#a24743" font-size="25" font-weight="700">목표 미도달 -> sparse reward는 계속 실패</text>
+
+    <path d="M600 335v58" stroke="#667680" stroke-width="5"/>
+    <path d="M600 393l-16-25m16 25 16-25" stroke="#667680" stroke-width="5"/>
+
+    <text x="72" y="445" fill="#20704d" font-size="26" font-weight="700">Hindsight replay: future achieved goal g' = m(s4)</text>
+    <line x1="120" y1="535" x2="910" y2="535" stroke="#9aa8b0" stroke-width="7"/>
+    <g fill="#47c5d5">
+      <circle cx="150" cy="535" r="16"/><circle cx="340" cy="535" r="16"/><circle cx="530" cy="535" r="16"/><circle cx="720" cy="535" r="16"/>
+    </g>
+    <circle cx="910" cy="535" r="24" fill="#74c69d"/>
+    <text x="910" y="495" text-anchor="middle" fill="#20704d" font-size="22" font-weight="700">g'</text>
+    <text x="600" y="615" text-anchor="middle" fill="#20704d" font-size="25" font-weight="700">물리 transition과 action은 그대로, goal과 reward만 재계산</text>
+    <text x="600" y="655" text-anchor="middle" fill="#52626b" font-size="22">(s, a, g, r, s')  ->  (s, a, g', r', s')</text>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f9fa"/>
+  <text x="600" y="54" text-anchor="middle" fill="#1d2a33" font-family="Arial, sans-serif" font-size="30" font-weight="700">UVFA는 state와 goal 양쪽에서 공통 구조를 학습한다</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="65" y="105" width="500" height="425" rx="8" fill="#fff" stroke="#cad5dc" stroke-width="2"/>
+    <text x="315" y="150" text-anchor="middle" fill="#34444d" font-size="25" font-weight="700">Concatenated architecture</text>
+    <rect x="115" y="205" width="145" height="75" rx="6" fill="#d9f2f5" stroke="#47c5d5"/>
+    <text x="187" y="250" text-anchor="middle" fill="#173f47" font-size="25" font-weight="700">state s</text>
+    <rect x="370" y="205" width="145" height="75" rx="6" fill="#ffe8b8" stroke="#f5b642"/>
+    <text x="442" y="250" text-anchor="middle" fill="#62470e" font-size="25" font-weight="700">goal g</text>
+    <path d="M260 243h110" stroke="#667680" stroke-width="4"/>
+    <path d="M315 280v55" stroke="#667680" stroke-width="4"/>
+    <rect x="175" y="335" width="280" height="85" rx="6" fill="#263641"/>
+    <text x="315" y="387" text-anchor="middle" fill="#fff" font-size="25" font-weight="700">MLP([s, g])</text>
+    <path d="M315 420v47" stroke="#667680" stroke-width="4"/>
+    <text x="315" y="505" text-anchor="middle" fill="#173f47" font-size="27" font-weight="700">V(s,g) or Q(s,a,g)</text>
+
+    <rect x="635" y="105" width="500" height="425" rx="8" fill="#fff" stroke="#cad5dc" stroke-width="2"/>
+    <text x="885" y="150" text-anchor="middle" fill="#34444d" font-size="25" font-weight="700">Two-stream architecture</text>
+    <rect x="685" y="200" width="150" height="70" rx="6" fill="#d9f2f5" stroke="#47c5d5"/>
+    <text x="760" y="243" text-anchor="middle" fill="#173f47" font-size="24" font-weight="700">state s</text>
+    <rect x="935" y="200" width="150" height="70" rx="6" fill="#ffe8b8" stroke="#f5b642"/>
+    <text x="1010" y="243" text-anchor="middle" fill="#62470e" font-size="24" font-weight="700">goal g</text>
+    <path d="M760 270v50M1010 270v50" stroke="#667680" stroke-width="4"/>
+    <rect x="675" y="320" width="170" height="75" rx="6" fill="#2f6872"/>
+    <text x="760" y="366" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">phi(s,a)</text>
+    <rect x="925" y="320" width="170" height="75" rx="6" fill="#9a6c16"/>
+    <text x="1010" y="366" text-anchor="middle" fill="#fff" font-size="24" font-weight="700">psi(g)</text>
+    <path d="M845 357h80" stroke="#667680" stroke-width="4"/>
+    <circle cx="885" cy="357" r="20" fill="#fff" stroke="#667680" stroke-width="3"/>
+    <text x="885" y="365" text-anchor="middle" fill="#34444d" font-size="25" font-weight="700">h</text>
+    <path d="M885 377v88" stroke="#667680" stroke-width="4"/>
+    <text x="885" y="505" text-anchor="middle" fill="#173f47" font-size="27" font-weight="700">h(phi, psi)</text>
+    <text x="600" y="585" text-anchor="middle" fill="#52626b" font-size="24">단순 연결도 가능하지만, 원 논문은 value table의 low-rank 구조와 두 embedding을 함께 탐구했다.</text>
+  </g>
+</svg>
