@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">LSD aligns a skill direction with a state-representation displacement</title>
+  <desc id="desc">A state trajectory maps through phi to a latent displacement aligned with z, while the Lipschitz constraint prevents distance inflation.</desc>
+  <defs>
+    <marker id="arrow-cyan" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#55d6d2"/>
+    </marker>
+    <marker id="arrow-yellow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#f3c969"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#8b93a7"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="620" fill="#0d1017"/>
+  <text x="60" y="58" fill="#f5f1e8" font-family="sans-serif" font-size="28" font-weight="700">State space</text>
+  <text x="790" y="58" fill="#f5f1e8" font-family="sans-serif" font-size="28" font-weight="700">Representation space</text>
+
+  <rect x="55" y="90" width="440" height="390" rx="8" fill="#121722" stroke="#343b4b" stroke-width="2"/>
+  <path d="M115 405 C170 365, 188 420, 250 335 S345 260, 420 145" fill="none" stroke="#55d6d2" stroke-width="10" stroke-linecap="round" marker-end="url(#arrow-cyan)"/>
+  <circle cx="115" cy="405" r="15" fill="#fb6a67"/>
+  <circle cx="420" cy="145" r="15" fill="#55d6d2"/>
+  <text x="88" y="450" fill="#d8dce7" font-family="sans-serif" font-size="24">s0</text>
+  <text x="425" y="139" fill="#d8dce7" font-family="sans-serif" font-size="24">sT</text>
+  <line x1="128" y1="392" x2="405" y2="158" stroke="#8b93a7" stroke-width="3" stroke-dasharray="10 9" marker-end="url(#arrow-gray)"/>
+  <text x="205" y="245" fill="#aab1c2" font-family="sans-serif" font-size="23">Delta s</text>
+
+  <line x1="530" y1="285" x2="690" y2="285" stroke="#f3c969" stroke-width="7" marker-end="url(#arrow-yellow)"/>
+  <text x="580" y="255" fill="#f3c969" font-family="sans-serif" font-size="30" font-weight="700">phi</text>
+
+  <rect x="730" y="90" width="415" height="390" rx="8" fill="#121722" stroke="#343b4b" stroke-width="2"/>
+  <line x1="785" y1="420" x2="1100" y2="420" stroke="#4b5364" stroke-width="2"/>
+  <line x1="785" y1="420" x2="785" y2="125" stroke="#4b5364" stroke-width="2"/>
+  <circle cx="830" cy="380" r="14" fill="#fb6a67"/>
+  <text x="798" y="414" fill="#d8dce7" font-family="sans-serif" font-size="22">phi(s0)</text>
+  <line x1="830" y1="380" x2="1045" y2="170" stroke="#55d6d2" stroke-width="8" marker-end="url(#arrow-cyan)"/>
+  <text x="920" y="250" fill="#55d6d2" font-family="sans-serif" font-size="23">Delta phi</text>
+  <line x1="830" y1="380" x2="1000" y2="215" stroke="#f3c969" stroke-width="5" stroke-dasharray="12 8" marker-end="url(#arrow-yellow)"/>
+  <text x="895" y="345" fill="#f3c969" font-family="sans-serif" font-size="27" font-weight="700">z</text>
+  <circle cx="1045" cy="170" r="14" fill="#55d6d2"/>
+  <text x="1018" y="145" fill="#d8dce7" font-family="sans-serif" font-size="22">phi(sT)</text>
+
+  <rect x="120" y="520" width="960" height="66" rx="8" fill="#171d29" stroke="#343b4b"/>
+  <text x="165" y="562" fill="#f3c969" font-family="monospace" font-size="26">reward = z^T Delta phi</text>
+  <text x="610" y="562" fill="#d8dce7" font-family="monospace" font-size="26">||Delta phi|| &lt;= ||Delta s||</text>
+</svg>

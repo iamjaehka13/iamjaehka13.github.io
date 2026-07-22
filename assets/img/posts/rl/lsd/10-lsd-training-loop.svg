@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">LSD training loop</title>
+  <desc id="desc">A sampled skill conditions the policy, transitions are embedded by a spectrally normalized representation network, and the resulting reward trains SAC and phi.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#9ba4b8"/>
+    </marker>
+    <marker id="arrow-reward" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#f3c969"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="620" fill="#0d1017"/>
+  <text x="60" y="62" fill="#f5f1e8" font-family="sans-serif" font-size="31" font-weight="700">LSD training: two optimizers, one intrinsic reward</text>
+
+  <g font-family="sans-serif" text-anchor="middle">
+    <rect x="55" y="140" width="170" height="105" rx="8" fill="#1b2130" stroke="#a78bfa" stroke-width="3"/>
+    <text x="140" y="183" fill="#d8dce7" font-size="24">sample z</text>
+    <text x="140" y="217" fill="#a78bfa" font-size="18">fixed per episode</text>
+
+    <rect x="300" y="140" width="205" height="105" rx="8" fill="#1b2130" stroke="#55d6d2" stroke-width="3"/>
+    <text x="402" y="183" fill="#d8dce7" font-size="24">policy pi(a|s,z)</text>
+    <text x="402" y="217" fill="#55d6d2" font-size="18">SAC actor</text>
+
+    <rect x="580" y="140" width="210" height="105" rx="8" fill="#1b2130" stroke="#fb923c" stroke-width="3"/>
+    <text x="685" y="183" fill="#d8dce7" font-size="24">environment</text>
+    <text x="685" y="217" fill="#fb923c" font-size="18">s, a, s'</text>
+
+    <rect x="865" y="140" width="260" height="105" rx="8" fill="#1b2130" stroke="#4ade80" stroke-width="3"/>
+    <text x="995" y="180" fill="#d8dce7" font-size="23">phi(s), phi(s')</text>
+    <text x="995" y="215" fill="#4ade80" font-size="18">spectral normalization</text>
+  </g>
+
+  <line x1="225" y1="192" x2="288" y2="192" stroke="#9ba4b8" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="505" y1="192" x2="568" y2="192" stroke="#9ba4b8" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="790" y1="192" x2="853" y2="192" stroke="#9ba4b8" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="355" y="335" width="490" height="92" rx="8" fill="#171d29" stroke="#f3c969" stroke-width="3"/>
+  <text x="600" y="373" fill="#f3c969" font-family="monospace" font-size="24" text-anchor="middle">r = (phi(s') - phi(s))^T z</text>
+  <text x="600" y="405" fill="#aab1c2" font-family="sans-serif" font-size="18" text-anchor="middle">direction alignment plus real state variation</text>
+
+  <path d="M995 245 C995 305, 850 335, 830 335" fill="none" stroke="#f3c969" stroke-width="4" marker-end="url(#arrow-reward)"/>
+  <path d="M140 245 C140 320, 320 345, 345 350" fill="none" stroke="#f3c969" stroke-width="4" marker-end="url(#arrow-reward)"/>
+
+  <rect x="160" y="490" width="355" height="82" rx="8" fill="#1b2130" stroke="#55d6d2" stroke-width="2"/>
+  <text x="338" y="524" fill="#55d6d2" font-family="sans-serif" font-size="22" text-anchor="middle">update policy with SAC</text>
+  <text x="338" y="551" fill="#aab1c2" font-family="sans-serif" font-size="17" text-anchor="middle">maximize accumulated intrinsic reward</text>
+
+  <rect x="685" y="490" width="355" height="82" rx="8" fill="#1b2130" stroke="#4ade80" stroke-width="2"/>
+  <text x="862" y="524" fill="#4ade80" font-family="sans-serif" font-size="22" text-anchor="middle">update representation phi</text>
+  <text x="862" y="551" fill="#aab1c2" font-family="sans-serif" font-size="17" text-anchor="middle">SGD under the Lipschitz constraint</text>
+
+  <line x1="480" y1="427" x2="380" y2="480" stroke="#9ba4b8" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="720" y1="427" x2="820" y2="480" stroke="#9ba4b8" stroke-width="4" marker-end="url(#arrow)"/>
+</svg>
