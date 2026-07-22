@@ -35,7 +35,7 @@ LSD, **Lipschitz-constrained Skill Discovery**는 목표를 다음처럼 바꾼�
   </div>
   <div class="col-md-6">
     <p class="fw-semibold mb-2">LSD: 방향별로 멀리 이동</p>
-    <img src="/assets/img/posts/rl/lsd/02-ant-continuous-lsd.gif" alt="LSD로 발견한 Ant continuous skill: skill 방향에 따라 멀리 이동하는 모습" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/lsd/02-ant-continuous-lsd.gif" alt="LSD로 발견한 Ant continuous skill: skill 방향에 따라 멀리 이동하는 모습" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   </div>
 </div>
 
@@ -487,7 +487,7 @@ $$
 즉 자기 차원의 변화는 키우고 다른 skill 차원의 변화와 대비한다.
 
 <figure class="my-3">
-  <img src="/assets/img/posts/rl/lsd/04-ant-discrete-skills.gif" alt="한 번의 discrete LSD 학습에서 발견한 Ant의 16개 skill" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/lsd/04-ant-discrete-skills.gif" alt="한 번의 discrete LSD 학습에서 발견한 Ant의 16개 skill" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">Ant에서 한 번의 discrete LSD 학습으로 얻은 locomotion, rotation, posing, flipping 계열의 16개 skill. 출처: <a href="https://seohong.me/projects/lsd/">LSD official project</a>.</figcaption>
 </figure>
 
@@ -520,7 +520,7 @@ pi(a | s, z) 실행
 ```
 
 <figure class="my-3">
-  <img src="/assets/img/posts/rl/lsd/03-zero-shot-goal-following.gif" alt="학습된 표현공간의 목표 방향을 이용해 spiral 목표들을 차례로 따라가는 Ant" class="d-block mx-auto" loading="lazy" style="width: min(100%, 620px); border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/lsd/03-zero-shot-goal-following.gif" alt="학습된 표현공간의 목표 방향을 이용해 spiral 목표들을 차례로 따라가는 Ant" class="d-block mx-auto" loading="lazy" style="width: min(100%, 620px); border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">학습된 $\phi$의 목표 방향을 사용해 spiral 형태의 여러 목표를 순서대로 따라가는 Ant. 공식 4배속 영상을 1배속으로 복원했다. 출처: <a href="https://seohong.me/projects/lsd/">LSD official project</a>.</figcaption>
 </figure>
 

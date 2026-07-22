@@ -546,7 +546,7 @@ V_h=XW_V^{(h)}
 $$
 
 <figure class="my-3">
-  <img src="/assets/img/posts/ai/deep-learning-5-attention/12-multi-head-attention.gif" alt="서로 다른 query key value projection을 가진 여러 attention head가 병렬로 contextual update를 만드는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/ai/deep-learning-5-attention/12-multi-head-attention.gif" alt="서로 다른 query key value projection을 가진 여러 attention head가 병렬로 contextual update를 만드는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 각 head는 서로 다른 attention pattern과 value subspace를 학습할 수 있습니다.

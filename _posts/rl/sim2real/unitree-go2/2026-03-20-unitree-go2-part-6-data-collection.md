@@ -116,7 +116,7 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 아래는 현재 baseline policy를 실제 Go2에 올려 야외 노면에서 굴린 모습입니다.
 
-[![](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif){: .popup .img-link .shimmer}
+[![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif)](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif){: .popup .img-link .shimmer}
 
 아직 논문에 넣을 최종 결과라기보다는, 데이터 수집용 baseline에 가깝습니다. 중요한 것은 "걷는다"가 아니라, 이 rollout에서 어떤 joint trajectory, torque pattern, reported actuator temperature trend가 나오는지입니다.
 

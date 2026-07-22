@@ -89,7 +89,7 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
 사선 follow-view로 보면 gait 자체의 차이도 더 잘 보입니다. 여기서는 단순히 최종 숫자가 아니라, body가 어떤 자세로 앞으로 가고 다리가 어떻게 움직이는지를 볼 수 있습니다.
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison_preview.jpg" style="width: 100%; border-radius: 6px;">
-  <source src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison.mp4" type="video/mp4">
+  <source src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison.mp4" type="video/mp4">
 </video>
 
 마지막으로 top-view에서 rear feet trail을 같이 보면, Thermal Feedback의 발 궤적과 body yaw가 훨씬 더 흔들리는 것이 보입니다.

@@ -618,7 +618,7 @@ if __name__ == "__main__":
             self.msc.SetTimeout(5.0)
             self.msc.Init()
 
-        [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80c7-bb29-c37f639f4d00.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80c7-bb29-c37f639f4d00.gif){.popup .img-link .shimmer}
+        [![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80c7-bb29-c37f639f4d00.gif)](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80c7-bb29-c37f639f4d00.gif){.popup .img-link .shimmer}
 
 [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp){.popup .img-link .shimmer}
 

@@ -11,7 +11,7 @@ math: true
 
 ## **1. 현재 문제**
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/img-1539.gif)
+![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-story/img-1539.gif)
 
 지난 글에서는 policy를 실제 Go2에 deploy했지만, 로봇이 발을 떼지 못하고 command 방향으로 base만 기울이는 문제를 확인했습니다. 이후 며칠 동안 reward와 학습 설정을 바꿔가며 원인을 좁혀보았습니다.
 

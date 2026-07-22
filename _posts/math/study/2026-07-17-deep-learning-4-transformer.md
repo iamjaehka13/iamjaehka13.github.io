@@ -176,7 +176,7 @@ $$
 $$
 
 <figure class="my-3">
-  <img src="/assets/img/posts/ai/deep-learning-4-transformer/06a-semantic-directions.gif" alt="embedding space에서 단어 사이의 차이 vector가 의미 관계의 방향으로 나타나는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/ai/deep-learning-4-transformer/06a-semantic-directions.gif" alt="embedding space에서 단어 사이의 차이 vector가 의미 관계의 방향으로 나타나는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 이 예제의 핵심은 `king - man + woman = queen`이라는 공식을 외우는 것이 아닙니다. 학습 과정에서 model이 어떤 관계를 여러 좌표에 흩어진 **방향**으로 표현할 수 있다는 점입니다.
@@ -313,7 +313,7 @@ MLP의 parameter가 학습된 지식을 어떻게 표현할 수 있는지는 6�
 하나의 attention과 MLP만으로 끝나지 않습니다. 같은 종류의 block을 깊게 쌓되, 각 layer는 서로 다른 학습 parameter를 가집니다.
 
 <figure class="my-3">
-  <img src="/assets/img/posts/ai/deep-learning-4-transformer/05-attention-mlp-stack.gif" alt="attention block과 MLP block을 번갈아 여러 층 반복하는 Transformer" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/ai/deep-learning-4-transformer/05-attention-mlp-stack.gif" alt="attention block과 MLP block을 번갈아 여러 층 반복하는 Transformer" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 layer $l$의 흐름을 단순화하면 다음과 같습니다.
@@ -351,7 +351,7 @@ Layer normalization은 각 sublayer 주변에서 activation의 scale을 조절�
 처음의 embedding은 token 자체에 가까운 표현입니다. 여러 block을 통과한 뒤의 hidden vector에는 문장 속 역할과 주변 문맥이 반영됩니다.
 
 <figure class="my-3">
-  <img src="/assets/img/posts/ai/deep-learning-4-transformer/07-contextual-vectors.gif" alt="초기 token embedding이 여러 Transformer block을 통과하며 문맥이 풍부한 vector로 변하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/ai/deep-learning-4-transformer/07-contextual-vectors.gif" alt="초기 token embedding이 여러 Transformer block을 통과하며 문맥이 풍부한 vector로 변하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 ```text

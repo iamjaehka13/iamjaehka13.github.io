@@ -317,7 +317,7 @@ $$
 $$
 
 <figure class="my-3">
-  <img src="/assets/img/posts/ai/deep-learning-2-gradient-descent/05-gradient-surface.gif" alt="두 parameter의 cost surface에서 gradient와 가장 빠르게 감소하는 방향을 찾는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/ai/deep-learning-2-gradient-descent/05-gradient-surface.gif" alt="두 parameter의 cost surface에서 gradient와 가장 빠르게 감소하는 방향을 찾는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
 </figure>
 
 gradient $\nabla C$는 현재 위치에서 cost가 가장 빠르게 증가하는 방향을 가리킵니다.

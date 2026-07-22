@@ -29,3 +29,4 @@ assets/js/dist
 __pycache__/
 *.pyc
 .omx/
+.wrangler/

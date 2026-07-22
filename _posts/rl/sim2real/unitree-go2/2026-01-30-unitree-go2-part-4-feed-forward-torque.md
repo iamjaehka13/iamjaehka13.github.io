@@ -5,7 +5,7 @@ last_modified_at: 2026-03-24 00:00:13 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: 실제 Go2 deploy에서 부족해 보였던 torque margin을 확인하기 위해 gravity compensation 기반 feed-forward torque를 적용한 실험을 정리한다.
-image: /assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-8055-bcb2-d4b130bc0615.gif
+image: https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-8055-bcb2-d4b130bc0615.gif
 math: true
 ---
 
@@ -120,9 +120,9 @@ $$
 
 
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-8055-bcb2-d4b130bc0615.gif)
+![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-8055-bcb2-d4b130bc0615.gif)
 
-![](/assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-806e-b45a-c57277e4fd76.gif)
+![](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-4-feed-forward-torque/32ccbb7d-7937-806e-b45a-c57277e4fd76.gif)
 
 feed-forward torque를 적용하자, 이전보다 로봇이 실제로 움직이기 시작했습니다. 이 결과는 torque margin 문제가 존재한다는 가설을 뒷받침했습니다.
 

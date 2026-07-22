@@ -11,7 +11,7 @@ math: true
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/01-policy-command-visualization.png){: .d-block .mx-auto }
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/02-trained-rl-policy-preview.jpg" style="width: 100%; border-radius: 6px;">
-  <source src="/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/02-trained-rl-policy.mp4" type="video/mp4">
+  <source src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/02-trained-rl-policy.mp4" type="video/mp4">
 </video>
 
 *학습완료된 RL 모델*
@@ -273,7 +273,7 @@ def go2_rl_env(env_cfg,cfg):
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/05-simulation-run.png){: .d-block .mx-auto }
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/04-policy-command-simulation-preview.jpg" style="width: 100%; border-radius: 6px;">
-  <source src="/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/04-policy-command-simulation.mp4" type="video/mp4">
+  <source src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/04-policy-command-simulation.mp4" type="video/mp4">
 </video>
 
 policy에서 commandCfg를 주는대로 로봇이 학습된대로 움직이는 모습을 볼 수 있습니다. 10초마다 (x,y,yaw) 명령을 주는대로 로봇이 움직입니다.

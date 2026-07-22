@@ -33,11 +33,11 @@ METRA는 이 temporal distance에 연결된 작은 latent space를 만들고, �
 <div class="row g-3 my-3">
   <div class="col-md-6">
     <p class="fw-semibold mb-2">LSD: pixel Euclidean metric</p>
-    <img src="/assets/img/posts/rl/metra/13-quadruped-lsd.gif" alt="LSD가 발견한 9개 Quadruped skill 비교" loading="eager" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/metra/13-quadruped-lsd.gif" alt="LSD가 발견한 9개 Quadruped skill 비교" loading="eager" style="width: 100%; border-radius: 6px;">
   </div>
   <div class="col-md-6">
     <p class="fw-semibold mb-2">METRA: temporal metric</p>
-    <img src="/assets/img/posts/rl/metra/12-quadruped-metra.gif" alt="METRA가 발견한 9개 Quadruped skill 비교" loading="eager" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/metra/12-quadruped-metra.gif" alt="METRA가 발견한 9개 Quadruped skill 비교" loading="eager" style="width: 100%; border-radius: 6px;">
   </div>
 </div>
 
@@ -587,7 +587,7 @@ _11개 unsupervised RL 방법의 qualitative comparison. Locomotion은 skill별 
 공식 논문은 METRA가 비교한 방법 중 pixel-based Quadruped와 Humanoid에서 다양한 locomotion behavior를 발견한 유일한 방법이었다고 보고한다. 이 주장은 해당 benchmark, 구현, 학습 budget 안에서의 결과로 읽어야 한다.
 
 <figure class="my-3">
-  <img src="/assets/img/posts/rl/metra/14-humanoid-metra.gif" alt="Pixel-based Humanoid에서 학습된 16개 METRA skill" loading="eager" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/metra/14-humanoid-metra.gif" alt="Pixel-based Humanoid에서 학습된 16개 METRA skill" loading="eager" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">Pixel-based Humanoid에서 학습된 16개 METRA skill을 각각 두 번 실행한 모습. 출처: <a href="https://seohong.me/projects/metra/">METRA official project</a>.</figcaption>
 </figure>
 

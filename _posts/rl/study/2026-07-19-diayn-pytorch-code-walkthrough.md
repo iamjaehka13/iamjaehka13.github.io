@@ -29,11 +29,11 @@ image:
 
 <div class="row g-3 mb-4">
   <figure class="col-md-6 mb-0">
-    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill8.gif" alt="Skill 8이 양의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/skill8.gif" alt="Skill 8이 양의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
     <figcaption class="text-center mt-2"><strong>z = 8</strong> · 양의 x 방향 이동 경향</figcaption>
   </figure>
   <figure class="col-md-6 mb-0">
-    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill9.gif" alt="Skill 9가 음의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/skill9.gif" alt="Skill 9가 음의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
     <figcaption class="text-center mt-2"><strong>z = 9</strong> · 음의 x 방향 이동 경향</figcaption>
   </figure>
 </div>
@@ -622,7 +622,7 @@ def _get_obs(self):
 
 <div class="row g-3 mb-4">
   <figure class="col-md-6 mb-0">
-    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill0.gif" alt="Skill 0이 거의 제자리에서 자세를 유지하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/skill0.gif" alt="Skill 0이 거의 제자리에서 자세를 유지하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
     <figcaption class="text-center mt-2"><strong>z = 0</strong> · 작은 x 변위, 1000 step 유지</figcaption>
   </figure>
   <figure class="col-md-6 mb-0">
@@ -637,11 +637,11 @@ def _get_obs(self):
 
 <div class="row g-3 mb-4">
   <figure class="col-md-6 mb-0">
-    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill17.gif" alt="Skill 17이 긴 episode 동안 양의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/skill17.gif" alt="Skill 17이 긴 episode 동안 양의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
     <figcaption class="text-center mt-2"><strong>z = 17</strong> · 양의 x 이동, 1000 step 유지</figcaption>
   </figure>
   <figure class="col-md-6 mb-0">
-    <img src="/assets/img/posts/rl/diayn-pytorch/gifs/skill19.gif" alt="Skill 19가 변동을 보이며 음의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
+    <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/skill19.gif" alt="Skill 19가 변동을 보이며 음의 x 방향으로 이동하는 Hopper 실행" decoding="async" style="width: 100%; border-radius: 6px;">
     <figcaption class="text-center mt-2"><strong>z = 19</strong> · 음의 x 이동, rollout 편차 큼</figcaption>
   </figure>
 </div>
@@ -672,17 +672,17 @@ def _get_obs(self):
 각 GIF는 같은 시간 구간을 좌우에 배치했다.
 
 <figure class="mb-4">
-  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill0-skill5.gif" alt="제자리 자세 유지로 비슷해 보이는 Skill 0과 Skill 5 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill0-skill5.gif" alt="제자리 자세 유지로 비슷해 보이는 Skill 0과 Skill 5 비교" decoding="async" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center mt-2"><strong>왼쪽 z=0 · 오른쪽 z=5</strong> — 둘 다 작은 x 변위로 1000 step을 유지한다.</figcaption>
 </figure>
 
 <figure class="mb-4">
-  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill6-skill16.gif" alt="수평 이동 없이 자세를 유지하는 Skill 6과 Skill 16 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill6-skill16.gif" alt="수평 이동 없이 자세를 유지하는 Skill 6과 Skill 16 비교" decoding="async" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center mt-2"><strong>왼쪽 z=6 · 오른쪽 z=16</strong> — x 변위와 생존 길이만 보면 가장 유사한 쌍이다.</figcaption>
 </figure>
 
 <figure class="mb-4">
-  <img src="/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill17-skill18.gif" alt="양의 x 방향으로 이동하는 Skill 17과 Skill 18 비교" decoding="async" style="width: 100%; border-radius: 6px;">
+  <img src="https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill17-skill18.gif" alt="양의 x 방향으로 이동하는 Skill 17과 Skill 18 비교" decoding="async" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center mt-2"><strong>왼쪽 z=17 · 오른쪽 z=18</strong> — 모두 끝까지 양의 x 방향 이동을 유지한다.</figcaption>
 </figure>
 

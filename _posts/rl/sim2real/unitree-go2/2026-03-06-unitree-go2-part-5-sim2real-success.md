@@ -220,11 +220,11 @@ tau = 0
 
 최종 policy는 실제 Unitree Go2에서 전진 command에 대해 안정적으로 보행했습니다.
 
-![실제 Unitree Go2 전진 보행 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
+![실제 Unitree Go2 전진 보행 성공](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif)
 
 또한 command 변화에 대해서도 이전처럼 base만 기울어지는 것이 아니라, 실제 보행 motion으로 반응하는 것을 확인했습니다.
 
-![실제 Unitree Go2 command 반응 성공](/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif)
+![실제 Unitree Go2 command 반응 성공](https://pub-7351ab7ce8d34a72861fbf2a7d06dd4c.r2.dev/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif)
 
 이전 시도와 비교하면 다음과 같습니다.
 
