@@ -31,15 +31,11 @@ LSD, **Lipschitz-constrained Skill Discovery**는 목표를 다음처럼 바꾼�
 <div class="row g-3 my-3">
   <div class="col-md-6">
     <p class="fw-semibold mb-2">DIAYN: 주로 제자리 자세 차이</p>
-    <video autoplay loop muted playsinline controls preload="metadata" poster="/assets/img/posts/rl/lsd/01-ant-continuous-diayn-poster.jpg" style="width: 100%; border-radius: 6px;">
-      <source src="/assets/img/posts/rl/lsd/01-ant-continuous-diayn.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/lsd/01-ant-continuous-diayn.gif" alt="DIAYN으로 발견한 Ant continuous skill: 제자리에서 서로 다른 자세를 취하는 모습" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   </div>
   <div class="col-md-6">
     <p class="fw-semibold mb-2">LSD: 방향별로 멀리 이동</p>
-    <video autoplay loop muted playsinline controls preload="metadata" poster="/assets/img/posts/rl/lsd/02-ant-continuous-lsd-poster.jpg" style="width: 100%; border-radius: 6px;">
-      <source src="/assets/img/posts/rl/lsd/02-ant-continuous-lsd.mp4" type="video/mp4">
-    </video>
+    <img src="/assets/img/posts/rl/lsd/02-ant-continuous-lsd.gif" alt="LSD로 발견한 Ant continuous skill: skill 방향에 따라 멀리 이동하는 모습" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   </div>
 </div>
 
@@ -491,9 +487,7 @@ $$
 즉 자기 차원의 변화는 키우고 다른 skill 차원의 변화와 대비한다.
 
 <figure class="my-3">
-  <video autoplay loop muted playsinline controls preload="metadata" poster="/assets/img/posts/rl/lsd/04-ant-discrete-skills-poster.jpg" style="width: 100%; border-radius: 6px;">
-    <source src="/assets/img/posts/rl/lsd/04-ant-discrete-skills.mp4" type="video/mp4">
-  </video>
+  <img src="/assets/img/posts/rl/lsd/04-ant-discrete-skills.gif" alt="한 번의 discrete LSD 학습에서 발견한 Ant의 16개 skill" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">
   <figcaption class="text-center text-muted small mt-2">Ant에서 한 번의 discrete LSD 학습으로 얻은 locomotion, rotation, posing, flipping 계열의 16개 skill. 출처: <a href="https://seohong.me/projects/lsd/">LSD official project</a>.</figcaption>
 </figure>
 
@@ -526,10 +520,8 @@ pi(a | s, z) 실행
 ```
 
 <figure class="my-3">
-  <video autoplay loop muted playsinline controls preload="metadata" poster="/assets/img/posts/rl/lsd/03-zero-shot-goal-following-poster.jpg" style="width: min(100%, 620px); border-radius: 6px; display: block; margin: 0 auto;">
-    <source src="/assets/img/posts/rl/lsd/03-zero-shot-goal-following.mp4" type="video/mp4">
-  </video>
-  <figcaption class="text-center text-muted small mt-2">학습된 $\phi$의 목표 방향을 사용해 spiral 형태의 여러 목표를 순서대로 따라가는 Ant. 영상은 4배속이다. 출처: <a href="https://seohong.me/projects/lsd/">LSD official project</a>.</figcaption>
+  <img src="/assets/img/posts/rl/lsd/03-zero-shot-goal-following.gif" alt="학습된 표현공간의 목표 방향을 이용해 spiral 목표들을 차례로 따라가는 Ant" class="d-block mx-auto" loading="lazy" style="width: min(100%, 620px); border-radius: 6px;">
+  <figcaption class="text-center text-muted small mt-2">학습된 $\phi$의 목표 방향을 사용해 spiral 형태의 여러 목표를 순서대로 따라가는 Ant. 공식 4배속 영상을 1배속으로 복원했다. 출처: <a href="https://seohong.me/projects/lsd/">LSD official project</a>.</figcaption>
 </figure>
 
 이 방식은 DADS처럼 skill dynamics model로 후보 sequence를 planning하지 않는다. 하지만 "아무 조건 없이 모든 목표를 해결한다"는 뜻도 아니다.
@@ -567,7 +559,25 @@ _AntGoal, AntMultiGoals, HumanoidGoal, HumanoidMultiGoals 결과. 실선 LSD는 
 ### 11.4 Ablation이 보여주는 핵심
 
 ![LSD ablation](/assets/img/posts/rl/lsd/08-ablation.png){: width="1000" .d-block .mx-auto }
-_Reward 형태, 현재·다음 state 표현 방식, 1-Lipschitz 제약을 조합한 Ant ablation. 오른쪽 아래의 inner product + representation difference + Lipschitz constraint 조합에서 넓은 coverage가 나타났다. 출처: [Park et al., Figure 7](https://arxiv.org/abs/2202.00914)._
+_Figure 7 전체 구성. 행은 reward distribution/형태를, 열은 reward에 넣는 state 표현을 바꾸며, 왼쪽과 오른쪽은 1-Lipschitz 제약의 유무를 비교한다. 아래에서 각 절반을 확대해 본다. 출처: [Park et al., Figure 7](https://arxiv.org/abs/2202.00914)._
+
+### Figure 7 확대해서 읽기
+
+![1-Lipschitz 제약이 없는 Ant ablation](/assets/img/posts/rl/lsd/08-ablation-without-lipschitz.png){: width="1200" .d-block .mx-auto }
+_왼쪽 3x4: $\phi$에 1-Lipschitz 제약이 없는 조합. 각 점과 궤적이 원점 근처에 몰려 있어 state-space coverage가 작다._
+
+![1-Lipschitz 제약이 있는 Ant ablation](/assets/img/posts/rl/lsd/08-ablation-with-lipschitz.png){: width="1200" .d-block .mx-auto }
+_오른쪽 3x4: 같은 reward와 state 표현 조합에 1-Lipschitz 제약을 적용했다. 제약만 추가한 위쪽 DIAYN 계열은 여전히 원점 부근에 머물고, 오른쪽 아래 LSD 조합에서만 여러 방향으로 긴 궤적이 펼쳐진다._
+
+![Figure 7의 LSD 핵심 조합 확대](/assets/img/posts/rl/lsd/08-ablation-lsd-detail.png){: width="520" .d-block .mx-auto }
+_핵심 셀 확대: inner product reward + representation difference $\phi(s')-\phi(s)$ + 1-Lipschitz constraint. 색마다 서로 다른 skill trajectory이며, skill 방향별로 넓은 coverage가 형성된다._
+
+Figure 7의 축을 읽는 방법은 다음과 같다.
+
+- **행**: Normal distribution, vMF distribution, inner product 순서로 reward 형태를 바꾼다.
+- **열**: $\phi(s)$, $\phi(s')$, $\phi(s'-s)$, $\phi(s')-\phi(s)$ 순서로 현재·다음 state의 표현 방식을 바꾼다.
+- **좌우**: 왼쪽은 Lipschitz 제약이 없고, 오른쪽은 spectral normalization으로 1-Lipschitz를 적용한다.
+- **오른쪽 아래**: LSD가 채택한 세 요소가 함께 들어간 설정이다. 그림에서 유일하게 넓은 방사형 trajectory가 뚜렷하다.
 
 이 결과에서 특히 중요한 점은 **DIAYN에 spectral normalization만 추가해도 LSD가 되지 않는다**는 것이다.
 
