@@ -4,6 +4,10 @@ GitHub Pages blog based on the Jekyll Chirpy theme.
 
 This repository was started from [`tosemfdk/tosemfdk.github.io`](https://github.com/tosemfdk/tosemfdk.github.io), which is MIT licensed, then cleaned up for `iamjaehka13.github.io`.
 
+Detailed authoring, media, validation, and publishing instructions are in
+[`docs/BLOG_WORKFLOW.md`](docs/BLOG_WORKFLOW.md). Codex sessions must also
+follow the repository-specific [`AGENTS.md`](AGENTS.md).
+
 ## Write a Post
 
 Create a Markdown file in `_posts/` with this filename format:
