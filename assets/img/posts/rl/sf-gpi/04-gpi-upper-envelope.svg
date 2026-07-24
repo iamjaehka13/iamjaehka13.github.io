@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Generalized policy improvement as an upper envelope</title>
+  <desc id="desc">GPI is greedy with respect to the maximum action value across source policies, not a one-time policy selector.</desc>
+  <rect width="1200" height="620" fill="#ffffff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">GPI는 source Q들의 upper envelope에 greedy하다</text>
+
+  <line x1="115" y1="490" x2="760" y2="490" stroke="#94a3b8" stroke-width="3"/>
+  <line x1="115" y1="490" x2="115" y2="125" stroke="#94a3b8" stroke-width="3"/>
+  <text x="430" y="540" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">actions a</text>
+  <text x="65" y="310" text-anchor="middle" transform="rotate(-90 65 310)" fill="#64748b" font-family="Arial, sans-serif" font-size="21">Q under new reward w</text>
+
+  <path d="M 125 430 C 240 160, 355 180, 470 420 C 560 520, 650 460, 745 390" fill="none" stroke="#60a5fa" stroke-width="6"/>
+  <path d="M 125 390 C 235 455, 340 430, 440 245 C 540 100, 655 190, 745 430" fill="none" stroke="#31c48d" stroke-width="6"/>
+  <path d="M 125 455 C 250 510, 360 390, 465 325 C 585 255, 660 280, 745 170" fill="none" stroke="#f59e0b" stroke-width="6"/>
+
+  <path d="M 125 390 C 180 360, 235 220, 300 180 C 355 155, 405 230, 440 245 C 485 210, 530 115, 585 120 C 645 130, 690 230, 745 170" fill="none" stroke="#172033" stroke-width="10"/>
+  <circle cx="585" cy="120" r="12" fill="#ef4444"/>
+  <line x1="585" y1="132" x2="585" y2="490" stroke="#ef4444" stroke-width="3" stroke-dasharray="8 7"/>
+  <text x="585" y="105" text-anchor="middle" fill="#b91c1c" font-family="Arial, sans-serif" font-size="20">selected action</text>
+
+  <rect x="820" y="120" width="330" height="370" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="985" y="168" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="27" font-weight="700">GPI policy</text>
+  <text x="985" y="226" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="25">π(s) ∈ argmaxₐ maxᵢ</text>
+  <text x="985" y="263" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="25">ψᵖⁱ(s,a)ᵀw</text>
+  <line x1="865" y1="300" x2="1105" y2="300" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="850" y="344" fill="#16a34a" font-family="Arial, sans-serif" font-size="21">✓ 매 state에서 다시 계산</text>
+  <text x="850" y="384" fill="#16a34a" font-family="Arial, sans-serif" font-size="21">✓ 행동별 continuation 평가</text>
+  <text x="850" y="424" fill="#dc2626" font-family="Arial, sans-serif" font-size="21">✗ policy 하나를 처음에 선택</text>
+  <text x="850" y="464" fill="#dc2626" font-family="Arial, sans-serif" font-size="21">✗ source action을 단순 평균</text>
+</svg>

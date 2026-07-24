@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Successor feature Bellman update</title>
+  <desc id="desc">The SF critic predicts a feature vector using an immediate feature and the discounted next successor features.</desc>
+  <rect width="1200" height="560" fill="#ffffff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">Scalar reward 대신 feature vector로 TD learning</text>
+
+  <rect x="55" y="120" width="220" height="115" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="165" y="163" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">transition</text>
+  <text x="165" y="203" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="26">(s, a, s′)</text>
+  <line x1="275" y1="177" x2="350" y2="177" stroke="#64748b" stroke-width="4"/>
+  <polygon points="370,177 342,162 342,192" fill="#64748b"/>
+
+  <rect x="370" y="105" width="230" height="145" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="485" y="150" text-anchor="middle" fill="#1e3a8a" font-family="Arial, sans-serif" font-size="24" font-weight="700">SF critic</text>
+  <text x="485" y="191" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="25">ψθ(s,a)</text>
+  <text x="485" y="224" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="18">d-dimensional output</text>
+
+  <rect x="735" y="105" width="410" height="145" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text x="940" y="149" text-anchor="middle" fill="#166534" font-family="Arial, sans-serif" font-size="23" font-weight="700">vector TD target</text>
+  <text x="940" y="196" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="28">y = φ(s,a,s′) + γ ψθ⁻(s′,π(s′))</text>
+  <line x1="735" y1="177" x2="620" y2="177" stroke="#16a34a" stroke-width="4"/>
+  <polygon points="600,177 628,162 628,192" fill="#16a34a"/>
+
+  <line x1="485" y1="250" x2="485" y2="330" stroke="#60a5fa" stroke-width="5"/>
+  <line x1="940" y1="250" x2="940" y2="330" stroke="#16a34a" stroke-width="5"/>
+  <line x1="485" y1="330" x2="940" y2="330" stroke="#94a3b8" stroke-width="3"/>
+  <rect x="390" y="360" width="620" height="82" rx="7" fill="#172033"/>
+  <text x="700" y="412" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="29">L_SF(θ) = ‖y - ψθ(s,a)‖²</text>
+  <text x="600" y="500" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="22">일반 critic이 scalar return 하나를 예측한다면 SF critic은 d개의 feature return을 동시에 예측한다</text>
+</svg>
