@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="610" viewBox="0 0 1200 610" role="img" aria-labelledby="title desc">
+  <title id="title">Closed-loop zero-shot goal tracking</title>
+  <desc id="desc">The desired skill is recomputed from current and goal latent states at every step, shrinking near the goal.</desc>
+  <rect width="1200" height="610" fill="#ffffff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">Goal vector를 매 step 다시 계산하면 감속이 생긴다</text>
+  <rect x="290" y="86" width="620" height="62" rx="6" fill="#172033"/>
+  <text x="600" y="126" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="27">z_des,t = φ(s_des) - φ(s_t)</text>
+
+  <line x1="105" y1="330" x2="1095" y2="330" stroke="#cbd5e1" stroke-width="4"/>
+  <circle cx="1090" cy="330" r="22" fill="#31c48d"/>
+  <text x="1090" y="382" text-anchor="middle" fill="#166534" font-family="Arial, sans-serif" font-size="21">goal</text>
+
+  <circle cx="155" cy="330" r="18" fill="#172033"/>
+  <line x1="180" y1="330" x2="520" y2="330" stroke="#f59e0b" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="555,330 513,307 513,353" fill="#f59e0b"/>
+  <text x="355" y="292" text-anchor="middle" fill="#b45309" font-family="Arial, sans-serif" font-size="22">far: ‖z_des‖ is large</text>
+
+  <circle cx="650" cy="330" r="18" fill="#172033"/>
+  <line x1="675" y1="330" x2="865" y2="330" stroke="#60a5fa" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="900,330 858,307 858,353" fill="#60a5fa"/>
+  <text x="785" y="292" text-anchor="middle" fill="#1d4ed8" font-family="Arial, sans-serif" font-size="22">near: ‖z_des‖ shrinks</text>
+
+  <circle cx="1090" cy="330" r="8" fill="#ffffff"/>
+  <text x="1090" y="285" text-anchor="middle" fill="#15803d" font-family="Arial, sans-serif" font-size="22">at goal: z_des ≈ 0</text>
+
+  <rect x="90" y="450" width="1020" height="105" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="600" y="489" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="24">observe current state → encode goal difference → execute conditioned policy → observe again</text>
+  <path d="M 965 518 C 875 574, 330 574, 235 518" fill="none" stroke="#31c48d" stroke-width="4"/>
+  <polygon points="216,505 247,509 231,535" fill="#31c48d"/>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Continuous locomotion skill manifold</title>
+  <desc id="desc">Skill angle controls direction and skill norm controls latent transition magnitude rather than naming discrete gaits.</desc>
+  <rect width="1200" height="620" fill="#ffffff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">발견한 것은 gait 목록보다 연속적인 locomotion command space다</text>
+
+  <circle cx="350" cy="330" r="210" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="350" cy="330" r="140" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 8"/>
+  <circle cx="350" cy="330" r="70" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 8"/>
+  <line x1="140" y1="330" x2="560" y2="330" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="350" y1="120" x2="350" y2="540" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="350" cy="330" r="8" fill="#172033"/>
+  <g stroke-linecap="round" stroke-width="9">
+    <line x1="350" y1="330" x2="440" y2="270" stroke="#60a5fa"/>
+    <line x1="350" y1="330" x2="505" y2="226" stroke="#31c48d"/>
+    <line x1="350" y1="330" x2="245" y2="205" stroke="#f59e0b"/>
+    <line x1="350" y1="330" x2="222" y2="438" stroke="#ef4444"/>
+  </g>
+  <text x="350" y="585" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">2-D latent skill disk</text>
+
+  <rect x="650" y="115" width="485" height="410" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="690" y="165" fill="#172033" font-family="Arial, sans-serif" font-size="27" font-weight="700">읽는 법</text>
+  <circle cx="700" cy="220" r="8" fill="#60a5fa"/>
+  <text x="728" y="229" fill="#172033" font-family="Arial, sans-serif" font-size="23">angle(z): 이동 방향</text>
+  <circle cx="700" cy="279" r="8" fill="#31c48d"/>
+  <text x="728" y="288" fill="#172033" font-family="Arial, sans-serif" font-size="23">‖z‖: latent transition 크기</text>
+  <line x1="690" y1="330" x2="1095" y2="330" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="690" y="380" fill="#475569" font-family="Arial, sans-serif" font-size="21">작은 반지름 → 느리거나 정지에 가까운 motion</text>
+  <text x="690" y="423" fill="#475569" font-family="Arial, sans-serif" font-size="21">큰 반지름 → 더 빠르고 큰 motion</text>
+  <text x="690" y="478" fill="#b45309" font-family="Arial, sans-serif" font-size="20">walk / trot / bound라는 이름이 자동으로 붙는 것은 아니다</text>
+</svg>

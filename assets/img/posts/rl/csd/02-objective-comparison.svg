@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Latent transition maximization and norm matching</title>
+  <desc id="desc">LSD and METRA maximize the projection while CSD matches the whole skill vector.</desc>
+  <rect width="1200" height="620" fill="#ffffff"/>
+  <text x="600" y="55" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="34" font-weight="700">같은 방향이어도 목적함수는 전혀 다르다</text>
+
+  <rect x="45" y="92" width="535" height="472" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="78" y="137" fill="#172033" font-family="Arial, sans-serif" font-size="29" font-weight="700">LSD / METRA</text>
+  <text x="78" y="172" fill="#64748b" font-family="Arial, sans-serif" font-size="20">projection을 계속 크게 만든다</text>
+  <line x1="130" y1="430" x2="520" y2="430" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="130" y1="430" x2="130" y2="215" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="130" y1="430" x2="278" y2="332" stroke="#60a5fa" stroke-width="10" stroke-linecap="round"/>
+  <polygon points="278,332 251,335 266,356" fill="#60a5fa"/>
+  <text x="242" y="316" fill="#2563eb" font-family="Arial, sans-serif" font-size="22">z</text>
+  <line x1="130" y1="430" x2="482" y2="197" stroke="#f59e0b" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="482,197 451,201 468,225" fill="#f59e0b"/>
+  <text x="305" y="230" fill="#b45309" font-family="Arial, sans-serif" font-size="21">Δφ를 더 크게</text>
+  <text x="78" y="505" fill="#172033" font-family="Arial, sans-serif" font-size="25">maximize  Δφᵀz</text>
+  <text x="78" y="538" fill="#b45309" font-family="Arial, sans-serif" font-size="20">작은 ‖z‖도 큰 이동을 막지 못한다</text>
+
+  <rect x="620" y="92" width="535" height="472" rx="8" fill="#f0fdf7" stroke="#86efac" stroke-width="2"/>
+  <text x="653" y="137" fill="#172033" font-family="Arial, sans-serif" font-size="29" font-weight="700">CSD</text>
+  <text x="653" y="172" fill="#64748b" font-family="Arial, sans-serif" font-size="20">direction과 magnitude를 함께 맞춘다</text>
+  <line x1="705" y1="430" x2="1095" y2="430" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="705" y1="430" x2="705" y2="215" stroke="#94a3b8" stroke-width="2"/>
+  <line x1="705" y1="430" x2="853" y2="332" stroke="#60a5fa" stroke-width="12" stroke-linecap="round"/>
+  <polygon points="853,332 826,335 841,356" fill="#60a5fa"/>
+  <text x="818" y="315" fill="#2563eb" font-family="Arial, sans-serif" font-size="22">z</text>
+  <line x1="705" y1="430" x2="853" y2="332" stroke="#16a34a" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="853" cy="332" r="15" fill="#ffffff" stroke="#16a34a" stroke-width="5"/>
+  <path d="M 920 252 C 974 285, 974 372, 900 395" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="8 7"/>
+  <text x="919" y="235" fill="#b91c1c" font-family="Arial, sans-serif" font-size="20">overshoot도 오차</text>
+  <text x="653" y="505" fill="#172033" font-family="Arial, sans-serif" font-size="25">minimize  ‖Δφ - z‖²</text>
+  <text x="653" y="538" fill="#15803d" font-family="Arial, sans-serif" font-size="20">작은 ‖z‖는 작은 latent transition이 된다</text>
+</svg>

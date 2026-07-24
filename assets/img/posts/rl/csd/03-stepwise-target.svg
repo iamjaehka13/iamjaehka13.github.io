@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Episode skill target and per-step latent targets</title>
+  <desc id="desc">An episodic transition target is converted into per-step losses by scaling each latent transition by the episode length.</desc>
+  <rect width="1200" height="520" fill="#ffffff"/>
+  <text x="600" y="56" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="32" font-weight="700">에피소드 목표를 PPO가 사용할 step reward로 바꾸기</text>
+
+  <rect x="55" y="100" width="1090" height="115" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="120" cy="157" r="10" fill="#172033"/>
+  <line x1="130" y1="157" x2="1045" y2="157" stroke="#31c48d" stroke-width="11" stroke-linecap="round"/>
+  <polygon points="1088,157 1042,132 1042,182" fill="#31c48d"/>
+  <text x="120" y="198" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="18">φ(s₀)</text>
+  <text x="1080" y="198" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="18">φ(s_T)</text>
+  <text x="600" y="142" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="24">episode target:  φ(s_T) - φ(s₀) ≈ z</text>
+
+  <text x="600" y="267" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="22">N개의 작은 transition 각각에서 같은 조건을 검사한다</text>
+  <g stroke="#94a3b8" stroke-width="2">
+    <line x1="120" y1="330" x2="1080" y2="330"/>
+    <line x1="120" y1="314" x2="120" y2="346"/>
+    <line x1="280" y1="314" x2="280" y2="346"/>
+    <line x1="440" y1="314" x2="440" y2="346"/>
+    <line x1="600" y1="314" x2="600" y2="346"/>
+    <line x1="760" y1="314" x2="760" y2="346"/>
+    <line x1="920" y1="314" x2="920" y2="346"/>
+    <line x1="1080" y1="314" x2="1080" y2="346"/>
+  </g>
+  <g stroke="#60a5fa" stroke-width="9" stroke-linecap="round">
+    <line x1="130" y1="330" x2="260" y2="330"/>
+    <line x1="290" y1="330" x2="420" y2="330"/>
+    <line x1="450" y1="330" x2="580" y2="330"/>
+    <line x1="610" y1="330" x2="740" y2="330"/>
+    <line x1="770" y1="330" x2="900" y2="330"/>
+    <line x1="930" y1="330" x2="1060" y2="330"/>
+  </g>
+  <text x="600" y="390" text-anchor="middle" fill="#172033" font-family="Arial, sans-serif" font-size="27">e_t = ‖N(φ(s_{t+1}) - φ(s_t)) - z‖²</text>
+  <rect x="375" y="425" width="450" height="60" rx="6" fill="#172033"/>
+  <text x="600" y="464" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="26">r_t = 1 / (1 + σ e_t)</text>
+</svg>
