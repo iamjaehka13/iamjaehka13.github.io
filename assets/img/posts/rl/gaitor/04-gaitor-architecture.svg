@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">Gaitor architecture and control flow</title>
+  <desc id="desc">Robot and terrain encoders, a latent planner, decoder, contact predictor, and whole-body controller form a closed-loop controller.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="820" fill="#f8fafc"/>
+  <text x="600" y="54" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="700">Gaitor는 trajectory generator와 WBC가 결합된 hybrid controller다</text>
+
+  <rect x="40" y="104" width="186" height="82" rx="8" fill="#111827"/>
+  <text x="133" y="137" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="20">robot history</text>
+  <text x="133" y="166" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="18">Xᵣ(k)</text>
+  <rect x="40" y="250" width="186" height="82" rx="8" fill="#334155"/>
+  <text x="133" y="283" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="20">processed terrain</text>
+  <text x="133" y="312" text-anchor="middle" fill="#cbd5e1" font-family="Arial" font-size="18">Xg(k)</text>
+  <rect x="40" y="396" width="186" height="106" rx="8" fill="#ec5b78"/>
+  <text x="133" y="429" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="19">operator command</text>
+  <text x="133" y="460" text-anchor="middle" fill="#fff1f2" font-family="Arial" font-size="18">action a · gait g</text>
+  <text x="133" y="487" text-anchor="middle" fill="#fff1f2" font-family="Arial" font-size="18">cadence Δϕ</text>
+
+  <rect x="292" y="104" width="220" height="112" rx="8" fill="#ffffff" stroke="#14b8a6" stroke-width="3"/>
+  <text x="402" y="145" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">VAE Encoder</text>
+  <text x="402" y="177" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">zᵣ ∈ ℝ¹⁰</text>
+  <rect x="292" y="250" width="220" height="112" rx="8" fill="#ffffff" stroke="#f6c85f" stroke-width="3"/>
+  <text x="402" y="291" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Terrain Encoder</text>
+  <text x="402" y="323" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">zg ∈ ℝ¹⁰</text>
+  <rect x="292" y="420" width="220" height="118" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="3"/>
+  <text x="402" y="460" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Latent Planner</text>
+  <text x="402" y="493" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">(ϕ, zg) → R</text>
+  <text x="402" y="520" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">behavioural cloning</text>
+
+  <rect x="584" y="182" width="226" height="248" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+  <text x="697" y="225" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Update latent</text>
+  <rect x="618" y="254" width="158" height="54" rx="6" fill="#ccfbf1"/>
+  <text x="697" y="288" text-anchor="middle" fill="#115e59" font-family="Arial" font-size="20">z₂ … z₉: keep</text>
+  <rect x="618" y="328" width="158" height="70" rx="6" fill="#ede9fe"/>
+  <text x="697" y="356" text-anchor="middle" fill="#5b21b6" font-family="Arial" font-size="19">z₀ = R sinϕ</text>
+  <text x="697" y="382" text-anchor="middle" fill="#5b21b6" font-family="Arial" font-size="19">z₁ = R cosϕ</text>
+
+  <rect x="584" y="500" width="226" height="106" rx="8" fill="#ffffff" stroke="#ec5b78" stroke-width="3"/>
+  <text x="697" y="541" text-anchor="middle" fill="#111827" font-family="Arial" font-size="23" font-weight="700">Condition</text>
+  <text x="697" y="576" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">z̃ᵣ + zg + a + g</text>
+
+  <rect x="880" y="126" width="268" height="126" rx="8" fill="#ffffff" stroke="#14b8a6" stroke-width="3"/>
+  <text x="1014" y="168" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">VAE Decoder</text>
+  <text x="1014" y="201" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">future states X̂ᵣ⁺</text>
+  <text x="1014" y="229" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">q · τ · base · feet</text>
+  <rect x="880" y="296" width="268" height="126" rx="8" fill="#ffffff" stroke="#f6c85f" stroke-width="3"/>
+  <text x="1014" y="338" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Contact Predictor</text>
+  <text x="1014" y="371" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">future contacts Ŝ⁺</text>
+  <text x="1014" y="399" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">LF · RF · LH · RH</text>
+
+  <rect x="880" y="500" width="268" height="112" rx="8" fill="#111827"/>
+  <text x="1014" y="542" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="24" font-weight="700">Whole-Body Controller</text>
+  <text x="1014" y="578" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="19">dynamics + contact constraints</text>
+
+  <rect x="880" y="682" width="268" height="78" rx="8" fill="#ec5b78"/>
+  <text x="1014" y="730" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="22" font-weight="700">joint torque · 400 Hz</text>
+
+  <path d="M226 145 H278" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M226 291 H278" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M512 160 H566 V254 H570" fill="none" stroke="#14b8a6" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M512 306 H548 V479 H278" fill="none" stroke="#f6c85f" stroke-width="3"/>
+  <path d="M512 479 H566" fill="none" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M226 449 H266 V580 H570" fill="none" stroke="#ec5b78" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M697 430 V486" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M810 553 H846 V189 H866" fill="none" stroke="#14b8a6" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M810 553 H846 V359 H866" fill="none" stroke="#f6c85f" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1014 252 V282" fill="none" stroke="#334155" stroke-width="3"/>
+  <path d="M1014 422 V486" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1014 612 V668" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M880 556 H836 V650 H133 V516" fill="none" stroke="#94a3b8" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#arrow)"/>
+  <text x="480" y="676" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">다음 cycle에서 실제 robot history를 다시 encode → closed loop</text>
+</svg>

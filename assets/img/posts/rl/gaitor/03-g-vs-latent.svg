@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Gait label and latent orbit have different roles</title>
+  <desc id="desc">The gait label changes leg coordination while phase and radius define the cyclic swing geometry.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="700" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="700">g와 z₀,z₁은 같은 gait 변수가 아니다</text>
+
+  <rect x="50" y="100" width="500" height="530" rx="8" fill="#ffffff" stroke="#ec5b78" stroke-width="3"/>
+  <text x="300" y="148" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="29" font-weight="700">Gait label g</text>
+  <text x="300" y="183" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">네 다리 사이의 coordination</text>
+  <line x1="145" y1="250" x2="455" y2="250" stroke="#cbd5e1" stroke-width="5"/>
+  <circle cx="145" cy="250" r="22" fill="#ec5b78"/>
+  <circle cx="300" cy="250" r="22" fill="#f6c85f"/>
+  <circle cx="455" cy="250" r="22" fill="#14b8a6"/>
+  <text x="145" y="296" text-anchor="middle" fill="#9f1239" font-family="Arial" font-size="23" font-weight="700">+1</text>
+  <text x="145" y="326" text-anchor="middle" fill="#334155" font-family="Arial" font-size="21">trot</text>
+  <text x="300" y="296" text-anchor="middle" fill="#92400e" font-family="Arial" font-size="23" font-weight="700">0</text>
+  <text x="300" y="326" text-anchor="middle" fill="#334155" font-family="Arial" font-size="21">crawl</text>
+  <text x="455" y="296" text-anchor="middle" fill="#115e59" font-family="Arial" font-size="23" font-weight="700">−1</text>
+  <text x="455" y="326" text-anchor="middle" fill="#334155" font-family="Arial" font-size="21">pace</text>
+  <rect x="96" y="380" width="408" height="110" rx="8" fill="#fff1f2" stroke="#fecdd3"/>
+  <text x="300" y="421" text-anchor="middle" fill="#881337" font-family="Arial" font-size="22">g를 연속적으로 바꾸면</text>
+  <text x="300" y="457" text-anchor="middle" fill="#334155" font-family="Arial" font-size="22">상대 phase와 contact schedule이 변함</text>
+  <text x="300" y="548" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="20">gait identity는 Decoder에 별도로 조건화</text>
+
+  <rect x="650" y="100" width="500" height="530" rx="8" fill="#ffffff" stroke="#14b8a6" stroke-width="3"/>
+  <text x="900" y="148" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="29" font-weight="700">Latent orbit z₀, z₁</text>
+  <text x="900" y="183" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">공통 phase와 swing geometry</text>
+  <line x1="740" y1="380" x2="1068" y2="380" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="900" y1="500" x2="900" y2="218" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <ellipse cx="900" cy="380" rx="126" ry="94" fill="#ccfbf1" opacity="0.55" stroke="#14b8a6" stroke-width="6"/>
+  <line x1="900" y1="380" x2="997" y2="322" stroke="#111827" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="954" y="336" fill="#111827" font-family="Arial" font-size="22">R</text>
+  <path d="M933 393 A45 45 0 0 1 923 350" fill="none" stroke="#52627a" stroke-width="3"/>
+  <text x="941" y="380" fill="#52627a" font-family="Arial" font-size="21">ϕ</text>
+  <text x="1078" y="407" fill="#115e59" font-family="Arial" font-size="20">z₀</text>
+  <text x="911" y="226" fill="#115e59" font-family="Arial" font-size="20">z₁</text>
+  <text x="900" y="548" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="20">ϕ: 주기 위치 · R: 발 움직임 크기</text>
+  <text x="900" y="582" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="20">같은 좌표도 g에 따라 다른 gait로 decode</text>
+</svg>

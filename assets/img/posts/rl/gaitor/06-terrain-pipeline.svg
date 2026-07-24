@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Gaitor terrain processing pipeline</title>
+  <desc id="desc">Depth cameras create a height map, future footholds define control pitch, and a terrain latent conditions both planner and decoder.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="650" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="700">지형은 planner의 경로와 decoder의 의미를 함께 바꾼다</text>
+
+  <rect x="46" y="130" width="174" height="104" rx="8" fill="#111827"/>
+  <text x="133" y="170" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="21">4 depth cameras</text>
+  <text x="133" y="202" text-anchor="middle" fill="#94a3b8" font-family="Arial" font-size="18">RGB-D perception</text>
+  <rect x="278" y="130" width="174" height="104" rx="8" fill="#ffffff" stroke="#14b8a6" stroke-width="3"/>
+  <text x="365" y="170" text-anchor="middle" fill="#111827" font-family="Arial" font-size="21">2.5D height map</text>
+  <path d="M312 208 L348 184 L382 202 L418 164" fill="none" stroke="#14b8a6" stroke-width="5"/>
+  <rect x="510" y="130" width="174" height="104" rx="8" fill="#ffffff" stroke="#f6c85f" stroke-width="3"/>
+  <text x="597" y="166" text-anchor="middle" fill="#111827" font-family="Arial" font-size="21">future footholds</text>
+  <circle cx="550" cy="204" r="8" fill="#ec5b78"/><circle cx="585" cy="184" r="8" fill="#ec5b78"/>
+  <circle cx="620" cy="204" r="8" fill="#8b5cf6"/><circle cx="655" cy="184" r="8" fill="#8b5cf6"/>
+  <rect x="742" y="130" width="174" height="104" rx="8" fill="#ffffff" stroke="#ec5b78" stroke-width="3"/>
+  <text x="829" y="166" text-anchor="middle" fill="#111827" font-family="Arial" font-size="21">control pitch</text>
+  <text x="829" y="204" text-anchor="middle" fill="#9f1239" font-family="Arial" font-size="24">front − rear</text>
+  <rect x="974" y="130" width="180" height="104" rx="8" fill="#ffffff" stroke="#8b5cf6" stroke-width="3"/>
+  <text x="1064" y="166" text-anchor="middle" fill="#111827" font-family="Arial" font-size="21">2nd-order LTI</text>
+  <path d="M1008 207 C1024 207,1028 178,1044 178 S1064 207,1080 207 S1100 178,1116 178" fill="none" stroke="#8b5cf6" stroke-width="4"/>
+
+  <line x1="220" y1="182" x2="264" y2="182" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="452" y1="182" x2="496" y2="182" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="684" y1="182" x2="728" y2="182" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="916" y1="182" x2="960" y2="182" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="462" y="328" width="276" height="94" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="3"/>
+  <text x="600" y="366" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Terrain Encoder</text>
+  <text x="600" y="399" text-anchor="middle" fill="#5b21b6" font-family="Arial" font-size="20">zg ∈ ℝ¹⁰</text>
+  <path d="M1064 234 V280 H600 V314" fill="none" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="178" y="498" width="320" height="100" rx="8" fill="#ffffff" stroke="#14b8a6" stroke-width="3"/>
+  <text x="338" y="538" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Latent Planner</text>
+  <text x="338" y="572" text-anchor="middle" fill="#115e59" font-family="Arial" font-size="20">(ϕ, zg) → phase-specific R</text>
+  <rect x="702" y="498" width="320" height="100" rx="8" fill="#ffffff" stroke="#ec5b78" stroke-width="3"/>
+  <text x="862" y="538" text-anchor="middle" fill="#111827" font-family="Arial" font-size="24" font-weight="700">Conditional Decoder</text>
+  <text x="862" y="572" text-anchor="middle" fill="#9f1239" font-family="Arial" font-size="20">same z can decode differently</text>
+  <path d="M550 422 V458 H338 V484" fill="none" stroke="#14b8a6" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M650 422 V458 H862 V484" fill="none" stroke="#ec5b78" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

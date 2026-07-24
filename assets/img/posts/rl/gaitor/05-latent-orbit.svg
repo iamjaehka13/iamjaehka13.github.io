@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Phase and radius parameterize the Gaitor latent orbit</title>
+  <desc id="desc">Phase moves around the orbit, radius changes swing geometry, and cadence controls orbit speed.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="700" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="700">Latent 평면을 한 바퀴 돌면 한 gait cycle이 생성된다</text>
+
+  <rect x="48" y="100" width="650" height="530" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="150" y1="390" x2="620" y2="390" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="385" y1="560" x2="385" y2="180" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <ellipse cx="385" cy="390" rx="170" ry="122" fill="#ccfbf1" opacity="0.52" stroke="#14b8a6" stroke-width="7"/>
+  <circle cx="385" cy="268" r="13" fill="#ec5b78"/>
+  <circle cx="555" cy="390" r="13" fill="#f6c85f"/>
+  <circle cx="385" cy="512" r="13" fill="#8b5cf6"/>
+  <circle cx="215" cy="390" r="13" fill="#14b8a6"/>
+  <text x="385" y="242" text-anchor="middle" fill="#9f1239" font-family="Arial" font-size="20">ϕ = 0</text>
+  <text x="580" y="397" fill="#92400e" font-family="Arial" font-size="20">π/2</text>
+  <text x="385" y="548" text-anchor="middle" fill="#5b21b6" font-family="Arial" font-size="20">π</text>
+  <text x="188" y="397" text-anchor="end" fill="#115e59" font-family="Arial" font-size="20">3π/2</text>
+  <line x1="385" y1="390" x2="520" y2="309" stroke="#111827" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="464" y="330" fill="#111827" font-family="Arial" font-size="23">R(k)</text>
+  <text x="672" y="424" text-anchor="end" fill="#115e59" font-family="Arial" font-size="20">z₀ · swing height</text>
+  <text x="398" y="182" fill="#115e59" font-family="Arial" font-size="21">z₁ · swing length</text>
+  <text x="373" y="593" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="19">phase는 cycle 위치, radius는 이번 swing의 크기</text>
+
+  <rect x="744" y="100" width="408" height="530" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="948" y="148" text-anchor="middle" fill="#111827" font-family="Arial" font-size="27" font-weight="700">Control variables</text>
+  <rect x="786" y="190" width="324" height="76" rx="8" fill="#fff1f2"/>
+  <text x="812" y="222" fill="#ec5b78" font-family="Arial" font-size="22" font-weight="700">ϕ(k)</text>
+  <text x="812" y="250" fill="#334155" font-family="Arial" font-size="20">현재 swing/stance 진행 위치</text>
+  <rect x="786" y="286" width="324" height="76" rx="8" fill="#fffbeb"/>
+  <text x="812" y="318" fill="#92400e" font-family="Arial" font-size="22" font-weight="700">R(k)</text>
+  <text x="812" y="346" fill="#334155" font-family="Arial" font-size="20">phase별 swing height와 length</text>
+  <rect x="786" y="382" width="324" height="76" rx="8" fill="#f5f3ff"/>
+  <text x="812" y="414" fill="#5b21b6" font-family="Arial" font-size="22" font-weight="700">Δϕ</text>
+  <text x="812" y="442" fill="#334155" font-family="Arial" font-size="20">orbit 회전 속도 = cadence</text>
+  <text x="948" y="514" text-anchor="middle" fill="#111827" font-family="Arial" font-size="22">z̃₀ = R sinϕ</text>
+  <text x="948" y="550" text-anchor="middle" fill="#111827" font-family="Arial" font-size="22">z̃₁ = R cosϕ</text>
+  <text x="948" y="596" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">R은 phase마다 달라져 비대칭 궤적도 가능</text>
+</svg>

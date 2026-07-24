@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Quadruped gait contact patterns</title>
+  <desc id="desc">Trot uses diagonal pairs, crawl moves one foot at a time, and pace uses lateral pairs.</desc>
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="34" font-weight="700">Gait의 차이는 네 발의 상대적인 contact timing이다</text>
+
+  <g transform="translate(42 98)">
+    <rect width="350" height="602" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="175" y="47" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="30" font-weight="700">Trot</text>
+    <text x="175" y="78" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="19">diagonal pairs · 2-beat</text>
+    <rect x="112" y="112" width="126" height="142" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+    <circle cx="92" cy="126" r="22" fill="#ec5b78"/><text x="92" y="133" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LF</text>
+    <circle cx="258" cy="126" r="22" fill="#14b8a6"/><text x="258" y="133" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">RF</text>
+    <circle cx="92" cy="240" r="22" fill="#14b8a6"/><text x="92" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LH</text>
+    <circle cx="258" cy="240" r="22" fill="#ec5b78"/><text x="258" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">RH</text>
+    <line x1="104" y1="140" x2="246" y2="226" stroke="#ec5b78" stroke-width="7"/>
+    <line x1="246" y1="140" x2="104" y2="226" stroke="#14b8a6" stroke-width="7"/>
+    <text x="175" y="294" text-anchor="middle" fill="#334155" font-family="Arial" font-size="20">LF + RH / RF + LH</text>
+
+    <text x="36" y="352" fill="#334155" font-family="Arial" font-size="18">LF</text>
+    <text x="36" y="397" fill="#334155" font-family="Arial" font-size="18">RF</text>
+    <text x="36" y="442" fill="#334155" font-family="Arial" font-size="18">LH</text>
+    <text x="36" y="487" fill="#334155" font-family="Arial" font-size="18">RH</text>
+    <g transform="translate(70 330)">
+      <rect width="120" height="28" fill="#334155"/><rect x="120" width="120" height="28" fill="#e2e8f0"/>
+      <rect y="45" width="120" height="28" fill="#e2e8f0"/><rect x="120" y="45" width="120" height="28" fill="#334155"/>
+      <rect y="90" width="120" height="28" fill="#e2e8f0"/><rect x="120" y="90" width="120" height="28" fill="#334155"/>
+      <rect y="135" width="120" height="28" fill="#334155"/><rect x="120" y="135" width="120" height="28" fill="#e2e8f0"/>
+    </g>
+    <text x="175" y="548" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">같은 색의 대각선 발이 함께 움직임</text>
+    <rect x="82" y="566" width="24" height="18" fill="#334155"/><text x="114" y="581" fill="#334155" font-family="Arial" font-size="16">stance</text>
+    <rect x="204" y="566" width="24" height="18" fill="#e2e8f0"/><text x="236" y="581" fill="#334155" font-family="Arial" font-size="16">swing</text>
+  </g>
+
+  <g transform="translate(425 98)">
+    <rect width="350" height="602" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="175" y="47" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="30" font-weight="700">Crawl</text>
+    <text x="175" y="78" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="19">one foot at a time · 4-beat</text>
+    <rect x="112" y="112" width="126" height="142" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+    <circle cx="92" cy="126" r="22" fill="#ec5b78"/><text x="92" y="133" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LF</text>
+    <circle cx="258" cy="126" r="22" fill="#f6c85f"/><text x="258" y="133" text-anchor="middle" fill="#422006" font-family="Arial" font-size="18">RF</text>
+    <circle cx="92" cy="240" r="22" fill="#14b8a6"/><text x="92" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LH</text>
+    <circle cx="258" cy="240" r="22" fill="#8b5cf6"/><text x="258" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">RH</text>
+    <path d="M92 148 L92 218 M114 240 H236 M258 218 V148 M236 126 H114" fill="none" stroke="#94a3b8" stroke-width="4" stroke-dasharray="8 7"/>
+    <text x="175" y="294" text-anchor="middle" fill="#334155" font-family="Arial" font-size="20">각 발의 swing이 순차적으로 분리</text>
+
+    <text x="36" y="352" fill="#334155" font-family="Arial" font-size="18">LF</text>
+    <text x="36" y="397" fill="#334155" font-family="Arial" font-size="18">RF</text>
+    <text x="36" y="442" fill="#334155" font-family="Arial" font-size="18">LH</text>
+    <text x="36" y="487" fill="#334155" font-family="Arial" font-size="18">RH</text>
+    <g transform="translate(70 330)">
+      <rect width="60" height="28" fill="#e2e8f0"/><rect x="60" width="180" height="28" fill="#334155"/>
+      <rect y="45" width="180" height="28" fill="#334155"/><rect x="180" y="45" width="60" height="28" fill="#e2e8f0"/>
+      <rect y="90" width="60" height="28" fill="#334155"/><rect x="60" y="90" width="60" height="28" fill="#e2e8f0"/><rect x="120" y="90" width="120" height="28" fill="#334155"/>
+      <rect y="135" width="120" height="28" fill="#334155"/><rect x="120" y="135" width="60" height="28" fill="#e2e8f0"/><rect x="180" y="135" width="60" height="28" fill="#334155"/>
+    </g>
+    <text x="175" y="548" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">동시에 지지하는 발이 많아 저속에서 안정적</text>
+    <rect x="82" y="566" width="24" height="18" fill="#334155"/><text x="114" y="581" fill="#334155" font-family="Arial" font-size="16">stance</text>
+    <rect x="204" y="566" width="24" height="18" fill="#e2e8f0"/><text x="236" y="581" fill="#334155" font-family="Arial" font-size="16">swing</text>
+  </g>
+
+  <g transform="translate(808 98)">
+    <rect width="350" height="602" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <text x="175" y="47" text-anchor="middle" fill="#111827" font-family="Arial, sans-serif" font-size="30" font-weight="700">Pace</text>
+    <text x="175" y="78" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="19">lateral pairs · 2-beat</text>
+    <rect x="112" y="112" width="126" height="142" rx="8" fill="#f1f5f9" stroke="#94a3b8"/>
+    <circle cx="92" cy="126" r="22" fill="#ec5b78"/><text x="92" y="133" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LF</text>
+    <circle cx="258" cy="126" r="22" fill="#14b8a6"/><text x="258" y="133" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">RF</text>
+    <circle cx="92" cy="240" r="22" fill="#ec5b78"/><text x="92" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">LH</text>
+    <circle cx="258" cy="240" r="22" fill="#14b8a6"/><text x="258" y="247" text-anchor="middle" fill="#fff" font-family="Arial" font-size="18">RH</text>
+    <line x1="92" y1="148" x2="92" y2="218" stroke="#ec5b78" stroke-width="7"/>
+    <line x1="258" y1="148" x2="258" y2="218" stroke="#14b8a6" stroke-width="7"/>
+    <text x="175" y="294" text-anchor="middle" fill="#334155" font-family="Arial" font-size="20">LF + LH / RF + RH</text>
+
+    <text x="36" y="352" fill="#334155" font-family="Arial" font-size="18">LF</text>
+    <text x="36" y="397" fill="#334155" font-family="Arial" font-size="18">RF</text>
+    <text x="36" y="442" fill="#334155" font-family="Arial" font-size="18">LH</text>
+    <text x="36" y="487" fill="#334155" font-family="Arial" font-size="18">RH</text>
+    <g transform="translate(70 330)">
+      <rect width="120" height="28" fill="#334155"/><rect x="120" width="120" height="28" fill="#e2e8f0"/>
+      <rect y="45" width="120" height="28" fill="#e2e8f0"/><rect x="120" y="45" width="120" height="28" fill="#334155"/>
+      <rect y="90" width="120" height="28" fill="#334155"/><rect x="120" y="90" width="120" height="28" fill="#e2e8f0"/>
+      <rect y="135" width="120" height="28" fill="#e2e8f0"/><rect x="120" y="135" width="120" height="28" fill="#334155"/>
+    </g>
+    <text x="175" y="548" text-anchor="middle" fill="#64748b" font-family="Arial" font-size="18">같은 쪽 앞뒤 발이 함께 움직임</text>
+    <rect x="82" y="566" width="24" height="18" fill="#334155"/><text x="114" y="581" fill="#334155" font-family="Arial" font-size="16">stance</text>
+    <rect x="204" y="566" width="24" height="18" fill="#e2e8f0"/><text x="236" y="581" fill="#334155" font-family="Arial" font-size="16">swing</text>
+  </g>
+</svg>
