@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">Temporal and spatial composition</title>
+  <desc id="desc">Options sequence skills across time, while MCP combines primitive distributions at each control step.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="640" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="34" font-weight="700">시간 순서 조합과 한 timestep 안의 조합은 다른 문제다</text>
+
+  <rect x="50" y="100" width="520" height="474" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="310" y="146" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Temporal composition</text>
+  <text x="310" y="181" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">Option / hierarchical policy</text>
+  <line x1="104" y1="330" x2="516" y2="330" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="114" y="264" width="116" height="76" rx="8" fill="#22c1c3"/>
+  <text x="172" y="309" text-anchor="middle" fill="#083344" font-family="Arial, sans-serif" font-size="21" font-weight="700">walk</text>
+  <rect x="246" y="264" width="116" height="76" rx="8" fill="#f6c85f"/>
+  <text x="304" y="309" text-anchor="middle" fill="#422006" font-family="Arial, sans-serif" font-size="21" font-weight="700">turn</text>
+  <rect x="378" y="264" width="116" height="76" rx="8" fill="#ef6a5b"/>
+  <text x="436" y="309" text-anchor="middle" fill="#4c0519" font-family="Arial, sans-serif" font-size="21" font-weight="700">carry</text>
+  <text x="310" y="405" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="23">한 skill을 여러 step 유지한 뒤</text>
+  <text x="310" y="441" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="23">다음 skill로 전환한다</text>
+  <text x="310" y="504" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">walk → turn → carry</text>
+
+  <rect x="630" y="100" width="520" height="474" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="890" y="146" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Action-space composition</text>
+  <text x="890" y="181" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">MCP at every control step</text>
+  <rect x="688" y="238" width="116" height="66" rx="8" fill="#22c1c3"/>
+  <text x="746" y="278" text-anchor="middle" fill="#083344" font-family="Arial, sans-serif" font-size="20" font-weight="700">balance</text>
+  <rect x="832" y="238" width="116" height="66" rx="8" fill="#f6c85f"/>
+  <text x="890" y="278" text-anchor="middle" fill="#422006" font-family="Arial, sans-serif" font-size="20" font-weight="700">step</text>
+  <rect x="976" y="238" width="116" height="66" rx="8" fill="#ef6a5b"/>
+  <text x="1034" y="278" text-anchor="middle" fill="#4c0519" font-family="Arial, sans-serif" font-size="20" font-weight="700">push</text>
+  <line x1="746" y1="304" x2="846" y2="372" stroke="#22c1c3" stroke-width="4"/>
+  <line x1="890" y1="304" x2="890" y2="372" stroke="#f6c85f" stroke-width="4"/>
+  <line x1="1034" y1="304" x2="934" y2="372" stroke="#ef6a5b" stroke-width="4"/>
+  <rect x="800" y="372" width="180" height="70" rx="8" fill="#0f172a"/>
+  <text x="890" y="414" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="22">one action aₜ</text>
+  <text x="890" y="504" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">매 timestep gate가 조합을 다시 계산</text>
+</svg>

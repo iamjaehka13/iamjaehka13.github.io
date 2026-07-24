@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Precision-weighted Gaussian composition</title>
+  <desc id="desc">Gate weight and inverse variance determine each primitive's effective influence for every action dimension.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="720" fill="#f8fafc"/>
+  <text x="600" y="56" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="34" font-weight="700">실제 영향력 = gate weight × precision</text>
+  <text x="600" y="92" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="22">λᵢⱼ = wᵢ / vᵢⱼ</text>
+
+  <rect x="48" y="126" width="320" height="222" rx="8" fill="#ffffff" stroke="#22c1c3" stroke-width="2"/>
+  <text x="208" y="169" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Primitive 1</text>
+  <text x="208" y="207" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="22">gate w₁ = 0.8</text>
+  <rect x="84" y="236" width="248" height="38" rx="6" fill="#ccfbf1"/>
+  <text x="208" y="262" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="20">knee variance v₁ₖ = 0.04</text>
+  <rect x="84" y="286" width="248" height="38" rx="6" fill="#f1f5f9"/>
+  <text x="208" y="312" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">arm variance v₁ₐ = 4.0</text>
+
+  <rect x="440" y="126" width="320" height="222" rx="8" fill="#ffffff" stroke="#ef6a5b" stroke-width="2"/>
+  <text x="600" y="169" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Primitive 2</text>
+  <text x="600" y="207" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="22">gate w₂ = 0.3</text>
+  <rect x="476" y="236" width="248" height="38" rx="6" fill="#f1f5f9"/>
+  <text x="600" y="262" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">knee variance v₂ₖ = 3.0</text>
+  <rect x="476" y="286" width="248" height="38" rx="6" fill="#ffe4e6"/>
+  <text x="600" y="312" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="20">arm variance v₂ₐ = 0.03</text>
+
+  <rect x="832" y="126" width="320" height="222" rx="8" fill="#ffffff" stroke="#f6c85f" stroke-width="2"/>
+  <text x="992" y="169" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Effective precision</text>
+  <text x="992" y="217" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="23">knee: λ₁ₖ = 20.0</text>
+  <text x="992" y="255" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="23">arm: λ₂ₐ = 10.0</text>
+  <text x="992" y="303" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">관절마다 지배 primitive가 다르다</text>
+
+  <line x1="368" y1="237" x2="424" y2="237" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="760" y1="237" x2="816" y2="237" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="48" y="390" width="1104" height="272" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="600" y="438" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Composite Gaussian</text>
+  <text x="600" y="487" text-anchor="middle" fill="#334155" font-family="Arial, sans-serif" font-size="25">vⱼ = 1 / Σᵢ λᵢⱼ</text>
+  <text x="600" y="531" text-anchor="middle" fill="#334155" font-family="Arial, sans-serif" font-size="25">μⱼ = (Σᵢ λᵢⱼ μᵢⱼ) / (Σᵢ λᵢⱼ)</text>
+  <line x1="154" y1="570" x2="1046" y2="570" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="310" y="620" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="24" font-weight="700">knee는 primitive 1의 제안</text>
+  <text x="890" y="620" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="24" font-weight="700">arm은 primitive 2의 제안</text>
+</svg>

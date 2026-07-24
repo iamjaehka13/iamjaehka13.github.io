@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Additive mixture and multiplicative composition</title>
+  <desc id="desc">A mixture preserves separate modes while a product keeps the region accepted by all primitives.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="700" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="34" font-weight="700">Mixture는 OR, Product는 AND</text>
+
+  <rect x="50" y="92" width="530" height="550" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="315" y="138" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Additive Mixture</text>
+  <text x="315" y="174" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">π(a) = w₁π₁(a) + w₂π₂(a)</text>
+
+  <line x1="112" y1="474" x2="524" y2="474" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="112" y1="474" x2="112" y2="222" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M130 474 C165 474, 174 470, 200 420 C230 360, 250 238, 286 238 C322 238, 342 360, 372 420 C398 470, 407 474, 442 474" fill="none" stroke="#22c1c3" stroke-width="6"/>
+  <path d="M190 474 C225 474, 234 470, 260 420 C290 360, 310 300, 346 300 C382 300, 402 360, 432 420 C458 470, 467 474, 502 474" fill="none" stroke="#ef6a5b" stroke-width="6"/>
+  <path d="M130 474 C165 474, 174 470, 200 445 C230 415, 250 320, 286 320 C318 320, 328 388, 346 388 C364 388, 374 352, 406 352 C442 352, 462 415, 492 445 C508 462, 516 470, 528 474" fill="none" stroke="#0f172a" stroke-width="5" stroke-dasharray="12 9"/>
+  <circle cx="286" cy="320" r="8" fill="#0f172a"/>
+  <circle cx="406" cy="352" r="8" fill="#0f172a"/>
+  <text x="315" y="532" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="24">primitive 1 또는 primitive 2</text>
+  <text x="315" y="570" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">서로 다른 mode가 함께 남는다</text>
+
+  <rect x="620" y="92" width="530" height="550" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="885" y="138" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">Multiplicative Product</text>
+  <text x="885" y="174" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">π(a) ∝ π₁(a)ʷ¹ π₂(a)ʷ²</text>
+
+  <line x1="682" y1="474" x2="1094" y2="474" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="682" y1="474" x2="682" y2="222" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M700 474 C736 474, 748 460, 780 398 C812 336, 838 258, 875 258 C912 258, 938 336, 970 398 C1002 460, 1014 474, 1050 474" fill="none" stroke="#22c1c3" stroke-width="6"/>
+  <path d="M720 474 C756 474, 768 460, 800 410 C832 360, 868 296, 905 296 C942 296, 968 360, 1000 410 C1032 460, 1044 474, 1080 474" fill="none" stroke="#ef6a5b" stroke-width="6"/>
+  <path d="M790 474 C830 474, 842 447, 860 384 C872 342, 878 324, 890 324 C902 324, 908 342, 920 384 C938 447, 950 474, 990 474" fill="none" stroke="#0f172a" stroke-width="7"/>
+  <rect x="855" y="316" width="70" height="168" fill="#f6c85f" opacity="0.22"/>
+  <text x="885" y="532" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="24">두 primitive가 모두 허용하는 action</text>
+  <text x="885" y="570" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="21">공통 영역이 좁은 composite가 된다</text>
+
+  <circle cx="152" cy="614" r="8" fill="#22c1c3"/>
+  <text x="170" y="622" fill="#334155" font-family="Arial, sans-serif" font-size="20">primitive 1</text>
+  <circle cx="315" cy="614" r="8" fill="#ef6a5b"/>
+  <text x="333" y="622" fill="#334155" font-family="Arial, sans-serif" font-size="20">primitive 2</text>
+  <circle cx="478" cy="614" r="8" fill="#0f172a"/>
+  <text x="496" y="622" fill="#334155" font-family="Arial, sans-serif" font-size="20">composite</text>
+</svg>

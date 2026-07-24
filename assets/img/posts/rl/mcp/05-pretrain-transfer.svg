@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">MCP pre-training and transfer</title>
+  <desc id="desc">Motion imitation trains a shared primitive library, then the primitives are frozen and a new task gate is learned.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="680" fill="#f8fafc"/>
+  <text x="600" y="58" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="34" font-weight="700">Motion imitation에서 운동 지식을 배우고, 새 task에서는 gate만 학습한다</text>
+
+  <rect x="50" y="102" width="500" height="512" rx="8" fill="#ffffff" stroke="#22c1c3" stroke-width="3"/>
+  <text x="300" y="150" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">1. Pre-training</text>
+  <text x="300" y="184" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="21">walking + turning motion clips</text>
+
+  <rect x="86" y="228" width="152" height="72" rx="8" fill="#ccfbf1"/>
+  <text x="162" y="258" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="19">reference</text>
+  <text x="162" y="284" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="19">ŝₜ₊₁, ŝₜ₊₂</text>
+  <rect x="348" y="228" width="154" height="72" rx="8" fill="#ffe4e6"/>
+  <text x="425" y="258" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="19">imitation</text>
+  <text x="425" y="284" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="19">reward</text>
+  <line x1="238" y1="264" x2="334" y2="264" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="120" y="356" width="360" height="104" rx="8" fill="#0f172a"/>
+  <text x="300" y="391" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="21">joint end-to-end PPO</text>
+  <text x="300" y="425" text-anchor="middle" fill="#22c1c3" font-family="Arial, sans-serif" font-size="22">gate + primitive library</text>
+  <text x="300" y="449" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="17">motion은 episode 중에도 전환</text>
+  <line x1="425" y1="300" x2="425" y2="342" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="120" y="506" width="360" height="70" rx="8" fill="#f6c85f"/>
+  <text x="300" y="550" text-anchor="middle" fill="#422006" font-family="Arial, sans-serif" font-size="23" font-weight="700">π₁*, π₂*, …, πₖ*</text>
+  <line x1="300" y1="460" x2="300" y2="492" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="650" y="102" width="500" height="512" rx="8" fill="#ffffff" stroke="#ef6a5b" stroke-width="3"/>
+  <text x="900" y="150" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="28" font-weight="700">2. Downstream transfer</text>
+  <text x="900" y="184" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="21">heading · carry · dribble</text>
+
+  <rect x="706" y="232" width="174" height="74" rx="8" fill="#ffe4e6"/>
+  <text x="793" y="263" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="19">new task</text>
+  <text x="793" y="290" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="19">goal g</text>
+  <rect x="920" y="232" width="174" height="74" rx="8" fill="#ffffff" stroke="#ef6a5b" stroke-width="2"/>
+  <text x="1007" y="263" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="19">new gate</text>
+  <text x="1007" y="290" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="19">ω(s,g)</text>
+  <line x1="880" y1="269" x2="906" y2="269" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="720" y="370" width="360" height="88" rx="8" fill="#f6c85f"/>
+  <text x="900" y="404" text-anchor="middle" fill="#422006" font-family="Arial, sans-serif" font-size="22" font-weight="700">frozen primitive library</text>
+  <text x="900" y="437" text-anchor="middle" fill="#422006" font-family="Arial, sans-serif" font-size="21">π₁*, π₂*, …, πₖ*</text>
+  <line x1="1007" y1="306" x2="1007" y2="356" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="720" y="506" width="360" height="70" rx="8" fill="#0f172a"/>
+  <text x="900" y="550" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="23">structured action space</text>
+  <line x1="900" y1="458" x2="900" y2="492" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <line x1="550" y1="540" x2="636" y2="540" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="593" y="520" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="18">freeze</text>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">MCP actor architecture</title>
+  <desc id="desc">The state is passed to both the gate and primitives, while the goal is visible only to the gate.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="760" fill="#f8fafc"/>
+  <text x="600" y="56" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="34" font-weight="700">목표는 gate만 보고, primitive는 몸 상태만 본다</text>
+
+  <rect x="62" y="116" width="176" height="74" rx="8" fill="#0f172a"/>
+  <text x="150" y="148" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="21">robot state</text>
+  <text x="150" y="177" text-anchor="middle" fill="#94a3b8" font-family="Arial, sans-serif" font-size="20">s</text>
+  <rect x="62" y="246" width="176" height="74" rx="8" fill="#ef6a5b"/>
+  <text x="150" y="278" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="21">task goal</text>
+  <text x="150" y="307" text-anchor="middle" fill="#fff1f2" font-family="Arial, sans-serif" font-size="20">g</text>
+
+  <rect x="326" y="90" width="278" height="250" rx="8" fill="#ffffff" stroke="#ef6a5b" stroke-width="2"/>
+  <text x="465" y="134" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Gating network</text>
+  <text x="465" y="174" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="21">input: (s, g)</text>
+  <rect x="365" y="202" width="200" height="50" rx="6" fill="#ffe4e6"/>
+  <text x="465" y="234" text-anchor="middle" fill="#881337" font-family="Arial, sans-serif" font-size="21">sigmoid weights</text>
+  <text x="465" y="302" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="25">w₁, w₂, …, wₖ</text>
+
+  <rect x="326" y="404" width="278" height="262" rx="8" fill="#ffffff" stroke="#22c1c3" stroke-width="2"/>
+  <text x="465" y="448" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Primitive networks</text>
+  <text x="465" y="488" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="21">input: s only</text>
+  <rect x="352" y="520" width="102" height="78" rx="6" fill="#ccfbf1"/>
+  <text x="403" y="551" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="19">π₁</text>
+  <text x="403" y="579" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="18">μ₁, v₁</text>
+  <rect x="476" y="520" width="102" height="78" rx="6" fill="#ccfbf1"/>
+  <text x="527" y="551" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="19">πₖ</text>
+  <text x="527" y="579" text-anchor="middle" fill="#134e4a" font-family="Arial, sans-serif" font-size="18">μₖ, vₖ</text>
+  <text x="465" y="638" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="19">goal을 직접 볼 수 없음</text>
+
+  <rect x="720" y="240" width="276" height="260" rx="8" fill="#ffffff" stroke="#f6c85f" stroke-width="3"/>
+  <text x="858" y="285" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27" font-weight="700">Product</text>
+  <text x="858" y="327" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">precision-weighted</text>
+  <text x="858" y="384" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="27">π(a|s,g)</text>
+  <text x="858" y="426" text-anchor="middle" fill="#334155" font-family="Arial, sans-serif" font-size="22">∝ ∏ᵢ πᵢ(a|s)ʷⁱ</text>
+  <text x="858" y="470" text-anchor="middle" fill="#64748b" font-family="Arial, sans-serif" font-size="20">N(μ, Σ)</text>
+
+  <rect x="1042" y="298" width="112" height="142" rx="8" fill="#0f172a"/>
+  <text x="1098" y="342" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="21">one</text>
+  <text x="1098" y="371" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="21">action</text>
+  <text x="1098" y="413" text-anchor="middle" fill="#f6c85f" font-family="Arial, sans-serif" font-size="24">a</text>
+
+  <path d="M238 153 H286 V142 H312" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M238 283 H286 V286 H312" fill="none" stroke="#ef6a5b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M238 153 H276 V535 H312" fill="none" stroke="#22c1c3" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M604 215 H660 V316 H706" fill="none" stroke="#ef6a5b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M604 535 H660 V432 H706" fill="none" stroke="#22c1c3" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="996" y1="370" x2="1028" y2="370" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <text x="817" y="590" text-anchor="middle" fill="#0f172a" font-family="Arial, sans-serif" font-size="22" font-weight="700">PPO gradient</text>
+  <text x="817" y="622" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">composite log-probability를 통해</text>
+  <text x="817" y="652" text-anchor="middle" fill="#475569" font-family="Arial, sans-serif" font-size="20">gate와 primitive로 함께 흐른다</text>
+</svg>
