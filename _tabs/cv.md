@@ -199,19 +199,15 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       <dl class="resume-skills">
         <div>
           <dt>Programming</dt>
-          <dd>Python, C++</dd>
+          <dd>Python, C</dd>
         </div>
         <div>
           <dt>Robotics</dt>
-          <dd>ROS 2, Unitree SDK2, CycloneDDS, rosbag2</dd>
+          <dd>ROS 2</dd>
         </div>
         <div>
-          <dt>Learning &amp; Simulation</dt>
-          <dd>PyTorch, Isaac Gym, Isaac Lab, MuJoCo, RSL-RL, PPO</dd>
-        </div>
-        <div>
-          <dt>Tools</dt>
-          <dd>Linux, Git, NumPy, SciPy</dd>
+          <dt>Simulation</dt>
+          <dd>Isaac Sim, Isaac Lab</dd>
         </div>
       </dl>
     </section>
