@@ -45,9 +45,8 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
           <span aria-hidden="true"></span>
         </div>
         <p>
-          Undergraduate student in Mechanical, Robotics and Automotive Engineering
-          with experience in quadruped locomotion, sim-to-real reinforcement learning,
-          and physical robot deployment.
+          Undergraduate student focused on reinforcement learning for legged robots,
+          with hands-on experience deploying locomotion policies on a real Unitree Go2.
         </p>
       </section>
 
@@ -98,18 +97,14 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         <div class="resume-entry-body">
           <h3>
             <a href="/posts/unitree-go2-part-5-sim2real-success/">
-              Unitree Go2 Locomotion and Sim-to-Real Deployment
+              Unitree Go2 Sim-to-Real Locomotion
             </a>
           </h3>
           <p class="resume-role">Independent Project</p>
           <ul>
             <li>
-              Trained and exported a PPO locomotion policy using a 47-dimensional
-              observation and 12 joint-position targets.
-            </li>
-            <li>
-              Implemented a 50 Hz Unitree SDK2/CycloneDDS deployment pipeline and
-              demonstrated command-responsive locomotion on a personally owned Go2.
+              Trained a locomotion policy in simulation and deployed it on a physical
+              Unitree Go2, demonstrating command-responsive walking.
             </li>
           </ul>
         </div>
@@ -124,19 +119,18 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         <div class="resume-entry-body">
           <h3>
             <a href="/posts/unitree-go2-part-8-thermal-policy-comparison/">
-              Thermal-Aware Reinforcement Learning for Go2 Locomotion
+              Thermal-Aware Locomotion for Unitree Go2
             </a>
           </h3>
           <p class="resume-role">Capstone Design Project</p>
           <ul>
             <li>
-              Fit a reported-temperature-rate proxy to real Go2 telemetry and expanded
-              the policy observation from 47 to 77 dimensions with thermal and load states.
+              Developed a thermal-aware locomotion policy using a temperature-rate
+              proxy fitted to real Go2 telemetry.
             </li>
             <li>
-              In a 480 s MuJoCo evaluation at a 1.5 m/s command, reduced
-              distance-normalized proxy thermal dose by 22.5% and hotspot dose by
-              27.0% versus baseline; the policy has not yet been deployed on hardware.
+              In MuJoCo, reduced proxy thermal dose by 22.5% and hotspot dose by
+              27.0% relative to the baseline; hardware validation is planned.
             </li>
           </ul>
         </div>
