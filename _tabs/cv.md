@@ -122,7 +122,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
               Thermal-Aware Locomotion for Unitree Go2
             </a>
           </h3>
-          <p class="resume-role">Capstone Design Project</p>
+          <p class="resume-role">Individual Capstone Design Project</p>
           <ul>
             <li>
               Developed a thermal-aware locomotion policy using a temperature-rate
