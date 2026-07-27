@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 1. TurtleBot으로 ROS2 연결하기"
 date: 2025-11-26 22:08:43 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+last_modified_at: 2025-11-26 22:08:43 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, turtlebot, omnigraph, urdf]
 description: Isaac Sim에서 TurtleBot3 URDF를 불러오고 ROS2 /cmd_vel 메시지로 주행시키는 전체 흐름을 정리한다.

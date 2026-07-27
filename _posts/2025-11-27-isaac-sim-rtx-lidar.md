@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 3. RTX Lidar Sensors"
-date: 2025-11-27 15:57:57 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2025-11-28 15:57:57 +0900
+last_modified_at: 2025-11-28 15:57:57 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, lidar, rtx-lidar, laserscan, pointcloud, rviz2, omnigraph]
 description: Isaac Sim에서 TurtleBot에 RTX 2D/3D Lidar를 붙이고 ROS2 LaserScan, PointCloud topic으로 publish하는 흐름을 정리한다.

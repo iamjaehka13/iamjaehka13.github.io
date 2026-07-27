@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 5. ROS2 Publish Rate and QoS"
-date: 2025-12-01 15:41:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2025-12-02 15:41:00 +0900
+last_modified_at: 2025-12-02 15:41:00 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, publish-rate, qos, omnigraph, imu]
 description: Isaac Sim ROS2 OmniGraph에서 publish rate를 조정하고 QoS profile과 static publisher를 설정하는 흐름을 정리한다.

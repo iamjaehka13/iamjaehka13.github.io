@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 4. TF Trees and Odometry"
-date: 2025-11-28 19:07:37 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2025-12-01 19:07:37 +0900
+last_modified_at: 2025-12-01 19:07:37 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, tf, odometry, rviz2, omnigraph]
 description: Isaac Sim에서 TurtleBot의 TF tree와 odometry를 ROS2로 publish하고 RViz2에서 확인하는 흐름을 정리한다.

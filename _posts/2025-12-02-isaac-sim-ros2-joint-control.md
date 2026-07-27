@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 6. ROS2 Joint Control"
-date: 2025-12-02 19:50:27 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2025-12-03 19:50:27 +0900
+last_modified_at: 2025-12-03 19:50:27 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, joint-control, joint-state, franka, omnigraph]
 description: Isaac Sim에서 Franka Panda의 joint state를 ROS2로 publish하고 joint command를 subscribe해 관절을 제어하는 흐름을 정리한다.

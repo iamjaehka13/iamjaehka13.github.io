@@ -1,7 +1,7 @@
 ---
 title: "Isaac Sim Tutorial 2. ROS2 Cameras"
 date: 2025-11-27 14:52:55 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+last_modified_at: 2025-11-27 14:52:55 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, camera, rviz2, omnigraph, sensor]
 description: Isaac Sim의 TurtleBot에 카메라를 붙이고 ROS2 image topic으로 publish한 뒤 RViz2에서 확인하는 흐름을 정리한다.
