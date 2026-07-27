@@ -1,7 +1,7 @@
 ---
 title: "OhDRL: MDP에서 MPO까지 이어지는 강화학습"
-date: 2026-07-28 01:20:00 +0900
-last_modified_at: 2026-07-28 02:01:00 +0900
+date: 2025-10-17 01:20:00 +0900
+last_modified_at: 2025-10-17 02:16:00 +0900
 categories: [RL, Study]
 tags: [reinforcement-learning, deep-reinforcement-learning, mdp, bellman-equation, dynamic-programming, monte-carlo, temporal-difference, dqn, policy-gradient, actor-critic, ppo, distributional-rl, mpo]
 description: "직접 작성하고 필기한 OhDRL.pdf 164페이지를 처음부터 끝까지 따라가며 MDP, Bellman equation, DP, RL, DQN, Policy Gradient, Distributional RL, MPO의 식과 알고리즘을 연결한다."
@@ -28,7 +28,7 @@ image:
 
 ## **0. 먼저 전체 흐름**
 
-PDF의 장 구분과 기존 세부 글은 다음처럼 대응한다.
+PDF의 장 구분과 기존 세부 글의 대응:
 
 | 기록 | PDF 범위 | 핵심 질문 | 세부 글 |
 | --- | --- | --- | --- |
@@ -38,10 +38,10 @@ PDF의 장 구분과 기존 세부 글은 다음처럼 대응한다.
 | A4 | p.40–62 | 모델을 모를 때 경험으로 어떻게 추정하는가? | [Reinforcement Learning](/posts/reinforcement-learning/) |
 | A5 | p.63–102 | 표를 쓸 수 없을 만큼 상태가 커지면 어떻게 하는가? | [Deep Reinforcement Learning](/posts/deep-reinforcement-learning/) |
 | A6 | p.103–124 | 연속 행동과 불안정한 정책 업데이트를 어떻게 다루는가? | [Policy Gradient DRL](/posts/policy-gradient-drl/) |
-| A7 | p.125–142 | 평균 Q값이 버리는 return 정보를 어떻게 보존하는가? | [Distributional RL](/posts/distributional-reinforcement-learning/) |
-| A8 | p.143–164 | 안정성과 데이터 효율을 추론 관점에서 어떻게 결합하는가? | [MPO](/posts/maximum-a-posteriori-policy-optimisation/) |
+| A7 | p.125–142 | 평균 Q값이 버리는 return 정보를 어떻게 보존하는가? | 이 글 9장 |
+| A8 | p.143–164 | 안정성과 데이터 효율을 추론 관점에서 어떻게 결합하는가? | 이 글 10장 |
 
-한 줄로 압축하면 다음과 같다.
+한 줄 요약:
 
 > **문제를 MDP로 정의하고, Bellman equation으로 시간축을 접은 뒤, 알려진 모델에서는 DP로 계산하고 알려지지 않은 모델에서는 표본으로 학습한다. 상태가 커지면 신경망을 붙이고, 행동과 정책 업데이트가 어려워지면 Policy Gradient 계열로 넘어간다. 이후 value의 표현을 분포로 확장하거나, policy improvement 자체를 확률적 추론으로 다시 해석한다.**
 
@@ -60,7 +60,7 @@ PDF의 장 구분과 기존 세부 글은 다음처럼 대응한다.
 
 ### **0.2 164쪽을 더 잘게 나눈 지도**
 
-8개의 장만 적어 두면 중간에 무엇을 공부했는지가 사라진다. 실제 PDF의 흐름은 다음 정도의 해상도로 나뉜다.
+8개의 장만 적어 두면 중간에 공부한 내용이 사라진다. 그래서 실제 PDF의 흐름을 조금 더 잘게 분해했다.
 
 | PDF 범위 | 실제로 이어지는 내용 |
 | --- | --- |
@@ -79,7 +79,7 @@ PDF의 장 구분과 기존 세부 글은 다음처럼 대응한다.
 | p.143–154 | Bayesian statistics, Bayes rule, MLE, MAP, ELBO, EM |
 | p.155–164 | RL as inference, MPO E-step/M-step, decoupled KL, Retrace, 전체 algorithm |
 
-이 글에서 각 구간을 읽는 순서도 통일한다.
+각 구간을 읽는 순서도 하나로 통일:
 
 1. **정의:** 무엇을 추정하거나 최적화하는가?
 2. **유도:** 그 식은 return과 probability에서 어떻게 나오는가?
@@ -91,13 +91,13 @@ PDF의 장 구분과 기존 세부 글은 다음처럼 대응한다.
 
 ## **1. Deep Reinforcement Learning은 어디에 놓이는가**
 
-PDF의 첫 네 페이지는 ML, DL, RL의 관계부터 시작한다.
+PDF 첫 네 페이지의 출발점은 ML, DL, RL의 관계.
 
 - **Supervised Learning:** 정답 label이 있는 데이터에서 입력과 출력의 관계 학습
 - **Unsupervised Learning:** label 없이 데이터의 구조나 분포 발견
 - **Reinforcement Learning:** 정답 행동 대신 환경이 주는 reward를 통해 장기적인 행동 전략 학습
 
-세 방법의 차이는 network architecture보다 **학습 데이터가 어떻게 생기고 어떤 target을 받는가**에 있다.
+세 방법을 가르는 핵심은 network architecture보다 **학습 데이터가 어떻게 생기고 어떤 target을 받는가**에 가깝다.
 
 | 구분 | 데이터 생성 | 학습 신호 | 핵심 어려움 |
 | --- | --- | --- | --- |
@@ -113,7 +113,7 @@ S_t
 (R_{t+1},S_{t+1})
 $$
 
-이 한 줄에는 supervised learning과 다른 세 문제가 들어 있다.
+이 한 줄에 겹쳐 있는, supervised learning과 다른 세 가지 문제:
 
 - **Sequential dependence:** $A_t$가 $S_{t+1}$을 바꾸고, 이후 모든 sample의 출발점까지 변경
 - **Delayed credit:** 마지막 성공 보상이 수십 step 전 행동 중 무엇 덕분인지 즉시 알 수 없음
@@ -127,7 +127,7 @@ d^{\pi_\theta}(s)
 \Pr(S_t=s\mid\pi_\theta)
 $$
 
-Policy를 바꾸면 state visitation distribution $d^{\pi_\theta}$도 바뀐다. 같은 loss를 줄이고 있어도 학습 데이터 분포가 함께 이동하는 이유.
+Policy를 바꾸면 state visitation distribution $d^{\pi_\theta}$도 함께 이동한다. 같은 loss를 줄이고 있는데도 학습 대상이 계속 달라지는 이유다.
 
 **Deep RL = Deep Learning + Reinforcement Learning.** 신경망은 이미지나 연속 센서처럼 큰 상태를 표현하고, RL은 그 표현 위에서 장기 의사결정을 학습한다.
 
@@ -153,7 +153,7 @@ parameter θ를 공유하는 함수로 여러 state의 값을 함께 근사
 
 ### **2.1 Grid world에서 시작하는 이유**
 
-Grid world는 단순하지만 강화학습의 핵심 요소를 모두 갖는다.
+Grid world는 단순하지만 강화학습의 핵심 요소가 한 화면에 모두 들어 있다.
 
 - 칸의 위치: state
 - 상하좌우 이동: action
@@ -165,13 +165,13 @@ Grid world는 단순하지만 강화학습의 핵심 요소를 모두 갖는다.
 
 *직접 작성한 `OhDRL.pdf`, p.6. 상태, 행동, 보상, 목표가 한 화면에 들어간 Grid world.*
 
-결정론적 환경에서는 같은 $(s,a)$가 항상 같은 $s'$를 만든다. 확률적 환경에서는 의도한 방향으로 갈 확률과 옆으로 미끄러질 확률이 함께 존재한다. Policy가 행동을 골라도 결과까지 완전히 결정하는 것은 아니라는 뜻.
+결정론적 환경에서는 같은 $(s,a)$가 항상 같은 $s'$를 만든다. 반면 확률적 환경에는 의도한 방향으로 갈 가능성과 옆으로 미끄러질 가능성이 공존한다. Policy가 고르는 것은 행동이지 결과 그 자체가 아니다.
 
 ![결정론적 전이와 확률론적 전이](/assets/img/posts/rl/ohdrl-complete-flow/detail-p007-actions-deterministic-stochastic.jpg)
 
 *직접 작성한 `OhDRL.pdf`, p.7. 같은 action도 environment dynamics에 따라 하나의 결과 또는 여러 확률적 결과로 이어진다.*
 
-예를 들어 `east`를 선택했을 때:
+가령 `east`를 선택했을 때의 전이:
 
 $$
 \Pr(S_{t+1}=s_{\text{east}}\mid S_t=s,A_t=\text{east})=0.8
@@ -225,7 +225,7 @@ $$
 
 ### **2.2.2 State와 observation은 같은가**
 
-이론의 $S_t$는 미래를 예측하기에 충분한 정보를 가진 state다. 실제 구현이 받는 $O_t$는 sensor observation일 수 있다.
+이론의 $S_t$는 미래 예측에 충분한 정보를 가진 state. 실제 구현이 받는 값은 sensor observation $O_t$일 수 있다.
 
 $$
 O_t\sim p(o\mid S_t)
@@ -242,7 +242,7 @@ $$
 
 ### **2.3 MDP tuple**
 
-Discounted MDP를 다음 tuple로 둔다.
+Discounted MDP의 기본 tuple:
 
 $$
 \mathcal{M}
@@ -297,7 +297,7 @@ $$
 
 ### **2.4 Reward와 Return**
 
-Reward $R_{t+1}$은 한 step의 피드백. Policy가 최대화하려는 것은 한 번의 reward가 아니라 누적된 return이다.
+Reward $R_{t+1}$은 한 step의 피드백. Policy의 최적화 대상은 그 한 번의 reward가 아니라 누적 return.
 
 $$
 G_t
@@ -340,7 +340,7 @@ $$
 
 ### **2.4.1 Episodic과 continuing task**
 
-Episodic task에는 terminal time $T$가 존재한다.
+Episodic task에는 terminal time $T$가 존재:
 
 $$
 G_t
@@ -416,7 +416,7 @@ $$
 
 ### **3.1 State value와 action value**
 
-정책 $\pi$ 아래에서 state의 가치:
+정책 $\pi$ 아래 state의 가치:
 
 $$
 v_\pi(s)
@@ -424,7 +424,7 @@ v_\pi(s)
 \mathbb{E}_\pi[G_t\mid S_t=s]
 $$
 
-state에서 특정 action까지 고정한 가치:
+State에서 특정 action까지 고정한 가치:
 
 $$
 q_\pi(s,a)
@@ -436,7 +436,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.18. $v_\pi$, $q_\pi$, advantage의 관계.*
 
-둘의 관계:
+두 value의 관계:
 
 $$
 v_\pi(s)
@@ -458,7 +458,7 @@ $$
 
 둘을 합치면 state에서 action을 평균내고, 그 action이 만드는 next state와 reward를 다시 평균내는 구조.
 
-Advantage는 action value에서 state의 평균적 가치를 뺀 상대적 이득.
+Advantage는 action value에서 그 state의 평균적 가치를 뺀 상대적 이득.
 
 $$
 A_\pi(s,a)
@@ -470,7 +470,7 @@ $$
 
 $A_\pi(s,a)>0$이면 현재 policy가 평균적으로 하던 선택보다 좋은 action, $A_\pi(s,a)<0$이면 평균보다 나쁜 action. Policy Gradient에서 좋은 action의 확률을 높이고 나쁜 action의 확률을 낮추는 weight가 되는 이유다.
 
-Policy 아래에서 advantage의 action 평균은 0.
+Policy 아래에서 advantage를 action에 대해 평균내면 0:
 
 $$
 \sum_a
@@ -482,7 +482,7 @@ Advantage는 state마다 value scale이 달라도 “그 state에서 상대적�
 
 ### **3.2 Bellman expectation equation**
 
-Return을 첫 reward와 나머지 return으로 분해하면:
+Return을 첫 reward와 나머지 return으로 쪼개면:
 
 $$
 G_t
@@ -520,7 +520,7 @@ v_\pi(s)
 \end{aligned}
 $$
 
-첫 번째 등호는 value의 정의, 두 번째는 return의 재귀식, 세 번째는 다음 state 이후 return의 conditional expectation을 $v_\pi(S_{t+1})$로 바꾼 것.
+첫 번째 등호는 value의 정의. 두 번째는 return의 재귀식. 마지막은 다음 state 이후 return의 conditional expectation을 $v_\pi(S_{t+1})$로 치환한 결과다.
 
 ![Bellman expectation equation의 전개](/assets/img/posts/rl/ohdrl-complete-flow/06-bellman-expectation.jpg)
 
@@ -539,12 +539,12 @@ r+\gamma v_\pi(s')
 \right]
 $$
 
-식 안에는 두 확률분포가 겹친다.
+식 안에 겹쳐 있는 두 확률분포:
 
 1. $\pi(a\mid s)$: agent가 어떤 action을 선택하는가
 2. $p(s',r\mid s,a)$: environment가 어떤 next state와 reward를 만드는가
 
-Policy evaluation은 첫 번째 분포를 고정한 채 이 식의 fixed point를 찾는 문제다.
+첫 번째 분포를 고정한 채 이 식의 fixed point를 찾는 문제, 바로 policy evaluation.
 
 유한 state MDP를 행렬로 쓰면:
 
@@ -564,7 +564,7 @@ $$
 (I-\gamma P_\pi)^{-1}\mathbf r_\pi
 $$
 
-작은 MDP라면 linear system으로 직접 풀 수 있다. DP가 반복 backup을 쓰는 이유는 큰 state space에서 inverse를 직접 계산하는 비용과 transition 구조 활용 문제 때문.
+작은 MDP라면 linear system으로 직접 풀 수 있다. 다만 state space가 커지면 inverse 계산이 비싸고 transition의 sparse structure도 활용해야 한다. DP가 반복 backup을 쓰는 배경이다.
 
 핵심은 먼 미래를 전부 tree로 펼치지 않는다는 점. Bellman equation은 다음 state의 value로 현재 value를 재귀적으로 표현한다. 반복 계산이나 학습에서는 다음 state의 현재 estimate를 가져와 값을 갱신하며, 이 연산이 **backup**. 실제 return을 끝까지 관측하지 않고 현재 estimate를 target에 넣는 방식이 **bootstrapping**이다.
 
@@ -599,7 +599,7 @@ $$
 
 ### **3.3 Bellman optimality equation**
 
-모든 policy 중 가장 큰 value를 optimal value로 정의한다.
+모든 policy 가운데 가장 큰 value를 optimal value로 정의:
 
 $$
 v_*(s)
@@ -617,7 +617,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.22. Policy 사이의 value ordering과 optimal value, optimal policy의 존재.*
 
-현재 policy를 평가하는 데서 멈추지 않고 가장 좋은 action을 선택하면:
+현재 policy 평가에서 한 걸음 더 나아가 가장 좋은 action을 고르면:
 
 $$
 v_*(s)
@@ -665,7 +665,7 @@ p(s',r\mid s,a)
 \left[r+\gamma v_*(s')\right]
 $$
 
-반면 $q_{\ast}$에는 “이 action을 한 뒤의 장기 결과”가 이미 들어 있다. Model-free control이 $Q(s,a)\approx q_{\ast}(s,a)$를 직접 학습하는 이유.
+반면 $q_{\ast}$에는 “이 action을 한 뒤의 장기 결과”가 이미 담겨 있다. 그래서 model-free control은 $Q(s,a)\approx q_{\ast}(s,a)$를 직접 학습한다.
 
 Bellman expectation equation은 fixed policy의 선형 expectation 관계다. Bellman optimality equation은 $\max$가 포함돼 일반적으로 nonlinear. 이 차이 때문에 “정책 평가”와 “최적 제어”의 난이도가 갈린다.
 
@@ -682,7 +682,7 @@ $$
 
 Discounted finite MDP에서는 이 operator도 contraction이므로 반복 적용하면 $v_{\ast}$로 수렴한다. 다음 장의 Value Iteration이 바로 이 반복.
 
-이제 분기점.
+여기서 첫 번째 분기.
 
 - **전이확률과 보상을 아는 경우:** Bellman equation의 합을 직접 계산하는 Dynamic Programming
 - **전이확률을 모르는 경우:** 실제 transition을 표본으로 관측하는 Reinforcement Learning
@@ -697,7 +697,7 @@ Discounted finite MDP에서는 이 operator도 contraction이므로 반복 적�
 
 DP는 가능한 다음 상태를 모두 합산하는 **full backup**을 사용한다. 이를 위해 $p(s',r\mid s,a)$를 알아야 한다.
 
-DP가 작동하는 두 구조:
+DP를 가능하게 하는 두 구조:
 
 - **Optimal substructure:** optimal policy의 이후 부분도 해당 subproblem에서 optimal
 - **Overlapping subproblems:** 같은 next state value가 여러 predecessor의 계산에 반복 등장
@@ -706,7 +706,7 @@ Bellman equation은 첫 번째 구조를 재귀식으로 만들고, value table�
 
 한 state의 backup 비용이 대략 $O(\lvert\mathcal A\rvert\lvert\mathcal S\rvert)$이고 모든 state를 sweep하면 $O(\lvert\mathcal S\rvert^2\lvert\mathcal A\rvert)$. State가 조합적으로 늘어나는 실제 문제에서 full sweep이 막히는 이유다.
 
-Update 순서도 나뉜다.
+Update 순서에 따른 구분:
 
 - **Synchronous backup:** $V_k$ 전체를 기준으로 $V_{k+1}$ 전체 계산
 - **Asynchronous backup:** state를 순차적으로 갱신하며 방금 바뀐 값도 즉시 사용
@@ -715,7 +715,7 @@ Update 순서도 나뉜다.
 
 ### **4.2 Policy Iteration**
 
-Policy Iteration은 두 단계를 번갈아 수행한다.
+Policy Iteration은 두 단계의 반복.
 
 **Policy evaluation**
 
@@ -779,7 +779,7 @@ Greedy improvement는 위 조건을 자동으로 만족한다. 새 policy가 기
 
 *직접 작성한 `OhDRL.pdf`, p.37. Initialization, iterative evaluation, greedy improvement, policy-stable 종료 조건.*
 
-Policy Iteration을 알고리즘 수준에서 풀면:
+알고리즘 수준에서 풀어 쓴 Policy Iteration:
 
 1. $V(s)$와 $\pi(s)$ 초기화
 2. $\pi$를 고정하고 Bellman expectation backup 반복
@@ -809,7 +809,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.32. State sweep, 최대 residual $\Delta$, threshold $\theta$를 이용한 종료.*
 
-Pseudocode의 핵심 값은 residual.
+Pseudocode에서 눈여겨볼 값은 residual.
 
 $$
 \Delta_k
@@ -826,7 +826,7 @@ $\Delta_k<\theta$가 되면 반복을 멈춘다. $\theta$가 지나치게 작으
 
 자동차 예제의 상태는 `cool`, `warm`, `overheated`, action은 `slow`, `fast`. `fast`는 즉각 reward가 클 수 있지만 warm 상태에서 과열 terminal로 갈 위험도 증가한다.
 
-한 backup은 “지금 reward가 큰가”만 보지 않는다.
+한 번의 backup이 묻는 것은 “지금 reward가 큰가”만이 아니다.
 
 $$
 Q_k(\text{warm},\text{fast})
@@ -851,7 +851,7 @@ $$
 
 ### **4.4 Policy Iteration과 Value Iteration의 경계**
 
-두 방법은 완전히 별개의 알고리즘이라기보다 evaluation depth가 다른 GPI.
+두 방법은 완전히 별개라기보다 evaluation depth가 다른 GPI로 보는 편이 자연스럽다.
 
 | Evaluation depth | 해석 |
 | --- | --- |
@@ -863,7 +863,7 @@ $$
 
 > **DP의 병목은 Bellman equation이 아니라 full backup에 필요한 정확한 모델과 계산량.**
 
-이제 합을 표본 하나로 바꾼다.
+다음 단계는 합을 표본 하나로 바꾸는 일.
 
 ## **5. Reinforcement Learning: Unknown MDP에서의 추정**
 
@@ -907,11 +907,11 @@ p(s',r\mid s,a)
 \left[r+\gamma V(s')\right]
 $$
 
-RL update는 이 noisy sample을 여러 번 보며 expectation의 fixed point로 접근하는 stochastic approximation. Model을 몰라도 되는 대신 sample 수, exploration, step-size 조건이 새 문제로 들어온다.
+RL update는 noisy sample을 반복해서 보며 expectation의 fixed point로 접근하는 stochastic approximation. 모델을 몰라도 된다는 이점과 함께 sample 수, exploration, step-size라는 새 문제가 들어온다.
 
 ### **5.2 Generalized Policy Iteration**
 
-거의 모든 control 알고리즘 안에는 두 과정이 있다.
+거의 모든 control 알고리즘 안에서 되풀이되는 두 과정:
 
 1. **Policy evaluation:** 현재 policy가 얼마나 좋은지 추정
 2. **Policy improvement:** 더 좋아 보이는 action의 확률 증가
@@ -924,7 +924,7 @@ RL update는 이 noisy sample을 여러 번 보며 expectation의 fixed point로
 
 ### **5.3 Monte Carlo: episode가 끝난 뒤 실제 return 사용**
 
-MC prediction은 episode가 끝난 후 관측한 return $G_t$를 target으로 사용한다.
+MC prediction의 target은 episode가 끝난 뒤 관측한 return $G_t$.
 
 $$
 Q(S_t,A_t)
@@ -937,7 +937,7 @@ G_t-Q(S_t,A_t)
 \right]
 $$
 
-같은 state-action이 한 episode에 여러 번 등장할 때 update 기준도 나뉜다.
+같은 state-action이 한 episode에 여러 번 등장한다면 update 기준은 둘로 나뉜다.
 
 - **First-visit MC:** episode에서 처음 등장한 시점의 return만 사용
 - **Every-visit MC:** 등장한 모든 시점의 return을 각각 사용
@@ -967,7 +967,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.46. 모든 return을 저장하지 않고 현재 평균과 새 sample만으로 update하는 과정.*
 
-고정 $\alpha$를 반복해서 전개하면 최근 sample에 더 큰 지수 가중이 생긴다.
+고정 $\alpha$를 반복해서 전개했을 때 생기는 최근 sample 중심의 지수 가중:
 
 $$
 Q_n
@@ -980,14 +980,14 @@ $$
 
 그래서 sample mean은 stationary value 추정, constant step-size는 변화하는 policy나 environment를 계속 따라갈 때 유리하다.
 
-특징:
+MC의 성격을 모아 보면:
 
 - 환경 모델 불필요
 - bootstrap 없음
 - terminal까지 기다려야 함
 - 고정된 policy value의 표본으로는 unbiased하지만 variance가 큼
 
-Control에서는 $\epsilon$-greedy로 exploration을 유지한다.
+Control 단계의 exploration은 $\epsilon$-greedy로 유지:
 
 $$
 \pi(a\mid s)
@@ -1016,7 +1016,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.50. Episode 생성, 뒤에서부터 return 계산, visit별 Q update, greedy improvement.*
 
-MC control의 한 episode:
+MC control의 한 episode를 순서대로 쓰면:
 
 1. 현재 $\epsilon$-soft policy로 trajectory 생성
 2. Terminal에서 시작해 $G\leftarrow\gamma G+R$로 return 누적
@@ -1051,9 +1051,9 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.51. MC의 episode return과 TD의 one-step bootstrap 비교.*
 
-$\delta_t$는 TD error. 실제 reward 한 개와 다음 value estimate를 섞는다.
+$\delta_t$는 TD error. 실제 reward 하나와 다음 value estimate의 조합.
 
-TD error는 단순한 loss가 아니라 **현재 transition이 기존 예측보다 얼마나 놀라웠는가**를 나타낸다.
+TD error를 단순한 loss로만 보면 의미가 좁아진다. 더 직접적인 해석은 **현재 transition이 기존 예측보다 얼마나 놀라웠는가**.
 
 $$
 \delta_t
@@ -1101,7 +1101,7 @@ R_{t+1}
 \gamma\max_{a'}Q(S_{t+1},a')
 $$
 
-실제 update는 target과 현재 Q의 차이를 step-size만큼 반영한다.
+실제 update에서는 target과 현재 Q의 차이를 step-size만큼 반영:
 
 $$
 Q(S_t,A_t)
@@ -1114,7 +1114,7 @@ Y_t-Q(S_t,A_t)
 \right]
 $$
 
-Sarsa라는 이름은 update에 들어가는 tuple에서 왔다.
+`Sarsa`라는 이름의 출처는 update에 들어가는 tuple:
 
 $$
 (S_t,A_t,R_{t+1},S_{t+1},A_{t+1})
@@ -1136,7 +1136,7 @@ Cliff walking에서 Sarsa는 탐색 중 절벽에 떨어질 위험까지 반영�
 - **Target policy $\pi$:** 배우고 싶은 policy
 - **Behavior policy $\mu$:** 데이터를 생성하는 policy
 
-둘이 다르면 $\mu$가 만든 trajectory로 $\pi$의 기대값을 추정해야 한다. Importance sampling ratio:
+둘이 다르면 $\mu$가 만든 trajectory로 $\pi$의 기대값을 추정해야 한다. 이때 등장하는 importance sampling ratio:
 
 $$
 \rho_{t:T-1}
@@ -1152,7 +1152,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.54. Behavior distribution에서 뽑은 sample을 target distribution의 expectation으로 보정하는 원리.*
 
-가장 먼저 필요한 조건은 support coverage.
+가장 먼저 필요한 조건은 support coverage:
 
 $$
 \pi(a\mid s)>0
@@ -1277,7 +1277,7 @@ $$
 
 ### **5.9 Multi-step과 TD($\lambda$)**
 
-One-step TD와 full-return MC 사이에는 여러 길이의 target이 있다.
+One-step TD와 full-return MC 사이에 놓인 여러 길이의 target:
 
 $$
 G_t^{(n)}
@@ -1300,7 +1300,7 @@ $$
 - $\lambda=0$: one-step TD
 - $\lambda\to1$: MC에 가까운 긴 return
 
-Backward view의 eligibility trace는 과거 state-action에 credit을 전달한다. 나중의 GAE, multi-step critic target을 이해하는 기반.
+Backward view의 eligibility trace는 과거 state-action에 credit을 전달한다. 나중에 나올 GAE와 multi-step critic target의 기반이 되는 개념.
 
 ![n-step return과 TD lambda](/assets/img/posts/rl/ohdrl-complete-flow/detail-p062-td-lambda.jpg)
 
@@ -1328,7 +1328,7 @@ $$
 
 $\lambda$가 클수록 먼 과거 state까지 credit이 오래 남고, 작을수록 최근 transition에 집중한다. Forward view의 여러 $n$-step return 가중합과 backward view의 online trace가 적절한 조건에서 같은 update를 만든다는 것이 핵심.
 
-이제 tabular value를 전부 저장할 수 없을 때의 문제로 이동한다.
+이제 tabular value를 전부 저장할 수 없는 영역으로 이동.
 
 ## **6. Deep Reinforcement Learning: 표를 신경망으로 바꾸기**
 
@@ -1350,7 +1350,7 @@ Q(s,a_1),\ldots,Q(s,a_{|\mathcal A|})
 \right]
 $$
 
-신경망은 비슷한 state 사이에서 정보를 공유하고 이미지 같은 고차원 입력을 처리한다. 대신 tabular update에서 없던 문제가 생긴다.
+신경망의 이점은 비슷한 state 사이의 정보 공유와 고차원 입력 처리. 그 대가로 tabular update에는 없던 문제가 따라온다.
 
 - 연속된 transition의 강한 상관관계
 - 같은 network가 target과 prediction을 동시에 변경
@@ -1383,7 +1383,7 @@ Target $y_t$와 prediction 양쪽에 같은 $\theta$가 들어간다. Gradient s
 
 *직접 작성한 `OhDRL.pdf`, p.68. Q-Learning에 network를 바로 붙였을 때 target과 prediction이 동시에 변하는 구조.*
 
-불안정성을 만드는 세 요소는 흔히 deadly triad로 묶인다.
+불안정성을 만드는 세 요소, 흔히 말하는 deadly triad:
 
 1. **Function approximation:** 여러 state가 parameter를 공유
 2. **Bootstrapping:** 현재 estimate를 target에 사용
@@ -1399,7 +1399,7 @@ Target $y_t$와 prediction 양쪽에 같은 $\theta$가 들어간다. Gradient s
 
 **Experience Replay**
 
-transition을 buffer에 저장하고 무작위 minibatch로 재사용한다.
+Transition을 buffer에 저장한 뒤 무작위 minibatch로 재사용.
 
 $$
 (S_t,A_t,R_{t+1},S_{t+1})
@@ -1409,7 +1409,7 @@ $$
 
 시간적으로 인접한 sample의 상관을 줄이고, 한 transition을 여러 update에 활용한다.
 
-Replay buffer가 만드는 효과:
+Replay buffer가 만드는 변화:
 
 - 연속 frame의 강한 autocorrelation 완화
 - 최근 trajectory 하나가 gradient를 독점하는 현상 감소
@@ -1420,7 +1420,7 @@ Replay buffer가 만드는 효과:
 
 **Target Network**
 
-Behavior network $\theta$와 target network $\theta^-$를 분리한다.
+Behavior network $\theta$와 target network $\theta^-$의 분리:
 
 $$
 Y_t^{\text{DQN}}
@@ -1481,7 +1481,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.74. Epsilon-greedy data collection과 replay minibatch update가 한 loop에 들어간 DQN.*
 
-한 minibatch update를 순서대로 쓰면:
+한 minibatch update의 실제 순서:
 
 1. Replay buffer에서 $(s_i,a_i,r_i,s'_i,d_i)$ sampling
 2. Online network의 selected Q 계산
@@ -1571,7 +1571,7 @@ $$
 
 ### **6.5 Prioritized Experience Replay**
 
-Uniform sampling 대신 TD error가 큰 transition을 더 자주 본다.
+Uniform sampling 대신 TD error가 큰 transition을 더 자주 보는 방식.
 
 $$
 p_i
@@ -1613,7 +1613,7 @@ Transition을 update한 뒤 새 TD error로 priority도 다시 갱신해야 한�
 
 ### **6.6 Dueling DQN**
 
-Q를 state value와 action advantage로 분리한다.
+Q를 state value와 action advantage로 분해:
 
 $$
 Q(s,a)
@@ -1667,7 +1667,7 @@ $$
 
 Mean subtraction은 모든 action advantage에 gradient를 분배하기 쉬워 실전에서 널리 사용된다. Dueling architecture가 모든 환경에서 자동 개선을 보장하는 것은 아니다. 여러 action의 차이가 작고 state value를 먼저 파악하는 것이 유리한 구간에서 특히 의미가 크다.
 
-Value-based method는 discrete action에서 $\arg\max_aQ(s,a)$를 쉽게 계산한다. Action이 연속이면 모든 action을 열거할 수 없다. Policy를 직접 출력하는 쪽으로 넘어갈 이유.
+Value-based method는 discrete action에서 $\arg\max_aQ(s,a)$를 쉽게 계산한다. 하지만 연속 action은 전부 열거할 수 없다. Policy를 직접 출력하는 쪽으로 넘어가는 이유다.
 
 ## **7. Policy Gradient와 Actor-Critic**
 
@@ -1679,7 +1679,7 @@ $$
 \pi_\theta(a\mid s)
 $$
 
-목표:
+최적화 목표:
 
 $$
 J(\theta)
@@ -1764,7 +1764,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.87. Trajectory likelihood의 log-derivative를 이용한 policy gradient.*
 
-Reward가 큰 trajectory에서 실행한 action의 log-probability를 높인다. 환경 dynamics를 미분하지 않고도 policy를 update할 수 있다는 점이 핵심.
+Reward가 큰 trajectory에서 실행한 action의 log-probability를 높이는 구조. 환경 dynamics를 미분하지 않고도 policy를 update할 수 있다는 점이 핵심이다.
 
 전체 episode return을 모든 action에 곱할 필요는 없다. Action $A_t$보다 과거에 받은 reward는 그 action의 결과가 아니므로 reward-to-go를 사용한다.
 
@@ -1779,7 +1779,7 @@ $$
 
 ### **7.2 REINFORCE와 baseline**
 
-REINFORCE는 MC return을 weight로 사용한다.
+REINFORCE가 weight로 쓰는 값은 MC return.
 
 $$
 \theta
@@ -1850,7 +1850,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.91. Policy network와 state-value baseline을 따로 학습하는 구조.*
 
-Value baseline은 다음 regression으로 학습할 수 있다.
+Value baseline의 학습은 다음 regression:
 
 $$
 L_V(\phi)
@@ -1872,7 +1872,7 @@ $$
 - **Actor:** $\pi_\theta(a\mid s)$를 update
 - **Critic:** $V_\phi(s)$ 또는 $Q_\phi(s,a)$를 학습
 
-Policy Gradient의 weight는 여러 동치 형태로 바꿀 수 있다.
+Policy Gradient의 weight에 가능한 여러 동치 표현:
 
 $$
 Q^\pi(s,a)
@@ -1944,7 +1944,7 @@ REINFORCE의 full return 대신 critic의 bootstrap estimate를 사용하면서 
 
 *직접 작성한 `OhDRL.pdf`, p.96. TD error 하나로 critic과 actor를 함께 update하는 online Actor-Critic.*
 
-실제 combined objective는 보통 세 항으로 구성된다.
+실제 combined objective의 세 가지 구성:
 
 $$
 L
@@ -1979,7 +1979,7 @@ A3C는 여러 worker가 서로 다른 environment copy에서 trajectory를 모�
 
 *직접 작성한 `OhDRL.pdf`, p.99. Local parameter sync, rollout, accumulated gradient, global asynchronous update.*
 
-각 worker의 흐름:
+각 worker 내부의 흐름:
 
 1. Global $\theta,\phi$를 local parameter로 복사
 2. 최대 $t_{\max}$ step rollout
@@ -2003,13 +2003,13 @@ A2C는 같은 구조를 동기식 batch update로 바꾼 형태. Worker가 모�
 | 장점 | CPU 병렬성과 decorrelation | GPU batch 효율과 재현성 |
 | 위험 | stale gradient, thread nondeterminism | 느린 worker를 기다리는 barrier |
 
-이제 policy를 직접 학습할 수 있다. 남은 문제는 연속 action과 **한 번의 policy update가 지나치게 클 때 생기는 성능 붕괴**.
+여기까지 오면 policy를 직접 학습할 수 있다. 다음 문제는 연속 action, 그리고 **한 번의 policy update가 지나치게 클 때 생기는 성능 붕괴**.
 
 ## **8. Continuous Control과 제한된 Policy Update**
 
 ### **8.1 DDPG: deterministic actor와 off-policy critic**
 
-연속 action에서 DQN식 $\arg\max_aQ(s,a)$는 계산하기 어렵다. DDPG는 actor가 action을 직접 낸다.
+연속 action에서 계산하기 어려운 DQN식 $\arg\max_aQ(s,a)$. DDPG는 이 탐색 대신 actor가 action을 직접 내도록 만든다.
 
 $$
 a=\mu_\theta(s)
@@ -2116,7 +2116,7 @@ $$
 
 여기서는 $\phi$를 고정하고 action을 거쳐 $\theta$로 gradient가 흐른다. Critic parameter까지 actor optimizer가 바꾸지 않도록 optimizer 경계를 분리해야 한다.
 
-DDPG의 구성:
+DDPG를 이루는 구성:
 
 - Replay buffer
 - Behavior actor/critic
@@ -2158,7 +2158,7 @@ Off-policy 데이터 재사용은 효율적이지만 critic error가 actor를 �
 
 ### **8.2 TRPO: parameter 거리가 아니라 policy 거리를 제한**
 
-같은 크기의 parameter update라도 network 위치에 따라 action distribution을 크게 바꿀 수 있다. TRPO는 expected return의 local surrogate를 개선하되 old/new policy의 KL divergence를 제한한다.
+같은 크기의 parameter update라도 network 안의 위치에 따라 action distribution 변화는 크게 달라진다. TRPO가 택한 기준은 parameter 거리가 아니라 old/new policy의 KL divergence.
 
 Performance difference identity의 출발:
 
@@ -2247,7 +2247,7 @@ $\alpha$를 작게 두면 policy collapse 가능성을 줄일 수 있지만 neur
 
 *직접 작성한 `OhDRL.pdf`, p.114. 현재 policy에서 실제 objective에 접하는 lower bound를 만들고 그 bound를 최대화하는 MM 관점.*
 
-MM의 흐름:
+MM의 반복 구조:
 
 1. 현재 $\theta_i$에서 실제 objective의 lower bound $M_i(\theta)$ 구성
 2. $M_i(\theta_i)=\eta(\theta_i)$가 되도록 접촉
@@ -2262,7 +2262,7 @@ MM의 흐름:
 
 *직접 작성한 `OhDRL.pdf`, p.118. Trajectory collection, advantage estimation, constrained optimization의 실용적 반복.*
 
-Practical TRPO:
+실제 TRPO의 순서:
 
 1. $\pi_{\text{old}}$로 trajectory 수집
 2. Return/critic으로 $\hat A_t$ 추정
@@ -2366,7 +2366,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.123. Ratio clipping으로 policy update의 추가 이득을 제한하는 PPO.*
 
-Clipping은 advantage 부호에 따라 다르게 읽어야 한다.
+Clipping은 advantage의 부호에 따라 해석이 달라진다.
 
 **$\hat A_t>0$인 좋은 action**
 
@@ -2398,7 +2398,7 @@ Clipping은 ratio가 범위를 벗어났을 때 objective의 이득을 잘라낸
 
 ### **8.4.1 GAE와 PPO의 전체 loss**
 
-PPO 구현에서 advantage는 GAE를 자주 사용한다.
+PPO 구현에서 자주 쓰이는 advantage estimator, GAE:
 
 $$
 \delta_t
@@ -2446,7 +2446,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.124. Model 유무, state/action space, on/off-policy, objective를 한 표로 정리한 장의 마지막 슬라이드.*
 
-여기까지는 value를 하나의 기대값으로 다뤘다. 다음 장은 policy update가 아니라 **critic이 표현하는 대상**을 바꾼다.
+여기까지 value는 하나의 기대값이었다. 다음 장에서 바뀌는 것은 policy update가 아니라 **critic이 표현하는 대상**.
 
 ## **9. Distributional RL: 평균 Return에서 분포로**
 
@@ -2459,7 +2459,7 @@ $$
 - stochastic policy $A_t\sim\pi(\cdot\mid S_t)$의 무작위성
 - 위 세 요소가 미래 여러 step에 걸쳐 누적되는 효과
 
-이 때문에 return은 처음부터 확률변수.
+따라서 return은 처음부터 확률변수.
 
 $$
 Z^\pi(s,a)
@@ -2472,7 +2472,7 @@ S_t=s,\ A_t=a
 \right)
 $$
 
-기존 action value는 이 분포의 첫 번째 moment, 즉 평균만 남긴 값이다.
+기존 action value는 이 분포의 첫 번째 moment, 즉 평균만 남긴 값.
 
 $$
 Q^\pi(s,a)
@@ -2485,7 +2485,7 @@ $$
 
 한 step의 reward distribution과 return distribution도 구분해야 한다. $R(s,a)$는 지금 받을 보상, $Z^\pi(s,a)$는 그 이후 모든 확률적 전이와 행동을 통과해 누적되는 discounted sum. Distributional RL의 직접적인 학습 대상은 후자다.
 
-같은 평균을 갖는 두 action도 variance, 꼬리, multimodality는 전혀 다를 수 있다.
+같은 평균 아래에 전혀 다른 variance, 꼬리, multimodality가 숨어 있을 수 있다.
 
 ![기대값이 숨기는 return distribution](/assets/img/posts/rl/ohdrl-complete-flow/25-mean-hides-risk.jpg)
 
@@ -2504,7 +2504,7 @@ $$
 Z_{\text{train}}=42
 $$
 
-기대값만 보면 동률. 분포를 보면 자동차는 30분과 90분에 질량이 놓인 bimodal distribution, 기차는 42분 근처에 집중된 distribution이다. 사고가 있는 날의 최악 구간이 중요한지, 평소의 짧은 시간이 중요한지에 따라 선택이 달라질 여지.
+기대값만 보면 동률. 분포를 펼치면 자동차는 30분과 90분에 질량이 놓인 bimodal distribution, 기차는 42분 근처에 집중된 distribution이다. 사고가 있는 날의 최악 구간을 중시하는지, 평소의 짧은 시간을 중시하는지에 따라 선택은 달라진다.
 
 여기서 distributional critic이 표현하는 것은 **return의 aleatoric variability**에 가깝다. 데이터가 부족해서 model parameter를 모르는 epistemic uncertainty와 동일한 개념은 아니다. 분포 하나를 출력한다고 critic의 불확실성이 모두 해결되는 것도 아니다.
 
@@ -2547,7 +2547,7 @@ R_{t+1}
 \gamma Z(S',A')
 $$
 
-현재 분포를 reward만큼 평행이동하고, $\gamma$만큼 축소한 뒤, 가능한 다음 상태와 행동의 확률에 따라 섞는 연산. Scalar Bellman backup이 weighted average 하나를 만들었다면 distributional backup은 **shifted-and-scaled mixture distribution**을 만든다.
+현재 분포를 reward만큼 평행이동하고 $\gamma$만큼 축소한 다음, 가능한 다음 상태와 행동의 확률에 따라 섞는 연산이다. Scalar Bellman backup의 결과가 weighted average 하나라면 distributional backup의 결과는 **shifted-and-scaled mixture distribution**.
 
 ![Distributional Bellman equation과 policy evaluation](/assets/img/posts/rl/ohdrl-complete-flow/detail-p128-distributional-bellman.jpg)
 
@@ -2607,20 +2607,20 @@ $$
 
 평균이 아주 조금 바뀌어 greedy action이 뒤집히면 target distribution 전체가 갑자기 다른 action의 분포로 교체될 수 있다. 이 optimality operator는 일반적으로 distribution space에서 contraction이 아니며 연속성조차 보장되지 않는다. 최적 $Q^{\ast}$의 기대값은 하나여도, 서로 다른 optimal policy가 만드는 최적 return distribution은 여러 개일 수 있다는 문제.
 
-따라서 실제 Distributional RL은 무한히 복잡한 분포를 그대로 저장하지 않는다.
+그래서 실제 Distributional RL은 무한히 복잡한 분포를 그대로 저장하지 않는다.
 
 1. 표현 가능한 분포 family 선택
 2. Distributional Bellman target 구성
 3. 그 target을 표현 공간으로 projection 또는 regression
 4. 평균을 사용해 control action 선택
 
-이 네 단계가 C51, QR-DQN, IQN을 읽는 공통 틀.
+이 네 단계가 C51, QR-DQN, IQN을 읽는 공통 틀이다.
 
 ### **9.2.1 확률분포 사이의 거리는 무엇인가**
 
 두 scalar 값의 오차는 $\lvert x-y\rvert$로 충분하지만, 두 확률분포를 비교하려면 거리의 정의가 필요하다.
 
-Metric $d(P,Q)$가 만족해야 할 조건:
+Metric $d(P,Q)$의 조건:
 
 1. $d(P,Q)\ge0$, 그리고 $d(P,Q)=0\iff P=Q$
 2. $d(P,Q)=d(Q,P)$
@@ -2676,7 +2676,7 @@ $$
 
 확률 질량을 한 분포에서 다른 분포로 옮기는 데 필요한 이동량으로 해석 가능하다. 두 Dirac distribution $\delta_x,\delta_y$의 거리는 단순히 $\lvert x-y\rvert$. Support가 겹치지 않아도 “얼마나 이동했는가”가 연속적으로 남기 때문에 return atom의 위치를 다루는 데 자연스럽다.
 
-중요한 이론·구현 간극도 여기서 등장한다. Distributional Bellman evaluation의 이론은 Wasserstein metric으로 설명되지만, C51은 Wasserstein loss를 직접 SGD로 최소화하지 않는다. 고정 support에 projection한 categorical target과 cross-entropy를 사용한다. QR-DQN은 이 간극을 quantile regression으로 다르게 푼 접근.
+여기서 드러나는 이론과 구현의 간극. Distributional Bellman evaluation의 이론은 Wasserstein metric으로 설명되지만, C51은 Wasserstein loss를 직접 SGD로 최소화하지 않는다. 고정 support에 projection한 categorical target과 cross-entropy를 사용하고, QR-DQN은 같은 간극을 quantile regression으로 다르게 푼다.
 
 ### **9.3 C51: 고정된 위치, 학습되는 확률**
 
@@ -2684,7 +2684,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.131. Scalar DQN에서 C51, QR-DQN, IQN으로.*
 
-C51은 $[V_{\min},V_{\max}]$ 안에 $N=51$개의 고정 support atom을 둔다.
+C51의 출발점은 $[V_{\min},V_{\max}]$ 안에 놓인 $N=51$개의 고정 support atom.
 
 $$
 z_i
@@ -2699,7 +2699,7 @@ i\Delta z,
 \qquad i=0,\ldots,N-1
 $$
 
-Network는 각 action마다 atom의 위치가 아니라 그 위치에 놓일 확률을 출력.
+Network가 각 action마다 출력하는 것은 atom의 위치가 아니라 그 위치에 놓일 확률.
 
 $$
 Z_\theta(s,a)
@@ -2717,7 +2717,7 @@ p_i(s,a)
 \right)
 $$
 
-Action selection에는 분포의 기대값을 사용한다.
+Action selection에 사용하는 값은 분포의 기대값:
 
 $$
 Q_\theta(s,a)
@@ -2797,7 +2797,7 @@ $$
 
 Target branch는 `detach` 또는 target network로 gradient를 끊는다. Online network로 next action을 고르고 target network에서 그 분포를 가져오면 Double DQN식 action selection/evaluation 분리도 가능.
 
-C51의 trade-off:
+C51의 trade-off를 정리하면:
 
 - 장점: discrete categorical output, 안정적인 cross-entropy, 분포 모양의 명시적 표현
 - 제약: $V_{\min},V_{\max}$를 사전에 정해야 함
@@ -2807,7 +2807,7 @@ C51의 trade-off:
 
 ### **9.4 QR-DQN: 고정된 확률, 학습되는 위치**
 
-C51의 parameterization을 뒤집으면 QR-DQN.
+C51의 parameterization을 뒤집은 형태가 QR-DQN.
 
 ![C51과 QR-DQN](/assets/img/posts/rl/ohdrl-complete-flow/27-c51-vs-qr-dqn.jpg)
 
@@ -2831,7 +2831,7 @@ Z_\theta(s,a)
 \delta_{\theta_i(s,a)}
 $$
 
-각 atom의 질량은 $1/N$으로 고정, network가 quantile 위치 $\theta_i(s,a)$를 학습한다. Quantile midpoint:
+각 atom의 질량은 $1/N$으로 고정하고 network가 quantile 위치 $\theta_i(s,a)$를 학습한다. Quantile midpoint는:
 
 $$
 \hat\tau_i
@@ -2851,11 +2851,11 @@ Q_\theta(s,a)
 \theta_i(s,a)
 $$
 
-고정 support 범위와 categorical projection이 필요 없다는 차이.
+고정 support 범위와 categorical projection이 필요 없다는 차이도 여기서 생긴다.
 
 #### **왜 quantile regression인가**
 
-일반 $L_2$ regression은 conditional mean, $L_1$ regression은 conditional median을 찾는다. 원하는 $\tau$-quantile은 비대칭 pinball loss의 minimizer.
+일반 $L_2$ regression이 찾는 것은 conditional mean, $L_1$ regression이 찾는 것은 conditional median. 원하는 $\tau$-quantile에는 비대칭 pinball loss를 사용한다.
 
 $$
 \rho_\tau(u)
@@ -2940,7 +2940,7 @@ Tensor로는 prediction `[B,N,1]`, target `[B,1,N']`, difference `[B,N,N']`. Sca
 
 ### **9.5 IQN**
 
-QR-DQN은 정해 둔 $N$개 quantile midpoint마다 별도 output을 낸다. IQN은 $\tau\in[0,1]$를 입력으로 받는 quantile function 자체를 학습.
+QR-DQN은 정해 둔 $N$개 quantile midpoint마다 별도 output을 낸다. IQN이 학습하는 대상은 $\tau\in[0,1]$를 입력으로 받는 quantile function 자체.
 
 $$
 Z_\tau(s,a)
@@ -2954,7 +2954,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.139. $\tau$를 sampling해 implicit quantile function을 근사하는 IQN.*
 
-구현의 핵심은 state feature와 quantile embedding의 결합.
+구현의 핵심은 state feature와 quantile embedding의 결합:
 
 $$
 \psi(s)\in\mathbb R^d
@@ -3039,7 +3039,7 @@ $$
 
 낮은 return이 실패를 뜻하는 문제에서 이 값을 최대화하면 tail failure를 더 민감하게 본다. 반대로 상위 quantile을 강조하면 낙관적 선택 가능. 어느 방향이 “안전”인지는 reward 부호와 task 정의에 달려 있으므로 distortion의 의미를 먼저 확인해야 한다.
 
-중요한 경계:
+여기서 반드시 그어 둘 경계:
 
 > **Distribution을 학습하는 것과 risk-sensitive policy를 사용하는 것은 같은 말이 아니다.** 분포를 배운 뒤 action selection에서 어떤 functional을 적용할지 별도로 정해야 한다.
 
@@ -3067,7 +3067,7 @@ transition sampling
     -> 주기적 target update
 ```
 
-달라진 것은 scalar target `y: [B]`가 distributional target으로 확장된 점.
+달라진 지점은 scalar target `y: [B]`의 distributional target 확장.
 
 ### **9.7 구현에서 자주 틀리는 지점**
 
@@ -3121,9 +3121,9 @@ $$
 \end{cases}
 $$
 
-Bellman recursion과 target network, replay buffer는 그대로 남고 critic의 표현과 loss가 바뀌었다. 분포가 더 많은 정보를 보존하지만, 계산량과 선택할 설계도 함께 증가.
+Bellman recursion, target network, replay buffer는 그대로 남는다. 바뀐 것은 critic의 표현과 loss. 더 많은 정보를 보존하는 만큼 계산량과 설계 선택지도 함께 늘어난다.
 
-마지막 장의 MPO는 distributional critic의 후속 알고리즘이 아니다. 다른 질문을 다룬다.
+마지막 장의 MPO는 distributional critic의 후속 알고리즘이 아니다. 질문의 축부터 다르다.
 
 - **Distributional RL:** value를 무엇으로 표현할 것인가?
 - **MPO:** critic을 이용해 policy를 어떻게 안정적으로 개선할 것인가?
@@ -3208,7 +3208,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.147. 검은 공과 흰 공을 순차 관측하며 두 bag hypothesis의 확률을 갱신하는 예제.*
 
-중요한 구조는 숫자가 아니라 반복:
+중요한 것은 숫자보다 반복 구조:
 
 ```text
 old belief
@@ -3221,7 +3221,7 @@ MPO도 current policy를 출발 분포로 두고 critic이 제공한 “좋은 �
 
 ### **10.2.1 MLE, MAP, 동전 parameter**
 
-이제 hypothesis를 연속 parameter $\theta$로 바꾸면:
+Hypothesis를 연속 parameter $\theta$로 바꾸면:
 
 $$
 p(\theta\mid X)
@@ -3255,7 +3255,7 @@ $$
 \right]
 $$
 
-Data likelihood만 보는 MLE와 달리 MAP는 prior가 한 번 더 들어간다. Dataset의 각 sample마다 prior를 반복해서 더하는 식이 아니라, **전체 dataset likelihood에 prior 한 번**이라는 점도 주의.
+Data likelihood만 보는 MLE와 달리 MAP에는 prior가 한 번 더 들어간다. 다만 dataset의 각 sample마다 prior를 반복해서 더하는 식은 아니다. **전체 dataset likelihood에 prior 한 번**.
 
 앞면 확률이 $\theta$인 동전을 $N$번 던져 앞면 $x$번을 관측하면:
 
@@ -3335,7 +3335,7 @@ $$
 \right]
 $$
 
-오른쪽이 ELBO(Evidence Lower Bound).
+오른쪽 항이 ELBO(Evidence Lower Bound).
 
 $$
 \mathcal L(q,\theta)
@@ -3371,7 +3371,7 @@ Evidence와 $\theta$를 고정했을 때 ELBO를 크게 만드는 일은 approxi
 
 #### **EM의 coordinate ascent**
 
-EM은 $q$와 $\theta$를 동시에 움직이지 않고 번갈아 최적화한다.
+EM의 핵심은 $q$와 $\theta$를 동시에 움직이지 않는 것. 두 변수를 번갈아 최적화한다.
 
 ![Expectation-Maximization의 E-step과 M-step](/assets/img/posts/rl/ohdrl-complete-flow/29a-em-algorithm.jpg)
 
@@ -3479,7 +3479,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.155. Reward maximization을 optimality posterior 추론으로 바꾸는 관점.*
 
-질문의 방향:
+질문의 방향을 나란히 놓으면:
 
 ```text
 Control:
@@ -3517,7 +3517,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.156. Trajectory optimality의 ELBO가 reward와 policy KL regularization으로 바뀌는 과정.*
 
-$q$는 개선된 행동 분포, $\pi_\theta$는 parametric policy, $\log p(\theta)$는 MAP prior. MPO는 이 objective를 E-step과 M-step으로 나눈다.
+$q$는 개선된 행동 분포, $\pi_\theta$는 parametric policy, $\log p(\theta)$는 MAP prior. MPO는 이 objective를 E-step과 M-step으로 분해한다.
 
 주의할 점도 하나. Discounted infinite-horizon objective를 엄밀한 probability model로 옮기는 과정에는 termination distribution이나 time-dependent optimality likelihood 같은 세부 구성이 필요하다. 여기서는 MPO update를 이해하기 위한 variational objective의 구조에 초점.
 
@@ -3543,7 +3543,7 @@ q(\cdot\mid s)
 \right]
 $$
 
-MPO는 reward와 KL의 상대 scale을 임의의 fixed coefficient 하나로 정하기보다 hard KL budget을 사용.
+MPO의 선택은 reward와 KL의 상대 scale을 임의의 fixed coefficient 하나로 정하는 대신 hard KL budget을 두는 것.
 
 $$
 \max_q
@@ -3614,7 +3614,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.158. Arbitrary reward scale에 대응하기 위해 expected KL budget으로 E-step을 제한하는 식.*
 
-Continuous action 적분은 직접 계산하지 않는다. 각 replay state $s_j$에서 current policy action $a_{ij}\sim\pi_i(\cdot\mid s_j)$를 $N$개 sampling.
+Continuous action 적분은 직접 계산하지 않는다. 대신 각 replay state $s_j$에서 current policy action $a_{ij}\sim\pi_i(\cdot\mid s_j)$를 $N$개 sampling:
 
 $$
 w_{ij}
@@ -3650,16 +3650,16 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.159. Closed form $q_i(a\mid s)\propto\pi_i(a\mid s)\exp(Q_i/\eta)$와 sample 기반 근사.*
 
-여기서 생긴 $q_i$는 모든 state를 입력받는 새 neural policy가 아니다. 각 sampled state에서 action과 weight로만 표현된 non-parametric distribution.
+여기서 생긴 $q_i$는 모든 state를 입력받는 새 neural policy가 아니다. 각 sampled state의 action과 weight로 표현된 non-parametric distribution일 뿐이다.
 
-$\eta$의 효과:
+$\eta$가 만드는 차이:
 
 - 작음: 최고 Q sample에 weight 집중, aggressive improvement
 - 큼: weight가 균일해져 current policy에 가까운 conservative improvement
 - KL budget $\epsilon$이 작음: 최적 $\eta$가 커지는 경향
 - Critic scale이 커짐: fixed temperature 대신 dual optimization이 필요한 이유
 
-E-step의 Q와 weight는 actor M-step 관점에서 target. Critic parameter로 gradient를 흘려 actor와 동시에 Q를 조작하는 경로가 아니다.
+Actor M-step 관점에서 E-step의 Q와 weight는 target. Critic parameter로 gradient를 흘려 actor와 동시에 Q를 조작하는 경로가 아니다.
 
 ### **10.6 MPO M-step**
 
@@ -3687,7 +3687,7 @@ w_{ij}
 \log\pi_\theta(a_{ij}\mid s_j)
 $$
 
-Q값이 큰 action은 큰 $w_{ij}$를 받아 policy likelihood를 더 강하게 끌어올린다. 형태는 weighted behavior cloning과 유사하지만 label weight가 critic에서 생성된다는 차이.
+Q값이 큰 action은 큰 $w_{ij}$를 받아 policy likelihood를 더 강하게 끌어올린다. 형태는 weighted behavior cloning과 비슷하다. 결정적인 차이는 label weight의 출처가 critic이라는 점.
 
 Actor를 $q_i$에 한 번에 맞추면 finite sample과 critic error까지 과하게 추종할 수 있다. 이전 policy와의 M-step trust region:
 
@@ -3708,7 +3708,7 @@ $$
 
 *직접 작성한 `OhDRL.pdf`, p.160. Weighted maximum likelihood와 parametric policy trust region.*
 
-두 KL의 방향과 역할:
+두 KL의 방향과 역할을 분리하면:
 
 | 단계 | Constraint | 역할 |
 | --- | --- | --- |
@@ -3733,7 +3733,7 @@ $$
 
 하나의 KL constraint만 쓰면 mean을 좋은 action 쪽으로 옮기는 비용과 covariance를 줄이는 비용이 같은 budget을 경쟁한다. Weighted samples를 빠르게 fit하면서 covariance까지 급격히 줄어 탐색이 조기에 사라질 수 있다.
 
-MPO는 두 contribution을 분리한 constraint를 사용한다.
+MPO의 해법은 두 contribution에 별도 constraint를 두는 것.
 
 $$
 C_\mu(\theta)
@@ -3859,7 +3859,7 @@ Q_t^{\text{ret}}
 \right]
 $$
 
-핵심 역할:
+구성요소별 역할:
 
 - Replay buffer: behavior transition과 가능하면 behavior action probability 저장
 - Target critic $\bar Q$: bootstrap 기준
@@ -3900,7 +3900,7 @@ $\lambda=0$이면 사실상 one-step target 쪽, 1에 가까울수록 긴 correc
    old policy snapshot 갱신
 ```
 
-Gradient boundary:
+Gradient boundary도 명시적으로 분리:
 
 ```text
 critic loss       -> critic only
@@ -3910,7 +3910,7 @@ weighted MLE      -> actor
 KL dual loss      -> KL dual variables
 ```
 
-E-step weight를 만드는 Q에 actor gradient를 통과시키거나, M-step KL의 old policy를 optimizer가 함께 바꾸면 알고리즘의 분해가 무너진다.
+E-step weight를 만드는 Q에 actor gradient를 통과시키거나 M-step KL의 old policy를 optimizer가 함께 바꾸는 순간, 알고리즘의 분해는 무너진다.
 
 ### **10.9 DDPG, SAC, PPO와 정확히 무엇이 다른가**
 
@@ -4000,7 +4000,7 @@ Action sample 수, $\epsilon$, $\epsilon_\mu$, $\epsilon_\Sigma$, critic update 
 
 MPO의 KL constraint는 actuator safety constraint가 아니다. Policy distribution의 update 크기를 제한할 뿐 torque, velocity, collision, sim-to-real error는 별도 제약으로 다뤄야 한다.
 
-로봇 적용에서 별도로 필요한 것:
+로봇 적용에서 별도로 챙겨야 할 것:
 
 - Action clipping과 physical unit 확인
 - Torque, velocity, joint-position limit
@@ -4016,7 +4016,7 @@ MPO의 trust region은 **optimization 안정화 장치**. 물리 안전 보증�
 
 ### **11.1 Bellman equation은 사라지지 않았다**
 
-전체 흐름에서 가장 오래 남는 구조는 Bellman relation이다.
+전체 흐름에서 끝까지 남는 구조, Bellman relation.
 
 - **DP:** 모든 다음 상태를 합산해 Bellman backup
 - **MC:** Bellman bootstrap 없이 실제 episode return으로 value 추정
@@ -4027,9 +4027,9 @@ MPO의 trust region은 **optimization 안정화 장치**. 물리 안전 보증�
 - **Distributional RL:** Bellman update의 대상을 평균이 아닌 return distribution으로 확장
 - **MPO:** Off-policy critic이 policy improvement를 위한 Q를 제공
 
-알고리즘 이름은 바뀌어도 “미래 정보를 현재 값으로 가져오는 구조”는 계속 남는다.
+알고리즘 이름이 바뀌어도 “미래 정보를 현재 값으로 가져오는 구조”는 그대로다.
 
-한 step target만 비교해도 계보가 보인다.
+한 step target만 나란히 놓아도 보이는 계보:
 
 **TD prediction**
 
@@ -4104,7 +4104,7 @@ r_t
 Z_{\theta^-}(s_{t+1},a^*)
 $$
 
-Target의 형태는 달라져도 `reward + discounted future estimate`라는 뼈대는 유지.
+Target의 형태는 달라져도 뼈대는 `reward + discounted future estimate`.
 
 ### **11.2 바뀐 것은 표현과 update 방식**
 
@@ -4147,7 +4147,7 @@ Explicit deterministic policy:
 a = mu_theta(s)
 ```
 
-Discrete action의 개수가 작으면 $\arg\max_aQ$가 간단. Continuous action에서는 모든 $a$를 열거할 수 없으므로 actor가 필요하다.
+Discrete action의 개수가 작을 때는 $\arg\max_aQ$로 충분하다. Continuous action에서는 모든 $a$를 열거할 수 없으므로 별도의 actor가 필요.
 
 #### **축 3. Data를 언제까지 재사용하는가**
 
@@ -4155,7 +4155,7 @@ Discrete action의 개수가 작으면 $\arg\max_aQ$가 간단. Continuous actio
 - Off-policy: behavior가 다른 replay transition도 재사용
 - Model-based DP: 실제 sample 대신 알려진 transition model 전체 사용
 
-Data reuse가 높다고 무조건 우월하지 않다. Policy-distribution mismatch를 보정하거나 견딜 critic 설계가 함께 필요.
+Data reuse가 높다고 무조건 우월한 것은 아니다. Policy-distribution mismatch를 보정하거나 견딜 critic 설계가 함께 필요하다.
 
 #### **축 4. Policy를 얼마나 움직일 것인가**
 
@@ -4165,7 +4165,7 @@ Data reuse가 높다고 무조건 우월하지 않다. Policy-distribution misma
 - KL-constrained step: TRPO, MPO
 - Action distribution fitting: MPO
 
-같은 actor-critic 구조라도 improvement rule이 완전히 다를 수 있다.
+같은 actor-critic 구조 안에서도 완전히 달라질 수 있는 improvement rule.
 
 ### **11.3 서로 다른 문제를 해결한 알고리즘을 일렬로 순위 매기지 않기**
 
@@ -4174,13 +4174,13 @@ Data reuse가 높다고 무조건 우월하지 않다. Policy-distribution misma
 - C51과 MPO: value representation과 policy improvement라는 서로 다른 축
 - MC와 TD: 정답/오답 관계가 아니라 bias–variance와 update timing의 trade-off
 
-“최신 알고리즘이 이전 알고리즘을 완전히 대체했다”보다 **무슨 가정을 바꾸고 어떤 실패 모드를 줄였는가**를 보는 편이 정확하다.
+“최신 알고리즘이 이전 알고리즘을 완전히 대체했다”는 서열보다 **무슨 가정을 바꾸고 어떤 실패 모드를 줄였는가**가 더 중요한 기준이다.
 
 ### **11.4 문제에서 알고리즘으로 내려가는 선택 순서**
 
 **1. Model을 알고 있는가**
 
-작은 $P(s'\mid s,a)$와 $R(s,a)$를 정확히 알고 있으면 DP가 baseline. Model이 없고 interaction만 가능하면 sample-based RL.
+작은 $P(s'\mid s,a)$와 $R(s,a)$를 정확히 알고 있다면 baseline은 DP. Model 없이 interaction만 가능하다면 sample-based RL.
 
 **2. Action space가 discrete인가 continuous인가**
 
@@ -4286,13 +4286,13 @@ Circular buffer index가 episode boundary를 넘어 n-step sequence를 이어 �
 
 ### **12.2 Value target**
 
-Value code를 볼 때 먼저 target tensor를 한 줄로 적는다.
+Value code를 읽을 때 가장 먼저 적어 둘 한 줄:
 
 ```python
 target = reward + discount * bootstrap_mask * next_value
 ```
 
-그 다음 각 항의 출처를 추적.
+그다음은 각 항의 출처 추적.
 
 **Return horizon**
 
@@ -4351,7 +4351,7 @@ IQN sampled quantile values  [B, N, A]
 
 ### **12.3 Actor update**
 
-Actor loss의 scalar 식보다 **어느 경로로 gradient가 흐르는가**를 먼저 표시.
+Actor loss의 scalar 식보다 먼저 표시할 것: **어느 경로로 gradient가 흐르는가**.
 
 **REINFORCE**
 
@@ -4415,7 +4415,7 @@ E-step temperature와 M-step KL dual optimizer가 actor optimizer와 분리돼 �
 
 ### **12.4 안정성과 재현성**
 
-학습 curve 하나만으로는 어느 구성요소가 실패했는지 알기 어렵다. 최소 logging 묶음:
+학습 curve 하나만으로는 어느 구성요소가 실패했는지 알기 어렵다. 최소한 필요한 logging 묶음:
 
 **Data**
 
@@ -4486,7 +4486,7 @@ Policy의 KL이 작아도 torque trajectory는 크게 달라질 수 있다. Obse
 
 ### **12.6 코드를 읽는 최소 순서**
 
-처음부터 class 전체를 읽기보다 한 update batch를 따라가는 편이 빠르다.
+처음부터 class 전체를 읽는 대신, 한 update batch를 끝까지 따라가는 편이 빠르다.
 
 1. Config에서 $\gamma$, horizon, batch size, action scale 확인
 2. `env.step()`의 transition 의미 확인
@@ -4499,15 +4499,15 @@ Policy의 KL이 작아도 torque trajectory는 크게 달라질 수 있다. Obse
 9. Evaluation action과 training action 차이 확인
 10. Checkpoint resume가 모든 state를 복원하는지 확인
 
-수식의 이름보다 실제 tensor가 어느 loss로 들어가고 어느 optimizer가 어떤 parameter를 바꾸는지 따라가는 것이 구현 분석의 핵심.
+구현 분석의 핵심은 수식의 이름이 아니다. 실제 tensor가 어느 loss로 들어가고, 어느 optimizer가 어떤 parameter를 바꾸는지를 추적하는 일이다.
 
 ## **13. 이 통합본의 역할**
 
-기존 A1~A8은 한 주제에 오래 머물며 공부한 상세 기록이다. 이 글은 그 글들을 대체하지 않는다. 일부 설명과 수식이 겹쳐도 삭제하지 않은 이유도 여기에 있다. 역할은 다음 하나.
+기존 A1~A8은 한 주제에 오래 머물며 공부한 상세 기록. 이 통합본이 그 글들을 대체하는 것은 아니다. 일부 설명과 수식을 겹치게 남겨 둔 이유도 여기에 있다. 역할은 하나:
 
 > **MDP에서 시작한 정의가 Bellman equation, sample backup, neural approximation, policy optimization, return distribution, inference-based policy improvement로 어떻게 이어졌는지 한 화면에서 다시 찾을 수 있는 기준점.**
 
-세부 derivation이나 구현이 필요할 때는 각 글로 돌아가면 된다.
+세부 derivation이나 구현이 필요할 때 돌아갈 글:
 
 1. [A1. MDP](/posts/mdp/)
 2. [A2. Bellman Equation](/posts/bellman-equation/)
@@ -4515,8 +4515,8 @@ Policy의 KL이 작아도 torque trajectory는 크게 달라질 수 있다. Obse
 4. [A4. Reinforcement Learning](/posts/reinforcement-learning/)
 5. [A5. Deep Reinforcement Learning](/posts/deep-reinforcement-learning/)
 6. [A6. Policy Gradient DRL](/posts/policy-gradient-drl/)
-7. [A7. Distributional Reinforcement Learning](/posts/distributional-reinforcement-learning/)
-8. [A8. Maximum a Posteriori Policy Optimisation](/posts/maximum-a-posteriori-policy-optimisation/)
+7. A7. Distributional Reinforcement Learning: 이 글 9장
+8. A8. Maximum a Posteriori Policy Optimisation: 이 글 10장
 
 ## **참고 자료**
 
