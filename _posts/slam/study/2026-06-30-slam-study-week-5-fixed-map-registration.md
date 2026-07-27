@@ -802,16 +802,10 @@ SLAM trajectory drift comparison
 
 이렇게 해야 registration metric 변화가 단순 residual 진단을 넘어서 실제 pose estimation 안정성까지 이어지는지 볼 수 있습니다.
 
-## **13. 이번 주 요약**
-
-5주차는 다음 한 문장으로 정리됩니다.
+## **13. Residual 진단에서 pose update로**
 
 > deskew된 scan 또는 왜곡된 scan이 fixed map의 local plane에 얼마나 잘 붙는지를 point-to-plane residual과 inlier ratio로 측정하는 주였다.
 
-핵심은 residual이 커졌다는 사실만 보는 게 아닙니다.
+Residual이 커졌다는 수치만으로는 원인을 알 수 없습니다. Correspondence가 깨진 것인지, 같은 plane 위에서 point 위치만 흔들린 것인지, geometry가 pose update를 충분히 구속하지 못한 것인지 구분해야 합니다.
 
-왜 커졌는지, correspondence가 깨진 것인지, 같은 plane 위에서 point 위치만 흔들린 것인지, 아니면 geometry가 애초에 pose update를 잘 구속하지 못하는 것인지 구분하는 것이 중요합니다.
-
-이번 UNIST 결과는 그 분석으로 가기 위한 첫 evaluator입니다.
-
-아직 연구 claim으로 세게 쓰면 안 되지만, 4주차 deskew 시각화에서 5주차 registration degradation 분석으로 넘어가는 연결고리로는 충분합니다.
+이번 UNIST 결과는 이 구분을 시작하기 위한 fixed-pose evaluator입니다. 다음 단계에서 point-to-plane Jacobian과 Gauss-Newton update를 넣어야 metric 변화가 실제 pose estimation의 convergence와 conditioning으로 이어지는지 확인할 수 있습니다. 현재 결과는 4주차 deskew 시각화와 이후 registration degradation 분석을 잇는 수준으로 해석합니다.

@@ -589,7 +589,7 @@ lowstate_bag_timestamp + (-995.347479105)
 
 그 상태에서 SE(3) deskew를 하면 결과가 틀어질 수밖에 없습니다.
 
-## **11. Claim Boundary**
+## **11. 결과를 해석할 수 있는 범위**
 
 이번 4주차 글의 claim은 다음 정도로 제한해야 합니다.
 
@@ -685,30 +685,10 @@ quadruped gait-induced body motion
 -> map blur 또는 odometry drift
 ```
 
-## **14. 이번 주 정리**
-
-4주차를 한 문장으로 정리하면 다음입니다.
+## **14. UNIST와 Go2 결과를 분리해서 읽기**
 
 > 실제 rosbag에서 point time과 IMU를 이용해 offline deskew를 수행했고, UNIST Livox는 시각화 예제로, Go2 LowState는 로봇개 연구 연결용 보조 근거로 정리했다.
 
-이번 주 흐름은 다음입니다.
+UNIST Livox 결과는 point time과 gyro integration으로 raw scan geometry가 얼마나 달라지는지 보여주는 시각화입니다. 여기서 p95 displacement는 error 감소량이 아니라 correction magnitude입니다. Go2 결과는 walking scan에서 rotation-only correction에 LowState 기반 estimated translation을 더한 보조 실험이며, translation이 0이 아니라는 연구 연결을 제공합니다.
 
-```text
-3주차 synthetic deskew 수식 확인
--> UNIST Livox MCAP에서 point time 추출
--> /livox/imu gyro integration으로 rotation trajectory 생성
--> raw vs gyro-deskewed cloud 시각화
--> p95 correction은 error가 아니라 보정량으로 해석
--> Go2 walking scan의 cm-scale correction으로 연구 연결
--> LowState estimated SE(3)는 아직 reference/GT가 아님을 명확히 둠
-```
-
-결론은 보수적으로 잡습니다.
-
-```text
-UNIST는 메인 그림으로 좋다.
-Go2는 연구 맥락상 필요하다.
-둘을 섞어 강한 성능 claim으로 쓰면 안 된다.
-```
-
-이 구성이 4주차 블로그에는 가장 안전합니다.
+두 결과 모두 reference trajectory나 ground truth 정확도 검증은 아닙니다. UNIST는 main visualization, Go2는 quadruped 연구 맥락으로 역할을 나누고, 둘을 합쳐 deskew가 SLAM 정확도를 개선했다고 주장하지 않는 것이 현재 증거에 맞습니다.

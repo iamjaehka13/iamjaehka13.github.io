@@ -23,7 +23,7 @@ MLP
 → 각 token vector를 독립적으로 변환
 ```
 
-이 글은 3Blue1Brown의 **Deep Learning Chapter 7: How might LLMs store facts**를 바탕으로 다음 질문에 답합니다.
+3Blue1Brown의 **Deep Learning Chapter 7: How might LLMs store facts**를 따라 아래 질문을 살펴봅니다.
 
 > MLP는 hidden vector에서 어떤 feature를 감지하고, 학습된 정보를 다시 hidden space에 어떻게 써 넣을 수 있는가?
 
@@ -536,14 +536,12 @@ $$
 
 입니다.
 
-## **23. 핵심 직관**
+## **23. Feature를 읽고 residual stream에 쓰기**
 
-MLP는 다음 두 단계로 기억할 수 있습니다.
+MLP의 계산은 두 단계로 나눠 볼 수 있습니다.
 
 1. Up projection의 방향들이 hidden vector에서 여러 feature pattern을 감지한다.
 2. Active한 intermediate feature들이 down projection의 방향을 통해 hidden space에 update를 쓴다.
-
-한 문장으로 정리하면 다음과 같습니다.
 
 > Transformer MLP는 각 token의 contextual hidden vector에서 학습된 feature 조합을 nonlinear하게 감지하고, 그 activation에 따라 새로운 feature 방향을 residual stream에 추가할 수 있다.
 

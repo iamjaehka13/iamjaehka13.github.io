@@ -68,7 +68,7 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
 
 ## **4. 결과: 온도-only는 기대처럼 좋아지지 않았다**
 
-결과를 먼저 보면 다음과 같습니다.
+세 policy의 480초 rollout 결과부터 나란히 놓았습니다.
 
 | policy | actual vx [m/s] | thermal dose [C*s/m] | max rise [C] | hotspot dose [C*s/m] |
 | --- | ---: | ---: | ---: | ---: |
@@ -86,7 +86,7 @@ Thermal-Torque Feedback은 Thermal Feedback에 torque와 positive mechanical pow
   <source src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_yaw10m_comparison.mp4" type="video/mp4">
 </video>
 
-사선 follow-view로 보면 gait 자체의 차이도 더 잘 보입니다. 여기서는 단순히 최종 숫자가 아니라, body가 어떤 자세로 앞으로 가고 다리가 어떻게 움직이는지를 볼 수 있습니다.
+사선 follow-view에서는 body 자세와 다리 움직임까지 비교할 수 있습니다.
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison_preview.jpg" style="width: 100%; border-radius: 6px;">
   <source src="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison.mp4" type="video/mp4">
@@ -201,8 +201,6 @@ Thermal-Torque Feedback은 Thermal Feedback에 다음 항들을 추가합니다.
 | `thermal_power_margin` | command speed 기준 power budget을 넘는 경우만 penalty |
 | `thermal_torque_margin` | command speed 기준 torque-squared budget을 넘는 경우만 penalty |
 
-핵심은 이것입니다.
-
 Thermal-only는 "온도 surrogate를 낮춰라"에 가까웠습니다. Thermal-Torque Feedback은 "온도를 만드는 load 자체를 줄여라"에 더 가깝습니다.
 
 margin term도 중요합니다. 무조건 torque와 power를 작게 만들면 policy가 느려지거나 보행을 포기할 수 있습니다. 그래서 command speed에 따라 허용 가능한 budget을 두고, 그 budget을 넘는 excess만 강하게 penalty로 줬습니다.
@@ -241,42 +239,20 @@ Baseline 대비:
 
 여기서도 "안전합니다"의 의미는 중요합니다. 이 문장은 실제 Go2 hardware에서 장시간 thermal policy deployment를 했다는 뜻이 아닙니다. 실제 로그로 grounded한 reported-temperature proxy를 기준으로, MuJoCo policy comparison에서 reward 설계 차이가 어떤 방향으로 나타났는지를 말하는 것입니다.
 
-## **10. 이 실험에서 주장해야 하는 것**
-
-이번 결과로 주장해야 하는 것은 "온도 reward를 넣으면 무조건 좋아진다"가 아닙니다.
-
-오히려 핵심 주장은 반대에 가깝습니다.
+## **10. 이 결과가 말해주는 범위**
 
 > 온도만 reward로 넣으면 reward hacking이 생길 수 있다. Thermal-aware locomotion을 만들려면 temperature feedback뿐 아니라 torque와 positive power 같은 physical load term을 같이 묶어야 한다.
 
-이 문장이 Part 8의 핵심입니다.
+Thermal Feedback의 나쁜 결과도 버릴 데이터는 아니었습니다. Temperature proxy 하나만 최적화했을 때 생기는 빈틈을 보여주는 ablation이었고, torque와 power term을 추가한 이유를 설명해줬습니다.
 
-이 흐름이면 Thermal Feedback의 나쁜 결과도 논문에서 버릴 데이터가 아닙니다. 오히려 왜 Thermal-Torque Feedback이 필요한지 보여주는 가장 중요한 ablation이 됩니다.
+## **11. 해석의 제한**
 
-## **11. 말하면 안 되는 것**
+Learned thermal policy 비교는 MuJoCo에서 수행했고, 실제 Go2는 log collection과 thermal model grounding에 사용했습니다. 따라서 이 결과를 실제 하드웨어 장시간 배포 성능으로 해석할 수는 없습니다. 비교 범위도 `vx_cmd = 1.5 m/s` operating point로 제한되며, 더 높은 속도에서는 reward를 다시 조정해야 할 수 있습니다.
 
-이 결과를 설명할 때 조심해야 할 말도 있습니다.
+이번 metric은 battery saving이나 motor winding temperature를 직접 측정한 값도 아닙니다. Go2가 제공하는 onboard reported actuator temperature를 바탕으로 만든 corrected risk proxy와 hotspot accumulation을 비교했습니다.
 
-첫째, "실제 Go2에서 thermal policy가 온도를 낮췄다"라고 말하면 안 됩니다. learned thermal policy comparison은 MuJoCo 결과입니다. 실제 Go2는 log collection과 thermal model grounding에 사용했습니다.
+## **12. 온도 proxy에서 물리적 부하로**
 
-둘째, "모든 속도에서 좋아졌다"라고 말하면 안 됩니다. 현재 주장은 `vx_cmd = 1.5 m/s` operating point에 제한하는 것이 안전합니다. 더 높은 속도에서는 다시 reward를 조정해야 할 수 있습니다.
-
-셋째, "에너지 효율이 좋아졌다"를 핵심 주장으로 잡으면 안 됩니다. 이번 결과의 핵심은 battery saving이 아니라, corrected reported-temperature risk와 hotspot accumulation 감소입니다.
-
-넷째, reported actuator temperature를 motor winding temperature처럼 말하면 안 됩니다. 우리가 보는 것은 onboard reported actuator temperature 기반 proxy입니다.
-
-## **12. 정리**
-
-Part 8의 결론은 이렇게 정리할 수 있습니다.
-
-1. Baseline과 Thermal-only를 비교했더니, thermal-only가 기대처럼 좋아지지 않았다.
-2. 원인은 온도 상승률 surrogate만 reward로 줬을 때 생기는 reward hacking이었다.
-3. policy는 온도 모델이 보는 신호를 우회하면서 특정 motor/hotspot에 부담을 몰 수 있었다.
-4. torque와 positive power를 직접 reward에 묶자, actuator load 자체를 줄이는 방향으로 objective가 바뀌었다.
-5. 그 결과 `vx_cmd = 1.5 m/s` MuJoCo corrected-fit 비교에서 Thermal-Torque Feedback이 thermal dose, max rise, hotspot dose를 줄였다.
-
-그래서 이 실험의 메시지는 단순히 "온도 reward를 넣었다"가 아닙니다.
+Baseline과 Thermal-only를 비교했을 때, temperature-rate surrogate만 넣은 policy는 오히려 thermal dose와 hotspot dose가 증가했습니다. Policy가 surrogate의 빈틈을 이용해 특정 motor에 부담을 몰 수 있다는 뜻이었습니다. Torque와 positive power를 직접 묶은 뒤에는 objective가 actuator load 자체를 줄이는 쪽으로 바뀌었고, `vx_cmd = 1.5 m/s` MuJoCo corrected-fit 비교에서 세 thermal metric이 모두 낮아졌습니다.
 
 > 온도 reward는 물리적 부하 항과 같이 설계해야 한다.
-
-이게 이번 결과에서 가장 중요한 결론입니다.

@@ -31,8 +31,6 @@ image:
 - 새 task는 그 feature를 얼마나 선호하는지 나타내는 reward weight $w$로 표현한다.
 - GPI는 이전 policy들을 새 reward에서 다시 평가하고, 그 값들의 maximum에 greedy한 새 policy를 만든다.
 
-한 문장으로 압축하면 다음과 같다.
-
 > **Successor Features는 미래의 행동 결과를 reward와 분리해 저장하고, GPI는 새 reward가 주어졌을 때 그 결과 예측을 즉시 재평가해 기존 policy들을 재사용한다.**
 
 ## 0. 먼저 전체 구조
@@ -1075,45 +1073,31 @@ Vector state-value critic을 학습하는 것은 가능하다. 하지만 하나�
 
 각 skill policy의 SF를 학습해 library로 사용할 수는 있다. 하지만 skill $z$, reward feature $\phi$, task weight $w$의 의미를 분리하고 SF-space coverage를 검증해야 한다.
 
-## 19. 정리
+## 19. 새 reward에서 policy library를 다시 읽는 법
 
-SF+GPI에서 기억할 것은 네 가지다.
+SF는 reward를 immediate feature $\phi$와 preference $w$로 분해하고, policy를 계속 따를 때의 미래 feature 발생량을 $\psi^\pi$에 저장한다.
 
-1. **Reward를 immediate feature와 preference로 분해한다.**
+$$
+r=\phi^\top w,
+\qquad
+\psi^\pi
+=
+\mathbb E^\pi
+\left[
+\sum_k\gamma^k\phi_{t+k+1}
+\right]
+$$
 
-   $$
-   r=\phi^\top w
-   $$
+새 task에서는 source policy를 다시 학습하지 않고도 $Q_w^\pi=\psi^{\pi\top}w$로 재평가할 수 있다. GPI는 policy 하나를 episode 단위로 고르는 대신, 각 state-action에서 source Q의 upper envelope에 greedy한 policy를 만든다.
 
-2. **Policy의 미래 feature 발생량을 Successor Features로 저장한다.**
-
-   $$
-   \psi^\pi
-   =
-   \mathbb E^\pi
-   \left[
-   \sum_k\gamma^k\phi_{t+k+1}
-   \right]
-   $$
-
-3. **새 reward에서 source policy를 dot product로 즉시 재평가한다.**
-
-   $$
-   Q_w^\pi=\psi^{\pi\top}w
-   $$
-
-4. **GPI는 source Q들의 maximum에 greedy한 policy를 만든다.**
-
-   $$
-   \pi_{\text{GPI}}(s)
-   \in
-   \arg\max_a\max_i
-   \psi^{\pi_i}(s,a)^\top w
-   $$
+$$
+\pi_{\text{GPI}}(s)
+\in
+\arg\max_a\max_i
+\psi^{\pi_i}(s,a)^\top w
+$$
 
 Skill discovery가 behavior repertoire를 만드는 문제라면, SF+GPI는 그 repertoire의 장기적인 결과를 새 목적함수에서 평가하고 재사용하는 문제다.
-
-가장 정확한 한 문장은 다음과 같다.
 
 > **Successor Features는 정책의 장기 행동 결과를 reward와 분리된 vector로 저장하고, GPI는 새 reward에서 여러 source policy의 continuation value를 비교해 best source보다 나쁘지 않은 새 policy를 만든다.**
 

@@ -9,7 +9,7 @@ image: /assets/img/posts/isaac-sim-tf-odometry/12-final-tf-tree.png
 
 이 글은 [TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/), [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/), [RTX Lidar Sensors](/posts/isaac-sim-rtx-lidar/)에 이어서 TurtleBot의 TF tree와 odometry를 ROS2로 publish하는 과정을 정리합니다.
 
-앞선 글에서 camera와 Lidar data를 ROS2 topic으로 내보냈습니다. 이번 글의 목표는 그 sensor data가 로봇의 어느 위치에 붙어 있는지 TF tree로 설명하고, `odom -> base_link` 변환과 `/odom` topic을 RViz2에서 확인하는 것입니다.
+앞선 글에서 camera와 Lidar data는 ROS2 topic으로 나왔지만, topic만으로는 센서가 로봇의 어디에 붙어 있는지 알 수 없습니다. 이번에는 TF tree로 sensor frame을 연결하고, `odom -> base_link` 변환과 `/odom` topic을 RViz2에서 확인했습니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -32,7 +32,7 @@ stage를 play하면 외부 ROS2 환경에서 TF를 확인할 수 있습니다. �
 
 ![TF tree node input 설정](/assets/img/posts/isaac-sim-tf-odometry/04-camera-tf-tree-inputs.png)
 
-여기서 핵심은 sensor topic과 sensor frame을 따로 생각하지 않는 것입니다. RViz2에서 image나 lidar data를 robot 위에 올바르게 표시하려면, topic뿐 아니라 그 topic의 frame도 TF tree에 포함되어 있어야 합니다.
+Sensor topic과 sensor frame은 함께 확인해야 합니다. RViz2에서 image나 lidar data를 robot 위에 올바르게 표시하려면 message의 frame이 TF tree에 연결되어 있어야 합니다.
 
 ## **2. Odometry 세팅**
 
@@ -46,7 +46,7 @@ stage를 play하면 외부 ROS2 환경에서 TF를 확인할 수 있습니다. �
 
 ![odom과 base_link frame 설정](/assets/img/posts/isaac-sim-tf-odometry/07-odometry-frame-settings.png)
 
-여기서 raw transform tree는 scene 안의 실제 prim만 다루는 것이 아니라, `odom`처럼 의미론적으로 필요한 frame을 만들 때 사용합니다. 즉, Isaac Sim stage 구조와 ROS2 TF 구조가 항상 1:1로만 대응하는 것은 아닙니다.
+Raw transform tree는 scene 안의 실제 prim뿐 아니라 `odom`처럼 ROS2에서 의미상 필요한 frame도 만듭니다. Isaac Sim stage 구조와 ROS2 TF 구조가 항상 1:1로 대응하지 않는 이유입니다.
 
 ## **3. Robot Base 아래 TF 묶기**
 
@@ -106,9 +106,7 @@ Isaac Sim 안에서도 TF 구조를 확인할 수 있습니다. `Window > Extens
 
 RViz2와 Isaac Sim의 TF viewer를 같이 보면, graph 설정이 실제 ROS2 TF tree로 어떻게 나가는지 확인하기 쉽습니다.
 
-## **7. 정리하며**
-
-이번 글의 핵심은 sensor topic을 publish하는 것에서 한 단계 더 나아가, 그 sensor들이 robot 기준으로 어디에 붙어 있는지 TF tree로 설명하는 것입니다.
+## **7. Topic과 frame을 함께 확인하기**
 
 ```text
 robot prim / sensor prim
@@ -117,4 +115,4 @@ robot prim / sensor prim
   -> RViz2 TF and Odometry display
 ```
 
-TF와 odometry까지 연결해두면 RViz2에서 image, lidar, robot pose를 같은 좌표계로 확인할 수 있고, 이후 navigation이나 control 예제로 확장하기 쉬워집니다. 센서 topic이 “무엇을 본다”를 담당한다면, TF는 그 data가 “어디 기준인지”를 설명합니다.
+TF와 odometry를 연결하면 RViz2에서 image, lidar, robot pose를 같은 좌표계에 표시할 수 있습니다. Sensor topic이 측정값을 전달한다면, TF는 그 측정값을 어느 좌표계에 놓아야 하는지 알려줍니다.

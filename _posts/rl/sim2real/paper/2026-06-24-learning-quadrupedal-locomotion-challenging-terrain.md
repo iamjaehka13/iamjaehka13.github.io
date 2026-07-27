@@ -38,7 +38,7 @@ Lee et al.의 **Learning Quadrupedal Locomotion over Challenging Terrain**은 �
 ![다양한 자연환경에 배포된 ANYmal](/assets/img/posts/rl/sim2real/challenging-terrain/00-preview.png){: width="1100" .d-block .mx-auto }
 _동일 세대의 ANYmal에는 환경별 재조정 없이 같은 proprioceptive controller가 사용되었다. Training에는 rigid procedural terrain만 있었지만, deployment에서는 mountain trail, creek, vegetation, rubble, snow, mud와 forest를 통과했다. 출처: [Lee et al., Figure 1](https://arxiv.org/pdf/2010.11251)._
 
-이 논문의 해법은 세 축으로 정리할 수 있습니다.
+논문의 구성은 teacher, student와 curriculum 세 축으로 나뉩니다.
 
 | 축 | Training에서 하는 일 | Deployment에 남는가 |
 |---|---|---|
@@ -52,12 +52,9 @@ Deploy되는 student는 camera, LiDAR, foot-contact sensor와 terrain height map
 
 > Student는 terrain map을 명시적으로 복원해 planning하는 것이 아니라, 과거 body response에서 control에 필요한 hidden condition의 흔적을 암묵적으로 인코딩한다.
 
-먼저 네 가지 claim boundary를 잡고 읽는 편이 좋습니다.
+여기서 `blind`는 무센서를 뜻하지 않습니다. Joint encoder, IMU와 state estimator를 사용하되 camera·LiDAR terrain map을 쓰지 않는다는 의미입니다. History도 아직 밟지 않은 terrain을 미리 보지 못하고, 이미 일어난 slip·collision·tracking mismatch에서 hidden condition을 추론합니다.
 
-1. **Blind는 무센서가 아니다.** Joint encoder, IMU와 state estimator를 사용하되 camera·LiDAR terrain map을 쓰지 않습니다.
-2. **History는 미래 terrain을 보지 못한다.** 이미 일어난 slip, collision과 tracking mismatch를 통해 hidden condition을 추론합니다.
-3. **Natural terrain을 simulation에 그대로 만들지 않았다.** Rigid hills·steps·stairs와 friction variation에서 response strategy를 학습했습니다.
-4. **TCN 하나의 성과가 아니다.** Privileged learning, DAgger, curriculum, PMTG, actuator model과 randomization이 함께 작동했습니다.
+Training에는 natural terrain을 그대로 넣지 않았습니다. Rigid hills, steps, stairs와 friction variation에서 response strategy를 학습했습니다. 결과 역시 TCN 하나로 설명할 수 없으며 privileged learning, DAgger, curriculum, PMTG, actuator model과 randomization이 함께 사용됐습니다.
 
 ---
 
@@ -161,7 +158,7 @@ Proprioceptive inference는 contact가 일어난 뒤 강합니다. 아직 밟지
 ![Privileged learning, terrain curriculum과 PMTG control architecture](/assets/img/posts/rl/sim2real/challenging-terrain/04-method-overview.png){: width="1300" .d-block .mx-auto }
 _A는 privileged teacher와 proprioceptive student의 두 단계 학습, B는 particle-filter terrain curriculum, C는 policy가 foot trajectory generator를 residual과 frequency로 조절하는 control architecture다. 출처: [Lee et al., Figure 4](https://arxiv.org/pdf/2010.11251)._
 
-그림을 data flow 순서대로 읽으면 다음과 같습니다.
+그림을 data flow에 따라 나누면 두 training stage와 runtime control이 보입니다.
 
 ### **Training Stage 1: Teacher**
 
@@ -425,7 +422,7 @@ N=100
 2.0\ \mathrm{s\ history}
 $$
 
-비교 model은 다음과 같습니다.
+History 길이에 따른 비교 model은 세 가지입니다.
 
 | Model | Receptive field |
 |---|---:|
@@ -514,7 +511,7 @@ Terrain은 매 episode 다른 random seed로 다시 생성됩니다.
 
 Command direction으로의 projected speed를 $v_{pr}$라 하겠습니다.
 
-한 transition의 success label은 다음과 같습니다.
+각 transition에는 projected speed를 기준으로 아래 success label을 붙입니다.
 
 $$
 \nu(s_t,a_t,s_{t+1})
@@ -721,7 +718,7 @@ ANYmal-B에 10 kg payload를 부착했습니다. 이는 total robot weight의 22
 - Proposed controller: payload 유무 모두 평균 heading error 10도 이내
 - Baseline: lateral direction heading error가 약 30도까지 증가
 
-이 실험은 terrain inference뿐 아니라 model mismatch robustness도 보여줍니다.
+이 결과에는 terrain response와 model mismatch robustness가 함께 들어 있습니다.
 
 ### **11.3 Wet whiteboard slip**
 
@@ -790,7 +787,7 @@ Uniform sampling은 현재 policy가 거의 통과할 수 없는 terrain을 자�
 
 ### **12.4 TCN vs GRU와 latent-loss ablation**
 
-Supplementary experiment의 결론은 더 세밀합니다.
+Supplementary experiment에서는 architecture와 latent loss의 영향을 따로 비교했습니다.
 
 - GRU: slope에서는 TCN-100과 비슷하지만 step은 TCN-100보다 낮음
 - GRU training update: TCN-100보다 약 3배 느림
@@ -799,7 +796,7 @@ Supplementary experiment의 결론은 더 세밀합니다.
 ![Student architecture와 latent-loss ablation](/assets/img/posts/rl/sim2real/challenging-terrain/09-student-architecture-ablation.png){: width="720" .d-block .mx-auto }
 _TCN-100, GRU와 action-only imitation인 TCN-100 naive IL을 비교한다. 각 model은 5개 seed로 학습되었다. 출처: [Lee et al., Figure S3](https://arxiv.org/pdf/2010.11251)._
 
-따라서 “TCN만 가능하다”는 결론은 아닙니다. GRU도 유효하지만 이 setup에서는 긴 TCN이 step handling과 training efficiency에 더 유리했습니다.
+GRU도 유효했으므로 TCN만 가능한 문제는 아닙니다. 다만 이 setup에서는 긴 TCN이 step handling과 training efficiency에 더 유리했습니다.
 
 ---
 
@@ -809,7 +806,7 @@ _TCN-100, GRU와 action-only imitation인 TCN-100 naive IL을 비교한다. 각 
 
 저자들은 trained TCN의 intermediate representation을 고정하고, 별도의 decoder를 나중에 학습했습니다.
 
-Decoder가 복원한 대상은 다음과 같습니다.
+Frozen representation에서 decoder가 복원한 대상은 아래와 같습니다.
 
 - Foot contact state
 - Terrain elevation과 normal
@@ -830,7 +827,7 @@ $$
 +\log\sigma_i
 $$
 
-중요한 점은 decoder가 policy training이나 real control에 들어가지 않았다는 것입니다. **Representation probing 도구**입니다.
+Decoder는 policy training이나 real control에 들어가지 않은 **representation probing 도구**입니다.
 
 ### **13.2 Foot-trapping analysis**
 
@@ -853,8 +850,6 @@ Saliency map에서는 first collision 시점의 left-front joint position, veloc
 - Decoder가 representation에 있는 상관관계를 읽었을 수 있습니다.
 - Latent의 특정 component가 policy action에 반드시 필요한지는 별도 intervention이 필요합니다.
 - Real terrain에서 decoded geometry가 정확하다고 직접 검증한 것은 아닙니다.
-
-따라서 안전한 결론은 다음입니다.
 
 > TCN representation에는 contact, terrain과 disturbance를 복원할 수 있는 정보가 포함되어 있었고, policy output은 과거 collision 시점에 민감했다.
 
@@ -882,7 +877,7 @@ Student가 2초 history를 사용하는 이유와 이 recovery timing이 연결�
 | Terrain curriculum update | 같은 desktop | 2.9 s |
 | Real inference | Onboard i7-5600U | 400 Hz |
 
-Teacher hyperparameter의 주요 값은 다음과 같습니다.
+Teacher의 주요 hyperparameter는 아래와 같습니다.
 
 | TRPO setting | 값 |
 |---|---:|
@@ -917,7 +912,7 @@ Policy는 natural deployment terrain에서 reward를 받아 fine-tuning하지 �
 
 ### **15.3 왜 simple simulation이 natural terrain으로 확장됐는가**
 
-논문 결과만으로 mechanism을 단 하나로 확정할 수는 없지만, evidence가 지지하는 설명은 다음과 같습니다.
+논문 결과만으로 mechanism을 하나로 확정할 수는 없습니다. 다만 ablation과 probing을 함께 보면 아래 연결이 가장 자연스럽습니다.
 
 | 학습 요소 | Natural-terrain transfer에 기여한 연결 고리 |
 |---|---|
@@ -1082,24 +1077,19 @@ Lee et al.은 2초 proprioceptive history로 terrain, contact와 disturbance의 
 
 ---
 
-## **20. 정리: Terrain Map보다 먼저 Body Response를 읽는다**
+## **20. Terrain Map보다 먼저 Body Response를 읽는다**
 
-이 논문의 핵심은 여섯 가지로 압축할 수 있습니다.
+Privileged teacher는 terrain profile, contact, friction과 disturbance를 보며 rough-terrain response를 배웠습니다. Student는 deployable observation과 2초 proprioceptive history만으로 teacher action과 latent를 함께 모방했고, DAgger로 자신이 실제 방문하는 state까지 training data에 포함했습니다. PMTG의 leg frequency와 foot residual을 policy가 조절하고, IK와 joint PD가 이를 actuator command로 바꿨습니다.
 
-1. **Teacher:** Rigid hills, slippery hills, steps와 stairs에서 terrain profile·contact·friction·disturbance를 privileged input으로 받아 TRPO로 학습했습니다.
-2. **Student:** Deployable observation과 2초 proprioceptive history로 teacher action과 latent를 함께 모방했고, DAgger로 student 방문 분포를 따라갔습니다.
-3. **Structured action:** Policy는 PMTG의 leg frequency와 foot residual을 출력하며, IK와 joint PD가 이를 real actuator command로 바꿨습니다.
-4. **Adaptive difficulty:** Particle-filter curriculum은 traversability 0.5-0.9의 learning frontier를 추적했고, long memory·privileged training·adaptive curriculum은 각각 ablation에서 이득을 보였습니다.
-5. **Real evidence:** ANYmal은 mud, snow, vegetation, rubble와 running water에서 동작했고, controlled test에서는 16.8 cm trapping, 10 kg payload와 wet surface를 따로 평가했습니다.
-6. **Boundary:** Decoder와 saliency는 hidden-condition information의 근거이지 explicit terrain reconstruction의 증명은 아니며, blind control은 contact 전 cliff·gap avoidance를 해결하지 못합니다.
+Particle-filter curriculum은 traversability 0.5-0.9의 learning frontier를 따라갔습니다. Long memory, privileged training과 adaptive curriculum은 각각 ablation에서 이득을 보였습니다. 실제 ANYmal은 mud, snow, vegetation, rubble와 running water에서 동작했고, controlled test에서는 16.8 cm foot trapping, 10 kg payload와 wet surface를 따로 평가했습니다.
 
-6편의 결론은 다음과 같습니다.
+Decoder와 saliency는 latent에 hidden-condition information이 있다는 근거이지 explicit terrain reconstruction의 증명은 아닙니다. 또한 blind control은 contact 전에 cliff나 gap을 피하는 문제를 해결하지 못합니다.
 
 > Simulation이 자연환경을 그대로 복제하지 못하더라도, robot이 자신의 response history에서 contact와 mismatch를 읽도록 학습하면 simple training domain을 넘어서는 robustness가 나타날 수 있다.
 
 다음 글: [Rapid Motor Adaptation, RMA](/posts/rma-rapid-motor-adaptation/)
 
-다음 편에서는 이 hidden-condition inference를 더 명시적인 environment latent와 adaptation module로 분리한 **Rapid Motor Adaptation, RMA**를 살펴봅니다.
+다음 편의 **Rapid Motor Adaptation, RMA**는 이 hidden-condition inference를 explicit environment latent와 adaptation module로 분리합니다.
 
 ---
 

@@ -10,7 +10,7 @@ image:
   alt: DADS로 학습한 Humanoid가 여러 목표점을 따라 이동하는 연속 동작
 ---
 
-[이전 글](/posts/diayn-diversity-is-all-you-need/)에서는 DIAYN이 외부 task reward 없이 서로 구별되는 skill을 어떻게 발견하는지 정리했다. DIAYN의 핵심은 현재 상태에서 실행된 skill을 맞히는 discriminator였다.
+[이전 글](/posts/diayn-diversity-is-all-you-need/)의 DIAYN은 현재 상태에서 실행된 skill을 맞히는 discriminator로 서로 다른 state visitation을 만들었다.
 
 $$
 q_\phi(z\mid s)
@@ -23,8 +23,6 @@ DADS, **Dynamics-Aware Discovery of Skills**는 이 지점에서 질문을 바�
 > 현재 상태 $s$에서 skill $z$를 실행했을 때, 다음 상태 $s'$를 얼마나 잘 예측할 수 있는가?
 
 DIAYN이 skill별 **state visitation**을 구별한다면, DADS는 skill별 **state transition**을 구별하고 예측한다. 그리고 학습 과정에서 얻은 skill dynamics를 downstream planning에 그대로 재사용한다.
-
-이 글을 한 문장으로 압축하면 다음과 같다.
 
 > **DADS는 서로 다르면서도 반복 가능한 상태 변화를 skill로 학습하고, 그 변화 모델 위에서 latent-space planning을 수행한다.**
 
@@ -83,7 +81,7 @@ DIAYN과 DADS를 가장 짧게 비교하면 다음과 같다.
 | 높은 보상의 의미 | 이 상태를 보면 $z$를 맞힐 수 있음 | 이 transition은 현재 $z$로 잘 예측되고 다른 $z$와 구별됨 |
 | Downstream 사용 | skill 선택, fine-tuning, meta-controller | learned skill dynamics를 이용한 planning |
 
-여기서 DIAYN을 "최종 상태만 보는 방법"이라고 설명하면 부정확하다. DIAYN discriminator는 trajectory에서 방문한 상태를 이용해 skill-conditioned state distribution을 구별한다. DADS의 차이는 단순히 중간 상태를 더 본다는 것이 아니라, **현재 상태를 조건으로 두고 다음 상태의 변화를 모델링한다**는 데 있다.
+DIAYN을 "최종 상태만 보는 방법"이라고 설명하면 부정확하다. DIAYN discriminator는 trajectory에서 방문한 상태로 skill-conditioned state distribution을 구별한다. DADS는 **현재 상태를 조건으로 두고 다음 상태의 변화를 모델링한다**는 점에서 다르다.
 
 예를 들어 다음 두 skill을 생각해보자.
 
@@ -501,17 +499,11 @@ DADS planning transfer
  + planner robustness 검증
 ```
 
-## 13. 최종 정리
+## 13. DADS에서 남는 연결
 
-DADS에서 반드시 남겨야 할 개념은 다섯 가지다.
+Policy $\pi(a\mid s,z)$의 $z$는 처음부터 의미를 갖지 않는다. DIAYN이 $q(z\mid s)$로 skill-conditioned state distribution을 구별했다면, DADS는 $q(s'\mid s,z)$로 skill-conditioned transition을 예측한다. 그 결과 $I(S';Z\mid S)$는 서로 다른 $z$의 diversity와 같은 $z$의 predictability를 함께 요구한다. 학습된 skill dynamics는 intrinsic reward를 만드는 데서 끝나지 않고 downstream MPC에도 재사용된다.
 
-1. Policy는 $\pi(a\mid s,z)$이며 $z$는 처음부터 의미를 갖지 않는다.
-2. DIAYN은 $q(z\mid s)$로 skill-conditioned state distribution을 구별한다.
-3. DADS는 $q(s'\mid s,z)$로 skill-conditioned transition을 예측한다.
-4. $I(S';Z\mid S)$는 서로 다른 $z$의 다양성과 같은 $z$의 predictability를 함께 요구한다.
-5. 학습된 skill dynamics는 intrinsic reward 계산뿐 아니라 downstream MPC에도 사용된다.
-
-반면 Mixture-of-Experts의 expert 수, prior sample 수, MPPI update 식과 같은 세부는 구현하거나 재현할 때 다시 보면 된다. 첫 번째 논문 리뷰에서 중요한 것은 수식을 전부 외우는 것이 아니라 다음 연결을 이해하는 것이다.
+Mixture-of-Experts의 expert 수, prior sample 수와 MPPI update 식은 구현할 때 다시 확인하면 된다. 논문의 연결은 아래 문장에 더 잘 남는다.
 
 > **스킬을 장기 계획에 사용하려면 서로 다르기만 해서는 부족하다. 결과를 예측할 수 있어야 한다.**
 

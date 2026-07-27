@@ -27,13 +27,7 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 
 > Simulation을 현실과 완전히 같게 만들 수 없다면, 우리는 simulation을 어떻게 써야 하는가?
 
-이 글의 결론은 세 문장으로 먼저 압축할 수 있습니다.
-
-1. 측정할 수 있는 sensor·motor dynamics는 실제 robot 데이터로 먼저 모델링한다.
-2. 모델에 남은 stochastic variation은 **실측 크기에 맞는 noise**로 표현한다.
-3. Simulation score만 보지 말고 simulation과 real robot의 **trajectory correspondence**를 직접 확인한다.
-
-즉 이 논문은 단순히 "noise를 많이 넣자"고 말하지 않습니다. 핵심은 **실측 기반 모델과 적절한 noise를 함께 사용한다**는 것입니다. Underlying model이 부정확하면 noise가 모든 차이를 해결해 주지 못하고, noise가 현실보다 지나치게 커도 transfer는 나빠질 수 있습니다.
+처음에는 제목만 보고 simulation에 noise를 많이 넣는 논문이라고 생각하기 쉽습니다. 실제 절차는 더 신중합니다. 측정 가능한 sensor·motor dynamics를 실제 robot 데이터로 먼저 맞추고, 모델에 남은 stochastic variation만 실측 크기의 noise로 표현했습니다. 마지막에는 simulation score보다 simulation과 real robot의 **trajectory correspondence**를 직접 비교했습니다. Underlying model이 부정확하면 noise가 모든 차이를 메우지 못하고, 현실보다 큰 noise 역시 transfer를 해칠 수 있다는 것이 실험에서 드러납니다.
 
 ## **1. 논문 정보**
 
@@ -53,7 +47,7 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 
 > Simulation에서 얻은 behavior가 real robot에서도 같은 behavior로 나오는가?
 
-## **2. 핵심 주장: 정교한 모델 위에 현실적인 noise를 넣기**
+## **2. 실측 모델 위에 현실적인 noise를 넣기**
 
 이 논문에서 가장 중요한 개념은 **envelope of noise**입니다.
 
@@ -65,7 +59,7 @@ Jakobi, Husbands, Harvey의 **Noise and The Reality Gap: The Use of Simulation i
 >
 > 실제 robot에서 생기는 불확실성을 simulation 안에서 일정 범위의 noise로 감싸서, controller가 깨끗한 simulation에만 맞춰지지 않도록 하는 방법입니다.
 
-여기서 중요한 점은 noise가 단순한 방해물이 아니라는 것입니다. 이 논문에서 noise는 simulation을 일부러 더 어렵게 만들기 위한 장치가 아니라, **real world에서 피할 수 없는 불확실성을 training distribution 안으로 넣는 장치**입니다.
+이 논문에서 noise는 난도를 올리기 위한 방해물이 아니라, **real world에서 피할 수 없는 불확실성을 training distribution 안으로 옮기는 장치**입니다.
 
 적절한 noise는 controller가 simulation의 특수한 조건에 overfit되는 것을 막습니다. Simulation 안에서 조금 흔들리는 세계를 경험한 controller는 실제 robot의 불완전함에도 더 잘 버틸 수 있습니다.
 
@@ -129,7 +123,7 @@ _Obstacle avoidance는 50 cm 정사각형 arena와 반지름 4 cm의 cylinder �
 
 ### **2.4 Evolution은 무엇을 최적화했는가?**
 
-Obstacle avoidance에서는 빠르게 전진하되 좌우 회전이 한쪽으로 치우치지 않는 controller를 찾았습니다. 논문이 실제로 사용한 fitness는 다음과 같습니다.
+Obstacle avoidance에서는 빠르게 전진하되 좌우 회전이 한쪽으로 치우치지 않는 controller를 찾았습니다. 실제 fitness는 아래 식입니다.
 
 $$
 F_{\mathrm{avoid}}
@@ -177,15 +171,13 @@ $$
 
 `Behavior quality`는 simulation에서 반복 실행했을 때 전략이 얼마나 optimal하고 robust한지를, `correspondence`는 simulation과 real trajectory가 얼마나 닮았는지를 나타냅니다. 둘 다 최대 10점이며 **저자들의 주관적 평가**입니다. Noise 조건마다 controller가 5개뿐이고 confidence interval이나 통계 검정도 없습니다. 따라서 숫자의 순위는 흥미로운 관찰이지 강한 정량적 증명은 아닙니다.
 
-이 결과에서 안전하게 읽을 수 있는 결론은 다음과 같습니다.
-
 > 이 실험에서는 현실과 비슷한 크기의 noise가 가장 높은 평균 점수를 보였다. 그러나 noise가 많을수록 transfer가 좋아진다는 뜻은 아니다.
 
-즉 핵심은 noise의 양 자체가 아니라, **real robot에서 실제로 생기는 variation을 적절한 범위로 감싸는 것**입니다.
+이 결과는 noise의 양보다 **real robot에서 생기는 variation을 적절한 범위로 감싸는 일**이 중요하다는 쪽으로 읽어야 합니다.
 
 ## **3. Trajectory로 읽는 실제 결과**
 
-평균 점수만 보면 observed noise가 좋아 보이지만, 이 논문의 핵심은 각 controller가 simulation의 어떤 규칙을 이용했는지 trajectory로 해석하는 데 있습니다.
+평균 점수만 보면 observed noise가 좋아 보입니다. 하지만 trajectory를 함께 보면 각 controller가 simulation의 어떤 규칙을 이용했는지가 더 분명하게 드러납니다.
 
 ### **3.1 Obstacle avoidance: 정확한 90도 회전이라는 편법**
 
@@ -228,7 +220,7 @@ Run당 fitness evaluation은 trial 2개의 평균뿐이어서 stochastic fitness
 
 > 이 절의 MDP 수식은 1995년 원문에 나온 표기가 아니라, 논문의 아이디어를 현대 reinforcement-learning 언어로 재해석한 것입니다.
 
-이 논문의 이론적 의미는 "simulation에 noise를 넣었다"보다 더 넓게 볼 수 있습니다. 핵심은 controller가 하나의 깨끗한 simulator에 과적합되는 문제를 줄이고, real world에서 나타날 수 있는 transition variation에 대해 robust하게 만드는 것입니다.
+이 논문의 이론적 의미는 "simulation에 noise를 넣었다"보다 넓습니다. Controller가 하나의 깨끗한 simulator에 과적합되는 문제를 줄이고, real world에서 나타날 transition variation에 버티게 만드는 과정으로 볼 수 있습니다.
 
 ### **4.1 Clean simulation은 하나의 좁은 MDP다**
 
@@ -374,7 +366,7 @@ Sim2Real에는 서로 보완적인 두 축이 있습니다.
 
 두 방법 모두 하나의 깨끗한 simulator에 controller가 과적합되는 문제를 줄이려 한다는 공통점이 있습니다.
 
-따라서 이 논문을 **domain randomization 그 자체**라고 부르는 것은 과합니다. 더 정확한 표현은 다음과 같습니다.
+따라서 이 논문을 **domain randomization 그 자체**라고 부르는 것은 과합니다. 두 개념의 관계는 아래 정도로 표현하는 편이 정확합니다.
 
 > 실측 noise를 training에 포함해 robustness를 얻으려 한 초기 Sim2Real 연구이며, 이후 domain randomization으로 이어지는 중요한 문제의식을 보여준다.
 
@@ -394,7 +386,7 @@ Legged locomotion이라면 다음과 같은 값이 후보가 될 수 있습니�
 | actuator load | torque/current가 비현실적으로 커지지 않는가 |
 | disturbance response | 작은 perturbation에 비슷하게 복구되는가 |
 
-각 값을 한 시점에서 정확히 일치시키는 것이 목표는 아닙니다. 평균, 분산, transient response, failure mode를 함께 비교해 simulation과 real robot의 동작 구조가 얼마나 같은지 확인하는 것이 핵심입니다. 결국 simulation reward가 아니라 real behavior가 최종 기준입니다.
+각 값을 한 시점에서 정확히 일치시키는 것이 목표는 아닙니다. 평균, 분산, transient response, failure mode를 함께 비교해 simulation과 real robot의 동작 구조가 얼마나 같은지 확인해야 합니다. 최종 기준은 simulation reward가 아니라 real behavior입니다.
 
 ## **6. 이 논문의 한계**
 
@@ -424,21 +416,15 @@ Khepera의 stepper motor와 평면 differential drive는 비교적 정확하게 
 
 > Real transfer를 목표로 한다면, clean simulator에서만 좋은 controller를 믿으면 안 된다.
 
-## **7. 정리하며: Reality Gap에서 Domain Randomization으로**
+## **7. Reality Gap에서 Domain Randomization으로**
 
-이번 글에서 남겨야 할 결론은 다섯 가지입니다.
+이 논문에서 reality gap은 parameter 몇 개가 틀린 상태보다 넓은 개념입니다. Simulation에서 얻은 behavior가 real robot에서 재현되지 않으면 transfer에 실패한 것입니다. 이를 줄이기 위해 저자들은 측정 가능한 dynamics를 먼저 모델링하고, 남은 uncertainty를 noise로 다뤘습니다.
 
-- Reality gap은 단순한 parameter 오차가 아니라 simulation behavior가 real robot에서 재현되지 않는 **transfer failure**입니다.
-- Simulation fidelity와 controller robustness는 대안 관계가 아닙니다. 측정 가능한 dynamics를 먼저 맞추고, 남은 uncertainty를 noise로 다뤄야 합니다.
-- Zero noise는 완벽한 반복성이라는 shortcut을, double noise는 현실에 없는 jitter라는 shortcut을 만들었습니다.
-- Simulation score와 sim-real correspondence는 별개의 평가축입니다.
-- Observed noise가 가장 좋았다는 결과는 소규모 주관 평가에 기반하므로, 현대 domain randomization의 보편 법칙으로 확대하면 안 됩니다.
-
-이 논문이 남긴 질문은 명확합니다.
+Zero-noise controller는 완벽한 반복성을, double-noise controller는 현실에 없는 jitter를 shortcut으로 이용했습니다. Observed noise의 평균 결과가 가장 좋았지만 조건당 controller가 5개뿐이고 평가도 주관적이었으므로, 이를 현대 domain randomization의 보편 법칙으로 확대할 수는 없습니다. 대신 아래 질문은 그대로 남습니다.
 
 > Simulation이 틀릴 수밖에 없다면, 어떤 차이는 모델링하고 어떤 차이는 training distribution으로 감쌀 것인가?
 
-다음 글인 **[Domain Randomization](/posts/domain-randomization/)**에서는 이 질문이 visual perception의 다양한 simulation domain으로 어떻게 확장되는지 살펴봅니다.
+다음 글인 **[Domain Randomization](/posts/domain-randomization/)**은 같은 질문을 sensor·motor noise에서 visual appearance의 distribution으로 옮깁니다.
 
 ## **참고 자료**
 

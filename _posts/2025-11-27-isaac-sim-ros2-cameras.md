@@ -7,9 +7,7 @@ description: Isaac Sim의 TurtleBot에 카메라를 붙이고 ROS2 image topic�
 image: /assets/img/posts/isaac-sim-ros2-cameras/05-camera-ros2-omnigraph.png
 ---
 
-이 글은 [이전 TurtleBot ROS2 연결 글](/posts/isaac-sim-turtlebot-ros2/)에서 만든 TurtleBot stage를 이어서 사용합니다. 이번 목표는 TurtleBot에 카메라를 추가하고, Isaac Sim camera view를 ROS2 image topic으로 publish한 뒤 RViz2에서 확인하는 것입니다.
-
-핵심은 카메라 prim 자체보다도 **camera prim이 render product가 되고, 그 render product가 ROS2 Camera Helper를 통해 image topic으로 나가는 흐름**을 이해하는 것입니다.
+[이전 TurtleBot ROS2 연결 글](/posts/isaac-sim-turtlebot-ros2/)에서 만든 stage에 카메라 두 대를 추가했습니다. Camera prim만 배치해서는 ROS2 image가 생기지 않습니다. **Camera prim에서 render product를 만들고, ROS2 Camera Helper가 이를 image topic으로 내보내야** RViz2에서 영상을 볼 수 있습니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -20,7 +18,7 @@ image: /assets/img/posts/isaac-sim-ros2-cameras/05-camera-ros2-omnigraph.png
 
 ## **1. TurtleBot에 카메라 추가**
 
-먼저 이전 글에서 import한 TurtleBot의 body 아래에 `camera1`, `camera2` prim을 만듭니다. 중요한 점은 카메라를 로봇의 움직임을 따라가는 prim 아래에 넣어야 한다는 것입니다.
+먼저 이전 글에서 import한 TurtleBot의 body 아래에 `camera1`, `camera2` prim을 만듭니다. 카메라는 반드시 로봇의 움직임을 따라가는 prim 아래에 있어야 합니다.
 
 URDF import 후 namespace가 붙은 경우에는 보통 `a__namespace_base_footprint`처럼 이름이 붙은 base prim 아래에 카메라를 추가합니다. 이렇게 해야 로봇이 움직일 때 카메라 frame도 같이 따라갑니다.
 
@@ -56,7 +54,7 @@ ROS2 graph가 보이지 않는다면 ROS2 bridge extension이 켜져 있는지 �
 
 ![ROS2 camera publish용 OmniGraph](/assets/img/posts/isaac-sim-ros2-cameras/05-camera-ros2-omnigraph.png)
 
-핵심 흐름은 다음과 같습니다.
+Graph의 데이터 흐름은 아래와 같습니다.
 
 ```text
 Camera prim
@@ -120,9 +118,7 @@ host 쪽 ROS2 workspace도 source한 뒤 RViz2에서 augmented image topic을 �
 
 이 예제는 실제 카메라 연결 과정과는 조금 별개지만, Isaac Sim에서 생성한 image stream을 ROS2로 publish하고 RViz2에서 확인하는 구조를 다시 한 번 확인하기 좋습니다.
 
-## **5. 정리하며**
-
-이번 글의 핵심은 camera prim을 만든 뒤, 그 출력을 ROS2 image topic으로 내보내는 연결 구조입니다.
+## **5. Camera prim에서 ROS2 image까지**
 
 ```text
 Camera prim
@@ -131,4 +127,4 @@ Camera prim
   -> RViz2 Image display
 ```
 
-이 구조를 잡아두면 이후 depth image, camera info, lidar, TF tree까지 같은 패턴으로 확장할 수 있습니다. 특히 여러 센서를 붙일 때는 prim target과 topic name을 명확히 분리해두는 것이 중요합니다.
+같은 graph에 depth image와 camera info publisher를 추가할 수 있고, lidar도 helper 종류만 달라질 뿐 연결 방식은 비슷합니다. 센서가 늘어나면 prim target과 topic name을 먼저 표로 정리해두는 편이 연결 실수를 줄여줍니다.

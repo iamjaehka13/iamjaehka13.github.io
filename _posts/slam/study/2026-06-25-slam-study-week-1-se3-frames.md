@@ -696,13 +696,9 @@ base가 제자리에서 회전하더라도 LiDAR가 base 원점에서 떨어져 
 
 이게 $ {}^W T_L = {}^W T_B {}^B T_L $을 직접 계산해야 하는 이유입니다.
 
-## **11. 이번 주 정리**
-
-1주차를 한 문장으로 정리하면 다음입니다.
+## **11. Frame에서 scan motion까지**
 
 > SLAM에서 pose를 다루기 전에, 모든 값이 어느 frame 기준인지 먼저 확인해야 한다.
-
-이번 주에 이해한 흐름은 다음입니다.
 
 ```text
 frame 구분
@@ -714,12 +710,10 @@ frame 구분
 -> frame_motion_analyzer로 motion feature 추출
 ```
 
-이 단계가 끝나야 다음 주제인 LiDAR timestamp와 deskew로 넘어갈 수 있습니다.
-
-특히 legged robot에서는 LiDAR가 base 위에 달려 있고, base가 보행 중 계속 흔들립니다. 따라서 scan 하나 안에서도 LiDAR pose는 고정되어 있지 않습니다.
+Frame을 고정한 뒤에야 LiDAR timestamp와 deskew를 같은 식 위에서 다룰 수 있습니다. 특히 legged robot에서는 LiDAR가 base 위에 달려 있고 base가 보행 중 계속 흔들리므로, scan 하나 안에서도 LiDAR pose가 고정되어 있지 않습니다.
 
 나중에 보고 싶은 질문은 다음입니다.
 
 > 보행 중 LiDAR가 scan 내부에서 얼마나 흔들렸고, 그 흔들림이 scan matching residual과 conditioning에 어떤 영향을 주는가?
 
-1주차의 `frame_motion_analyzer`는 이 질문으로 가기 위한 첫 번째 도구입니다.
+`frame_motion_analyzer`는 이 질문을 수치로 확인하기 위한 첫 번째 도구입니다.

@@ -22,7 +22,7 @@ forward pass로 예측
 
 이 원리는 Transformer에서도 바뀌지 않습니다. 달라지는 것은 forward pass의 내부 구조입니다.
 
-이 글은 3Blue1Brown의 **Deep Learning Chapter 5: Transformers, the tech behind LLMs**를 바탕으로 다음 질문에 답합니다.
+3Blue1Brown의 **Deep Learning Chapter 5: Transformers, the tech behind LLMs**를 따라 아래 질문을 추적합니다.
 
 > 입력 문장은 Transformer 안에서 어떤 순서로 처리되어 다음 token의 확률분포가 되는가?
 
@@ -552,13 +552,9 @@ $$
 
 두 block 모두 matrix multiplication과 학습 parameter를 사용하지만, sequence를 다루는 방식이 다릅니다.
 
-## **20. 핵심 직관**
-
-Transformer의 전체 흐름은 다음 한 문장으로 정리할 수 있습니다.
+## **20. Input text에서 다음 token까지**
 
 > Transformer는 text를 token vector의 sequence로 바꾸고, attention과 MLP를 반복해 각 vector에 문맥을 반영한 뒤, 마지막 vector를 vocabulary 전체의 다음 token 확률분포로 변환한다.
-
-다시 순서만 적으면 다음과 같습니다.
 
 ```text
 tokenize

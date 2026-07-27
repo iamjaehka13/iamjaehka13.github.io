@@ -9,7 +9,7 @@ image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 
 이 글은 [TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/), [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/), [RTX Lidar Sensors](/posts/isaac-sim-rtx-lidar/), [TF Trees and Odometry](/posts/isaac-sim-tf-odometry/)에 이어서 ROS2 topic의 publish rate와 QoS를 조정하는 과정을 정리합니다.
 
-앞선 글들에서는 topic을 “나오게 만드는 것”에 집중했습니다. 이번 글의 목표는 한 단계 더 나아가, topic이 **얼마나 자주 publish되는지**와 **subscriber가 어떤 조건으로 message를 받는지**를 Isaac Sim OmniGraph에서 조정하는 것입니다.
+앞선 글들에서는 topic이 정상적으로 publish되는지만 확인했습니다. 실제 연결에서는 topic의 **publish 주기**와 publisher/subscriber 사이의 **QoS 호환성**도 맞아야 합니다. 두 설정을 Isaac Sim OmniGraph에서 직접 바꿔봤습니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -42,7 +42,7 @@ image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 
 ![IMU publish용 Simulation Gate graph](/assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png)
 
-핵심 설정은 다음과 같습니다.
+이번 예제에서 바꿀 값은 두 개입니다.
 
 - `Isaac Simulation Gate`의 `step`을 `2`로 설정합니다.
 - `Isaac Read IMU` 노드의 target에는 추가한 IMU sensor prim을 넣습니다.
@@ -64,7 +64,7 @@ ros2 topic hz /imu
 
 ![step size 2일 때 topic hz](/assets/img/posts/isaac-sim-publish-rate-qos/04-topic-hz-step-2.png)
 
-정리하면 `Isaac Simulation Gate`의 `step`은 simulation frame 기준 divider처럼 생각하면 됩니다.
+`Isaac Simulation Gate`의 `step`은 simulation frame 기준 divider로 동작합니다.
 
 ```text
 publish rate = simulation rate / step
@@ -193,7 +193,7 @@ static publisher는 message를 반복해서 publish하기보다 한 번 publish�
 
 ![Static Publisher graph](/assets/img/posts/isaac-sim-publish-rate-qos/17-static-publisher-graph.png)
 
-설정 흐름은 다음과 같습니다.
+설정은 아래 순서로 진행합니다.
 
 1. `On Stage Event`의 event name을 simulation start play로 설정합니다.
 2. `Countdown` 노드의 input duration을 `3`, period를 `1`로 설정해 simulation 시작 후 3 frame 뒤 publisher에 tick이 들어가게 합니다.
@@ -211,7 +211,7 @@ ros2 topic echo /topic
 
 ![static publisher topic echo 확인](/assets/img/posts/isaac-sim-publish-rate-qos/20-static-publisher-echo.png)
 
-## **9. 정리하며**
+## **9. Rate와 전달 정책은 별도 설정이다**
 
 publish rate와 QoS는 topic이 “보이게 만드는 것” 다음 단계의 튜닝입니다.
 
@@ -227,4 +227,4 @@ QoS:
   -> subscriber behavior
 ```
 
-센서 topic은 필요 이상으로 높은 rate를 줄이고, 중요한 상태값은 `transientLocal` 같은 durability를 써서 늦게 붙은 subscriber도 받을 수 있게 만드는 것이 핵심입니다. 결국 publish rate는 “얼마나 자주 보낼 것인가”, QoS는 “어떤 방식으로 받을 것인가”를 정하는 설정입니다.
+Publish rate는 message를 얼마나 자주 만들지 정하고, QoS는 만들어진 message를 어떤 조건으로 전달할지 정합니다. 센서별로 필요한 주기를 먼저 잡은 뒤 reliability와 durability를 subscriber 요구사항에 맞춰야 합니다. 늦게 접속한 subscriber도 마지막 상태값을 받아야 한다면 `transientLocal`이 필요하지만, 계속 갱신되는 고주기 sensor data에 무조건 적용할 설정은 아닙니다.

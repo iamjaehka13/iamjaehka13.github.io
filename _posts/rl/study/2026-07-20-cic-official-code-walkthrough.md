@@ -30,8 +30,6 @@ image:
 ![CIC official update flow](/assets/img/posts/rl/cic-code/01-cic-update-flow.svg){: width="1100" .d-block .mx-auto }
 _한 replay batch에서 CPC representation과 DDPG policy가 갱신되는 두 경로. CPC loss는 actor에 직접 전달되지 않고, `state_net(next_obs)`의 k-NN reward가 critic을 거쳐 actor에 간접적으로 영향을 준다._
 
-가장 중요한 결론은 한 줄로 정리할 수 있다.
-
 > **CPC loss는 CIC encoder를 학습하고, actor-critic은 그 encoder의 next-state embedding에서 계산한 k-NN reward를 학습한다.**
 
 즉 `contrastive loss + entropy reward`를 하나의 scalar reward로 합쳐 DDPG에 넣는 구조가 아니다. Representation learning과 policy learning은 서로 연결돼 있지만 optimizer와 gradient 경로는 분리돼 있다.
@@ -67,7 +65,7 @@ CIC는 새로운 actor-critic을 처음부터 구현하지 않는다. 기존 DDP
 
 ## 2. 먼저 고정할 기호와 기본 설정
 
-이 글에서는 tensor shape를 다음 기호로 쓴다.
+Tensor shape에는 아래 기호를 사용한다.
 
 | 기호 | 의미 | 기본 설정 |
 |---|---|---:|
@@ -606,24 +604,15 @@ transition 101 : z@50       ↔ z@100
 
 따라서 이 결과를 `CIC 성능 재현`이라고 부르면 안 된다. 정확한 표현은 **공식 코드 경로에 대한 CPU smoke practice**다. 장기 학습 전에 코드가 어떤 tensor와 gradient를 실제로 사용하는지 검증했다는 데 의미가 있다.
 
-## 13. 최종 정리
+## 13. 한 replay batch에서 확인한 실제 경로
 
-공식 코드를 한 replay batch 기준으로 다시 연결하면 다음과 같다.
+64D continuous skill은 50 step 동안 policy input으로 유지되고 replay buffer에는 state, action, reward, discount와 함께 저장된다. `compute_cpc_loss()`가 skill query와 transition key 사이의 $B\times B$ similarity를 만들면 `update_cic()`는 CPC module만 갱신한다. Actor와 critic은 이 loss를 직접 받지 않는다.
 
-1. 64D continuous skill을 뽑아 50 step 동안 policy input에 붙인다.
-2. Replay buffer는 state, action, environment reward, discount와 skill을 저장한다.
-3. `compute_cpc_loss()`는 skill query와 transition key의 $B\times B$ similarity를 만든다.
-4. `update_cic()`는 CPC module만 갱신한다.
-5. Default intrinsic reward는 `state_net(next_obs)`의 k-NN distance에서 계산된다.
-6. Reward는 gradient가 끊긴 scalar로 critic target에 들어간다.
-7. Twin critic이 장기 intrinsic return을 학습하고 actor는 $Q$를 최대화한다.
-8. Fine-tuning에서는 intrinsic reward 대신 environment reward를 사용한다.
-
-한 문장으로 압축하면 다음과 같다.
+Default intrinsic reward는 `state_net(next_obs)`의 k-NN distance에서 계산되고, gradient가 끊긴 scalar로 critic target에 들어간다. Twin critic은 장기 intrinsic return을 학습하며 actor는 그 $Q$를 최대화한다. Fine-tuning으로 전환한 뒤에는 이 intrinsic reward 대신 environment reward를 사용한다.
 
 > **CIC 공식 구현은 contrastive loss로 novelty를 측정할 state representation을 학습하고, 그 representation의 k-NN reward를 DDPG가 최대화하는 두 단계 구조다.**
 
-이 글에서 가장 중요한 코드상의 발견은 `CPC loss가 actor reward가 아니다`라는 사실만이 아니다. Default k-NN reward가 transition key 자체가 아니라 `state_net(next_obs)`에서 계산된다는 점, 그리고 public fine-tuning code에는 paper의 skill search 전체가 들어 있지 않다는 점까지 구분해야 논문과 구현을 정확히 연결할 수 있다.
+여기에 두 가지 구현 세부를 더 구분해야 한다. Default k-NN reward는 transition key 자체가 아니라 `state_net(next_obs)`에서 계산되며, public fine-tuning code에는 paper의 skill search 전체가 들어 있지 않다. `CPC loss가 actor reward가 아니다`라는 사실과 이 두 차이를 함께 봐야 논문과 공개 구현이 정확히 연결된다.
 
 ## 참고 자료
 

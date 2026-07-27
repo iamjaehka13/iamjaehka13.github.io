@@ -22,8 +22,6 @@ image:
 
 이 변화로 $z$의 각도는 이동 방향, $\lVert z\rVert$은 latent transition의 크기를 나타낼 수 있다. 작은 $z$는 느린 이동이나 정지에 가까운 행동으로 연결되고, 큰 $z$는 빠른 이동으로 연결된다.
 
-한 문장으로 먼저 정리하면 다음과 같다.
-
 > **CSD는 "어느 방향으로 멀리 갈 것인가"를 학습하던 LSD/METRA 목적을 "어느 방향으로 얼마나 갈 것인가"를 학습하는 norm-matching 문제로 바꾼다.**
 
 ## 0. 먼저 결과부터 보기
@@ -32,7 +30,7 @@ image:
 
 _왼쪽의 꽃잎 모양이 샘플링한 2-D skill이다. LSD와 METRA는 skill 크기와 무관하게 바깥 경계까지 이동하는 경향이 강하다. CSD는 같은 방향에서도 짧은 trajectory와 긴 trajectory를 함께 만든다. 출처: [Atanassov et al., Figure 1](https://arxiv.org/abs/2410.07877)._
 
-그림에서 가장 중요한 차이는 coverage의 최대 반지름이 아니다.
+그림에서는 coverage의 최대 반지름보다 trajectory 길이의 분포를 봐야 한다.
 
 - LSD와 METRA는 여러 방향으로 멀리 간다.
 - CSD는 여러 방향뿐 아니라 **여러 이동 크기**를 채운다.
@@ -189,7 +187,7 @@ LSD/METRA가 주로 가운데 alignment 항을 최대화한다면, CSD는 $\lVer
 | Inner product maximization | 불리함 | 덜 유리함 | 계속 유리함 |
 | Norm matching | 불리함 | 오차 | 오차 |
 
-여기서 CSD의 핵심은 새로운 거대한 모델이 아니라 **버렸던 quadratic term을 다시 살린 것**이라고 볼 수 있다.
+CSD는 새로운 거대한 모델을 추가하는 대신, 앞선 유도에서 버렸던 **quadratic term을 다시 살린다**.
 
 ## 4. 그런데 Lipschitz constraint는 왜 그대로 필요한가?
 
@@ -715,15 +713,9 @@ CSD가 METRA를 모든 면에서 대체한다고 보는 것도 정확하지 않�
 
 사용 감각은 비슷해질 수 있지만 물리 단위가 정해진 velocity command는 아니다. 학습된 latent transition command다.
 
-## 16. 정리
+## 16. 이동 방향에서 이동량까지
 
-CSD에서 기억할 것은 세 가지다.
-
-1. **LSD와 METRA는 alignment와 큰 transition을 선호한다.** 그래서 여러 방향은 발견하지만 저속 skill이 부족할 수 있다.
-2. **CSD는 $\Delta\phi$와 $z$ 전체를 matching한다.** 방향과 크기를 함께 맞추므로 작은 $z$가 작은 motion으로 연결된다.
-3. **이 연속적인 magnitude control이 closed-loop goal tracking을 가능하게 한다.** 목표에 가까워질수록 매 step 계산한 $z_{\text{des}}$가 작아지고 policy가 감속한다.
-
-가장 중요한 변화는 아주 짧게 쓸 수 있다.
+LSD와 METRA의 inner product는 alignment와 큰 transition을 함께 선호한다. 여러 방향으로 뻗는 skill은 얻을 수 있지만, 같은 방향에서 느리게 움직이거나 멈추는 command를 표현하기는 어렵다. CSD는 $\Delta\phi$와 $z$ 전체를 matching해 작은 $z$를 작은 motion과 연결한다.
 
 $$
 \text{maximize }
@@ -733,7 +725,7 @@ $$
 \lVert\Delta\phi-z\rVert^2
 $$
 
-하지만 이 한 줄이 exploration 중심의 skill space를 실제 로봇에서 조작하기 쉬운 command space로 바꾼다.
+이 magnitude control은 closed-loop goal tracking에서도 그대로 쓰인다. 목표가 가까워질수록 매 step 다시 계산한 $z_{\text{des}}$가 작아지고 policy가 감속한다. 수식의 변화는 짧지만, exploration 중심의 skill space를 로봇에서 조작하기 쉬운 command space로 바꾸는 부분은 여기에 있다.
 
 ## 참고 자료
 

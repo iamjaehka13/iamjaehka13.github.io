@@ -1008,26 +1008,13 @@ summary CSV column은 다음 정도로 잡습니다.
 10. deskew correction amount와 deskew error의 차이
 11. point-level error가 scan matching residual, map blur, odometry drift로 이어지는 경로
 
-## **24. 이번 주 정리**
-
-3주차를 한 문장으로 정리하면 다음입니다.
+## **24. 실제 rosbag 전에 synthetic world를 쓰는 이유**
 
 > Deskew 수식을 외우는 것이 아니라, scan distortion이 왜 생기고 deskew model의 가정이 언제 깨지는지 synthetic 실험으로 확인하는 주.
 
-이번 주 흐름은 다음입니다.
+Clean cloud에 알고 있는 trajectory로 distortion을 넣고 exact trajectory로 되돌리면, frame 방향과 timestamp 처리가 맞는지 reference 없이 추측할 필요가 없습니다. Constant-velocity 결과와 비교하면 trajectory model이 틀릴 때 남는 deskew error도 별도로 볼 수 있습니다.
 
-```text
-LiDAR scan은 시간 구간이다
--> point마다 t_i가 있다
--> scan 동안 LiDAR pose가 변하면 raw cloud가 skew된다
--> deskew는 point를 L(t_i)에서 L(t_r)로 재표현한다
--> synthetic re-skew는 deskew의 반대 과정이다
--> exact deskew는 clean cloud를 복원해야 한다
--> constant-velocity deskew는 비선형 motion에서 오차가 남을 수 있다
--> deskew error는 trajectory / time / interpolation / extrinsic error에서 나온다
-```
-
-특히 legged robot에서는 motion이 단순한 constant velocity가 아닐 수 있습니다.
+Legged robot의 motion은 constant velocity로 충분히 설명되지 않을 수 있습니다.
 
 ```text
 pitch / roll oscillation
@@ -1038,11 +1025,9 @@ high-frequency body motion
 
 이런 motion이 scan 내부에서 생기면 constant-velocity deskew가 실제 LiDAR trajectory를 충분히 설명하지 못할 수 있습니다.
 
-따라서 3주차 결론은 단순합니다.
-
 ```text
 실제 rosbag으로 가기 전에,
 synthetic world에서 re-skew와 exact deskew가 맞는지 먼저 확인하자.
 ```
 
-이 단계가 끝나야 4주차 실제 데이터 deskew 비교로 넘어갈 수 있습니다.
+이 synthetic sanity check를 통과한 뒤 4주차 실제 데이터에서 trajectory source와 sensor time 문제를 따로 다룹니다.

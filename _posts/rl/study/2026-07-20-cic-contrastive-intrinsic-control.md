@@ -27,7 +27,7 @@ _같은 reward-free pretraining에서 발견된 Walker의 leap·jog, Quadruped�
 
 ## 0. 먼저 보는 전체 구조
 
-CIC의 전체 학습은 다음 한 흐름으로 정리할 수 있다.
+CIC의 학습 경로를 data flow로 놓으면 아래와 같다.
 
 ```text
 continuous skill z 샘플링
@@ -306,7 +306,7 @@ _Replay transition에서 particle entropy와 contrastive representation을 계�
 
 여기에는 논문 설명과 공개 코드 사이의 구현상 세부 차이가 있다. 이 commit의 default update는 transition key `pred_net([s,s'])`가 아니라 `state_net(next_obs)` embedding끼리의 k-NN 거리를 reward로 사용한다. 정확한 tensor와 gradient 경로는 [공식 코드 분석 글](/posts/cic-official-code-walkthrough/)에서 별도로 추적했다.
 
-정리하면 `contrastive loss는 표현 학습용`, `particle entropy는 actor-critic 보상용`이다. 이 구분을 잡고 나면 뒤의 DDPG 학습 흐름은 일반적인 off-policy actor-critic과 크게 다르지 않다.
+Contrastive loss는 표현을 학습하고, particle entropy는 actor-critic reward를 만든다. 이 역할을 분리해 두면 뒤의 DDPG 학습 흐름은 일반적인 off-policy actor-critic과 크게 다르지 않다.
 
 ## 7. 실제 학습은 DDPG로 어떻게 이어지는가?
 
@@ -374,8 +374,6 @@ z_{\mathrm{diagonal}}
 $$
 
 CIC 목적함수에는 latent의 덧셈이 행동의 합성이 되도록 만드는 항이 없다. Continuous space는 interpolation과 촘촘한 sampling의 가능성을 주지만, 각 좌표축의 의미·선형성·disentanglement를 보장하지 않는다.
-
-따라서 정확한 결론은 다음과 같다.
 
 > CIC는 많은 행동을 큰 continuous space에 대응시키지만, 그 공간을 사람이 해석하거나 선형적으로 조합할 수 있게 만들지는 않는다.
 
@@ -485,22 +483,13 @@ CIC의 실험 결과가 좋다고 해서 continuous skill space가 곧바로 범
 
 즉 CIC가 학습하는 것은 **다양한 행동의 후보 공간**이다. 어떤 행동이 유용하고 안전한지는 downstream objective와 constraint가 추가로 결정해야 한다.
 
-## 12. 최종 정리
+## 12. Representation과 탐색을 함께 묶기
 
-CIC의 논리를 처음부터 다시 연결하면 다음과 같다.
-
-1. $\tau=(s,s')$는 긴 trajectory가 아니라 한 step의 state transition이다.
-2. $I(\tau;Z)=H(\tau)-H(\tau\mid Z)$는 전체 transition diversity와 skill별 일관성을 함께 요구한다.
-3. Contrastive learning은 skill과 transition을 비교할 representation을 만든다.
-4. Particle entropy는 그 representation에서 드문 transition에 높은 intrinsic reward를 준다.
-5. DDPG는 이 reward의 장기 return을 높이는 skill-conditioned policy를 학습한다.
-6. 64D continuous skill은 큰 repertoire를 담지만 해석 가능성, 합성 가능성, task-to-skill mapping을 보장하지 않는다.
-
-한 문장으로 압축하면 다음과 같다.
+CIC에서 $\tau=(s,s')$는 긴 trajectory가 아니라 한 step의 state transition이다. Contrastive learning은 $I(\tau;Z)$를 바탕으로 skill과 transition을 비교할 representation을 만들고, particle entropy는 그 공간에서 드문 transition에 높은 intrinsic reward를 준다. DDPG는 이 reward의 장기 return을 높이는 skill-conditioned policy를 학습한다.
 
 > **CIC는 contrastive learning으로 행동을 skill에 정리하고, particle entropy로 그 행동 공간의 coverage를 넓힌다.**
 
-DIAYN이 `서로 구별되는 상태`, DADS가 `서로 다르고 예측 가능한 상태 변화`를 강조했다면, CIC는 `구별되는 행동을 넓게 탐색해 큰 continuous skill space에 담는 방법`을 보여준다. 다만 이것은 zero-shot 명령 controller의 완성이 아니라, downstream adaptation을 위한 reward-free pretraining이다.
+이렇게 얻은 64D continuous skill은 큰 repertoire를 담을 수 있지만, 좌표의 의미나 skill 합성, task-to-skill mapping까지 보장하지는 않는다. DIAYN이 `서로 구별되는 상태`, DADS가 `서로 다르고 예측 가능한 상태 변화`를 강조했다면, CIC는 `구별되는 행동을 넓게 탐색해 큰 continuous skill space에 담는 방법`을 보여준다. 범용 zero-shot 명령 controller라기보다 downstream adaptation을 위한 reward-free pretraining으로 보는 편이 정확하다.
 
 ## 후속 글: 공식 코드에서는 어떻게 구현됐는가?
 

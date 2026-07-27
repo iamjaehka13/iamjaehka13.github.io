@@ -25,7 +25,7 @@ tokenization
 
 그중 attention은 “token들이 서로 정보를 주고받는다”는 하나의 block으로 남겨 두었습니다.
 
-이 글은 3Blue1Brown의 **Deep Learning Chapter 6: Attention in transformers, step-by-step**을 바탕으로 다음 질문에 답합니다.
+3Blue1Brown의 **Deep Learning Chapter 6: Attention in transformers, step-by-step**을 따라 아래 질문을 계산 순서로 풀어봅니다.
 
 > Attention은 어떤 token의 정보를 가져올지 어떻게 정하고, 그 정보를 현재 token vector에 어떻게 반영하는가?
 
@@ -57,7 +57,7 @@ $$
 \mathbf{x}_i+\Delta\mathbf{x}_i
 $$
 
-## **2. 한 문장으로 보는 attention**
+## **2. Query-Key와 Value의 역할**
 
 Attention은 다음 두 질문을 분리해서 계산합니다.
 
@@ -697,7 +697,7 @@ Token이 행인지 열인지 확인하지 않고 식만 비교하면 transpose �
 | Output projection | $O_{cat}W_O$ | $T\times d_{model}$ |
 | Residual output | $X+O_{cat}W_O$ | $T\times d_{model}$ |
 
-## **24. 핵심 직관**
+## **24. 정보의 경로와 내용을 나누어 계산하기**
 
 Attention의 전체 흐름은 다음과 같습니다.
 
@@ -719,8 +719,6 @@ A × V
 → residual connection
 → contextual representation
 ```
-
-한 문장으로 정리하면 다음과 같습니다.
 
 > Attention은 query와 key의 유사도로 정보의 경로와 비율을 정하고, 그 비율로 value를 가중합하여 각 token의 contextual representation을 갱신한다.
 

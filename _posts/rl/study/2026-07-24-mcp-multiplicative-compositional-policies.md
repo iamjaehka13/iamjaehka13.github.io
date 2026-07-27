@@ -27,8 +27,6 @@ image:
 
 > 여러 primitive 중 하나를 선택하지 말고, 여러 primitive의 action distribution을 곱해 모두가 함께 허용하는 하나의 action distribution을 만들자.
 
-한 문장으로 먼저 정리하면 다음과 같다.
-
 > **MCP는 motion imitation으로 재사용 가능한 Gaussian motor primitive를 학습하고, 새 task에서는 goal-conditioned gate가 primitive들을 precision-weighted product로 조합하도록 만든다.**
 
 ## 0. 먼저 결과부터 보기
@@ -903,9 +901,9 @@ MCP는 action-space composition에는 강하지만 option termination, subgoal d
 
 Motion prior를 보존하고, 새 task reward가 primitive를 파괴하는 catastrophic forgetting을 줄이기 위해서다.
 
-## 15. 최종 정리
+## 15. Primitive product가 실제 action이 되기까지
 
-MCP의 핵심은 `skill library에서 하나를 선택한다`가 아니다.
+MCP는 `skill library에서 하나를 선택하는` 구조가 아니다. 여러 primitive가 만든 Gaussian action proposal을 곱해 하나의 composite distribution을 구성한다.
 
 $$
 \boxed{
@@ -916,17 +914,9 @@ $$
 }
 $$
 
-이 식을 구현 수준까지 풀면 다음과 같다.
+Primitive는 state에서 $(\mu_i,v_i)$를 만들고, gate는 state와 goal에서 primitive-level weight $w_i$를 출력한다. 실제 관절별 영향력은 $w_i/v_{ij}$이므로 같은 primitive도 관절마다 다르게 작용한다. Product는 이 제안들이 공통으로 허용하는 하나의 Gaussian을 만들고, 환경에는 여기서 뽑은 action vector 하나만 전달한다.
 
-1. Primitive는 state에서 Gaussian action proposal $(\mu_i,v_i)$를 만든다.
-2. Gate는 state와 goal에서 primitive-level weight $w_i$를 만든다.
-3. 실제 관절별 영향력은 precision-weighted 값 $w_i/v_{ij}$다.
-4. Product는 primitive들이 공통으로 허용하는 하나의 Gaussian을 만든다.
-5. Pre-training에서는 motion imitation으로 primitive와 gate를 함께 학습한다.
-6. Transfer에서는 primitive를 고정하고 새 task용 gate만 학습한다.
-7. 이 구조는 raw action보다 구조화된 exploration을 제공하지만, motion corpus 밖의 행동과 장기 planning은 직접 해결하지 못한다.
-
-지금까지의 흐름을 가장 짧게 연결하면 다음과 같다.
+Pre-training에서는 motion imitation으로 primitive와 gate를 함께 학습한다. Transfer에서는 motion prior를 보존하기 위해 primitive를 고정하고 새 task용 gate만 학습한다. 이 action prior는 raw action보다 구조화된 exploration을 제공하지만, motion corpus 밖의 행동이나 장기 planning까지 해결하지는 않는다.
 
 ```text
 DIAYN 계열:
@@ -939,7 +929,7 @@ MCP:
 여러 motor primitive를 같은 timestep의 action으로 어떻게 합칠 것인가?
 ```
 
-MCP를 `여러 스킬을 곱한다`는 한 문장으로만 기억하면 variance의 역할과 action dimension별 composition을 놓치기 쉽다. 더 정확한 표현은 다음과 같다.
+`여러 스킬을 곱한다`고만 기억하면 variance의 역할과 action dimension별 composition을 놓치기 쉽다.
 
 > **MCP는 goal-based global routing과 state-based joint-level precision routing을 결합한 compositional Gaussian actor다.**
 

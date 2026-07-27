@@ -14,19 +14,20 @@ math: true
   <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/02-trained-rl-policy.mp4" type="video/mp4">
 </video>
 
-*학습완료된 RL 모델*
+*학습이 끝난 RL policy의 실행 결과*
 {: .text-center}
 
-- 이전에 학습한 모델을 load하여 로봇이 움직이는 모습을 play해볼 수 있습니다.
+이전 글에서 저장한 checkpoint를 load해 policy를 실행했습니다. 화면의 두 화살표는 command tracking 상태를 보여줍니다.
+
 - 초록색 화살표
   - 사용자가 로봇에게 내린 목표 선속도 명령(상위 제어)값입니다.
 - 파란색 화살표
   - 로봇의 현재 실제 속도입니다. 로봇의 base가 실제로 물리엔진 상에서 어느 방향으로 움직이고 있는지를 보여줍니다.
   - RL의 목표는 파란색 화살표와 초록색 화살표가 최대한 일치되도록 로봇의 관절(하위제어)을 제어하는 것입니다.
 
-### Scene구성 코드 작성
+## Inference scene 구성
 
-학습한 Policy를 load하기 위해 학습할때와 동일한 Action, Observation, Event의 Cfg를 수립해야 합니다. 이를 위해서 이전 학습시에 사용했던 설정과 동일하게 추론시에도 유지시켜줘야합니다.
+Checkpoint만 읽는다고 policy가 같은 동작을 내는 것은 아닙니다. Training 때 사용한 Action, Observation과 Event config를 inference에서도 동일하게 유지해야 합니다.
 
 - Scene : 지형, 로봇, 센서등을 몇개나 만들고 어떻게 배치할지 결정합니다.
 - Observation : 로봇이 현재 상태를 어떻게 파악하고 있는가? 로봇의 속도, 관절 각도, 기울기, 바닥높이등의 정보가 포함됩니다.학습시와 추론시에 정확히 동일한 입력이 들어와야 합니다.
@@ -276,9 +277,9 @@ def go2_rl_env(env_cfg,cfg):
   <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/04-policy-command-simulation.mp4" type="video/mp4">
 </video>
 
-policy에서 commandCfg를 주는대로 로봇이 학습된대로 움직이는 모습을 볼 수 있습니다. 10초마다 (x,y,yaw) 명령을 주는대로 로봇이 움직입니다.
+`CommandCfg`가 10초마다 새 $(x, y, yaw)$ command를 만들고, policy가 그 command를 따라 joint target을 출력하는 것을 확인했습니다.
 
-다음으로 구현할 내용은 아래와 같습니다.
+이 시점에 남아 있던 작업은 세 가지였습니다.
 
 1. 키보드 입력을 통해 teleop으로 로봇을 조종하는 것
 

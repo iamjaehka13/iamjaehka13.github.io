@@ -27,21 +27,14 @@ $$
 
 질량, 마찰, damping, controller gain, sensor noise, action timing이 바뀌면 같은 state에서 같은 action을 줘도 다음 state가 달라집니다. Simulation에서 하나의 고정된 transition만 경험한 policy는 real robot의 다른 transition을 만났을 때 쉽게 깨질 수 있습니다.
 
-이 논문의 핵심은 다음 한 문장으로 정리할 수 있습니다.
-
 > Real robot을 하나의 정확한 simulation으로 복제하는 대신, 가능한 dynamics들의 distribution에서 policy를 학습시키자.
 
-다만 이 논문은 randomization만 넣고 끝나지 않습니다. **LSTM policy가 state-action history를 이용해 현재 dynamics에 적응하도록 만들었다**는 점이 중요합니다.
+이 논문은 randomization만 넣고 끝나지 않습니다. **LSTM policy가 state-action history를 이용해 현재 dynamics에 적응하도록 만들었습니다.**
 
 ![Fetch 로봇의 puck pushing 연속 장면](/assets/img/posts/rl/sim2real/dynamics-randomization/02-real-pushing-sequence.png){: width="1200" .d-block .mx-auto }
 _Fetch 로봇 팔이 puck을 빨간 목표점까지 미는 실제 실행 장면. Policy는 real robot data로 추가 학습하지 않고 simulation에서만 학습되었다. 출처: [Peng et al., Figure 1 source](https://arxiv.org/pdf/1710.06537)._
 
-이 글에서 먼저 기억할 결과는 네 가지입니다.
-
-1. Mass와 friction뿐 아니라 control timing과 observation noise까지 포함해 총 95개 parameter를 randomize했습니다.
-2. Actor는 parameter를 직접 받지 않고 LSTM history로 task-relevant dynamics context를 암묵적으로 추론했습니다.
-3. Critic만 simulation의 dynamics parameter를 보는 asymmetric training을 사용했습니다.
-4. LSTM policy는 real Fetch에서 28회 중 약 0.89의 success를 보였지만, 실험 규모와 task는 tabletop pushing으로 제한됩니다.
+Mass와 friction뿐 아니라 control timing과 observation noise까지 95개 parameter를 randomize했습니다. Actor는 그 값을 직접 받지 않고 LSTM history에서 control에 필요한 context를 추론하며, critic만 simulation parameter를 보는 asymmetric training을 사용합니다. 이 구성의 LSTM policy는 real Fetch 28회에서 약 0.89의 success를 기록했습니다. 다만 실험 범위는 tabletop pushing이고 real trial 수도 많지 않습니다.
 
 ---
 
@@ -157,7 +150,7 @@ HER 때문에 과거 trajectory를 다른 goal로 다시 학습해야 하므로 
 
 ### **3.1 Randomization 대상과 범위**
 
-저자들은 총 95개의 dynamics parameter를 randomize합니다. Parameter family와 원문 범위는 다음과 같습니다.
+저자들은 총 95개의 dynamics parameter를 randomize합니다. Parameter family와 원문 범위는 아래 표에 정리했습니다.
 
 | Parameter family | Training range |
 |---|---:|
@@ -209,7 +202,7 @@ $\lambda$는 episode마다 $[125,1000]$ s$^{-1}$에서 sample되지만, exponent
 
 Observation에는 feature별 running standard deviation의 5%를 표준편차로 갖는 zero-mean Gaussian noise를 매 step 더합니다. Training action에는 표준편차 0.01 rad의 Gaussian exploration noise도 사용합니다.
 
-이 구분을 정리하면 다음과 같습니다.
+두 시간 척도는 policy가 처리해야 하는 방식도 다릅니다.
 
 | 시간 척도 | 예시 | Policy가 해야 하는 일 |
 |---|---|---|
@@ -381,7 +374,7 @@ Simulator는 이번 episode의 mass, friction, damping, gain을 알고 있으므
 
 그래서 DDPG의 off-policy replay와 recurrent extension인 RDPG를 결합합니다.
 
-간략한 흐름은 다음과 같습니다.
+한 번의 update는 아래 순서로 진행됩니다.
 
 1. Goal $g$와 dynamics $\mu$를 sample합니다.
 2. Recurrent policy로 한 episode를 rollout합니다.
@@ -392,7 +385,7 @@ Simulator는 이번 episode의 mass, friction, damping, gain을 알고 있으므
 
 Episode 전체를 replay하는 이유는 recurrent memory가 과거 state-action sequence에 의존하기 때문입니다. Transition 한 개만 무작위로 꺼내면 그 시점의 LSTM state를 복원할 수 없습니다.
 
-논문의 critic TD target을 개념적으로 쓰면 다음과 같습니다. 여기서 $m^Q_t$는 critic의 recurrent memory입니다.
+논문의 critic TD target을 개념적으로 쓰면 아래 식과 같습니다. 여기서 $m^Q_t$는 critic의 recurrent memory입니다.
 
 $$
 \hat{q}_t
@@ -428,7 +421,7 @@ Target network도 사용하지만 논문의 algorithm 표에서는 간결함을 
 
 ### **5.1 Training 규모**
 
-논문의 주요 training setting은 다음과 같습니다.
+주요 training setting은 아래와 같습니다.
 
 | 항목 | 값 |
 |---|---:|
@@ -465,7 +458,7 @@ _Randomized simulation에서 LSTM이 더 빠르게 학습하고 가장 높은 su
 ![Architecture별 simulation과 real success](/assets/img/posts/rl/sim2real/dynamics-randomization/06-sim-real-success.png){: width="760" .d-block .mx-auto }
 _Orange는 randomized simulation 100 trials, blue는 real Fetch 결과다. Randomization 없이 학습한 FF policy는 real에서 한 번도 성공하지 못했다. 출처: [Peng et al., Figure 7](https://arxiv.org/pdf/1710.06537)._
 
-원문 Table II의 수치는 다음과 같습니다.
+원문 Table II의 수치를 그대로 옮기면 아래와 같습니다.
 
 | Model | Success in randomized sim | Success on real robot | Real trials |
 |---|---:|---:|---:|
@@ -486,7 +479,7 @@ _Orange는 randomized simulation 100 trials, blue는 real Fetch 결과다. Rando
 
 ### **5.3 어떤 Randomization이 실제로 중요했는가**
 
-LSTM policy에서 일부 randomization을 제거하고 real robot에 배포한 ablation은 다음과 같습니다.
+LSTM policy에서 randomization 항목을 하나씩 제거한 real-robot ablation은 아래와 같습니다.
 
 | Training configuration | Real success | Trials |
 |---|---:|---:|
@@ -540,7 +533,7 @@ _Puck 아래에 과자 봉지를 붙여 friction과 contact dynamics를 바꾼 �
 
 ### **6.1 하나의 MDP가 아니라 Dynamics-parameterized MDP**
 
-일반적인 MDP는 다음과 같습니다.
+일반적인 MDP를 먼저 쓰면
 
 $$
 \mathcal{M}
@@ -734,15 +727,11 @@ Training distribution의 tail이나 support 밖 조건에서는 실패할 수 �
 
 ---
 
-## **9. 정리하며: Randomization만큼 중요한 것은 Adaptation이다**
+## **9. Randomization과 Adaptation을 같이 쓴 이유**
 
-이번 글에서 남겨야 할 결론은 다섯 가지입니다.
+Dynamics randomization은 fixed simulator 하나 대신 sampled dynamics distribution에서 policy를 학습시킵니다. Peng et al.은 mass와 friction 외에도 controller gain, action timing과 observation noise를 closed-loop uncertainty에 포함했습니다. LSTM의 역할은 physical parameter의 정답을 복원하는 것이 아니라 state-action history를 control에 필요한 context로 압축하는 데 있습니다.
 
-- Dynamics randomization은 fixed simulator 하나가 아니라 sampled dynamics distribution에서 policy를 학습하는 방법입니다.
-- 이 논문은 mass와 friction뿐 아니라 controller gain, action timing, observation noise까지 closed-loop uncertainty에 포함했습니다.
-- LSTM은 physical parameter의 정답을 맞히는 estimator가 아니라, state-action history를 control에 필요한 latent context로 압축합니다.
-- Actor에는 $\mu$를 숨기고 critic에만 제공하는 asymmetric training과, sparse reward를 재활용하는 HER·RDPG가 함께 사용됐습니다.
-- Real success 결과는 randomization과 memory의 가치를 보여주지만, 10-28회의 tabletop pushing trial을 넘어선 broad guarantee는 아닙니다.
+Actor에는 $\mu$를 숨기고 critic에만 제공하는 asymmetric training, sparse reward를 재활용하는 HER, recurrent off-policy update를 위한 RDPG가 한 구조로 묶였습니다. Real result는 randomization과 memory가 유용하다는 근거지만, 10-28회의 tabletop pushing trial을 넘어선 보장은 아닙니다.
 
 2편의 visual domain randomization이
 
@@ -752,9 +741,9 @@ Training distribution의 tail이나 support 밖 조건에서는 실패할 수 �
 
 > Real closed-loop system을 training dynamics distribution 안에서 policy가 적응 가능한 한 경우로 만들자.
 
-라고 정리할 수 있습니다.
+라는 관점이었다면, 여기서는 appearance를 closed-loop transition으로 바꿔 읽을 수 있습니다.
 
-다음 글인 **[Learning Agile Locomotion](/posts/learning-agile-locomotion-quadruped-robots/)**에서는 이 생각이 quadruped locomotion으로 넘어가며 actuator model, latency, reference motion, system identification과 어떻게 결합되는지 살펴봅니다.
+다음 글인 **[Learning Agile Locomotion](/posts/learning-agile-locomotion-quadruped-robots/)**에서는 이 구성이 quadruped locomotion으로 넘어가며 actuator model, latency와 system identification을 만나게 됩니다.
 
 ## **참고 자료**
 

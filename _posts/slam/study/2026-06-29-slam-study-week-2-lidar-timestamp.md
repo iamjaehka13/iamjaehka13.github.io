@@ -892,33 +892,15 @@ dropped_packet_flag != packet loss proof
 
 따라서 다음 단계는 단순히 deskew를 적용하는 것이 아니라, flagged scan을 먼저 시각화하고 ring별 point time 분포를 확인하는 것입니다. 그래야 deskew가 실제 motion distortion을 줄이는지, 아니면 timestamp/order 문제를 더 크게 만드는지 분리해서 볼 수 있습니다.
 
-## **14. 이번 주 정리**
-
-2주차를 한 문장으로 정리하면 다음입니다.
+## **14. Timestamp audit에서 deskew로**
 
 > LiDAR point cloud는 한 순간의 사진이 아니라 시간 구간이고, deskew를 하려면 각 point의 실제 측정 시간을 알아야 한다.
 
-이번 주에 이해한 흐름은 다음입니다.
-
-```text
-scan은 시간 구간이다
--> packet들이 모여 PointCloud2가 된다
--> header.stamp는 대표 timestamp일 뿐이다
--> point별 time field를 확인해야 한다
--> point ordering을 시간순으로 믿으면 안 된다
--> LiDAR clock과 IMU clock이 같은 시간축인지 확인해야 한다
--> IMU가 scan 전체를 덮는지 margin으로 확인한다
--> jitter, packet loss, buffering latency를 감사한다
--> lidar_time_auditor로 scan별 진단값을 저장한다
-```
-
-이 단계가 끝나야 3~4주차의 deskew를 안전하게 공부할 수 있습니다.
-
-특히 legged robot에서는 LiDAR가 몸체 위에 있고, 보행 중 body motion이 계속 발생합니다. 따라서 point time이 틀리면 deskew가 틀리고, deskew가 틀리면 scan matching residual, map sharpness, odometry drift까지 영향을 받을 수 있습니다.
-
-2주차의 결론은 단순합니다.
+이번 audit에서는 `/utlidar/cloud`의 point별 `time`, 약 64 ms의 실제 scan duration, 약 67 ms의 cloud interval, scan당 IMU coverage를 확인했습니다. 동시에 point ordering이 완전히 monotonic하지 않고 walking 구간의 time gap이 더 크게 나타난다는 문제도 남았습니다.
 
 ```text
 point index를 시간으로 믿지 말고,
 point.time과 IMU coverage를 직접 검증하자.
 ```
+
+이 검증이 끝나야 3~4주차의 deskew 결과를 시간축 오류와 분리해 해석할 수 있습니다. Legged robot에서는 보행 중 body motion이 계속되므로, point time의 오차가 deskew를 거쳐 scan matching residual, map sharpness, odometry drift에까지 전달될 수 있습니다.

@@ -7,9 +7,7 @@ description: Isaac Sim에서 TurtleBot에 RTX 2D/3D Lidar를 붙이고 ROS2 Lase
 image: /assets/img/posts/isaac-sim-rtx-lidar/06-rtx-lidar-action-graph.png
 ---
 
-이 글은 [TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/)과 [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/)에 이어서, TurtleBot에 RTX Lidar sensor를 붙이고 ROS2 topic으로 내보내는 과정을 정리합니다.
-
-이번 목표는 2D RTX Lidar는 `LaserScan`, 3D RTX Lidar는 `PointCloud`로 publish하고 RViz2에서 확인하는 것입니다. 카메라 글과 마찬가지로 핵심은 **sensor prim을 render product로 만들고, ROS2 helper가 topic으로 변환하는 흐름**입니다.
+[TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/)과 [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/)에서 사용한 stage에 RTX Lidar를 붙였습니다. 2D sensor는 `LaserScan`, 3D sensor는 `PointCloud`로 publish합니다. Camera와 마찬가지로 sensor prim에서 render product를 만든 뒤, RTX Lidar Helper가 ROS2 message로 변환합니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -52,7 +50,7 @@ Lidar prim이 `base_scan` 아래에 들어갔다면 local transform은 모두 0�
 
 ![RTX Lidar용 Action Graph](/assets/img/posts/isaac-sim-rtx-lidar/06-rtx-lidar-action-graph.png)
 
-핵심 노드는 다음과 같습니다.
+필요한 노드는 아래 네 종류입니다.
 
 | 노드 | 역할 |
 | --- | --- |
@@ -61,7 +59,7 @@ Lidar prim이 `base_scan` 아래에 들어갔다면 local transform은 모두 0�
 | Isaac Create Render Product | RTX Lidar sensor를 render product로 연결합니다. |
 | ROS2 RTX Lidar Helper | Lidar render product를 ROS2 `LaserScan` 또는 `PointCloud` topic으로 publish합니다. |
 
-2D Lidar와 3D Lidar는 각각 별도의 `Isaac Create Render Product`와 `ROS2 RTX Lidar Helper`에 연결합니다. 카메라 때와 거의 같은 구조이지만, helper node가 camera helper가 아니라 RTX Lidar helper로 바뀐다는 점이 다릅니다.
+2D Lidar와 3D Lidar는 각각 별도의 `Isaac Create Render Product`와 `ROS2 RTX Lidar Helper`에 연결합니다. Camera graph와 달라지는 부분은 helper node와 출력 message type입니다.
 
 ## **4. Topic과 Frame 설정**
 
@@ -93,9 +91,7 @@ ros2 topic list
 
 RViz2에서 data가 보이지 않는다면 topic name, message type, fixed frame, frame ID를 순서대로 확인합니다. Lidar data는 publish되고 있는데 frame이 맞지 않아서 화면에 안 보이는 경우도 자주 생깁니다.
 
-## **6. 정리하며**
-
-RTX Lidar graph의 핵심 흐름은 camera graph와 비슷합니다.
+## **6. RTX Lidar에서 ROS2 scan까지**
 
 ```text
 RTX Lidar prim
@@ -104,4 +100,4 @@ RTX Lidar prim
   -> LaserScan / PointCloud topic
 ```
 
-카메라와 Lidar까지 ROS2 topic으로 연결해두면, 이후 TF tree와 odometry를 붙여 RViz2에서 로봇 전체 센서 구성을 확인할 수 있습니다. 즉, 이제 필요한 것은 sensor data 자체뿐 아니라 그 data가 어느 frame 기준인지 설명해주는 TF입니다.
+이 단계에서는 sensor data만 publish했기 때문에, RViz2가 `base_scan`과 robot base의 관계를 알아야 올바른 위치에 표시할 수 있습니다. 다음 단계에서는 TF tree와 odometry를 붙여 각 topic의 frame을 하나의 로봇 좌표계로 연결합니다.

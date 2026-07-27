@@ -15,13 +15,11 @@ image:
 
 이전 글: [RMA: recent history로 environment latent를 추정하는 online adaptation](/posts/rma-rapid-motor-adaptation/)
 
-Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 제목만 보면 “GPU를 많이 쓰면 강화학습이 빨라진다”는 논문처럼 보입니다.
-
-하지만 핵심은 단순한 simulator 가속이 아닙니다.
+Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 제목만 보면 “GPU를 많이 쓰면 강화학습이 빨라진다”는 논문처럼 보입니다. 실제 contribution은 simulator 속도보다 넓습니다.
 
 > 4096개 robot이 동시에 만드는 대규모 on-policy batch를 PPO가 제대로 사용할 수 있도록 rollout horizon, mini-batch, timeout, terrain curriculum과 simulation layout을 함께 다시 설계한 논문이다.
 
-논문이 보고한 대표 결과는 다음과 같습니다.
+제목의 `minutes`가 가리키는 wall-clock time은 아래와 같습니다.
 
 | Task | Training time |
 |---|---:|
@@ -121,13 +119,13 @@ Isaac Gym은 simulation state를 GPU tensor로 제공합니다.
 
 Rudin et al.의 pipeline은 GPU physics $\rightarrow$ state tensor $\rightarrow$ observation/reward $\rightarrow$ policy inference $\rightarrow$ rollout buffer $\rightarrow$ PPO update로 이어집니다.
 
-핵심은 “GPU simulator” 하나가 아니라 **data collection과 optimization 사이에 CPU round trip이 거의 없는 구조**입니다.
+속도는 GPU simulator 하나에서 나오지 않습니다. **Data collection과 optimization 사이의 CPU round trip을 거의 없앤 구조**가 함께 필요합니다.
 
 ### **2.3 하나의 simulation에 수천 개 robot을 넣는다**
 
 각 robot마다 별도 process를 띄우는 CPU 방식과 달리, Isaac Gym은 하나의 simulation world에서 수천 actor를 vectorized tensor로 처리합니다.
 
-State shape는 개념적으로 다음과 같습니다.
+Vectorized state는 개념적으로
 
 $$
 \mathbf X_t
@@ -321,17 +319,13 @@ _왼쪽 위가 높은 reward와 짧은 time을 동시에 만족하는 영역이�
 
 Throughput은 약 4,000 robot까지 거의 선형으로 좋아지지만 이후 증가폭이 둔화됩니다.
 
-논문의 결론은:
-
 > `num_envs`를 GPU memory가 허용하는 최대값으로 설정하는 것이 아니라, 최소한의 temporal horizon을 보존하면서 throughput과 sample diversity를 함께 최적화해야 한다.
-
-입니다.
 
 ---
 
 ## **5. Final PPO 설정**
 
-Supplementary가 공개한 hyperparameter는 다음과 같습니다.
+Supplementary의 final PPO hyperparameter는 아래와 같습니다.
 
 | 항목 | 값 |
 |---|---:|
@@ -437,7 +431,7 @@ transition입니다.
 
 “분 단위 학습”은 sample-efficient하다는 주장과 다릅니다.
 
-> 이 논문의 핵심은 같은 wall-clock 시간에 매우 많은 simulation sample을 처리하는 compute efficiency와 throughput이다.
+> 이 논문이 개선한 것은 같은 wall-clock 시간에 매우 많은 simulation sample을 처리하는 compute efficiency와 throughput이다.
 
 Sample efficiency를 평가하려면 transition 수 대비 성능을 별도로 비교해야 합니다.
 
@@ -499,7 +493,7 @@ Robot당 rollout은 0.48초이고 episode는 20초입니다.
 ![Timeout bootstrapping의 reward와 critic loss 효과](/assets/img/posts/rl/sim2real/walk-minutes/08-timeout-bootstrap.png){: width="1300" .d-block .mx-auto }
 _위쪽은 flat terrain, 아래쪽은 rough terrain이다. Timeout을 bootstrap하면 critic loss가 크게 낮아지고 total reward가 약 10~20% 높아진다. 학습 자체는 bootstrapping 없이도 가능했지만 final quality가 떨어졌다. 출처: [Rudin et al., Appendix Figure 9](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
 
-이 결과는 작은 API detail이 learning objective를 실제로 바꿀 수 있음을 보여줍니다.
+작아 보이는 timeout 처리 하나가 실제 learning objective를 바꾼 셈입니다.
 
 Gym 환경에서 task-defined terminal인 `terminated`와 time/resource limit인 `truncated`를 분리해야 하는 이유가 여기에 있습니다.
 
@@ -608,7 +602,7 @@ Curriculum 초기에는 쉬운 level에 robot이 몰려 있고 넘어짐과 base
 
 ### **7.6 VRAM**
 
-4096 robot 기준 부록의 대략적인 값은 다음과 같습니다.
+4096 robot에서 측정한 대략적인 VRAM은 아래와 같습니다.
 
 | Terrain | Rendering | VRAM |
 |---|---|---:|
@@ -820,7 +814,7 @@ $$
 \right)
 $$
 
-Supplementary의 아홉 term은 다음과 같습니다.
+Supplementary에는 아래 아홉 reward term이 공개돼 있습니다.
 
 | Reward term | Definition | Weight |
 |---|---|---:|
@@ -909,7 +903,7 @@ $$
 
 ### **12.2 Observation noise**
 
-Supplementary의 uniform noise range는 다음과 같습니다.
+Observation에는 아래 범위의 uniform noise를 더했습니다.
 
 | Observation | Noise |
 |---|---:|
@@ -970,7 +964,7 @@ Unitree A1 simulation으로 확장할 때는:
 ![Stairs, obstacle와 slope 난이도별 success rate](/assets/img/posts/rl/sim2real/walk-minutes/06-traversability.png){: width="1300" .d-block .mx-auto }
 _왼쪽은 discrete obstacle와 stairs, 오른쪽은 slope의 success rate다. 평가는 0.75 m/s 전진 command와 [-0.1, 0.1] m/s lateral command에서 수행됐다. 출처: [Rudin et al., Figure 5](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
 
-논문이 보고한 핵심은 다음과 같습니다.
+Traversability curve에서 직접 읽을 수 있는 결과는 아래와 같습니다.
 
 - 20 cm까지 stairs up/down은 거의 100% success
 - 20 cm는 training의 최대 stair height이자 ANYmal kinematic limit에 가까움
@@ -1493,8 +1487,6 @@ transition을 RTX A6000 한 장에서 20분 이내에 처리했습니다.
 Simulation에서는 20 cm stairs를 거의 완벽하게 통과했고, 실제 ANYmal C에서도 stairs와 obstacle traversal을 보였습니다.
 
 그러나 real elevation map 오차 때문에 maximum command를 0.6 m/s로 낮췄고, 실기 정량 benchmark는 제한적이었습니다.
-
-따라서 가장 정확한 결론은 다음입니다.
 
 > Massively parallel RL은 학습에 필요한 simulation experience를 없애는 방법이 아니라, 충분한 trajectory horizon과 올바른 RL semantics를 유지하면서 그 경험을 매우 짧은 wall-clock time에 수집·최적화하는 시스템 설계다.
 

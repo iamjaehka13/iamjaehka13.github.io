@@ -11,9 +11,7 @@ math: true
 
 ## **0. 이 글의 질문**
 
-신경망을 처음 보면 원이 여러 층으로 놓여 있고, 그 사이를 수많은 선이 연결한 그림부터 나옵니다.
-
-그림만 보면 신경망이 실제 뇌를 흉내 낸 복잡한 장치처럼 느껴집니다. 하지만 계산 관점에서 보면 핵심은 훨씬 단순합니다.
+신경망을 처음 보면 여러 층의 원과 그 사이를 잇는 수많은 선부터 보입니다. 실제 뇌를 흉내 낸 복잡한 장치처럼 느껴지지만, 계산만 떼어 보면 아래 연산의 반복입니다.
 
 ```text
 숫자를 입력한다.
@@ -23,7 +21,7 @@ activation function을 통과시킨다.
 이 과정을 여러 층에서 반복한다.
 ```
 
-이 글은 3Blue1Brown의 **Deep Learning Chapter 1: But what is a neural network?**를 바탕으로 다음 질문에 답하는 것을 목표로 합니다.
+3Blue1Brown의 **Deep Learning Chapter 1: But what is a neural network?**를 따라가며 아래 질문부터 확인합니다.
 
 > 신경망은 입력을 받아 출력을 만드는 어떤 계산 구조인가?
 
@@ -498,20 +496,15 @@ layer와 parameter가 많아지면 더 복잡한 함수를 표현할 가능성�
 
 이번 글은 첫 번째 질문에 답했습니다. 두 번째 질문은 gradient descent에서 시작합니다.
 
-## **13. 전체 흐름 요약**
+## **13. 한 번의 forward pass**
 
-손글씨 숫자 분류 신경망의 계산 흐름은 다음과 같습니다.
+손글씨 숫자 분류에서는 28×28 이미지를 784차원 vector로 펼친 뒤, 각 layer에서 weight와 bias로 표현을 바꾸고 activation function을 적용합니다. Hidden layer에서 이 계산을 반복한 결과가 output layer의 10개 값입니다.
 
 ```text
-1. 28×28 이미지를 784차원 input vector로 만든다.
-2. weight matrix를 곱해 입력을 새로운 표현으로 섞는다.
-3. bias vector를 더해 activation 기준을 이동시킨다.
-4. nonlinear activation function을 적용한다.
-5. hidden layer에서 같은 계산을 반복한다.
-6. output layer의 10개 값으로 숫자를 판단한다.
+image → input vector → affine transformation
+      → nonlinear activation → hidden layers
+      → 10-dimensional output
 ```
-
-핵심 식은 하나입니다.
 
 $$
 \boxed{
@@ -525,7 +518,7 @@ W^{(l)}\mathbf{a}^{(l-1)}
 }
 $$
 
-그리고 이 식이 여러 번 합성된 전체 네트워크도 결국 하나의 함수입니다.
+이 식을 여러 번 합성한 전체 네트워크도 결국 하나의 parameterized function입니다.
 
 > 신경망은 벡터를 입력받아, affine transformation과 nonlinear activation을 반복하고, 새로운 벡터를 출력하는 parameterized function이다.
 

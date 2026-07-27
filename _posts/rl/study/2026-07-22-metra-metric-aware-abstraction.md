@@ -22,8 +22,6 @@ State가 관절각과 위치처럼 잘 정규화된 수치라면 Euclidean dista
 
 METRA는 이 temporal distance에 연결된 작은 latent space를 만들고, 그 공간의 여러 방향으로 움직이는 skill policy를 함께 학습한다.
 
-한 문장으로 압축하면 다음과 같다.
-
 > **METRA는 상태공간 전체를 직접 덮으려 하지 않고, temporal distance를 과장하지 않는 compact latent space를 만든 뒤 그 공간의 여러 방향을 skill로 덮는다.**
 
 ## 0. 먼저 눈으로 보는 LSD와 METRA
@@ -695,24 +693,13 @@ METRA reward에는 에너지, 충돌, 넘어짐, torque limit, thermal limit 같
 
 논문은 단순성을 위해 vanilla SAC를 사용했고, pixel Quadruped와 Humanoid에서는 낮은 update-to-data ratio를 사용했다. 저자들도 wall-clock 성능과 별개로 sample efficiency에는 개선 여지가 있다고 명시한다.
 
-## 15. 최종 정리
+## 15. Temporal metric이 skill reward가 되기까지
 
-METRA의 논리를 순서대로 연결하면 다음과 같다.
+Pure exploration으로 복잡한 state space 전체를 덮기는 어렵고, MI는 behavior의 구별 가능성은 보지만 두 behavior 사이의 거리는 직접 다루지 않는다. METRA는 WDM에서 출발한 endpoint objective를 inner product로 단순화하고, telescoping sum을 이용해 transition reward $\Delta\phi^\top z$로 바꾼다.
 
-1. Pure exploration으로 복잡한 state space 전체를 덮기는 어렵다.
-2. MI는 behavior의 구별 가능성은 보지만 그 사이의 거리는 보지 않는다.
-3. WDM은 underlying metric을 목적함수에 넣을 수 있다.
-4. METRA는 full WDM을 inner-product endpoint objective로 단순화한다.
-5. Telescoping sum으로 transition reward $\Delta\phi^\top z$를 얻는다.
-6. Raw pixel L2 대신 minimum step 수인 temporal distance를 선택한다.
-7. 모든 adjacent transition에서 latent displacement를 1 이하로 제한한다.
-8. Triangle inequality가 multi-step state pair의 global upper bound를 만든다.
-9. Directional objective가 collapse를 막고 temporally spread-out한 variation을 펼친다.
-10. SAC policy와 dual-constrained representation을 함께 학습한다.
-11. 학습된 latent direction은 zero-shot goal command나 high-level action으로 사용할 수 있다.
-12. 하지만 결과는 observability, symmetric metric, latent capacity와 safety objective에 의존한다.
+이때 raw pixel L2 대신 두 상태를 오가는 데 필요한 minimum step 수를 temporal distance로 선택한다. 모든 adjacent transition의 latent displacement를 1 이하로 제한하면 triangle inequality가 multi-step state pair에도 upper bound를 만든다. Directional objective는 collapse를 막고, SAC policy와 dual-constrained representation은 이 metric 안에서 여러 방향의 behavior를 함께 학습한다.
 
-가장 중요한 식은 다음 하나다.
+학습된 latent direction은 zero-shot goal command나 high-level action으로 사용할 수 있다. 다만 representation의 품질은 observability, symmetric metric 가정, latent capacity에 좌우되며, 행동의 안전성은 별도 objective가 필요하다.
 
 $$
 \boxed{
@@ -728,8 +715,6 @@ r_t^{\mathrm{METRA}}
 \end{aligned}
 }
 $$
-
-한 문장으로 기억하면 다음과 같다.
 
 > **METRA는 한 step의 latent 이동을 제한하면서, 각 skill 방향으로 여러 step의 displacement가 누적되게 만들어 temporal dynamics가 넓게 펼쳐진 behavior를 발견한다.**
 

@@ -15,22 +15,16 @@ image:
 
 이전 글인 **[Noise and The Reality Gap](/posts/noise-and-the-reality-gap/)**에서는 sensor·motor variation을 simulation에 넣어 controller의 과적합을 줄이는 관점을 봤습니다. Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World**는 같은 문제를 visual perception으로 옮깁니다.
 
-핵심 문장은 이렇게 볼 수 있습니다.
-
 > Real world를 simulation distribution 안의 하나의 sample처럼 보이게 만들자.
 
 Simulator 한 장을 현실과 똑같이 만들기보다 texture, lighting, camera pose, distractor, image noise를 계속 바꿔 model이 특정 simulation appearance에 의존하지 못하게 만드는 것입니다.
 
-이 글의 핵심은 세 가지입니다.
-
-1. Target-domain real image를 training에 사용하지 않고도 geometric object를 평균 약 1.5 cm 오차로 localization했습니다.
-2. Randomization은 realism을 높이는 작업이 아니라 **task와 무관한 visual cue를 불안정하게 만드는 작업**입니다.
-3. Robustness는 training에 포함한 variation axis에 대해서만 생겼으며, distractor를 빼면 clutter 성능이 크게 무너졌습니다.
+Target-domain real image를 training에 사용하지 않았는데도 geometric object를 평균 약 1.5 cm 오차로 찾았습니다. 이 수치만 보는 것보다 어떤 variation이 transfer를 만들었는지 보는 편이 중요합니다. Randomization은 realism을 높이기보다 task와 무관한 visual cue를 불안정하게 만들었고, training에서 distractor를 빼자 clutter 성능이 크게 무너졌습니다.
 
 ![Randomized simulation training image와 실제 test image](/assets/img/posts/rl/sim2real/domain-randomization/01-training-vs-real.png){: width="1150" .d-block .mx-auto }
 _왼쪽의 비현실적인 simulation image만으로 detector를 학습한 뒤, 오른쪽 실제 webcam image에 추가 학습 없이 적용한다. 출처: [Tobin et al., Figure 1](https://arxiv.org/pdf/1703.06907)._
 
-이 그림에서 주목할 것은 simulation 한 장이 현실과 닮았는지가 아닙니다. Training image끼리도 색, 조명, camera, object 구성이 크게 달라서 **공통으로 남는 shape와 spatial cue**를 학습하게 만드는 것이 핵심입니다.
+이 그림에서는 simulation 한 장이 현실과 얼마나 닮았는지보다 training image끼리의 차이를 봐야 합니다. 색, 조명, camera와 object 구성이 계속 바뀌면서 **공통으로 남는 shape와 spatial cue**만 비교적 안정적인 단서가 됩니다.
 
 ## **1. 논문 정보**
 
@@ -52,7 +46,7 @@ _왼쪽의 비현실적인 simulation image만으로 detector를 학습한 뒤, 
 
 > Simulator를 하나의 고정된 world로 두지 말고, 가능한 여러 world의 distribution으로 보자.
 
-## **2. 핵심 아이디어: Photorealism 대신 Randomization**
+## **2. Photorealism 대신 Randomization**
 
 로봇이 vision을 사용하려면 image에서 필요한 정보를 뽑아야 합니다. 예를 들어 table 위에 있는 object의 위치를 찾아야 grasping을 할 수 있습니다.
 
@@ -91,11 +85,11 @@ Tobin et al.의 답은 domain randomization입니다.
 ![Domain randomization으로 생성한 여러 training scene](/assets/img/posts/rl/sim2real/domain-randomization/02-randomized-scenes.png){: width="900" .d-block .mx-auto }
 _같은 task label을 유지하면서 texture, lighting, camera, target 위치와 distractor 구성을 바꾼 training scene 일부. 출처: [Tobin et al., supplementary figure source](https://arxiv.org/abs/1703.06907)._
 
-중요한 점은 texture가 realistic할 필요가 없다는 것입니다.
+Texture는 realistic할 필요가 없습니다.
 
 논문에서는 random RGB color, random gradient, checker pattern 같은 단순하고 비현실적인 texture도 사용합니다. 목적은 예쁜 simulation image를 만드는 것이 아닙니다. 목적은 model이 texture나 lighting 같은 우연한 visual cue에 기대지 못하게 만드는 것입니다.
 
-여기서 "randomize했다"는 말을 실제 범위로 풀어 쓰면 다음과 같습니다.
+논문에서 사용한 randomization 범위를 실제 값으로 풀어 쓰면 아래와 같습니다.
 
 | 요소 | 논문의 구체적인 설정 |
 |---|---|
@@ -121,7 +115,7 @@ Training data는 simulation에서 만듭니다. Simulator는 MuJoCo built-in ren
 4. Light 개수와 위치, 방향, specular 특성을 바꿉니다.
 5. Image noise를 추가합니다.
 
-Test는 real world image에서 합니다. 중요한 점은 target-domain real robot image로 model을 다시 학습하지 않는다는 것입니다.
+Test는 real world image에서 수행하며, target-domain real robot image로 model을 다시 학습하지 않습니다.
 
 ### **2.1 Detector는 무엇을 입력받고 무엇을 출력하는가?**
 
@@ -217,9 +211,9 @@ Detector가 실제 control에 충분한지 확인하기 위해 Fetch robot과 of
 
 논문이 증명한 것은 randomized RGB로 학습한 localization network가 real manipulation pipeline에 쓸 만큼 정확했다는 것입니다. Contact-rich manipulation dynamics까지 simulation에서 real로 이전한 것은 아닙니다.
 
-## **3. 핵심 아이디어의 이론적 원리**
+## **3. Distribution 관점에서 본 원리**
 
-이 논문의 이론적 핵심은 "simulation image를 다양하게 만들었다"가 아닙니다. 더 정확히 말하면, **real domain을 포함할 수 있을 만큼 넓은 synthetic domain distribution을 만들고, 그 distribution에서 유지되는 feature를 학습한다**는 것입니다.
+단순히 simulation image 수를 늘리는 것만으로는 설명이 부족합니다. **Real domain을 포함할 만큼 넓은 synthetic domain distribution을 만들고, 그 안에서 유지되는 feature를 학습한다**는 관점이 필요합니다.
 
 ### **3.1 Domain을 하나의 distribution으로 본다**
 
@@ -324,7 +318,7 @@ Domain randomization은 real world를 자동으로 해결하는 방법이 아닙
 
 Training distribution에 들어간 variation에 대해서만 robustness가 생깁니다.
 
-논문의 ablation이 이 점을 잘 보여줍니다.
+이 coverage 문제는 ablation에서 직접 드러납니다.
 
 ![Training sample 수와 real-image error](/assets/img/posts/rl/sim2real/domain-randomization/04-training-samples-ablation.png){: width="1100" .d-block .mx-auto }
 _ImageNet-pretrained model은 적은 data에서 유리하지만, synthetic sample이 충분해지면 scratch model도 비슷한 real error에 도달한다. 성능은 약 50,000 samples까지 개선됐다. 출처: [Tobin et al., Figure 4](https://arxiv.org/pdf/1703.06907)._
@@ -419,8 +413,6 @@ Model이 object의 색이나 배경 texture 같은 쉬운 shortcut을 쓰면 rea
 | image noise | sensor noise |
 | domain distribution | deployment condition distribution |
 
-핵심은 하나입니다.
-
 > Real world가 training distribution 밖에 있으면 Sim2Real은 깨진다.
 
 따라서 Sim2Real에서 domain randomization은 단순한 augmentation이 아닙니다. Real deployment condition을 training distribution 안에 넣으려는 방법입니다.
@@ -461,17 +453,11 @@ Object와 조건에 따라 variance가 컸고, tetrahedron의 occlusion처럼 ou
 
 Photorealistic simulator를 완벽하게 만들지 못해도, model이 simulation의 특정 appearance에 묶이지 않게 할 수 있습니다.
 
-## **6. 정리하며: Visual Randomization에서 Dynamics Randomization으로**
+## **6. Visual Randomization에서 Dynamics Randomization으로**
 
-이번 글에서 남겨야 할 결론은 다섯 가지입니다.
+Tobin et al.은 simulator를 하나의 고정된 world가 아니라 **simulated domain의 distribution**으로 다뤘습니다. Photorealistic rendering이나 target-domain fine-tuning 없이 real-image localization이 가능했고, detector를 기존 manipulation pipeline에 연결해 geometric object 38/40회, Spam can 9/10회 grasp에 성공했습니다. 다만 이것은 end-to-end contact policy transfer 결과가 아닙니다.
 
-- Domain randomization은 simulator를 하나의 고정된 world가 아니라 **simulated domain의 distribution**으로 보는 방법입니다.
-- 이 논문은 photorealistic rendering 없이도 target-domain fine-tuning 없는 real-image localization이 가능함을 보였습니다.
-- Texture 개수와 distractor coverage가 중요했고, image noise는 이 실험에서 영향이 작았습니다.
-- Geometric object grasping 38/40과 Spam can 9/10은 detector가 manipulation pipeline에 쓸 만큼 정확했음을 보여주지만, end-to-end contact policy transfer는 아닙니다.
-- Randomization range와 axis는 deployment condition에 대한 가설이므로, 무조건 많이 흔드는 것이 아니라 ablation으로 검증해야 합니다.
-
-1편이 "simulation의 오차를 어떻게 다룰 것인가"를 물었다면, 2편의 답은 다음과 같습니다.
+Ablation에서는 texture diversity와 distractor coverage가 중요했고 image noise의 영향은 작았습니다. 모든 randomization axis가 같은 가치가 있는 것은 아니며, range와 axis는 deployment condition에 대한 가설로 두고 검증해야 합니다. 1편이 simulation의 오차를 어디까지 모델링할지 물었다면, 이 논문은 visual gap에 대해 아래처럼 답합니다.
 
 > 하나의 simulation을 믿지 말고, real world가 그 안의 한 variation처럼 보일 수 있는 distribution을 학습에 사용하자.
 

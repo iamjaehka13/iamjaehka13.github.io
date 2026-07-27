@@ -17,7 +17,7 @@ Part 1에서 설명했던 것처럼, 이 프로젝트는 Unitree Go2를 구매�
 
 > 실로봇 장시간 보행에서는 nominal RL baseline이 command tracking은 잘해도, 특정 actuator에 열이 불균일하게 쌓여 thermal bottleneck이 생길 수 있다. 따라서 per-actuator reported temperature와 current/load 정보를 보는 runtime regulator가 필요하고, 이를 사용하면 비슷한 walking task를 유지하면서 peak reported temperature와 temperature rise를 줄이고 더 오래 안전하게 걸을 수 있다.
 
-여기서 temperature는 실제 winding temperature를 직접 측정한 값이라고 단정하지 않고, **onboard reported actuator temperature**로 표현하는 편이 안전합니다. 핵심은 평균 온도나 배터리 전류만 보는 것이 아니라, 어느 actuator가 hotspot으로 보고되는지 보는 것입니다. 한 actuator만 빠르게 뜨거워져도 전체 보행 시간은 그 actuator에 의해 제한될 수 있습니다.
+여기서 temperature는 실제 winding temperature를 직접 측정한 값이라고 단정하지 않고, **onboard reported actuator temperature**로 표현하는 편이 안전합니다. 평균 온도나 배터리 전류만 보면 actuator별 hotspot을 놓칠 수 있습니다. 한 actuator만 빠르게 뜨거워져도 전체 보행 시간은 그 actuator에 의해 제한될 수 있습니다.
 
 이전 글까지는 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정에 집중했습니다. Part 5에서는 Domain Randomization과 deploy 정합성을 맞춘 뒤, 실제 Go2가 안정적으로 걷는 것까지 확인했습니다.
 
@@ -29,7 +29,7 @@ Part 1에서 설명했던 것처럼, 이 프로젝트는 Unitree Go2를 구매�
 
 아직 proposed controller를 주장하는 단계는 아닙니다. 먼저 nominal walking policy가 실제 로봇에서 어떤 열/전류 기준선을 만드는지 확인해야 합니다. 그래야 이후 thermal-aware regulator를 붙였을 때 좋아진 것인지, 단순히 느리게 걸어서 덜 뜨거워진 것인지 구분할 수 있습니다.
 
-현재 데이터 수집의 목적은 다음과 같습니다.
+그래서 baseline 수집 단계에서 아래 다섯 항목을 먼저 확보하기로 했습니다.
 
 1. nominal baseline policy의 real robot reported thermal/current 기준선 만들기
 2. 같은 command profile에서 12 actuator reported temperature, battery current, pack voltage, `tau_est`, `dq` 기록하기
@@ -45,7 +45,7 @@ Part 1에서 설명했던 것처럼, 이 프로젝트는 Unitree Go2를 구매�
 
 이번 단계에서 가장 중요하게 보는 값은 `/lowstate`에서 나오는 real robot 상태입니다. 다만 여기서 구분해야 할 점이 있습니다. `/lowstate` logger가 CSV로 직접 저장하는 값과, 나중에 정확한 분석을 위해 deploy script나 다른 topic에서 추가로 저장해야 하는 값이 다릅니다.
 
-현재 `/lowstate` logger에서 직접 저장하는 값은 다음과 같습니다.
+현재 `/lowstate` logger가 CSV로 직접 저장하는 field는 아래와 같습니다.
 
 ```text
 joint position
@@ -100,7 +100,7 @@ base pose / velocity
 
 ![데이터 수집용 deploy 실행](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/data-collection-terminal.jpg)
 
-대략적인 실행 흐름은 다음과 같습니다.
+당시 사용한 실행 명령도 함께 남겼습니다.
 
 ```bash
 conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
@@ -225,11 +225,11 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 ## **10. 논문에서 보여주고 싶은 방향**
 
-논문에서 보여주고 싶은 핵심은 다음 한 문장에 가깝습니다.
+논문에서 검증하려던 가설은 아래 문장에 가깝습니다.
 
 > Per-actuator reported temperature and current-derived load provide actionable information for long-duration quadruped deployment, enabling a lightweight runtime regulator to reduce actuator thermal risk while preserving the nominal locomotion task.
 
-한국어로 쓰면 다음과 같습니다.
+한국어로 옮기면 이렇습니다.
 
 > 실로봇 보행에서 열 문제는 평균 전류 문제가 아니라 모터별 hotspot 문제이고, 이를 관측해서 runtime에 제어 입력을 조절하면 baseline보다 더 열적으로 안전하게 오래 걸을 수 있다.
 
@@ -244,7 +244,7 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 ## **11. 다음 작업**
 
-다음으로 할 일은 다음과 같습니다.
+이 가설을 검증하려면 당시 baseline 한 번으로는 부족했고, 아래 작업이 남아 있었습니다.
 
 1. baseline rollout을 여러 episode로 수집하기
 2. `/lowstate` log를 episode 단위로 정리하기

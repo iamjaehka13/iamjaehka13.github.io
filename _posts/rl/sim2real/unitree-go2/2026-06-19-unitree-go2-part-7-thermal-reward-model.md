@@ -65,13 +65,13 @@ $$
 
 예를 들어 12개 motor 평균이 괜찮아 보여도, 한두 개 motor가 빠르게 올라가면 그 motor가 전체 rollout을 제한합니다. 그래서 thermal reward도 전체 평균만 줄이는 방향이면 부족합니다. 어느 motor가 hotspot이 되는지, 그리고 그 motor에 torque와 positive mechanical power가 계속 들어가는지를 같이 봐야 합니다.
 
-이 지점에서 Part 6의 데이터 수집 목적이 reward 설계 문제로 연결됩니다. 단순히 "온도를 낮추자"가 아니라, **hotspot이 되는 actuator의 load를 줄이도록 policy에게 어떤 신호를 줄 것인가**가 핵심이었습니다.
+이 지점에서 Part 6의 데이터 수집이 reward 설계 문제로 연결됩니다. Policy가 받아야 할 신호는 막연한 온도 감소보다 **hotspot actuator에 쌓이는 load를 줄이는 방향**이어야 했습니다.
 
 ## **4. 온도 상승률 모델**
 
 그래서 먼저 motor별 reported-temperature rate를 설명하는 작은 모델을 만들었습니다. 목적은 정교한 actuator thermal simulator가 아니라, 실제 Go2 log에서 관찰한 상승 경향을 학습 중에 재사용할 수 있는 proxy로 만드는 것입니다.
 
-모델 형태는 다음과 같습니다.
+사용한 temperature-rate proxy는 아래 식입니다.
 
 $$
 \begin{aligned}
@@ -85,7 +85,7 @@ $$
 \end{aligned}
 $$
 
-여기서 $j$는 motor index이고, $g$는 motor group입니다. 각 항의 의미는 다음과 같습니다.
+여기서 $j$는 motor index이고, $g$는 motor group입니다. 각 항은 서로 다른 부하와 cooling 효과를 나타냅니다.
 
 | 항 | 의미 |
 | --- | --- |
@@ -167,7 +167,7 @@ Thermal observation에는 대략 다음 정보가 들어갑니다.
 
 가장 먼저 넣은 thermal reward는 fitted temperature rate에 대한 penalty였습니다. 이 시도는 직관적으로 가장 직접적입니다.
 
-핵심 아이디어는 다음과 같습니다.
+첫 reward는 positive temperature rate를 motor별 위험도에 따라 가중했습니다.
 
 $$
 \ell_{\dot{T}}
@@ -196,7 +196,7 @@ $$
 
 셋째, motor별 weight를 둡니다. 실제 로그에서 더 자주 hotspot이 되는 group에 penalty가 더 민감하게 들어가도록 했습니다.
 
-이 구조의 장점은 명확합니다. policy가 단순히 torque regularization만 받는 것이 아니라, 실제 Go2 log에서 fitting한 reported-temperature rate를 줄이는 방향으로 학습됩니다.
+이렇게 하면 일반적인 torque regularization 대신 실제 Go2 log에서 fitting한 reported-temperature rate를 줄이는 방향으로 policy를 학습시킬 수 있습니다.
 
 하지만 이 reward만으로는 문제가 남았습니다.
 
@@ -230,7 +230,7 @@ $$
 
 그래서 이후에는 temperature rate만 보지 않고, torque와 positive mechanical power를 직접 reward에 넣었습니다.
 
-정리하면 다음과 같습니다.
+최종 reward에서 각 term이 맡은 역할은 아래와 같습니다.
 
 | term | 역할 |
 | --- | --- |

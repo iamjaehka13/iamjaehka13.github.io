@@ -50,7 +50,7 @@ image:
 서로 다른 action distribution과 state visitation
 ```
 
-여기서 핵심은 단순히 action이 다르다는 사실이 아니다. Discriminator가 **도달한 물리 상태만 보고 어떤 `z`였는지 맞힐 수 있을 정도로** 결과 상태가 달라져야 한다.
+Action만 달라서는 충분하지 않다. Discriminator가 **도달한 물리 상태만 보고 어떤 `z`였는지 맞힐 수 있을 정도로** 결과 상태가 달라져야 한다.
 
 ## 1. 먼저 볼 파일과 네트워크
 
@@ -128,7 +128,7 @@ for episode in range(1 + min_episode, max_n_episodes + 1):
     state = concat_state_latent(state, z, n_skills)
 ```
 
-중요한 점은 **step마다 다시 뽑지 않는다는 것**이다. 한 episode 동안 같은 `z`가 유지되어야 조건부 Policy $\pi(a\mid s,z)$가 일관된 상태 분포 $p(s\mid z)$를 만들 수 있다.
+`z`는 **step마다 다시 뽑지 않는다.** 한 episode 동안 같은 값이 유지되어야 조건부 Policy $\pi(a\mid s,z)$가 일관된 상태 분포 $p(s\mid z)$를 만들 수 있다.
 
 ```text
 episode 42: z = 8
@@ -904,8 +904,6 @@ with torch.no_grad():
    physical state s의 정답 class가 z=8이 되도록 Cross Entropy 최소화
 ```
 
-이 흐름에서 Discriminator와 Critic의 차이를 한 문장으로 정리할 수 있다.
-
 > **Discriminator는 현재 상태가 얼마나 `z`다운지 한 step의 reward를 만들고, Critic은 그 reward가 앞으로 얼마나 누적될지 예측한다.**
 
 DIAYN은 기존 강화학습을 버리는 알고리즘이 아니다. SAC의 상태를 $(s,z)$로 확장하고, 고정된 task reward 대신 학습되는 분류기의 log-likelihood ratio를 reward로 사용하며, Discriminator의 supervised update를 하나 더 결합한다.
@@ -924,7 +922,7 @@ intrinsic reward와 Critic target
 
 이 연결을 이해하면 왜 label leakage가 치명적인지, 왜 reward가 non-stationary한지, 왜 전진과 후진뿐 아니라 제자리 유지와 빠른 종료가 발견되는지 설명할 수 있다. 또한 **latent label의 개수와 사람이 구별하는 semantic skill의 개수는 같지 않을 수 있다**는 한계도 코드 수준에서 이해할 수 있다.
 
-Hopper 구현을 다른 로봇에 그대로 복사하는 것이 핵심은 아니다. `robot_obs`, `behavior_features`, `skill_horizon`, `safety_constraint`를 독립된 인터페이스로 만들고, 어떤 값이 Policy·Discriminator·Critic·실제 actuator에 전달되는지 명시하는 것이 범용화의 핵심이다.
+다른 로봇에서는 Hopper 구현을 그대로 복사하기보다 `robot_obs`, `behavior_features`, `skill_horizon`, `safety_constraint`를 독립된 인터페이스로 만들어야 한다. 어떤 값이 Policy·Discriminator·Critic·실제 actuator에 전달되는지 명시해야 같은 메커니즘을 안전하게 옮길 수 있다.
 
 ## 참고 자료
 

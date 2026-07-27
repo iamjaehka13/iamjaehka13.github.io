@@ -8,17 +8,14 @@ description: Isaac Lab의 InteractiveSceneCfg와 SimulationContext로 Unitree Go
 image: /assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/01-go2-twisted-joints.png
 math: true
 ---
-### 사담
+## 프로젝트 목표
 
-드디어 내 로봇개 go2가 도착했습니다!!
+Go2가 도착한 뒤부터 simulation 설정을 실제 배포까지 이어갈 수 있게 됐습니다. 이때 잡은 프로젝트 목표는 두 단계였습니다.
 
-이번 프로젝트의 최종 목표는 로봇개로 건물 전체를 매핑하는 일인데.. 세부 목표를 따지면 아래와 같을 것 같습니다.
+1. Isaac Lab에서 Go2 walking policy를 학습한다.
+2. Sim-to-real 배포와 ROS2 제어를 연결한다.
 
-1. isaac lab을 통해 isaac sim상에서 로봇개의 걷는 policy 학습하기
-
-2. sim to real을 통해 ros로 로봇개의 움직임 제어..
-
-### Interactive scene구성
+## Interactive scene 구성
 
 ```python
 from isaaclab.scene import InteractiveSceneCfg
@@ -60,12 +57,13 @@ class Myscene(InteractiveSceneCfg):
     )
 ```
 
-- Isaac lab은 InteractiveScene과 InteractiveCfg를 통해 환경을 구성할 수 있는데요 그중에는 Terrain(장애물), robot, sensor, light등이 있습니다.
-  - Terrain : 일단 prim_path와 type을 지정하여 아무것도 없는 지면으로 구성하였습니다.
-  - robot : asset으로부터 unitree go2로봇의 cfg파일을 가져와 로봇의 관절이나, 여러 파라미터 구성해줍니다.
-  - sensor : hight_scanner sensor를 장착했는데요. 로봇의 강화학습에 필요한 지형높이정보를 수집하는데 사용될 수 있습니다. 예를들어 robot의 base로부터 mesh_prim_path인 ground까지의 높이를 측정합니다.
+`InteractiveSceneCfg`에는 terrain, robot, sensor와 light를 함께 정의할 수 있습니다.
 
-### Simulation setting
+- **Terrain:** `prim_path`와 type을 지정해 plane을 생성했습니다.
+- **Robot:** `UNITREE_GO2_CFG`를 가져와 각 environment namespace에 Go2를 배치했습니다.
+- **Sensor:** `height_scanner`가 robot base 주변에서 ground까지 ray를 쏴 지형 높이를 측정합니다. 이 값은 이후 locomotion policy의 terrain observation으로 사용할 수 있습니다.
+
+## Simulation 설정
 
 ```python
 import os
@@ -142,16 +140,15 @@ if __name__ == "__main__":
     run_simulator()
 ```
 
-- hydra를 통해 cfg를 가져오고 run_simulator안에서 SimulationContext를 통해 simulation을 시작한 후 위에서 구성한 scene의 Cfg를 통해 scene을 생성합니다.
-- scene["go2"]를 통해 scene안에 있는 로봇에 접급할 수 있습니다. 300번의 step마다 로봇의 pos와 joint값을 reset하게 함으로써 우리가 원하는 scene을 isaaclab에서 불러 올 수 있게 됩니다.
+Hydra로 config를 읽고 `SimulationContext`를 만든 뒤, 위에서 정의한 scene config로 실제 scene을 생성합니다. `scene["go2"]`로 articulation에 접근하고 300 step마다 root와 joint state를 reset했습니다.
 
 ![관절이 기묘하게 뒤틀린 go2..](/assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/01-go2-twisted-joints.png){: .d-block .mx-auto }
 
-*관절이 기묘하게 뒤틀린 go2..*
+*Random joint target 때문에 관절이 크게 꺾인 Go2*
 {: .text-center}
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/02-isaaclab-scene-random-joints-preview.jpg" style="width: 100%; border-radius: 6px;">
   <source src="/assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/02-isaaclab-scene-random-joints.mp4" type="video/mp4">
 </video>
 
-결과적으로 random 값을 로봇의 joint에 주고 있어서 관절이 기묘하게 꺽이고 있지만 isaac sim안에서 scene은 원하는대로 구성된 모습입니다..
+Random joint target을 그대로 넣었기 때문에 동작 자체는 의미가 없지만, terrain·robot·sensor가 config대로 생성되고 reset loop가 동작하는 것까지 확인했습니다.

@@ -15,9 +15,7 @@ image:
 
 이전 글: [Challenging Terrain Locomotion: proprioceptive history와 privileged learning](/posts/learning-quadrupedal-locomotion-challenging-terrain/)
 
-앞선 Sim2Real 논문들에서는 dynamics randomization으로 여러 물리 조건을 경험시키고, proprioceptive history로 보이지 않는 접촉 상태를 추론하는 방법을 살펴봤습니다.
-
-그렇다면 다음 질문이 생깁니다.
+앞선 논문들은 dynamics randomization으로 여러 물리 조건을 경험시키고, proprioceptive history에서 보이지 않는 접촉 상태를 추론했습니다. RMA는 여기서 한 단계 더 나아가 현재 환경에 맞춰 policy input 자체를 바꿉니다.
 
 > 마찰, payload, actuator 성능과 지형이 계속 바뀔 때, 하나의 robust policy가 모든 상황을 평균적으로 버티게 하는 것만으로 충분할까?
 
@@ -47,7 +45,7 @@ Simulation에서는 mass, friction, motor strength와 terrain height를 알고 �
 ![여러 실제 야외 환경을 통과하는 RMA](/assets/img/posts/rl/sim2real/rma/00-preview.png){: width="1200" .d-block .mx-auto }
 _같은 RMA pipeline으로 grass, vegetation, sand, mud, stairs와 construction debris를 이동한 Unitree A1. 환경별 real-world fine-tuning은 수행하지 않았다. 출처: [Kumar et al., Figure 1](https://arxiv.org/pdf/2107.04034)._
 
-핵심 흐름은 다음과 같습니다.
+Training과 deployment의 data flow를 나누면 아래와 같습니다.
 
 | 단계 | 입력과 학습 | 결과 |
 |---|---|---|
@@ -55,11 +53,7 @@ _같은 RMA pipeline으로 grass, vegetation, sand, mud, stairs와 construction 
 | Phase 2 | Recent history $\rightarrow\phi\rightarrow\hat z_t$, on-policy supervised MSE | Deployable adaptation module |
 | Deployment | $\phi$ 10 Hz + $\pi$ 100 Hz + fixed-gain PD | Latest $\hat z_t$에 조건화된 joint target |
 
-이 글에서 가장 중요하게 구분할 것은 세 가지입니다.
-
-1. RMA는 물리 parameter를 정확히 복원하는 classical system identification이 아닙니다.
-2. “adaptation sample 0”은 아무 센서 이력도 쓰지 않는다는 뜻이 아닙니다.
-3. Latent component가 변했다고 해서 각 component가 friction이나 mass를 명시적으로 의미한다고 단정할 수는 없습니다.
+RMA는 physical parameter를 정확히 복원하는 classical system identification이 아닙니다. “Adaptation sample 0”도 sensor history를 쓰지 않는다는 뜻이 아니라 별도의 test-time optimization rollout이 없다는 의미입니다. 따라서 latent component가 변해도 각 component를 friction이나 mass에 바로 대응시킬 수는 없습니다.
 
 ---
 
@@ -113,7 +107,7 @@ J(\pi;\mathcal{M}_e)
 \right]
 $$
 
-Policy가 $e$를 입력받지 않는다면 action은 다음과 같습니다.
+Policy가 $e$를 입력받지 않는 경우 action은
 
 $$
 a_t = \pi(x_t)
@@ -204,7 +198,7 @@ $$
 
 논문에서는 $k=50$이며 policy가 100 Hz이므로 약 0.5초 이력입니다.
 
-중요한 점은 **state history만이 아니라 action history도 함께 본다**는 것입니다.
+Adaptation module은 **state history와 action history를 함께** 봅니다.
 
 같은 state 변화라도 어떤 action을 가한 결과인지 알아야 environment response를 해석할 수 있기 때문입니다.
 
@@ -247,7 +241,7 @@ RMA에는 세 개의 함수가 등장합니다.
 
 ### **4.1 Privileged environment vector $e_t$: 17 dimensions**
 
-논문이 $e_t$에 넣은 요소는 다음과 같습니다.
+Privileged vector $e_t$는 아래 17개 요소로 구성됩니다.
 
 | 요소 | 차원 | 의미 |
 |---|---:|---|
@@ -279,7 +273,7 @@ $\mu$는 hidden size 256, 128의 3-layer MLP입니다.
 
 ### **4.3 Base policy $\pi$: 총 50D 조건에서 12D action 생성**
 
-입력 차원은 다음과 같습니다.
+Base policy의 입력 차원은
 
 $$
 30\;\text{state}
@@ -376,7 +370,7 @@ K_d
 \right)
 $$
 
-논문 설정은 다음과 같습니다.
+Fixed-gain PD 설정은
 
 $$
 K_p=55,
@@ -468,7 +462,7 @@ Simulation baseline에서 exact parameter $e_t$를 예측하는 SysID가 RMA보�
 
 ### **6.3 PPO 설정**
 
-논문과 supplementary가 보고한 Phase 1 설정은 다음과 같습니다.
+논문과 supplementary의 Phase 1 설정을 표로 옮기면 아래와 같습니다.
 
 | 항목 | 값 |
 |---|---:|
@@ -526,7 +520,7 @@ Base frame의 linear velocity를 $\mathbf v$, angular velocity를 $\boldsymbol\o
 
 원문은 9번을 “Z Acceleration”이라고 부르지만 식은 $v_z$를 사용합니다. 따라서 이 글에서는 식에 맞춰 vertical velocity penalty로 해석합니다.
 
-Reward가 유도하는 행동은 다음과 같습니다.
+각 reward 묶음이 맡는 역할은 아래와 같습니다.
 
 | Reward 묶음 | 유도하는 행동 |
 |---|---|
@@ -767,7 +761,7 @@ Joint state와 contact는 빠르게 변합니다. 안정적인 locomotion feedba
 
 저자들은 state-action history를 하나의 policy가 직접 처리하는 대안도 실험했다고 설명합니다.
 
-원문에서 보고한 문제는 다음과 같습니다.
+저자들이 이 대안에서 관찰한 문제는 세 가지였습니다.
 
 1. Simulation에서 부자연스러운 gait와 낮은 성능
 2. Onboard compute에서 10 Hz로만 실행 가능
@@ -837,7 +831,7 @@ $$
 
 Adaptation을 제거하면 52.1%로 더 크게 떨어집니다.
 
-이 결과는 단순히 큰 randomization range가 아니라 **현재 condition을 구분해 action을 바꾸는 mechanism**이 중요했음을 보여줍니다.
+큰 randomization range만으로는 Robust baseline과의 11.1%p 차이를 설명하기 어렵습니다. **현재 condition을 구분해 action을 바꾸는 mechanism**이 실제 이득을 만들었습니다.
 
 ### **11.4 `Adapt samples = 0`을 오해하지 말 것**
 
@@ -897,13 +891,13 @@ Figure 3에서 RMA는:
 
 특히 uneven foam에서 adaptation 제거 model은 성공하지 못했고, 제조사 controller도 낮은 성공률을 보였습니다.
 
-이 결과는 rigid fractal terrain에서만 학습한 latent adaptation이 실제 deformable contact에도 어느 정도 유효했음을 보여줍니다.
+Rigid fractal terrain에서만 학습한 latent adaptation이 실제 deformable contact에서도 어느 정도 작동했습니다.
 
 다만 deformable foam의 정확한 물리 model을 식별했다는 뜻은 아닙니다. Foam 때문에 나타난 body/contact response를 training 중 학습한 latent space의 유용한 영역으로 mapping했다고 보는 편이 정확합니다.
 
 StepDown 15 cm의 성공률은 논문 Figure 3의 내부 표기와 caption 문구가 서로 일치하지 않습니다. Caption은 80%라고 설명하고 panel은 100%로 읽힙니다.
 
-따라서 이 글에서는 하나의 숫자를 확정해 과장하지 않고, **15 cm step-down을 반복적으로 성공했지만 정확한 비율 표기에는 원문 내부 불일치가 있다**고 기록합니다.
+그래서 **15 cm step-down을 반복적으로 성공했지만 정확한 비율 표기에는 원문 내부 불일치가 있다**고만 기록했습니다.
 
 ### **12.3 12 kg payload의 의미**
 
@@ -979,7 +973,7 @@ Adaptation ablation과 simulation baseline을 함께 봐야 구조적 기여를 
 ![자연 지형에서의 RMA 결과](/assets/img/posts/rl/sim2real/rma/08-overview-results.png){: width="1250" .d-block .mx-auto }
 _Simulation baseline과 실제 자연환경 결과를 함께 요약한 원문 시각자료. Outdoor result는 동일한 정책의 qualitative·trial-level evidence이며, 모든 환경을 동일 수의 반복으로 비교한 benchmark는 아니다. 출처: [RMA paper and project](https://ashish-kmr.github.io/rma-legged-robots/)._
 
-논문이 보고한 outdoor 결과는 다음과 같습니다.
+Outdoor trial에서 보고된 결과는 아래와 같습니다.
 
 | Terrain | 보고된 결과 |
 |---|---|
@@ -1066,7 +1060,7 @@ $z_t$는 PPO return을 높이도록 policy와 함께 형성된 latent입니다.
 
 논문의 SysID success rate는 56.5%, RMA는 73.5%입니다.
 
-가능한 해석은 다음과 같습니다.
+RMA가 direct SysID보다 높았던 이유는 세 가지로 생각해볼 수 있습니다.
 
 1. 짧은 history로 17D physical factor를 정확히 분리하기 어렵다.
 2. Policy가 필요한 정보는 physical parameter 전체가 아니다.
@@ -1211,7 +1205,7 @@ AWR은 40k adaptation sample을 사용했지만 success가 41.7%였습니다.
 
 Test dynamics가 episode 중 계속 바뀌는 setting에서는 여러 rollout을 모아 느리게 latent를 최적화하는 방식이 현재 environment를 따라가기 어렵습니다.
 
-이 비교가 RMA의 “rapid”를 가장 잘 보여줍니다.
+여러 rollout을 요구하지 않고 현재 history에서 바로 context를 갱신한다는 점에서 `rapid`의 의미가 가장 직접적으로 드러나는 비교입니다.
 
 ---
 
@@ -1397,15 +1391,11 @@ Latent는 행동에 유용한 representation이지 자동으로 해석 가능한
 
 ---
 
-## **22. 정리: RMA가 실제로 바꾼 것**
+## **22. RMA가 실제로 바꾼 것**
 
-RMA를 “history를 넣은 PPO”라고만 보면 contribution이 흐려집니다. 핵심은 locomotion adaptation을 세 부분으로 분해한 것입니다.
+RMA를 “history를 넣은 PPO”라고만 보면 구조가 흐려집니다. 먼저 privileged PPO로 환경을 알 때 잘 걷는 policy를 만들고, policy가 필요로 하는 environment 정보를 8D behavior-relevant latent로 압축합니다. 실제 robot에서는 최근 50-step state-action history로 그 latent를 추정합니다.
 
-1. **환경을 알 때 잘 걷는 policy**를 privileged PPO로 학습합니다.
-2. Policy가 필요로 하는 environment 정보를 **8D behavior-relevant latent**로 압축합니다.
-3. 실제 robot에서는 최근 **50-step state-action history**로 그 latent를 추정합니다.
-
-정확한 data flow는 다음입니다.
+세 network의 data flow는 아래와 같습니다.
 
 $$
 e_t\in\mathbb{R}^{17}
@@ -1429,15 +1419,11 @@ Phase 1은 PPO로 1.2 billion simulation step을 사용하고, Phase 2는 predic
 
 Simulation에서 RMA는 73.5% success로 Robust 62.4%, direct SysID 56.5%, adaptation 제거 52.1%를 앞섰고 oracle latent를 쓰는 Expert 76.2%에 근접했습니다. 실제 A1에서는 payload, foam, mattress, incline, oil, sand, mud, vegetation, stairs와 debris를 평가했습니다.
 
-그러나 결론은 “0.5초면 현실의 모든 물리를 알아낸다”가 아닙니다.
-
 > RMA는 simulation에서 학습한 environment-conditioned control latent가 실제 interaction history에서 식별 가능할 때, 별도의 real-world optimization 없이 그 latent를 빠르게 갱신해 locomotion action을 바꿀 수 있음을 보여준다.
-
-이것이 이 논문의 가장 정확한 핵심입니다.
 
 다음 글: [Learning to Walk in Minutes](/posts/learning-to-walk-in-minutes/)
 
-다음 편에서는 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**을 통해, 이런 locomotion policy 학습을 GPU 병렬 simulation이 어떻게 수 분 단위로 줄였는지 살펴보겠습니다.
+다음 편의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 이런 locomotion policy 학습의 wall-clock time을 GPU 병렬 simulation으로 줄입니다.
 
 ---
 

@@ -134,7 +134,7 @@ scripts/
 
 실제 robot deploy는 `scripts/sim_to_real.py`를 사용했습니다.
 
-전체 흐름은 다음과 같습니다.
+Deploy script에서는 아래 순서가 한 control loop 안에서 반복됩니다.
 
 1. Unitree SDK2로 `/lowstate` 수신
 2. SDK joint order를 policy joint order로 변환
@@ -226,7 +226,7 @@ tau = 0
 
 ![실제 Unitree Go2 command 반응 성공](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif)
 
-이전 시도와 비교하면 다음과 같습니다.
+처음 실패했던 조건과 최종 모델의 차이를 표로 남겼습니다.
 
 | 구분 | 이전 시도 | 최종 모델 |
 | --- | --- | --- |
@@ -238,16 +238,9 @@ tau = 0
 
 단순히 로봇이 움직였다는 것보다, 적절한 gain에서도 policy가 실제 로봇이 따라갈 수 있는 target trajectory를 출력했다는 점에 의미가 있었습니다.
 
-## **12. 정리**
+## **12. 무엇이 실제로 문제를 풀었나**
 
-이번 Sim2Real 과정에서 확인한 내용은 다음과 같습니다.
-
-1. Reward만 수정해서 해결되는 문제가 아니었습니다.
-2. Kp를 높이면 일부 실패 모드는 가려지지만, 안정적인 해결책은 아니었습니다.
-3. Feed-forward torque는 원인 분석에는 도움이 되었지만, 최종 해결책은 아니었습니다.
-4. 최종적으로는 적절한 gain과 Domain Randomization이 필요했습니다.
-5. Deploy observation, action scale, joint order 같은 정합성이 큰 영향을 줬습니다.
-6. Sim2Real 문제는 action이 실제 joint motion으로 이어지는 closed-loop transition을 학습 중에 충분히 경험하게 만드는 문제로 볼 수 있습니다.
+처음에는 reward와 Kp부터 의심했습니다. Kp를 올리면 일부 실패가 가려졌고 feed-forward torque는 원인을 좁히는 데 도움을 줬지만, 둘 다 최종 해결책은 아니었습니다. 적절한 gain에서 actuator variation을 Domain Randomization에 포함하고, deploy observation·action scale·joint order를 training과 맞췄을 때 비로소 실제 보행이 이어졌습니다.
 
 > real에서 더 강하게 제어하는 것이 아니라, sim에서 action이 joint motion으로 이어지는 dynamics를 충분히 학습시키는 것.
 

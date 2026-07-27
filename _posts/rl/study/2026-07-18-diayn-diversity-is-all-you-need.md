@@ -29,11 +29,7 @@ Eysenbach et al.의 **Diversity Is All You Need, DIAYN**은 질문을 반대로 
 
 DIAYN은 외부 task reward 없이 latent skill $z$를 조건으로 받는 정책을 학습합니다. 각 skill이 서로 다른 상태 분포를 만들도록 하고, 나중에 필요한 skill을 선택하거나 fine-tuning하거나 상위 정책이 조합하게 합니다.
 
-DIAYN을 한 문장으로 압축하면 다음과 같습니다.
-
 > **현재 상태만 보고 어떤 skill이 실행되었는지 맞힐 수 있도록 정책을 학습하고, 그 분류 가능성을 intrinsic reward로 사용한다.**
-
-다만 첫 문장부터 주의할 점이 있습니다.
 
 > **서로 다른 행동**과 **사람에게 유용한 행동**은 같은 말이 아닙니다.
 
@@ -71,7 +67,7 @@ Supervised downstream stage
 
 ## **2. DIAYN에서 말하는 skill은 무엇인가?**
 
-DIAYN의 policy는 일반적인 $\pi(a\mid s)$가 아니라 다음과 같습니다.
+DIAYN은 일반적인 policy에 skill condition $z$를 추가합니다.
 
 $$
 \pi_\theta(a\mid s,z)
@@ -102,7 +98,7 @@ z = 3 -> 아직 의미 없음
 
 초기에는 어떤 $z$에도 사람이 정한 의미가 없습니다. 학습이 진행되면서 어떤 skill은 앞으로 이동하고, 어떤 skill은 뒤로 이동하며, 어떤 skill은 뛰거나 회전하는 식으로 서로 다른 상태 분포를 만들게 됩니다.
 
-여기서 중요한 점은 **skill label과 의미 사이의 대응도 학습 결과**라는 것입니다. $z=2$가 반드시 "오른쪽 걷기"여야 하는 이유는 없습니다. random seed가 달라지면 같은 번호가 전혀 다른 행동을 나타낼 수 있습니다.
+**Skill label과 의미 사이의 대응도 학습 결과**입니다. $z=2$가 반드시 "오른쪽 걷기"여야 하는 이유는 없고, random seed가 달라지면 같은 번호가 전혀 다른 행동을 나타낼 수 있습니다.
 
 ## **3. Prior $p(z)$는 사전지식이 아니다**
 
@@ -154,7 +150,7 @@ I(S;Z)
 H(Z)-H(Z\mid S)
 $$
 
-각 항의 의미는 다음과 같습니다.
+두 entropy 항의 역할은 아래와 같습니다.
 
 | 항 | 의미 |
 |---|---|
@@ -208,7 +204,7 @@ $$
 
 ## **5. 전체 목적함수는 왜 이런 모양인가?**
 
-논문의 출발 목적함수는 다음과 같습니다.
+논문은 아래 목적함수에서 출발합니다.
 
 $$
 \mathcal{F}(\theta)
@@ -298,7 +294,7 @@ $$
 
 ## **7. Intrinsic reward의 의미**
 
-DIAYN의 pseudo-reward는 다음과 같습니다.
+DIAYN의 pseudo-reward는
 
 $$
 r_z(s)
@@ -315,7 +311,7 @@ r_t
 -\log p(z)
 $$
 
-Uniform prior라면 다음과 같습니다.
+Uniform prior에서는
 
 $$
 r_t
@@ -354,7 +350,7 @@ $$
 - $p(s\mid z)$: 이 skill이 해당 상태를 얼마나 자주 방문하는가
 - $p(s)$: 모든 skill을 섞었을 때 해당 상태가 얼마나 흔한가
 
-따라서 높은 reward를 받는 상태는 다음과 같습니다.
+높은 reward는 아래 조건을 만족하는 상태에서 생깁니다.
 
 > **내 skill은 자주 방문하지만 다른 skill은 잘 방문하지 않는 상태**
 
@@ -399,7 +395,7 @@ Off-policy replay에서 구현 선택은 두 가지입니다.
 ![DIAYN algorithm from the original paper](/assets/img/posts/rl/diayn/diayn-algorithm.png)
 _DIAYN의 policy-discriminator 학습 흐름. 출처: [Eysenbach et al., Figure 1](https://arxiv.org/abs/1802.06070)._
 
-학습 순서는 다음과 같습니다.
+한 episode와 network update는 아래 순서로 진행됩니다.
 
 1. 에피소드 시작 시 $z\sim p(z)$를 한 번 sampling합니다.
 2. 해당 에피소드 동안 같은 $z$를 유지합니다.
@@ -410,7 +406,7 @@ _DIAYN의 policy-discriminator 학습 흐름. 출처: [Eysenbach et al., Figure 
 7. SAC가 이 reward를 최대화하도록 actor와 critic을 업데이트합니다.
 8. Discriminator는 실제 skill ID를 맞히도록 cross-entropy로 업데이트됩니다.
 
-코드에 가까운 형태로 보면 다음과 같습니다.
+같은 과정을 pseudocode로 옮기면 아래와 같습니다.
 
 ```python
 for episode in range(num_episodes):
@@ -456,7 +452,7 @@ r(s_t,a_t)
 \right]
 $$
 
-Policy entropy는 다음과 같습니다.
+Policy entropy는
 
 $$
 \mathcal{H}\bigl(\pi(\cdot\mid s)\bigr)
@@ -481,7 +477,7 @@ $\alpha$가 크면 Policy가 더 넓은 action distribution을 유지하고, 너
 
 여기서 **Soft**는 action을 부드럽게 움직인다는 뜻이 아닙니다. Bellman backup과 Policy objective에 entropy가 포함되어, 단 하나의 최고 action만 보는 hard maximum 대신 여러 가능성의 가치를 함께 반영한다는 뜻입니다.
 
-SAC의 핵심 구성은 다음과 같습니다.
+SAC를 구성하는 network와 buffer의 역할은 아래와 같습니다.
 
 | 구성 | 역할 |
 |---|---|
@@ -528,7 +524,7 @@ $$
 
 > **초기 SAC와 현대 SAC는 코드 모양이 다릅니다.**
 >
-> DIAYN 논문 시기의 초기 SAC와 이 글의 참고 구현은 별도의 Value network와 target Value network를 사용합니다. 이후 널리 쓰이는 SAC는 explicit Value network를 제거하고 target Q를 사용하며, $\alpha$를 자동 조절하는 구성을 자주 사용합니다. 네트워크 배치는 달라도 off-policy replay와 maximum-entropy Actor-Critic이라는 핵심은 같습니다.
+> DIAYN 논문 시기의 초기 SAC와 이 글의 참고 구현은 별도의 Value network와 target Value network를 사용합니다. 이후 널리 쓰이는 SAC는 explicit Value network를 제거하고 target Q를 사용하며, $\alpha$를 자동 조절하는 구성을 자주 사용합니다. 네트워크 배치는 달라도 off-policy replay와 maximum-entropy Actor-Critic이라는 성격은 같습니다.
 
 ### **8.2 로봇 강화학습에서 익숙한 PPO와 무엇이 다른가?**
 
@@ -749,7 +745,7 @@ $$
 \tilde{s}_t=(s_t,z)
 $$
 
-전이는 다음과 같습니다.
+Episode 안에서 확장 상태는 아래처럼 전이합니다.
 
 $$
 (s_t,z)
@@ -781,7 +777,7 @@ $$
 
 $d_{\pi_z}(s)$는 skill $z$의 state visitation distribution입니다. Replay buffer에는 모든 skill의 transition이 섞여 있고, discriminator는 이 mixture에서 각 sample의 label을 구별합니다.
 
-Uniform prior는 이 mixture의 label balance를 유지합니다. 동시에 skill 수 $K$가 커질수록 skill 하나가 받는 데이터는 대략 $1/K$로 줄어듭니다. 따라서 $K$는 단순히 크게 설정할 수 있는 숫자가 아니라 data budget, network capacity, discriminator difficulty와 함께 결정해야 합니다.
+Uniform prior는 이 mixture의 label balance를 유지합니다. 동시에 skill 수 $K$가 커질수록 skill 하나가 받는 데이터는 대략 $1/K$로 줄어듭니다. 따라서 $K$는 data budget, network capacity, discriminator difficulty와 함께 결정해야 합니다.
 
 ## **11. VIC와 DIAYN의 차이**
 
@@ -793,7 +789,7 @@ $$
 I(\Omega;S_f\mid S_0)
 $$
 
-대표적인 intrinsic reward 형태는 다음과 같습니다.
+VIC의 대표적인 intrinsic reward는
 
 $$
 r_I
@@ -883,8 +879,6 @@ _Cheetah hurdle과 sparse-reward Ant navigation 결과. 출처: [Eysenbach et al
 
 Cheetah hurdle에서는 DIAYN skill 조합이 강한 결과를 보입니다. Ant navigation은 더 미묘합니다. Discriminator가 center of mass에 집중하도록 $f(s)$를 지정한 **DIAYN+prior**가 큰 성능 향상을 만들고, 순수 DIAYN은 같은 수준에 도달하지 못합니다.
 
-이 결과는 중요한 사실을 보여줍니다.
-
 > 어떤 state feature로 skill을 구별하게 할지가 downstream usefulness를 크게 결정한다.
 
 ### **13.3 Imitation without expert actions**
@@ -964,7 +958,7 @@ Learning rate, update ratio, normalization, capacity가 결과에 직접 영향�
 - 가장 좋은 skill 선택에는 downstream reward 평가가 필요합니다.
 - Ant navigation의 강한 결과는 center-of-mass feature라는 task-relevant prior를 사용합니다.
 
-따라서 "완전한 무감독 학습만으로 모든 downstream task를 해결했다"는 결론은 과합니다.
+"완전한 무감독 학습만으로 모든 downstream task를 해결했다"고 읽기 어려운 이유입니다.
 
 ## **16. 로봇에 적용한다면 무엇이 달라져야 하는가?**
 
@@ -1144,9 +1138,9 @@ Label leakage가 생기면 Discriminator accuracy와 intrinsic reward는 매우 
 | Safety | fall, limit, contact, actuator constraint가 있는가? |
 | Evaluation | diversity뿐 아니라 stability, energy, usefulness도 따로 측정하는가? |
 
-## **18. 최종 정리**
+## **18. 수식과 구현을 한 흐름으로 연결하기**
 
-DIAYN의 핵심 연결을 다시 정리하면 다음과 같습니다.
+DIAYN의 각 구성은 아래 순서로 연결됩니다.
 
 ```text
 Uniform skill prior p(z)
@@ -1168,11 +1162,7 @@ Learned skill repertoire
 -> selection, fine-tuning, hierarchy, imitation에 재사용
 ```
 
-이 논문에서 가장 중요한 통찰은 "보상이 없어도 다양하게 움직일 수 있다"는 결과만이 아닙니다.
-
 > **Skill discovery를 상태와 latent variable 사이의 정보량을 최대화하는 문제로 바꾸면, 분류기가 reward를 만들고 기존 maximum-entropy RL이 그 reward를 최적화할 수 있다.**
-
-동시에 가장 중요한 한계도 같은 곳에서 나옵니다.
 
 > **분류하기 쉬운 차이가 반드시 유용하고 안전한 차이는 아니다.**
 

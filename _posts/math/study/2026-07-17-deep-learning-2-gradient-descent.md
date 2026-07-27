@@ -23,7 +23,7 @@ $$
 
 입력이 주어지면 weight matrix와 bias vector를 이용해 다음 layer의 activation을 계산합니다.
 
-하지만 가장 중요한 값인 weight와 bias를 어떻게 정해야 하는지는 아직 다루지 않았습니다.
+이제 남은 문제는 weight와 bias를 어떻게 정할 것인가입니다.
 
 Chapter 1의 신경망에는 13,002개의 parameter가 있습니다. 사람이 이 값을 하나씩 정하는 것은 불가능합니다.
 
@@ -31,7 +31,7 @@ Chapter 1의 신경망에는 13,002개의 parameter가 있습니다. 사람이 �
 
 > 현재 신경망의 오차를 줄이려면 각 parameter를 어느 방향으로 얼마나 수정해야 하는가?
 
-이 글은 3Blue1Brown의 **Deep Learning Chapter 2: Gradient descent, how neural networks learn**을 바탕으로 이 질문에 답합니다.
+3Blue1Brown의 **Deep Learning Chapter 2: Gradient descent, how neural networks learn**를 따라 이 update 방향을 확인합니다.
 
 이번 글에서는 gradient를 실제로 어떻게 효율적으로 계산하는지는 다루지 않습니다. 그 계산 알고리즘인 backpropagation은 [3편](/posts/deep-learning-3-backpropagation/)에서 이어집니다.
 
@@ -69,8 +69,6 @@ W^{(3)},\mathbf{b}^{(3)}
 $$
 
 여기서 $\theta$는 신경망의 모든 parameter를 한꺼번에 나타냅니다.
-
-학습을 한 문장으로 쓰면 다음과 같습니다.
 
 > 신경망의 학습은 좋은 출력을 만들도록 parameter $\theta$를 반복해서 수정하는 과정이다.
 
@@ -602,9 +600,9 @@ Backpropagation
 → 그 gradient를 신경망 내부에서 어떻게 계산할 것인가
 ```
 
-## **17. 전체 흐름 요약**
+## **17. Cost에서 parameter update까지**
 
-신경망이 학습하는 전체 흐름은 다음과 같습니다.
+학습은 현재 parameter로 예측하고, 정답과의 오차를 cost로 만든 뒤, 그 cost의 gradient를 따라 parameter를 수정하는 반복입니다.
 
 ```text
 1. 입력과 정답으로 구성된 training data를 준비한다.
@@ -616,8 +614,6 @@ Backpropagation
 7. 이 과정을 반복한다.
 ```
 
-핵심 식은 다음과 같습니다.
-
 $$
 \boxed{
 \theta_{t+1}
@@ -627,8 +623,6 @@ $$
 \eta\nabla_{\theta}C(\theta_t)
 }
 $$
-
-그리고 이 식의 의미는 다음 한 문장으로 정리할 수 있습니다.
 
 > Gradient Descent는 cost를 가장 빠르게 줄이는 방향을 따라 신경망의 weight와 bias를 반복적으로 수정하는 방법이다.
 

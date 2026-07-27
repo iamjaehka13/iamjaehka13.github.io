@@ -27,7 +27,7 @@ $$
 
 즉, 상태 $s$가 주어지면 Actor가 하나의 행동을 직접 출력합니다.
 
-### **1.2 DDPG의 핵심 아이디어**
+### **1.2 DDPG의 구성**
 
 DDPG는 다음 구성 요소로 이루어집니다.
 
@@ -42,7 +42,7 @@ DDPG는 다음 구성 요소로 이루어집니다.
 
 ### **1.3 DPG와 SPG의 차이**
 
-확률적 정책 경사(SPG)와 결정적 정책 경사(DPG)의 차이는 다음과 같습니다.
+확률적 정책 경사(SPG)와 결정적 정책 경사(DPG)를 나란히 놓으면 차이가 분명해집니다.
 
 | 특징 | 확률적 정책 경사 (Stochastic PG) | 결정적 정책 경사 (Deterministic PG) |
 | --- | --- | --- |
@@ -57,13 +57,13 @@ DDPG는 다음 구성 요소로 이루어집니다.
 
 DDPG는 연속 행동 공간을 다룰 수 있지만, 정책 업데이트의 크기를 잘 조절해야 합니다. 스텝이 너무 크면 성능이 크게 무너질 수 있고, 너무 작으면 학습이 느립니다.
 
-TRPO는 이 문제를 **정책을 너무 멀리 바꾸지 않는 업데이트**로 해결하려고 합니다. 핵심은 정책 업데이트에 **신뢰 영역(Trust Region)**을 두는 것입니다.
+TRPO는 정책 업데이트에 **신뢰 영역(Trust Region)**을 두어 새 정책이 이전 정책에서 너무 멀어지지 않게 합니다.
 
 ### **2.1 TRPO의 주요 개념**
 
 TRPO는 기대 반환을 최대화하되, 새 정책이 이전 정책에서 너무 멀어지지 않도록 KL divergence 제약을 둡니다.
 
-직관적으로는 다음과 같습니다.
+목적을 풀어 쓰면 두 조건이 함께 들어갑니다.
 
 - 정책을 개선하고 싶다.
 - 하지만 한 번에 너무 크게 바꾸면 위험하다.
@@ -87,7 +87,7 @@ TRPO는 기대 반환을 최대화하되, 새 정책이 이전 정책에서 너�
 
 ![State visitation frequency](/assets/img/posts/rl-policy-gradient-drl/state-visitation-frequency.png)
 
-정리하면 정책 성능 차이는 다음처럼 볼 수 있습니다.
+이 관계는 아래의 정책 성능 차이로 표현할 수 있습니다.
 
 ![Performance difference summary](/assets/img/posts/rl-policy-gradient-drl/performance-difference-summary.png)
 
@@ -119,7 +119,7 @@ $$
 
 ### **2.6 일반적인 확률적 정책으로 확장**
 
-TRPO는 이 하한을 일반적인 확률적 정책으로 확장합니다. 핵심은 정책 사이의 차이를 전체 변동 거리(Total Variation Distance)로 다루고, 다시 KL divergence로 바꾸는 것입니다.
+TRPO는 이 하한을 일반적인 확률적 정책으로 확장합니다. 정책 사이의 차이를 전체 변동 거리(Total Variation Distance)로 다룬 뒤 KL divergence를 이용해 계산 가능한 제약으로 바꿉니다.
 
 ![Stochastic policy bound](/assets/img/posts/rl-policy-gradient-drl/stochastic-policy-bound.png)
 
@@ -139,7 +139,7 @@ TRPO는 이 관점에서, 실제 성능이 나빠지지 않도록 보수적인 �
 
 ### **2.8 신뢰 영역 (Trust Region) 제약**
 
-TRPO의 핵심 최적화 문제는 다음과 같이 이해할 수 있습니다.
+TRPO의 최적화 문제에는 다음 두 항이 들어갑니다.
 
 - 국소 목적 함수 $L_{\theta_{\mathrm{old}}}(\theta)$를 최대화한다.
 - 단, 새 정책과 이전 정책의 KL divergence가 너무 커지지 않도록 제한한다.
@@ -217,7 +217,7 @@ $$
 H^{-1}\nabla_\theta L_{\theta_{\mathrm{old}}}
 $$
 
-즉, 단순히 파라미터를 크게 바꾸는 방향이 아니라, 정책 분포의 변화까지 고려해 더 자연스러운 방향으로 업데이트합니다.
+따라서 파라미터 좌표에서 큰 기울기를 그대로 따르지 않고, 그 변화가 정책 분포를 얼마나 움직이는지까지 반영합니다.
 
 ### **3.3 TRPO에서의 실용적 계산**
 
@@ -233,11 +233,11 @@ $$
 
 ![TRPO and NPG procedure](/assets/img/posts/rl-policy-gradient-drl/trpo-npg-procedure.png)
 
-정리하면 NPG는 정책 공간의 곡률을 반영한 업데이트 방향이고, TRPO는 이를 신뢰 영역 제약과 함께 실용적으로 구현한 알고리즘입니다.
+NPG는 정책 공간의 곡률을 반영한 업데이트 방향을 구하고, TRPO는 이 방향을 신뢰 영역 제약 안에서 실제 최적화 절차로 사용합니다.
 
 ## **4. Proximal Policy Optimization (PPO)**
 
-TRPO는 안정적이지만 구현이 복잡합니다. PPO는 TRPO의 핵심 아이디어인 **정책을 너무 크게 바꾸지 말자**를 훨씬 단순한 목적 함수로 구현합니다.
+TRPO는 안정적이지만 구현이 복잡합니다. PPO는 **정책을 한 번에 너무 크게 바꾸지 않는다**는 제약을 더 단순한 목적 함수로 구현합니다.
 
 TRPO의 기본 목적은 다음과 같은 신뢰 영역 최적화입니다.
 
@@ -251,7 +251,7 @@ PPO는 KL 제약을 직접 풀지 않고, 정책 비율(policy ratio)을 사용�
 
 ### **4.1 Clipped Surrogate Objective**
 
-PPO의 핵심은 policy ratio가 너무 커지거나 작아지는 것을 잘라내는 clipped objective입니다.
+PPO의 clipped objective는 policy ratio가 허용 범위 밖으로 커지거나 작아질 때 추가 이득을 제한합니다.
 
 ![PPO clipped objective](/assets/img/posts/rl-policy-gradient-drl/ppo-clipped-objective.png)
 
@@ -269,7 +269,7 @@ PPO는 TRPO보다 이론적 보장은 약하지만, 구현이 훨씬 쉽고 계�
 
 ## **5. 주요 발전 흐름**
 
-Policy Gradient 계열의 흐름은 다음처럼 정리할 수 있습니다.
+아래 흐름도는 각 알고리즘이 앞선 방법에서 어떤 문제를 이어받았는지 보여줍니다.
 
 ![Policy gradient development flow](/assets/img/posts/rl-policy-gradient-drl/policy-gradient-development-flow.png)
 
@@ -279,13 +279,8 @@ Policy Gradient 계열의 흐름은 다음처럼 정리할 수 있습니다.
 - **NPG:** 정책 공간의 곡률을 반영한 자연 경사 방향을 사용합니다.
 - **PPO:** TRPO의 복잡한 제약 최적화를 clipped objective로 단순화했습니다.
 
-## **6. 정리하며**
+## **6. 로봇 제어에서 다시 보게 되는 지점**
 
-이번 글에서는 Policy Gradient 계열 DRL 알고리즘의 발전 흐름을 정리했습니다.
+DDPG는 연속 행동을 직접 출력하는 actor와 off-policy critic을 결합했고, TRPO와 PPO는 새 정책이 기존 정책에서 지나치게 멀어지는 문제를 서로 다른 방식으로 제어합니다. NPG는 그 사이에서 파라미터 거리가 아니라 정책 분포의 거리를 봐야 하는 이유를 설명합니다.
 
-- DDPG는 deterministic actor와 critic을 사용해 연속 행동 공간을 다룹니다.
-- TRPO는 정책이 한 번에 너무 크게 변하지 않도록 trust region을 둡니다.
-- NPG는 정책 공간의 곡률을 고려한 자연 경사를 사용합니다.
-- PPO는 clipped objective로 TRPO의 안정성을 더 단순하게 구현합니다.
-
-여기까지 보면 가치 기반 방법(DQN 계열)과 정책 기반 방법(Policy Gradient 계열)의 큰 흐름이 어느 정도 연결됩니다. 이후에는 이 알고리즘들을 실제 환경과 구현 코드에서 어떻게 다루는지로 넘어가면 좋습니다.
+실제 로봇 강화학습 코드를 읽을 때는 알고리즘 이름보다 데이터가 on-policy인지, action distribution이 어떻게 정의되는지, policy update를 어느 장치로 제한하는지를 먼저 확인하는 편이 이해가 빨랐습니다. 이후 글에서는 이 기준을 실제 환경과 구현에 적용합니다.

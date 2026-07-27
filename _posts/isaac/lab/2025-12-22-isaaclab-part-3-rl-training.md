@@ -8,13 +8,11 @@ description: Isaac Lab manager-based 환경과 RSL-RL 프레임워크로 Unitree
 image: /assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1-preview.jpg
 math: true
 ---
-Isaac sim에서 강화학습을 통해 얻은 모델로 로봇을 걷게하려면 RL 학습시와 동일한 config (observation, Policy, Actions)를 유지해야 합니다.
-
-따라서 오늘은 Isaac Lab의 **"manager-based"** 환경 프레임워크와 **RSL-RL** 학습프레임워크를 통해 unitree go2모델의 강화학습 환경을 구성해 보겠습니다.
+학습된 policy를 나중에 다시 실행하려면 training과 inference에서 observation의 순서, action scale과 environment config가 같아야 합니다. 이 조건을 관리하기 위해 Isaac Lab의 **manager-based environment**와 **RSL-RL**을 사용해 Unitree Go2 locomotion task를 구성했습니다.
 
 #### RSL-RL 학습 프레임워크란?
 
-**RSL-RL** 은 ETH Zurich의 Robotic Systems Lab(RSL)에서 개발한 고성능 강화학습 라이브러리입니다. 주로 **PPO(Proximal Policy Optimization)** 알고리즘을 구현하며, 다음과 같은 특징이 있습니다.
+**RSL-RL**은 ETH Zurich의 Robotic Systems Lab에서 개발한 강화학습 라이브러리입니다. 이 예제에서는 PPO runner가 rollout 수집, optimization, logging과 checkpoint 저장을 담당합니다.
 
 ## Isaaclab Code
 
@@ -58,7 +56,7 @@ simulation_app = app_launcher.app
 
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/04-rsl-rl-wrapper.png){: .d-block .mx-auto }
 
-- **RslRlVecEnvWrapper:** 이 스크립트에서 가장 중요한 부분 중 하나입니다. Isaac Lab 환경에서 나오는 관측값(Observation) 텐서를 RSL-RL 라이브러리가 요구하는 특정 텐서 구조와 장치(Device) 위치로 변환해주는 역할을 합니다.
+- **RslRlVecEnvWrapper:** Isaac Lab 환경의 observation과 action interface를 RSL-RL이 기대하는 vectorized environment 형식으로 맞춥니다.
 
 **강화학습 시작**
 
@@ -118,7 +116,7 @@ Go2-v0 --num_envs 4096 --max_iterations 10000 --video --headless
 
 #### 결과물
 
-9000 iteration까지 학습했을때의 결과물 입니다.
+9000 iteration까지 학습한 checkpoint의 실행 결과입니다.
 
 <video controls playsinline preload="metadata" poster="/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1-preview.jpg" style="width: 100%; border-radius: 6px;">
   <source src="/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1.mp4" type="video/mp4">
@@ -129,3 +127,5 @@ Go2-v0 --num_envs 4096 --max_iterations 10000 --video --headless
 </video>
 
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/10-training-result-log.png){: .d-block .mx-auto }
+
+이 단계에서 확인한 것은 reward graph의 우수성보다 training pipeline이 끝까지 이어진다는 점입니다. 등록된 task ID로 environment를 만들고, wrapper를 거쳐 PPO rollout을 수집한 뒤 checkpoint를 저장할 수 있었습니다. 다음 단계에서는 같은 observation과 action 정의를 유지한 채 이 checkpoint를 inference 환경에서 불러옵니다.

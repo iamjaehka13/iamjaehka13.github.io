@@ -7,9 +7,7 @@ description: Isaac Sim에서 Franka Panda의 joint state를 ROS2로 publish하�
 image: /assets/img/posts/isaac-sim-ros2-joint-control/02-joint-state-graph.png
 ---
 
-이 글은 [ROS2 Publish Rate and QoS](/posts/isaac-sim-publish-rate-qos/)에 이어서, Isaac Sim에서 robot articulation을 ROS2 joint command로 움직이는 과정을 정리합니다.
-
-이번 예제의 대상은 Franka Panda robot입니다. Isaac Sim은 `/joint_states`로 현재 관절 상태를 publish하고, 외부 ROS2 node가 `/joint_command`로 보낸 명령을 subscribe해서 `Articulation Controller`로 전달합니다.
+[ROS2 Publish Rate and QoS](/posts/isaac-sim-publish-rate-qos/)까지는 주로 Isaac Sim에서 ROS2로 data를 내보냈습니다. 이번에는 Franka Panda의 `/joint_states`를 publish하는 경로와, 외부 node의 `/joint_command`를 `Articulation Controller`로 전달하는 반대 방향을 한 graph에 연결했습니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -64,7 +62,7 @@ Isaac Read Simulation Time
 
 `Articulation Controller` 노드도 같은 robot prim을 target으로 잡습니다. target prim을 다르게 잡으면 `/joint_command`를 받아도 실제 robot이 움직이지 않습니다.
 
-핵심 topic은 다음과 같습니다.
+확인할 topic은 두 개입니다.
 
 - `/joint_states`: Isaac Sim에서 publish하는 현재 joint 상태
 - `/joint_command`: 외부 ROS2 node가 publish하는 joint command
@@ -111,9 +109,7 @@ Tools > Robotics > ROS 2 OmniGraphs > JointStates
 
 직접 graph를 구성하면 노드의 역할을 이해하기 쉽고, shortcut을 쓰면 반복 설정 시간을 줄일 수 있습니다. 처음에는 직접 구성해보고, 이후 같은 구조를 반복할 때 shortcut을 쓰는 방식이 좋습니다.
 
-## **7. 정리하며**
-
-Joint control graph의 핵심은 ROS2 topic과 Isaac Sim articulation을 양방향으로 연결하는 것입니다.
+## **7. 양방향 graph에서 확인할 것**
 
 ```text
 Franka articulation
@@ -126,4 +122,4 @@ Franka articulation
   -> Franka articulation
 ```
 
-이 구조를 이해해두면 Franka뿐 아니라 다른 manipulator나 robot joint에도 같은 방식으로 ROS2 joint command 제어를 붙일 수 있습니다. 결국 Isaac Sim 쪽 articulation target만 정확히 잡으면, ROS2에서는 표준 joint state와 joint command topic 흐름으로 다룰 수 있습니다.
+Franka 대신 다른 manipulator를 사용해도 graph의 방향은 같습니다. 다만 articulation target, joint name과 command 배열 순서는 실제 robot model과 반드시 일치해야 합니다. State가 publish된다는 사실만으로 command 경로까지 정상이라고 판단하지 말고 두 방향을 따로 확인해야 합니다.

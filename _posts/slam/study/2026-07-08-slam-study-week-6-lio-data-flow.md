@@ -1133,7 +1133,7 @@ odometry drift가 줄었다.
 
 이번 결과의 의미는 성능 검증이 아니라, 6주차 목표였던 LIO 내부 변수 추적을 실제 코드에서 시작했다는 것입니다.
 
-## **18. Claim Boundary**
+## **18. 이번 trace로 말할 수 있는 범위**
 
 6주차 글에서 조심할 점은 명확합니다.
 
@@ -1162,15 +1162,11 @@ deskew가 odometry drift를 줄였다는 것을 검증했다.
 
 다만 아직 calibration sensitivity, time offset sweep, ground-truth trajectory 비교는 하지 않았습니다.
 
-## **19. 이번 주 정리**
-
-6주차를 한 문장으로 정리하면 다음입니다.
+## **19. 알고리즘 이름보다 코드 위치를 남기기**
 
 > LIO 안에서 IMU가 pose를 예측하고, LiDAR point residual이 그 pose를 보정하며, 보정된 point가 map에 들어가는 전체 경로를 추적하는 주다.
 
-이번 주의 핵심은 알고리즘 이름을 외우는 것이 아닙니다.
-
-코드에서 다음 질문에 답할 수 있어야 합니다.
+이 단계에서는 알고리즘 이름보다 아래 연산이 실제 코드의 어디에서 일어나는지 찾는 편이 중요합니다.
 
 ```text
 point timestamp는 어디에서 읽히는가?
@@ -1181,9 +1177,7 @@ LiDAR update 전후 pose는 어디에서 바뀌는가?
 보정된 point는 언제 map에 들어가는가?
 ```
 
-이 질문에 답할 수 있어야 7주차부터 실제 LIO logging과 실험으로 넘어갈 수 있습니다.
-
-내 연구 관점에서는 이 연결이 중요합니다.
+이 위치를 알아야 7주차부터 logging을 추가하고, 같은 scan에서 prediction, deskew, residual, update, map insertion을 연결할 수 있습니다. 내 연구에서는 아래 경로를 실제 변수로 기록하는 것이 다음 목표입니다.
 
 ```text
 보행으로 생긴 LiDAR motion
@@ -1194,4 +1188,4 @@ LiDAR update 전후 pose는 어디에서 바뀌는가?
 -> odometry drift 또는 map blur
 ```
 
-6주차는 이 경로를 실제 LIO 내부 변수로 확인하기 위한 준비 단계입니다.
+이번 FAST-LIO2 trace는 이 경로를 기록하기 시작한 단계이며, calibration sensitivity와 time offset, ground-truth trajectory 비교는 아직 남아 있습니다.

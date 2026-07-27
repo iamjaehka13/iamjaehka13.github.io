@@ -20,8 +20,6 @@ LSD, **Lipschitz-constrained Skill Discovery**는 목표를 다음처럼 바꾼�
 
 > Skill $z$를 표현공간에서의 **이동 방향**으로 만들고, 그 방향으로 가능한 한 크게 이동하라. 단, 표현 함수가 실제 상태 차이를 과장해서는 안 된다.
 
-이 글을 한 문장으로 압축하면 다음과 같다.
-
 > **LSD는 $z$와 표현 변화 $\phi(s_T)-\phi(s_0)$의 방향을 맞추고, 1-Lipschitz 제약으로 큰 latent 이동이 실제 state variation을 동반하게 만든다.**
 
 ## 0. 먼저 눈으로 보는 DIAYN과 LSD의 차이
@@ -148,7 +146,7 @@ $$
 \right)
 $$
 
-$p(z)$가 고정돼 있으므로 기대값에서 $\|z\|^2$ 항은 상수로 볼 수 있다. 남는 핵심은 두 항이다.
+$p(z)$가 고정돼 있으므로 기대값에서 $\|z\|^2$ 항은 상수로 볼 수 있다. 그러면 두 항이 남는다.
 
 $$
 z^\top\Delta\phi
@@ -579,7 +577,7 @@ Figure 7의 축을 읽는 방법은 다음과 같다.
 - **좌우**: 왼쪽은 Lipschitz 제약이 없고, 오른쪽은 spectral normalization으로 1-Lipschitz를 적용한다.
 - **오른쪽 아래**: LSD가 채택한 세 요소가 함께 들어간 설정이다. 그림에서 유일하게 넓은 방사형 trajectory가 뚜렷하다.
 
-이 결과에서 특히 중요한 점은 **DIAYN에 spectral normalization만 추가해도 LSD가 되지 않는다**는 것이다.
+이 ablation은 **DIAYN에 spectral normalization만 추가해도 LSD가 되지 않는다**는 사실을 보여준다.
 
 ```text
 Spectral normalization만 있음
@@ -632,7 +630,7 @@ State에 위치, 관절각, 속도, 방향이 함께 들어 있으면 어떤 차
 
 ### 13.3 Continuous LSD는 magnitude를 충분히 사용하지 않는다
 
-Continuous LSD의 핵심은 $z$의 방향 정렬이다. 논문은 continuous setting이 주로 멀리 이동하는 locomotion skill을 발견하며, $z$ magnitude까지 행동 세기로 의미 있게 사용하는 것은 후속 과제로 남긴다.
+Continuous LSD는 $z$의 방향을 표현 변화와 정렬한다. 논문은 continuous setting이 주로 멀리 이동하는 locomotion skill을 발견하며, $z$ magnitude까지 행동 세기로 의미 있게 사용하는 것은 후속 과제로 남긴다.
 
 ### 13.4 큰 변화가 곧 유용하거나 안전한 행동은 아니다
 
@@ -674,24 +672,13 @@ METRA
 환경에서 서로 도달하기 어려운 상태를 더 멀게 표현하라
 ```
 
-이 차이는 다음 글에서 별도로 다루는 편이 맞다. LSD 글의 결론은 Euclidean metric의 한계를 인정하되, METRA의 해법까지 미리 전개하지 않는 것이다.
+이 차이는 [METRA 글](/posts/metra-metric-aware-abstraction/)에서 temporal distance와 함께 이어서 다룬다. 여기서는 LSD가 normalized observation의 Euclidean metric에 의존한다는 한계까지만 남겨 둔다.
 
-## 15. 최종 정리
+## 15. 목적함수와 제약을 다시 연결하기
 
-LSD의 논리를 순서대로 다시 연결하면 다음과 같다.
+MI 기반 skill discovery는 작은 state 차이만으로도 skill을 구별할 수 있다. LSD는 Gaussian posterior를 분해해 얻은 방향 정렬 항 $z^\top\Delta\phi$를 남기고, 이동 크기를 제한하던 quadratic penalty를 제거했다. 이 식만 최적화하면 representation $\phi$가 scale을 키워 reward를 조작할 수 있으므로, 1-Lipschitz 제약과 spectral normalization으로 latent distance의 과장을 막는다.
 
-1. MI 기반 skill discovery는 작은 state 차이만으로도 skill을 구별할 수 있다.
-2. Gaussian posterior를 분해하면 방향 정렬 항과 크기 penalty가 나타난다.
-3. LSD는 크기 penalty를 제거하고 $z^\top\Delta\phi$만 최대화한다.
-4. 그대로 두면 $\phi$가 scale을 키워 reward를 조작할 수 있다.
-5. 1-Lipschitz 제약이 latent distance의 과장을 막는다.
-6. Spectral normalization은 각 선형층의 최대 확대율을 제한한다.
-7. Telescoping sum으로 per-step intrinsic reward를 얻는다.
-8. SAC policy와 representation $\phi$를 번갈아 학습한다.
-9. 학습된 방향 구조로 zero-shot goal skill을 선택할 수 있다.
-10. 그러나 결과는 observation metric과 state normalization에 의존한다.
-
-가장 중요한 식은 하나다.
+Endpoint displacement는 telescoping sum을 통해 per-step intrinsic reward가 되고, SAC policy와 representation이 번갈아 학습된다. 학습된 방향 구조는 zero-shot goal skill 선택에도 쓸 수 있지만, 그 결과가 어떤 행동을 강조하는지는 observation metric과 state normalization에 의존한다.
 
 $$
 \boxed{
@@ -707,8 +694,6 @@ z^\top
 \|x-y\|
 }
 $$
-
-한 문장으로 기억하면 다음과 같다.
 
 > **LSD는 skill을 latent 이동 방향으로 만들고, 표현 함수가 거리를 속이지 못하게 한 상태에서 그 방향의 실제 변화를 최대화한다.**
 

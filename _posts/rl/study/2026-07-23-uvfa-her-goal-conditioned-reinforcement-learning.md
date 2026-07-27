@@ -22,8 +22,6 @@ UVFA + HER
 
 목표 위치가 계속 바뀌는 로봇 제어를 생각해 보자. 하나의 policy가 여러 목표를 처리하게 만들 수는 있지만, 성공했을 때만 reward를 주면 학습 초기에 거의 모든 episode가 실패한다. **UVFA, Universal Value Function Approximators**는 첫 번째 문제인 다중 목표 표현을 다루고, **HER, Hindsight Experience Replay**는 두 번째 문제인 sparse reward 학습을 다룬다.
 
-둘의 관계를 한 문장으로 압축하면 다음과 같다.
-
 > **UVFA는 가치함수에 목표를 넣어 여러 목표를 하나의 함수로 표현하고, HER는 실패한 경험을 실제 달성한 목표의 성공 경험으로 다시 해석한다.**
 
 ## 0. 먼저 전체 그림
@@ -767,26 +765,11 @@ Off-policy RL은 target policy와 다른 behavior가 만든 action도 학습에 
 
 Goal-conditioned PPO는 가능하지만, 고전적 HER relabeling은 off-policy replay를 전제로 한다. PPO rollout의 goal만 바꾸는 것은 on-policy probability ratio를 깨뜨릴 수 있다.
 
-## 20. 결론
+## 20. 표현과 데이터 재사용의 역할 분리
 
-UVFA와 HER에서 가져가야 할 핵심은 서로 다르다.
+목표가 바뀌면 같은 state와 action의 가치도 달라진다. UVFA는 이를 $V(s,g)$ 또는 $Q(s,a,g)$ 하나로 표현해 state뿐 아니라 goal space에서도 일반화할 여지를 만든다. Goal마다 network를 따로 두는 대신 여러 value function이 공유하는 구조를 학습하는 셈이다.
 
-### UVFA
-
-1. 목표가 바뀌면 같은 상태와 행동의 가치도 바뀐다.
-2. $V(s,g)$와 $Q(s,a,g)$는 여러 목표의 value function을 하나로 묶는다.
-3. State뿐 아니라 goal space에서도 일반화할 수 있다.
-4. 원 논문은 value matrix의 공통 구조와 state-goal embedding을 탐구했다.
-
-### HER
-
-1. 실패 trajectory도 다른 achieved goal에 대해서는 성공일 수 있다.
-2. State, action, next state는 유지하고 goal과 reward만 바꾼다.
-3. Relabeled sample은 off-policy data이므로 replay 기반 RL과 자연스럽다.
-4. `future` achieved goal은 강한 기본 전략이지만 original goal data도 유지해야 한다.
-5. HER는 exploration이나 goal discovery 자체를 해결하지 않는다.
-
-최종적으로 두 방법의 역할은 다음 한 줄로 정리된다.
+HER는 함수 구조가 아니라 replay data를 바꾼다. 물리 transition은 그대로 두고 실제로 달성한 goal로 relabel한 뒤 reward를 다시 계산한다. 이 sample은 off-policy data이므로 replay 기반 RL과 자연스럽게 결합되지만, original goal data도 유지해야 하며 방문하지 못한 영역의 성공 경험까지 만들어 주지는 않는다.
 
 > **UVFA가 여러 목표를 표현하는 좌표계를 만들고, HER가 실패 경험에서도 그 좌표계를 학습할 신호를 찾아낸다.**
 

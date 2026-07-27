@@ -38,15 +38,13 @@ reported actuator temperature
 
 이 질문을 정리하지 않고 바로 Sim2Real로 들어가면, 뒤에서 생기는 문제들이 전부 뜬금없어집니다. 그래서 Part 0에서는 Go2를 강화학습 실험 플랫폼으로 보기 위해 필요한 시스템 구조를 먼저 정리합니다.
 
-이 글의 핵심은 하나입니다.
-
 > Unitree Go2에서 강화학습 policy를 deploy하려면 단순히 ROS2 topic을 publish/subscribe하는 수준을 넘어서, SDK2/DDS 기반 low-level state와 command loop를 이해해야 한다.
 
 Unitree 공식 자료 기준으로 `unitree_ros2`는 SDK2와 CycloneDDS 기반 통신을 ROS2 message로 사용할 수 있게 해주는 구조입니다. 공식 README에서도 SDK2가 CycloneDDS 기반 통신을 구현하고, ROS2도 DDS를 통신 메커니즘으로 사용하기 때문에 Unitree robot의 하위 통신 계층이 ROS2와 맞물릴 수 있다고 설명합니다.
 
 이 말은 편하면서도 위험합니다. 편한 점은 ROS2 topic처럼 접근할 수 있다는 것입니다. 위험한 점은 ROS2 topic이 보인다고 해서 실험에 필요한 모든 데이터가 자동으로 정렬되고 저장되는 것은 아니라는 것입니다.
 
-이번 글은 그 차이를 정리하는 글입니다.
+뒤에서 다룰 deploy 실패와 logging 문제를 이해하려면 이 차이를 먼저 구분해야 합니다.
 
 ![Unitree Go2 ROS2 and SDK2 architecture](/assets/img/posts/unitree/sim2real/unitree-go2-part-0-unitree-ros2-architecture/part0.png)
 
@@ -227,7 +225,7 @@ ROS2 topic이 보이는 것과 논문용 dataset이 생기는 것은 전혀 다�
 
 Go2에서 강화학습 deploy를 할 때 `/lowstate`는 observation의 원천입니다.
 
-대표적으로 보는 값은 다음과 같습니다.
+Deploy와 분석에서 자주 쓰는 field를 역할별로 나누면 아래와 같습니다.
 
 | 값 | 의미 | deploy에서 쓰는 방식 |
 | --- | --- | --- |
@@ -263,7 +261,7 @@ base velocity 또는 position estimate가 필요하다.
 
 강화학습 policy deploy에서는 보통 12개 leg joint에 대해 command를 구성합니다.
 
-기본 형태는 다음과 같습니다.
+내가 사용한 position-target control은 아래 순서로 명령을 만들었습니다.
 
 ```text
 policy action
@@ -394,7 +392,7 @@ deploy context log:
   command, policy action, target q, episode id, start/stop/cooldown marker
 ```
 
-ROS2 bag을 쓰든 CSV를 쓰든 핵심은 timestamp alignment입니다. State와 command가 같은 clock 기준으로 정렬되지 않으면 나중에 "이 action 때문에 이 torque가 나왔다"고 말하기 어렵습니다.
+ROS2 bag을 쓰든 CSV를 쓰든 state와 command의 timestamp를 같은 clock 기준으로 정렬해야 합니다. 이 조건이 빠지면 나중에 "이 action 때문에 이 torque가 나왔다"고 연결하기 어렵습니다.
 
 ## **12. Unitree ROS2를 쓸 때 처음 확인할 것**
 
@@ -528,8 +526,6 @@ robot hardware
 ```
 
 강화학습 policy를 안정적으로 올리려면 이 중 어디서 state가 오고, 어디서 command가 나가고, 어디서 log가 빠지는지 알아야 합니다.
-
-나에게 중요한 결론은 이것입니다.
 
 > `/lowstate`는 real robot을 이해하는 입구이고, `/lowcmd`는 policy가 real robot에 개입하는 출구다. Sim2Real deploy는 이 두 지점 사이의 의미를 simulation과 최대한 같게 맞추는 작업이다.
 

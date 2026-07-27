@@ -7,9 +7,7 @@ description: Isaac Sim에서 TurtleBot3 URDF를 불러오고 ROS2 /cmd_vel 메�
 image: /assets/img/posts/isaac-sim-turtlebot-ros2/09-omnigraph-overview.png
 ---
 
-Isaac Sim에서 ROS2 연결을 처음 확인할 때 가장 작고 다루기 좋은 예제가 TurtleBot3입니다. 이 글에서는 TurtleBot3 Burger URDF를 Isaac Sim으로 가져온 뒤, ROS2 `/cmd_vel` topic을 받아 로봇 바퀴 joint에 속도 명령을 보내는 과정을 정리합니다.
-
-이번 글의 목표는 단순히 TurtleBot을 움직이는 것이 아니라, **ROS2 메시지가 Isaac Sim의 OmniGraph를 거쳐 articulation 제어로 이어지는 흐름**을 이해하는 것입니다.
+Isaac Sim의 ROS2 bridge를 처음 확인할 때는 TurtleBot3처럼 입출력이 단순한 로봇이 다루기 편합니다. TurtleBot3 Burger URDF를 불러오고 `/cmd_vel`을 바퀴 joint 명령으로 바꾸면서, **ROS2 메시지가 OmniGraph를 거쳐 articulation 제어까지 전달되는 경로**를 확인했습니다.
 
 참고한 자료는 아래와 같습니다.
 
@@ -27,7 +25,7 @@ git clone -b $ROS_DISTRO https://github.com/ROBOTIS-GIT/turtlebot3.git turtlebot
 
 ![TurtleBot3 패키지 clone 명령](/assets/img/posts/isaac-sim-turtlebot-ros2/01-clone-turtlebot3.png)
 
-이번 글에서 사용할 URDF는 아래 경로에 있습니다.
+사용할 URDF는 아래 경로에 있습니다.
 
 ```text
 turtlebot3/turtlebot3_description/urdf/turtlebot3_burger.urdf
@@ -67,7 +65,7 @@ Import가 끝나면 stage에 `turtlebot3_burger` prim이 생성됩니다.
 
 ![URDF import 성공 후 stage](/assets/img/posts/isaac-sim-turtlebot-ros2/06-import-success.png)
 
-이 시점에서 중요한 것은 로봇이 stage에 보이는 것만이 아닙니다. 이후 OmniGraph에서 articulation target과 wheel joint name을 지정해야 하므로, stage tree에서 TurtleBot prim과 wheel joint 이름을 미리 확인해두면 좋습니다.
+로봇이 stage에 나타났다고 import가 끝난 것은 아닙니다. 이후 OmniGraph에서 articulation target과 wheel joint name을 지정해야 하므로, stage tree에서 TurtleBot prim과 두 wheel joint 이름을 먼저 확인합니다.
 
 ## **4. 바퀴 Joint 물리 설정**
 
@@ -115,7 +113,7 @@ ROS2 Subscribe Twist
 
 ![ROS2 Subscribe Twist의 /cmd_vel topic 설정](/assets/img/posts/isaac-sim-turtlebot-ros2/10-cmd-vel-topic.png)
 
-이 graph에서 핵심은 `/cmd_vel`을 직접 joint에 넣는 것이 아니라, Differential Controller를 통해 differential drive robot에 맞는 양쪽 wheel velocity로 변환한다는 점입니다.
+`/cmd_vel`은 joint 명령이 아니므로 바로 Articulation Controller에 넣을 수 없습니다. Differential Controller가 선속도와 각속도를 differential drive에 맞는 좌우 wheel velocity로 변환합니다.
 
 ## **6. Differential Controller 파라미터**
 
@@ -172,9 +170,7 @@ ros2 topic pub /cmd_vel geometry_msgs/Twist "{'linear': {'x': 0.2, 'y': 0.0, 'z'
   <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac-sim-turtlebot-ros2/16-drive-result.mp4" type="video/mp4">
 </video>
 
-## **9. 정리하며**
-
-이번 과정의 핵심은 URDF import 자체보다도 ROS2 메시지가 Isaac Sim 내부 제어 노드로 들어가는 경로를 이해하는 것입니다.
+## **9. 확인한 제어 경로**
 
 ```text
 /cmd_vel
@@ -183,4 +179,4 @@ ros2 topic pub /cmd_vel geometry_msgs/Twist "{'linear': {'x': 0.2, 'y': 0.0, 'z'
   -> wheel_left_joint, wheel_right_joint
 ```
 
-이 구조를 이해해두면 이후 camera, lidar, odometry, TF tree를 붙일 때도 훨씬 덜 헷갈립니다. 특히 Isaac Sim의 ROS2 튜토리얼은 대부분 `ROS2 Context`, sensor/helper node, target prim 지정이라는 패턴을 반복하므로, 여기서 graph 흐름을 익혀두는 것이 중요합니다.
+여기서 확인한 것은 URDF import보다 `/cmd_vel`이 실제 joint velocity가 되기까지의 변환 과정입니다. 이후 camera, lidar, odometry를 붙일 때도 `ROS2 Context`, helper node, target prim을 연결하는 같은 패턴이 반복됩니다.

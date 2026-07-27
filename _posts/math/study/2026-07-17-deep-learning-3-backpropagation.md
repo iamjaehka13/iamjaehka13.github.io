@@ -547,7 +547,7 @@ $$
 \mathbf{b}^{(l)}\leftarrow \mathbf{b}^{(l)}-\eta\frac{\partial C}{\partial \mathbf{b}^{(l)}}
 $$
 
-## **18. 핵심 직관**
+## **18. Error signal이 역방향으로 흐르는 과정**
 
 backpropagation을 외울 때는 식보다 정보의 흐름을 먼저 잡는 것이 좋습니다.
 
@@ -557,8 +557,6 @@ backpropagation을 외울 때는 식보다 정보의 흐름을 먼저 잡는 것
 4. weight를 거꾸로 따라가며 이전 layer에 책임을 분배한다.
 5. 각 neuron의 error와 이전 activation을 곱해 weight gradient를 만든다.
 6. 같은 계산을 입력 쪽으로 반복한다.
-
-한 문장으로 줄이면 다음과 같습니다.
 
 > backpropagation은 출력 오차를 계산 그래프의 역방향으로 전달하며, 각 parameter가 그 오차에 얼마나 기여했는지를 chain rule로 계산하는 알고리즘이다.
 

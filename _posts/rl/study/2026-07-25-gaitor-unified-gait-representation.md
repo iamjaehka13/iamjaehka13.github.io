@@ -144,7 +144,7 @@ Gaitor는 두 방식의 중간 지점을 택한다.
 latent structure를 해석하고 직접 계획에 사용
 ```
 
-## 4. 가장 중요한 구분: gait label과 latent trajectory
+## 4. Gait label과 latent trajectory
 
 Gaitor를 처음 읽을 때 가장 헷갈리는 부분은 `gait를 무엇이 결정하는가`다. Decoder 입력에는 gait label $g$도 있고, robot latent $z_r$도 있다.
 
@@ -717,9 +717,9 @@ Gaitor의 최종 학습 pipeline은 VAE representation learning과 behavioural c
 
 Training endpoint 사이에서 dataset에 없던 contact schedule이 나타난 것은 맞다. 하지만 endpoint와 $g$의 순서는 사람이 제공했다. Unsupervised skill discovery와 같은 의미의 자율적 skill discovery는 아니다.
 
-## 17. 내가 이 논문에서 가져갈 핵심
+## 17. 표현을 실제 제어 변수로 바꾸기
 
-Gaitor의 핵심은 VAE를 사용했다는 사실 자체가 아니다. 더 중요한 것은 **표현을 실제 제어 변수로 바꾸는 과정**이다.
+Gaitor에서 주목할 부분은 VAE 자체보다 **학습한 표현을 실제 제어 변수로 바꾸는 과정**이다.
 
 ```text
 1. 여러 expert gait를 하나의 conditional representation에 학습한다.
@@ -729,7 +729,7 @@ Gaitor의 핵심은 VAE를 사용했다는 사실 자체가 아니다. 더 중�
 5. 생성 trajectory를 WBC에 연결해 real robot에서 실행한다.
 ```
 
-이 구조는 representation learning 연구를 실제 robotics control에 연결할 때 좋은 기준을 준다.
+이 구조는 representation learning을 실제 robotics control에 연결할 때 확인할 기준을 준다.
 
 > 좋은 latent space는 그림이 예쁜 공간이 아니라, 어떤 축을 어떻게 움직였을 때 robot behavior가 어떻게 바뀌는지 설명하고 실제 controller가 사용할 수 있는 공간이어야 한다.
 

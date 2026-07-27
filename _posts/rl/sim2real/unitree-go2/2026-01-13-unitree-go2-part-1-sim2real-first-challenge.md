@@ -13,7 +13,7 @@ math: true
 
 이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다. 하지만 최종 목표는 단순히 "걷게 만들기"에서 끝나지 않습니다.
 
-장기적으로 주장하고 싶은 것은 다음과 같습니다.
+처음 세운 장기 목표는 아래 가설을 실제 데이터로 검증하는 것이었습니다.
 
 > 실로봇 장시간 보행에서는 nominal RL policy가 command tracking은 잘해도, 특정 actuator에 열과 부하가 불균일하게 쌓여 thermal bottleneck이 될 수 있다. 따라서 `/lowstate`에서 얻을 수 있는 per-actuator reported temperature, current/load, torque, joint state를 이용해 runtime에서 보행 입력을 조절하는 thermal-aware regulator가 필요하다.
 
