@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 6] Challenging Terrain Locomotion"
 date: 2026-06-24 17:34:00 +0900
-last_modified_at: 2026-07-27 21:22:15 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, quadruped-locomotion, rough-terrain, proprioception, privileged-learning, teacher-student, tcn, terrain-curriculum, anymal]
 description: Lee et al.의 blind rough-terrain locomotion을 privileged teacher, TCN student, PMTG, adaptive terrain curriculum, 자연환경 실험과 ablation까지 원문 기준으로 정리한다.
@@ -392,7 +392,7 @@ Exteroceptive height map을 붙이면 일부 geometry는 얻을 수 있지만,
 - loose rubble의 움직임
 - 발이 만든 terrain deformation
 
-은 geometry sensor만으로 충분하지 않는다.
+이러한 요소는 geometry sensor만으로 충분히 판단하기 어렵다.
 
 Teacher는 최종 controller가 아니라 **좋은 behavior와 latent target을 생성하는 simulation expert**이다.
 
@@ -511,7 +511,7 @@ Terrain은 매 episode 다른 random seed로 다시 생성된다.
 
 Command direction으로의 projected speed를 $v_{pr}$라 하겠다.
 
-각 transition에는 projected speed를 기준으로 아래 success label을 붙이다.
+각 transition에는 projected speed를 기준으로 아래 success label을 붙인다.
 
 $$
 \nu(s_t,a_t,s_{t+1})
@@ -986,7 +986,7 @@ Teacher가 local height, normal, contact, friction과 disturbance를 보도록 �
 
 ### **17.6 Natural-terrain evaluation의 통제 수준**
 
-Outdoor terrain은 반복 가능한 standardized benchmark가 아니다. Speed/COT 비교는 유용하지만 sample 수, terrain variation과 confidence interval이 모든 조건에서 상세히 제시되지는 않다.
+Outdoor terrain은 반복 가능한 standardized benchmark가 아니다. Speed/COT 비교는 유용하지만 sample 수, terrain variation과 confidence interval이 모든 조건에서 상세히 제시되지는 않는다.
 
 DARPA mission evidence와 indoor controlled experiment를 함께 봐야 한다.
 

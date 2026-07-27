@@ -1,6 +1,7 @@
 ---
 title: "[CIC 코드 읽기] 공식 구현의 Tensor와 Gradient 흐름"
 date: 2026-07-20 22:42:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [cic, pytorch, contrastive-learning, intrinsic-reward, ddpg, urlb, code-review]
 description: "공식 rll-research/cic 구현에서 64D skill sampling, CPC tensor, k-NN intrinsic reward, gradient 경로와 DDPG update가 실제로 어떻게 연결되는지 추적한다."
@@ -14,18 +15,18 @@ image:
 
 이번 글에서는 수식을 반복하지 않는다. 공식 [`rll-research/cic`](https://github.com/rll-research/cic) 구현에서 **replay batch 하나가 어떤 tensor로 바뀌고, 어떤 optimizer를 거쳐 actor까지 도달하는지**를 실행 순서대로 추적한다.
 
-읽으면서 확인할 질문은 다음 네 가지다.
+읽으면서 확인할 질문은 다음 네 가지.
 
 1. 64차원 skill $z$는 언제 뽑고, policy와 replay buffer에는 어떻게 들어가는가?
 2. `compute_cpc_loss()`의 $B\times B$ matrix는 무엇을 positive와 negative로 보는가?
 3. 실제 actor-critic reward는 CPC score인가, k-NN distance인가?
 4. CPC, critic, actor의 gradient는 어디까지 흐르고 어디에서 끊기는가?
 
-분석 기준은 공식 저장소의 마지막 공개 commit [`b523c38`](https://github.com/rll-research/cic/tree/b523c3884256346cb585bf06e52a7aadc127dcfc)이다. 이 저장소는 2022년 URLB 코드와 Python 3.8·구형 MuJoCo 환경을 기반으로 한다. 따라서 최신 PyTorch 예제로 고쳐 쓰기보다, **논문의 실제 공개 구현을 고정된 상태로 읽는 것**이 이번 글의 목적이다.
+분석 기준은 공식 저장소의 마지막 공개 commit [`b523c38`](https://github.com/rll-research/cic/tree/b523c3884256346cb585bf06e52a7aadc127dcfc). 이 저장소는 2022년 URLB 코드와 Python 3.8·구형 MuJoCo 환경을 기반으로 한다. 따라서 최신 PyTorch 예제로 고쳐 쓰기보다, **논문의 실제 공개 구현을 고정된 상태로 읽는 것**이 이번 글의 목적.
 
 ## 0. 결론부터 보는 실제 update 경로
 
-공식 코드의 reward-free pretraining 경로는 다음과 같다.
+공식 코드의 reward-free pretraining 경로는:
 
 ![CIC official update flow](/assets/img/posts/rl/cic-code/01-cic-update-flow.svg){: width="1100" .d-block .mx-auto }
 _한 replay batch에서 CPC representation과 DDPG policy가 갱신되는 두 경로. CPC loss는 actor에 직접 전달되지 않고, `state_net(next_obs)`의 k-NN reward가 critic을 거쳐 actor에 간접적으로 영향을 준다._
@@ -76,7 +77,7 @@ Tensor shape에는 아래 기호를 사용한다.
 | $T$ | Contrastive temperature | 0.5 |
 | $k$ | k-NN 이웃 수 | 16 |
 
-주요 설정은 다음과 같다.
+주요 설정은:
 
 | 설정 | 값 | 코드에서의 의미 |
 |---|---:|---|
@@ -175,7 +176,7 @@ CIC module은 네 개의 MLP를 선언한다.
 | `skill_net` | $[B,64]$ | $[B,64]$ | Skill query embedding |
 | `pred_net` | $[B,128]$ | $[B,64]$ | 두 state embedding을 transition key로 결합 |
 
-실제 forward path는 다음과 같다.
+실제 forward path는:
 
 $$
 h_t=g_s(s_t),
@@ -193,7 +194,7 @@ $$
 
 즉 현재 state와 next state 모두 **같은 `state_net`**을 통과한다. 별도로 만들어진 `next_state_net`은 이 공개 commit의 forward path에서는 호출되지 않는다.
 
-Tensor 흐름을 한 줄로 쓰면 다음과 같다.
+Tensor 흐름을 한 줄로 쓰면:
 
 ```text
 obs [B,D] ─────→ state_net ──→ h_t     [B,64] ─┐
@@ -203,7 +204,7 @@ next_obs [B,D] → state_net ──→ h_t+1   [B,64] ─┘
 skill [B,64] ──→ skill_net ────────────────→ query [B,64]
 ```
 
-여기까지가 논문의 $(z,\tau)$ pair를 코드 tensor로 만드는 부분이다.
+여기까지가 논문의 $(z,\tau)$ pair를 코드 tensor로 만드는 부분.
 
 ## 6. `compute_cpc_loss()`: $B\times B$ 비교 행렬
 
@@ -225,7 +226,7 @@ query @ key.T
 similarity  [1024, 1024]
 ```
 
-대각선 $C_{ii}$는 같은 replay sample의 $(z_i,\tau_i)$이고, 나머지 $C_{ij}$는 batch 안의 negative pair다.
+대각선 $C_{ii}$는 같은 replay sample의 $(z_i,\tau_i)$이고, 나머지 $C_{ij}$는 batch 안의 negative pair.
 
 다만 공식 코드의 loss를 곧바로 표준 `cross_entropy(logits, arange(B))`와 같다고 쓰면 부정확하다. 구현은 positive score를 따로 계산하고, 전체 exponential sum에서 실제 diagonal score가 아니라 고정값 $e^{1/T}$를 뺀다.
 
@@ -262,7 +263,7 @@ actor, critic은 이 optimizer로 바뀌지 않음
 intr_reward = compute_apt_reward(next_obs, next_obs)
 ```
 
-Method 내부에서는 두 인자를 각각 `state_net`에 통과시킨다. 두 인자가 모두 `next_obs`이므로 reward particle은 다음과 같다.
+Method 내부에서는 두 인자를 각각 `state_net`에 통과시킨다. 두 인자가 모두 `next_obs`이므로 reward particle은:
 
 $$
 h_i=g_s(s'_i)
@@ -273,7 +274,7 @@ $$
 D_{ij}=\lVert h_i-h_j\rVert_2
 $$
 
-즉 default code의 k-NN reward는 `pred_net([s,s'])`가 만든 transition key끼리의 거리가 아니라, **CPC로 함께 학습된 `state_net(next_obs)` embedding끼리의 거리**다.
+즉 default code의 k-NN reward는 `pred_net([s,s'])`가 만든 transition key끼리의 거리가 아니라, **CPC로 함께 학습된 `state_net(next_obs)` embedding끼리의 거리**.
 
 Reward 계산은 다음 순서로 진행된다.
 
@@ -292,7 +293,7 @@ r_i^{\mathrm{APT}}
 \right)
 $$
 
-Source와 target batch가 같기 때문에 각 sample의 self-distance 0도 nearest-neighbor 집합에 포함된다. $k=16$에서는 자기 자신과 나머지 가까운 15개 sample이 평균에 들어가는 셈이다.
+Source와 target batch가 같기 때문에 각 sample의 self-distance 0도 nearest-neighbor 집합에 포함된다. $k=16$에서는 자기 자신과 나머지 가까운 15개 sample이 평균에 들어가는 셈.
 
 Contrastive learning이 여전히 필요한 이유는 `state_net`이 CPC loss로 갱신되기 때문이다.
 
@@ -310,7 +311,7 @@ intrinsic reward 변화
 
 ## 8. `CICAgent.update()`의 gradient를 끝까지 추적하기
 
-한 replay batch의 update 순서는 다음과 같다.
+한 replay batch의 update 순서는:
 
 ```text
 1. batch sampling
@@ -323,7 +324,7 @@ intrinsic reward 변화
 8. soft update target critic
 ```
 
-각 loss가 실제로 바꾸는 parameter를 분리하면 다음과 같다.
+각 loss가 실제로 바꾸는 parameter를 분리하면:
 
 | 학습 신호 | 직접 갱신되는 parameter | 직접 갱신되지 않는 parameter |
 |---|---|---|
@@ -354,7 +355,7 @@ Actor가 CPC loss를 직접 미분하지 않는다는 뜻이지, CPC가 policy�
 
 DIAYN과 DADS 글에서는 SAC가 중심이었다. CIC 공식 구현은 URLB의 공통 backbone인 DDPG 계열 agent를 사용한다.
 
-Critic target은 다음 형태다.
+Critic target은 다음 형태.
 
 $$
 y_t
@@ -489,7 +490,7 @@ obs index / action index / next_obs index
 
 ### 12.1 실행 환경과 방법
 
-실행 조건은 다음과 같다.
+실행 조건은:
 
 | 항목 | 값 |
 |---|---|
@@ -523,7 +524,7 @@ CUDA_VISIBLE_DEVICES="" python scripts/cic_official_code_practice.py \
 ### 12.2 결과 한눈에 보기
 
 ![CIC official code smoke practice results](/assets/img/posts/rl/cic-code/02-cic-practice-results.png){: width="1150" .d-block .mx-auto }
-_왼쪽 위부터 CPC $32\times32$ similarity, k-NN reward 분포, `update_cic()` 직후 parameter 변화, 50-step skill boundary의 replay mismatch. 이 값은 학습 성능이 아니라 코드 경로 검증 결과다._
+_왼쪽 위부터 CPC $32\times32$ similarity, k-NN reward 분포, `update_cic()` 직후 parameter 변화, 50-step skill boundary의 replay mismatch. 이 값은 학습 성능이 아니라 코드 경로 검증 결과._
 
 Tensor shape와 scalar 출력은 다음과 같았다.
 
@@ -569,11 +570,11 @@ Tensor shape와 scalar 출력은 다음과 같았다.
 | Actor | 0.016969 |
 | Critic | 0.021285 |
 
-즉 full path에서는 먼저 CPC module이 바뀌고, k-NN reward를 받은 critic과 actor도 각각 자신의 optimizer로 갱신된다. 앞에서 그린 두 gradient path가 실제 parameter 변화로 확인된 셈이다.
+즉 full path에서는 먼저 CPC module이 바뀌고, k-NN reward를 받은 critic과 actor도 각각 자신의 optimizer로 갱신된다. 앞에서 그린 두 gradient path가 실제 parameter 변화로 확인된 셈.
 
 ### 12.4 코드에서 의심했던 두 문제도 재현되는가?
 
-첫 번째는 logging 변수명 문제다. Default처럼 TensorBoard와 W&B를 끄면 update가 완료됐다. 하지만 `use_tb=True`로 같은 batch를 실행하면 다음 오류가 발생했다.
+첫 번째는 logging 변수명 문제. Default처럼 TensorBoard와 W&B를 끄면 update가 완료됐다. 하지만 `use_tb=True`로 같은 batch를 실행하면 다음 오류가 발생했다.
 
 ```text
 NameError: name 'apt_reward' is not defined
@@ -589,7 +590,7 @@ transition 51  : z@0        ↔ z@50
 transition 101 : z@50       ↔ z@100
 ```
 
-즉 시작 직후와 50-step skill 교체 직후의 action이 replay에서 이전 meta와 연결되는 패턴이 확인됐다. 다만 이 실습은 실제 `dm_control` rollout이 아니라 공식 loop와 buffer index를 재현한 deterministic audit다. Environment를 포함한 최종 확인에서는 action을 만들 때 사용한 skill ID를 transition에 함께 기록해 다시 검증해야 한다.
+즉 시작 직후와 50-step skill 교체 직후의 action이 replay에서 이전 meta와 연결되는 패턴이 확인됐다. 다만 이 실습은 실제 `dm_control` rollout이 아니라 공식 loop와 buffer index를 재현한 deterministic audit. Environment를 포함한 최종 확인에서는 action을 만들 때 사용한 skill ID를 transition에 함께 기록해 다시 검증해야 한다.
 
 ### 12.5 이 실습이 검증한 것과 검증하지 않은 것
 
@@ -602,7 +603,7 @@ transition 101 : z@50       ↔ z@100
 | Logging branch의 `NameError` | 수정 후 TensorBoard 장기 logging |
 | 50-step boundary index mismatch | 실제 dm_control transition trace |
 
-따라서 이 결과를 `CIC 성능 재현`이라고 부르면 안 된다. 정확한 표현은 **공식 코드 경로에 대한 CPU smoke practice**다. 장기 학습 전에 코드가 어떤 tensor와 gradient를 실제로 사용하는지 검증했다는 데 의미가 있다.
+따라서 이 결과를 `CIC 성능 재현`이라고 부르면 안 된다. 정확한 표현은 **공식 코드 경로에 대한 CPU smoke practice**. 장기 학습 전에 코드가 어떤 tensor와 gradient를 실제로 사용하는지 검증했다는 데 의미가 있다.
 
 ## 13. 한 replay batch에서 확인한 실제 경로
 

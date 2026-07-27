@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 7] RMA: 0.5초의 이력으로 환경에 적응하는 로봇"
 date: 2026-06-24 17:35:00 +0900
-last_modified_at: 2026-07-27 21:23:41 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, rapid-motor-adaptation, rma, quadruped-locomotion, online-adaptation, privileged-learning, domain-randomization, ppo, unitree-a1]
 description: Kumar et al.의 RMA를 base policy, 17D privileged environment, 8D extrinsics, 50-step adaptation history, PPO와 on-policy supervised learning, 비동기 배포, 시뮬레이션 및 실제 A1 실험까지 원문 기준으로 분석한다.
@@ -97,7 +97,7 @@ RMA는 현재 한 trajectory의 최근 0.5초를 입력으로 사용하며, 저�
 
 환경 parameter를 $e$라고 합시다.
 
-일반적인 domain randomization은 여러 환경에서 평균 return을 높이다.
+일반적인 domain randomization의 목표는 여러 환경에서 평균 return을 높이는 것.
 
 $$
 \max_{\pi}
@@ -338,7 +338,7 @@ Flattened CNN output은 linear projection을 거쳐 8D $\hat z_t$가 된다.
 
 하지만 **foot contact sensor가 없는 것도 아니다**. 논문은 각 발의 contact indicator 4개를 명시적으로 사용한다.
 
-따라서 RMA를 “joint encoder와 IMU만 쓰는 완전한 contact-blind policy”라고 설명하면 정확하지 않는다.
+따라서 RMA를 “joint encoder와 IMU만 쓰는 완전한 contact-blind policy”라고 설명하면 정확하지 않다.
 
 또한 base linear velocity, yaw와 full orientation을 policy state에 직접 넣지 않는다. Reward 계산에는 simulation의 velocity와 force를 사용하지만, deployment observation과 reward-only signal은 구분해야 한다.
 
@@ -740,7 +740,7 @@ $$
 
 를 10 Hz로 갱신한다.
 
-두 process 사이에 매 step barrier나 central synchronization이 필요하지 않는다. Base policy는 adaptation module이 가장 최근에 계산한 latent를 읽는다.
+두 process 사이에 매 step barrier나 central synchronization이 필요하지 않다. Base policy는 adaptation module이 가장 최근에 계산한 latent를 읽는다.
 
 ### **10.2 왜 속도를 분리했나**
 
@@ -956,7 +956,7 @@ Payload가 올라온 순간:
 
 Plot에서 latent 변화와 recovery가 시간적으로 함께 나타났다는 것은 좋은 diagnostic.
 
-그러나 다음을 직접 증명하지는 않다.
+그러나 다음을 직접 증명하지는 않는다.
 
 - 특정 latent component가 특정 물리량과 일대일 대응한다.
 - Latent 변화 하나만으로 recovery가 발생했다.
@@ -1195,7 +1195,7 @@ $$
 \text{Success: }73.5\%\;\text{vs}\;76.2\%
 $$
 
-차이가 작다는 것은 좋은 결과지만, $\hat z$ 자체의 MSE가 작거나 physical parameter가 정확하다는 것을 직접 의미하지는 않다. 최종 locomotion metric이 가깝다는 뜻.
+차이가 작다는 것은 좋은 결과지만, $\hat z$ 자체의 MSE가 작거나 physical parameter가 정확하다는 것을 직접 의미하지는 않는다. 최종 locomotion metric이 가깝다는 뜻.
 
 ### **17.4 RMA vs AWR**
 

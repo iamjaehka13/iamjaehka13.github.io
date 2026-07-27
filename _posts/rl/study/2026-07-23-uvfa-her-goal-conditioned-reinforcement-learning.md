@@ -1,6 +1,7 @@
 ---
 title: "UVFA + HER: 실패 경험을 학습 데이터로 바꾸기"
 date: 2026-07-23 00:58:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [uvfa, her, goal-conditioned-reinforcement-learning, hindsight-experience-replay, sparse-reward, experience-replay, off-policy, ddpg, sac, robotics]
 description: "UVFA가 state와 goal을 함께 입력받아 여러 목표의 가치함수를 표현하는 방법과, HER가 실패 trajectory의 goal과 reward를 relabel해 sparse reward 학습을 가능하게 하는 원리를 정리한다."
@@ -78,7 +79,7 @@ $$
 
 > HER가 UVFA를 대체하거나, UVFA와 HER가 하나의 새로운 actor-critic 알고리즘을 이루는 것은 아니다.
 
-UVFA는 **함수의 조건화와 일반화 구조**에 가깝고, HER는 **replay data를 재구성하는 방법**이다.
+UVFA는 **함수의 조건화와 일반화 구조**에 가깝고, HER는 **replay data를 재구성하는 방법**.
 
 ## 2. UVFA는 왜 필요한가?
 
@@ -96,7 +97,7 @@ $$
 
 이 식에는 어떤 목표를 수행하는지가 이미 reward function 안에 고정돼 있다. 목표를 바꾸면 reward가 바뀌고, 같은 상태의 가치도 바뀐다.
 
-목표 $g$마다 별도 value function을 만들면 다음과 같다.
+목표 $g$마다 별도 value function을 만들면:
 
 $$
 V_{g_1}(s),\quad V_{g_2}(s),\quad \ldots,\quad V_{g_K}(s)
@@ -110,7 +111,7 @@ V(s,g;\theta)\approx V_g^*(s)
 }
 $$
 
-Action value를 사용하면 다음과 같다.
+Action value를 사용하면:
 
 $$
 \boxed{
@@ -124,7 +125,7 @@ $$
 \pi_\theta(a\mid s,g)
 $$
 
-다만 원래 UVFA 논문의 중심 기여는 이름 그대로 **universal value function approximator**다. Goal-conditioned actor는 이 value function으로부터 greedy policy를 만들거나, DDPG·SAC 같은 actor-critic으로 확장할 때 자연스럽게 등장한다.
+다만 원래 UVFA 논문의 중심 기여는 이름 그대로 **universal value function approximator**. Goal-conditioned actor는 이 value function으로부터 greedy policy를 만들거나, DDPG·SAC 같은 actor-critic으로 확장할 때 자연스럽게 등장한다.
 
 ## 3. Goal $g$는 전체 state가 아니다
 
@@ -167,7 +168,7 @@ $$
 r(s,a,s',g)
 $$
 
-대표적인 sparse reward는 다음과 같다.
+대표적인 sparse reward는:
 
 $$
 r(s',g)=
@@ -190,7 +191,7 @@ r(s,a,s',g)
 \right]
 $$
 
-목표가 바뀌면 reward와 value가 바뀌지만, 일반적인 goal-reaching 문제에서는 물리 transition 자체는 그대로다.
+목표가 바뀌면 reward와 value가 바뀌지만, 일반적인 goal-reaching 문제에서는 물리 transition 자체는 그대로.
 
 $$
 p(s'\mid s,a,g)=p(s'\mid s,a)
@@ -287,11 +288,11 @@ Critic은 어떤 행동이 목표에 조금 더 가까워졌는지 알 수 없�
 
 ## 7. HER의 핵심: 실패를 다른 목표의 성공으로 읽기
 
-원래 목표가 빨간 지점인데 trajectory가 초록 지점에서 끝났다고 하자. 원래 목표 기준으로는 실패다. 하지만 초록 지점이 목표였다면 동일한 행동은 성공 경험이 된다.
+원래 목표가 빨간 지점인데 trajectory가 초록 지점에서 끝났다고 하자. 원래 목표 기준으로는 실패. 하지만 초록 지점이 목표였다면 동일한 행동은 성공 경험이 된다.
 
 ![HER goal relabeling](/assets/img/posts/rl/uvfa-her/03-her-relabeling.svg){: width="1200" .d-block .mx-auto }
 
-원래 transition은 다음과 같다.
+원래 transition은:
 
 $$
 (s_t,a_t,g,r_t,s_{t+1})
@@ -309,7 +310,7 @@ $$
 r'_t=r(s_t,a_t,s_{t+1},g')
 $$
 
-HER transition은 다음과 같다.
+HER transition은:
 
 $$
 \boxed{
@@ -317,7 +318,7 @@ $$
 }
 $$
 
-정확히 무엇이 바뀌는지 정리하면 다음과 같다.
+정확히 무엇이 바뀌는지 정리하면:
 
 | 항목 | 변경 여부 |
 |---|---|
@@ -333,13 +334,13 @@ $$
 
 여기가 HER에서 가장 헷갈리기 쉬운 부분이다.
 
-$a_t$는 원래 목표 $g$를 보고 선택한 action이다.
+$a_t$는 원래 목표 $g$를 보고 선택한 action.
 
 $$
 a_t\sim\pi_b(a\mid s_t,g)
 $$
 
-그런데 relabeled transition에서는 목표가 $g'$다. 마치 $g'$를 보고 그 action을 낸 것처럼 보인다.
+그런데 relabeled transition에서는 목표가 $g'$. 마치 $g'$를 보고 그 action을 낸 것처럼 보인다.
 
 HER는 **그렇게 주장하지 않는다.** 이 데이터는 target policy가 직접 생성한 on-policy sample이 아니라, 다른 behavior policy가 만든 off-policy sample로 취급된다.
 
@@ -358,7 +359,7 @@ g'
 \right)
 $$
 
-Critic loss는 다음과 같다.
+Critic loss는:
 
 $$
 \mathcal{L}_Q
@@ -387,7 +388,7 @@ HER는 DDPG, DQN, SAC의 actor·critic loss를 새로 정의하지 않는다. Ba
 7. replay batch로 기존 off-policy RL update
 ```
 
-간단한 pseudocode는 다음과 같다.
+간단한 pseudocode는:
 
 ~~~python
 for episode in range(num_episodes):
@@ -435,7 +436,7 @@ HER 논문은 네 전략을 비교했다.
 | `episode` | 같은 episode의 임의 achieved goal |
 | `random` | 지금까지 replay에 등장한 임의 achieved goal |
 
-`future` 전략에서 transition $t$보다 뒤의 state를 고르는 이유는 causality와 학습 신호가 잘 맞기 때문이다.
+`future` 전략에서 transition $t$보다 뒤의 state를 고르는 이유는 causality와 학습 신호가 잘 맞기 때문.
 
 $$
 g'=m(s_j),\qquad j>t
@@ -443,7 +444,7 @@ $$
 
 현재 action 이후 실제로 도달한 상태를 goal로 삼으므로, trajectory 후반에 성공 reward가 생기고 앞선 transition은 그 성공으로 bootstrap할 수 있다.
 
-원 논문의 robotics experiment에서는 `future`의 $k=4$ 또는 $k=8$이 가장 좋은 결과를 보였고, $k$가 너무 크면 original goal data의 비중이 줄어 성능이 나빠졌다. 이 수치는 모든 환경의 고정 정답이 아니라 해당 실험의 결과다.
+원 논문의 robotics experiment에서는 `future`의 $k=4$ 또는 $k=8$이 가장 좋은 결과를 보였고, $k$가 너무 크면 original goal data의 비중이 줄어 성능이 나빠졌다. 이 수치는 모든 환경의 고정 정답이 아니라 해당 실험의 결과.
 
 ### 10.1 원본 transition을 버리면 안 되는 이유
 
@@ -528,7 +529,7 @@ $$
 }
 $$
 
-Goal을 $g'$로 바꾸면 분모에 필요한 값은 사실 다음이다.
+Goal을 $g'$로 바꾸면 분모에 필요한 값은 사실:
 
 $$
 \pi_{\theta_{old}}(a_t\mid s_t,g')
@@ -536,7 +537,7 @@ $$
 
 하지만 rollout 당시 action은 $g$ 조건에서 나왔다. 단순히 goal과 reward만 바꾸면 PPO가 전제로 하는 on-policy 관계가 깨진다.
 
-따라서 정확한 구분은 다음이다.
+따라서 정확한 구분은:
 
 - **UVFA식 goal conditioning**은 PPO에도 자연스럽게 적용할 수 있다.
 - **고전적 HER relabeling**은 replay를 사용하는 off-policy 알고리즘과 가장 자연스럽다.
@@ -544,7 +545,7 @@ $$
 
 ## 13. HER가 implicit curriculum인 이유
 
-학습 초기 policy는 시작점 근처밖에 가지 못한다. HER가 만드는 goal도 그 근처 achieved state다.
+학습 초기 policy는 시작점 근처밖에 가지 못한다. HER가 만드는 goal도 그 근처 achieved state.
 
 ```text
 초기 policy
@@ -574,9 +575,9 @@ Pick-and-place 물체를 집어 공중 목표 위치에 놓기
 
 ![HER DDPG learning curves](/assets/img/posts/rl/uvfa-her/06-her-learning-curves.png){: width="1200" .d-block .mx-auto }
 
-_왼쪽은 여러 training goal, 오른쪽은 하나의 고정 goal을 사용한 결과다. 해당 실험에서 plain DDPG는 sparse reward로 세 task를 해결하지 못했지만 DDPG+HER는 큰 폭으로 개선됐다. 빨간 선은 Section 4.5의 best HER setting이다. 출처: [Andrychowicz et al., Figures 2 and 3](https://proceedings.neurips.cc/paper_files/paper/2017/file/453fadbd8a1a3af50a9df4df899537b5-Paper.pdf)._
+_왼쪽은 여러 training goal, 오른쪽은 하나의 고정 goal을 사용한 결과. 해당 실험에서 plain DDPG는 sparse reward로 세 task를 해결하지 못했지만 DDPG+HER는 큰 폭으로 개선됐다. 빨간 선은 Section 4.5의 best HER setting이다. 출처: [Andrychowicz et al., Figures 2 and 3](https://proceedings.neurips.cc/paper_files/paper/2017/file/453fadbd8a1a3af50a9df4df899537b5-Paper.pdf)._
 
-이 결과에서 중요한 것은 다음 두 가지다.
+이 결과에서 중요한 것은 다음 두 가지.
 
 1. HER는 multi-goal policy 학습에서 sparse reward를 유용한 데이터로 바꿨다.
 2. 최종 관심 goal이 하나뿐인 경우에도, 학습 중 여러 goal을 사용하면 더 쉽게 배울 수 있었다.
@@ -619,7 +620,7 @@ HER도 reward engineering을 완전히 제거하지는 않는다. Goal represent
 
 ### 16.1 Goal이 dynamics를 바꾸지 않아야 한다
 
-HER의 핵심 가정은 다음이다.
+HER의 핵심 가정은:
 
 $$
 p(s'\mid s,a,g)=p(s'\mid s,a)
@@ -743,7 +744,7 @@ HER source = achieved_goal(next_state)
 
 ### Q1. UVFA가 새로운 RL update rule인가?
 
-아니다. Value function을 state와 goal에 함께 조건화해 goal space까지 일반화하는 함수 구조다. Bellman update 자체는 goal-conditioned 형태로 확장된다.
+아니다. Value function을 state와 goal에 함께 조건화해 goal space까지 일반화하는 함수 구조. Bellman update 자체는 goal-conditioned 형태로 확장된다.
 
 ### Q2. HER는 실패를 성공이라고 거짓말하는가?
 
@@ -755,7 +756,7 @@ Off-policy RL은 target policy와 다른 behavior가 만든 action도 학습에 
 
 ### Q4. HER를 쓰면 exploration 문제가 해결되나?
 
-아니다. 방문한 상태를 더 잘 재사용할 뿐이다. 방문하지 못한 영역의 성공 경험은 만들 수 없다.
+아니다. 방문한 상태를 더 잘 재사용할 뿐. 방문하지 못한 영역의 성공 경험은 만들 수 없다.
 
 ### Q5. Goal이 하나여도 HER가 의미 있나?
 

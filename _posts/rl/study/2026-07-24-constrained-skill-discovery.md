@@ -1,6 +1,7 @@
 ---
 title: "CSD: 방향뿐 아니라 이동 크기까지 맞추는 스킬 발견"
 date: 2026-07-24 21:34:41 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [csd, constrained-skill-discovery, lsd, metra, unsupervised-reinforcement-learning, skill-discovery, quadruped-locomotion, ppo, representation-learning, zero-shot-control, anymal]
 description: "CSD가 LSD와 METRA의 latent transition maximization을 norm matching으로 바꾸고, 방향과 속도를 함께 제어하는 연속 스킬 공간과 zero-shot goal tracking을 만드는 과정을 정리한다."
@@ -28,7 +29,7 @@ image:
 
 ![CSD와 LSD, METRA의 실제 XY trajectory 비교](/assets/img/posts/rl/csd/01-paper-skill-trajectories.png){: width="1120" .d-block .mx-auto }
 
-_왼쪽의 꽃잎 모양이 샘플링한 2-D skill이다. LSD와 METRA는 skill 크기와 무관하게 바깥 경계까지 이동하는 경향이 강하다. CSD는 같은 방향에서도 짧은 trajectory와 긴 trajectory를 함께 만든다. 출처: [Atanassov et al., Figure 1](https://arxiv.org/abs/2410.07877)._
+_왼쪽의 꽃잎 모양이 샘플링한 2-D skill. LSD와 METRA는 skill 크기와 무관하게 바깥 경계까지 이동하는 경향이 강하다. CSD는 같은 방향에서도 짧은 trajectory와 긴 trajectory를 함께 만든다. 출처: [Atanassov et al., Figure 1](https://arxiv.org/abs/2410.07877)._
 
 그림에서는 coverage의 최대 반지름보다 trajectory 길이의 분포를 봐야 한다.
 
@@ -55,7 +56,7 @@ _왼쪽의 꽃잎 모양이 샘플링한 2-D skill이다. LSD와 METRA는 skill 
 | Downstream demo | 추가 학습 없는 Cartesian goal tracking |
 | Source | [arXiv](https://arxiv.org/abs/2410.07877), [OpenReview](https://openreview.net/forum?id=tdfHABLdxR) |
 
-현재 공개된 OpenReview 페이지의 표기는 **ICLR 2025에 제출된 논문**이다. 따라서 이 글에서는 ICLR 2025 accepted paper라고 쓰지 않는다.
+현재 공개된 OpenReview 페이지의 표기는 **ICLR 2025에 제출된 논문**. 따라서 이 글에서는 ICLR 2025 accepted paper라고 쓰지 않는다.
 
 그리고 이름의 `Constrained`를 먼저 분명히 해야 한다.
 
@@ -63,7 +64,7 @@ _왼쪽의 꽃잎 모양이 샘플링한 2-D skill이다. LSD와 METRA는 skill 
 
 ## 2. LSD와 METRA에서는 왜 작은 z도 빨라지는가?
 
-LSD와 METRA의 policy reward는 핵심적으로 다음 내적 형태다.
+LSD와 METRA의 policy reward는 핵심적으로 다음 내적 형태.
 
 $$
 r_t^{\text{LSD/METRA}}
@@ -81,7 +82,7 @@ $$
 \phi(s_{t+1})-\phi(s_t)
 $$
 
-라고 두면 reward는 $\Delta\phi_t^\top z$다. 내적은 다음 두 가지에 의해 커진다.
+라고 두면 reward는 $\Delta\phi_t^\top z$. 내적은 다음 두 가지에 의해 커진다.
 
 $$
 \Delta\phi_t^\top z
@@ -168,7 +169,7 @@ $$
 \phi(s_T)-\phi(s_0)=z
 $$
 
-Transition이 $z$보다 작아도 오차고, $z$보다 커도 오차다. 방향뿐 아니라 norm까지 맞아야 한다.
+Transition이 $z$보다 작아도 오차고, $z$보다 커도 오차. 방향뿐 아니라 norm까지 맞아야 한다.
 
 ### 3.1 MSE를 전개하면 무엇이 달라졌는가?
 
@@ -227,19 +228,19 @@ $$
 
 State vector에는 base position뿐 아니라 joint position, velocity, body orientation 등이 함께 들어간다. 따라서 $\lVert s'-s\rVert$은 물리적 미터 거리와 동일하지 않다. 논문도 latent distance와 실제 traveled distance가 같은 크기라고 보장하지는 않는다고 명시한다.
 
-정확한 해석은 다음과 같다.
+정확한 해석은:
 
 > $\lVert z\rVert$이 커질수록 더 큰 latent transition을 요구하고, 학습된 representation에서 이것이 대체로 더 큰 locomotion motion과 연결된다.
 
 ## 5. 에피소드 목적을 step reward로 바꾸기
 
-원래 목표는 episode 전체 transition을 $z$에 맞추는 것이다.
+원래 목표는 episode 전체 transition을 $z$에 맞추는 것.
 
 $$
 \phi(s_T)-\phi(s_0)\approx z
 $$
 
-하지만 PPO는 매 step의 reward가 필요하다. Episode가 $N$ step이라면 telescoping sum은 다음과 같다.
+하지만 PPO는 매 step의 reward가 필요하다. Episode가 $N$ step이라면 telescoping sum은:
 
 $$
 \phi(s_T)-\phi(s_0)
@@ -285,11 +286,11 @@ $$
 - 오차가 커질수록 reward는 0에 가까워진다.
 - $\sigma$는 error scale을 조절한다.
 
-논문 부록은 per-step loss의 합을 episodic loss의 upper bound로 설명한다. 중요한 점은 **원래 episode objective와 per-step objective가 완전히 같은 식은 아니라는 것**이다. 제곱노름과 여러 step의 합을 연결할 때 horizon-dependent scale이 개입할 수 있지만, 각 step에서 $\Delta\phi_t=z/N$을 만드는 target은 일관된다.
+논문 부록은 per-step loss의 합을 episodic loss의 upper bound로 설명한다. 중요한 점은 **원래 episode objective와 per-step objective가 완전히 같은 식은 아니라는 것**. 제곱노름과 여러 step의 합을 연결할 때 horizon-dependent scale이 개입할 수 있지만, 각 step에서 $\Delta\phi_t=z/N$을 만드는 target은 일관된다.
 
 ## 6. Encoder와 PPO는 어떻게 같이 학습되는가?
 
-논문의 전체 학습 구조는 다음 그림처럼 encoder의 supervised learning과 policy의 reinforcement learning이 결합된 형태다.
+논문의 전체 학습 구조는 다음 그림처럼 encoder의 supervised learning과 policy의 reinforcement learning이 결합된 형태.
 
 ![CSD 논문의 encoder와 policy 학습 구조](/assets/img/posts/rl/csd/04-paper-training-loop.png){: width="1080" .d-block .mx-auto }
 
@@ -344,7 +345,7 @@ encoder error e_t
 
 ### 6.3 실제 network와 control rate
 
-부록에 나온 구현은 다음과 같다.
+부록에 나온 구현은:
 
 | 구성 | 설정 |
 |---|---|
@@ -438,7 +439,7 @@ $$
 
 ![CSD의 closed-loop zero-shot goal tracking](/assets/img/posts/rl/csd/07-goal-feedback.svg){: width="1200" .d-block .mx-auto }
 
-핵심은 $z_{\text{des}}$를 한 번만 계산하지 않는다는 것이다.
+핵심은 $z_{\text{des}}$를 한 번만 계산하지 않는다는 것.
 
 ~~~text
 현재 state 측정
@@ -448,7 +449,7 @@ $$
 -> latent 차이 다시 계산
 ~~~
 
-이것은 open-loop skill playback이 아니라 **closed-loop feedback control**이다.
+이것은 open-loop skill playback이 아니라 **closed-loop feedback control**.
 
 ### 8.1 목표에 가까워지면 왜 감속하는가?
 
@@ -508,7 +509,7 @@ LSD처럼 작은 $z$에서도 고속 motion만 존재하면 목표를 지나친 
 
 _1,000개 trajectory의 episode 평균 base speed 분포. LSD와 METRA는 약 2.5 m/s 부근에 집중하지만, CSD는 0에서 3 m/s까지 훨씬 넓게 분포한다. 출처: [Atanassov et al., Figure 3](https://arxiv.org/abs/2410.07877)._
 
-이 결과가 뒷받침하는 주장은 다음과 같다.
+이 결과가 뒷받침하는 주장은:
 
 - LSD와 METRA skill은 대부분 높은 평균 속도에 몰린다.
 - CSD는 낮은 속도부터 높은 속도까지 더 넓은 범위를 만든다.
@@ -532,9 +533,9 @@ _위쪽은 CSD, 아래쪽은 LSD다. CSD는 여러 목표에 접근해 정착하
 
 ![실제 ANYmal의 연속 목표 위치 추종](/assets/img/posts/rl/csd/09-paper-real-anymal.png){: width="1100" .d-block .mx-auto }
 
-_실제 ANYmal이 첫 번째 목표와 두 번째 목표를 연속으로 추종한 결과. Orange는 측정된 base position, 점선은 target이다. 출처: [Atanassov et al., Figure 7](https://arxiv.org/abs/2410.07877)._
+_실제 ANYmal이 첫 번째 목표와 두 번째 목표를 연속으로 추종한 결과. Orange는 측정된 base position, 점선은 target. 출처: [Atanassov et al., Figure 7](https://arxiv.org/abs/2410.07877)._
 
-논문은 simulation policy를 실제 ANYmal에 배포하고 두 개의 Cartesian position target을 순서대로 추종한다. 추가 goal-reaching policy training 없이 학습된 encoder와 skill policy를 feedback controller로 재사용했다는 점이 핵심이다.
+논문은 simulation policy를 실제 ANYmal에 배포하고 두 개의 Cartesian position target을 순서대로 추종한다. 추가 goal-reaching policy training 없이 학습된 encoder와 skill policy를 feedback controller로 재사용했다는 점이 핵심.
 
 하지만 `arbitrary points`라는 표현을 무제한 workspace, 장애물 회피, 전역 경로 계획까지 가능한 것으로 확대하면 안 된다. 공개된 실험은 평평한 실내 공간에서의 local Cartesian goal tracking이다.
 
@@ -560,7 +561,7 @@ $$
 
 가 position error와 heading error를 함께 담도록 학습된다.
 
-다만 각 latent axis가 사전에 `x`, `y`, `yaw`로 지정된 것은 아니다. Encoder가 full state에서 변화가 크고 skill matching에 유리한 구조를 스스로 정렬한 결과다. 더 높은 차원을 추가한다고 반드시 사람이 원하는 의미가 한 축씩 깔끔하게 분리되는 것도 아니다.
+다만 각 latent axis가 사전에 `x`, `y`, `yaw`로 지정된 것은 아니다. Encoder가 full state에서 변화가 크고 skill matching에 유리한 구조를 스스로 정렬한 결과. 더 높은 차원을 추가한다고 반드시 사람이 원하는 의미가 한 축씩 깔끔하게 분리되는 것도 아니다.
 
 ## 11. 이것은 정말 reward-free locomotion인가?
 
@@ -582,9 +583,9 @@ CSD는 다음 task-specific reward를 사용하지 않는다.
 - nominal base height
 - unwanted contact penalty
 
-논문의 ablation에서는 intrinsic reward만 사용한 policy가 엎어진 상태로 구르는 local optimum에 빠진다. Body-contact termination을 추가하면 locomotion이 나타나지만, 전체 regularization을 사용한 policy가 더 안정적이다.
+논문의 ablation에서는 intrinsic reward만 사용한 policy가 엎어진 상태로 구르는 local optimum에 빠진다. Body-contact termination을 추가하면 locomotion이 나타나지만, 전체 regularization을 사용한 policy가 더 안정적.
 
-따라서 가장 정확한 표현은 다음과 같다.
+따라서 가장 정확한 표현은:
 
 > **Task-specific 이동 reward 없이 skill objective와 표준 locomotion regularization으로 연속 locomotion skill space를 학습했다.**
 
@@ -594,7 +595,7 @@ CSD는 다음 task-specific reward를 사용하지 않는다.
 
 ### 12.1 Skill norm은 물리 단위가 아니다
 
-$\lVert z\rVert$은 latent transition target이다. m/s나 m와 직접 같은 값이 아니다. 특정 speed command와 정확히 대응시키려면 별도 calibration이 필요하다.
+$\lVert z\rVert$은 latent transition target. m/s나 m와 직접 같은 값이 아니다. 특정 speed command와 정확히 대응시키려면 별도 calibration이 필요하다.
 
 ### 12.2 Full-state distance는 여전히 편법을 허용한다
 
@@ -606,7 +607,7 @@ Encoder가 full state를 보므로 joint oscillation이나 body motion처럼 XY 
 
 ### 12.4 Per-step surrogate는 episodic objective와 동일하지 않다
 
-Per-step loss는 PPO 학습을 가능하게 하는 surrogate다. Long-horizon behavior와 stepwise matching 사이에는 approximation이 들어간다.
+Per-step loss는 PPO 학습을 가능하게 하는 surrogate. Long-horizon behavior와 stepwise matching 사이에는 approximation이 들어간다.
 
 ### 12.5 Goal tracking은 navigation 전체가 아니다
 
@@ -632,7 +633,7 @@ Per-step loss는 PPO 학습을 가능하게 하는 surrogate다. Long-horizon be
 | METRA | $\Delta\phi^\top z$ | 최대화 | Temporal distance | Dynamics-aware 방향별 skill |
 | CSD | $\lVert\Delta\phi-z\rVert^2$ | $z$와 matching | Euclidean state distance | 방향과 크기를 조절하는 skill |
 
-관계를 흐름으로 보면 다음과 같다.
+관계를 흐름으로 보면:
 
 ~~~text
 DIAYN
@@ -691,7 +692,7 @@ CSD가 METRA를 모든 면에서 대체한다고 보는 것도 정확하지 않�
 
 ### Q1. CSD는 PPO를 새로 만든 논문인가?
 
-아니다. Policy optimization에는 기존 PPO를 사용한다. 새 핵심은 encoder objective와 intrinsic reward다.
+아니다. Policy optimization에는 기존 PPO를 사용한다. 새 핵심은 encoder objective와 intrinsic reward.
 
 ### Q2. Encoder와 policy를 하나의 loss로 end-to-end 학습하는가?
 
@@ -699,7 +700,7 @@ CSD가 METRA를 모든 면에서 대체한다고 보는 것도 정확하지 않�
 
 ### Q3. \(z\)가 작으면 왜 느려지는가?
 
-큰 transition도 reward를 더 주던 inner product와 달리, CSD에서는 target보다 큰 transition도 오차이기 때문이다. Regularization도 불필요한 큰 motion을 억제한다.
+큰 transition도 reward를 더 주던 inner product와 달리, CSD에서는 target보다 큰 transition도 오차이기 때문. Regularization도 불필요한 큰 motion을 억제한다.
 
 ### Q4. Goal tracking을 위해 다시 학습하는가?
 
@@ -707,11 +708,11 @@ CSD가 METRA를 모든 면에서 대체한다고 보는 것도 정확하지 않�
 
 ### Q5. Zero-shot이면 planner도 필요 없는가?
 
-아니다. 논문이 보여준 것은 local Cartesian goal tracking이다. 장애물이 있는 navigation에는 별도 planner와 perception이 필요하다.
+아니다. 논문이 보여준 것은 local Cartesian goal tracking. 장애물이 있는 navigation에는 별도 planner와 perception이 필요하다.
 
 ### Q6. CSD의 \(z\)는 velocity command와 같은가?
 
-사용 감각은 비슷해질 수 있지만 물리 단위가 정해진 velocity command는 아니다. 학습된 latent transition command다.
+사용 감각은 비슷해질 수 있지만 물리 단위가 정해진 velocity command는 아니다. 학습된 latent transition command.
 
 ## 16. 이동 방향에서 이동량까지
 

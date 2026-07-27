@@ -1,7 +1,7 @@
 ---
 title: "[IsaacLab Part 4] RL Policy로 Isaac Sim에서 Go2 로봇 걷게하기"
 date: 2025-12-29 19:53:25 +0900
-last_modified_at: 2025-12-29 19:53:25 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [Isaac, Lab]
 tags: [unitree-go2, isaac-lab, isaac-sim, rsl-rl, inference]
 description: 학습된 RL policy를 load해 Isaac Sim에서 Unitree Go2를 제어하는 inference 환경 구성을 정리한다.
@@ -17,26 +17,28 @@ math: true
 *학습이 끝난 RL policy의 실행 결과*
 {: .text-center}
 
-이전 글에서 저장한 checkpoint를 load해 policy를 실행했습니다. 화면의 두 화살표는 command tracking 상태를 보여줍니다.
+이전 글에서 저장한 checkpoint를 load해 policy를 실행했다. 화면의 두 화살표는 command tracking 상태를 보여준다.
 
 - 초록색 화살표
-  - 사용자가 로봇에게 내린 목표 선속도 명령(상위 제어)값입니다.
+  - 사용자가 로봇에게 내린 목표 선속도 명령(상위 제어)값.
 - 파란색 화살표
-  - 로봇의 현재 실제 속도입니다. 로봇의 base가 실제로 물리엔진 상에서 어느 방향으로 움직이고 있는지를 보여줍니다.
-  - RL의 목표는 파란색 화살표와 초록색 화살표가 최대한 일치되도록 로봇의 관절(하위제어)을 제어하는 것입니다.
+  - 로봇의 현재 실제 속도. 로봇의 base가 실제로 물리엔진 상에서 어느 방향으로 움직이고 있는지를 보여준다.
+  - RL의 목표는 파란색 화살표와 초록색 화살표가 최대한 일치되도록 로봇의 관절(하위제어)을 제어하는 것이다.
 
 ## Inference scene 구성
 
-Checkpoint만 읽는다고 policy가 같은 동작을 내는 것은 아닙니다. Training 때 사용한 Action, Observation과 Event config를 inference에서도 동일하게 유지해야 합니다.
+Checkpoint만 읽는다고 policy가 같은 동작을 내는 것은 아니다. Training 때 사용한 Action, Observation과 Event config를 inference에서도 동일하게 유지해야 한다.
 
-- Scene : 지형, 로봇, 센서등을 몇개나 만들고 어떻게 배치할지 결정합니다.
-- Observation : 로봇이 현재 상태를 어떻게 파악하고 있는가? 로봇의 속도, 관절 각도, 기울기, 바닥높이등의 정보가 포함됩니다.학습시와 추론시에 정확히 동일한 입력이 들어와야 합니다.
-- actions : 관절제어의 출력으로 신경망의 output에 해당합니다. joint의 position를 나타냅니다. 추론시에 output의 scale이 학습시와 동일해야합니다.
-- command : 로봇에게 무엇을 하라고 시킬 것인지에 대해서 정의되어 있습니다. 로봇의 목표 속도에 해당합니다.
-- reward : 보상에 대해 정의입니다.
-- termination : 언제 에피소드를 끝내고 처음부터 다시 시작할 것인지에 대한 설정입니다.
-- event : 로봇의 무게를 살짝 바꾸거나, 마찰력을 무작위로 결정하여 학습시 로봇에 강인함을 부여합니다.
-- curriculum : 로봇에게 점진적으로 어려운 미션을 부여합니다.
+핵심: training과 inference 사이의 observation·action contract 일치.
+
+- Scene : 지형, 로봇, 센서등을 몇개나 만들고 어떻게 배치할지 결정한다.
+- Observation : 로봇이 현재 상태를 어떻게 파악하고 있는가? 로봇의 속도, 관절 각도, 기울기, 바닥높이등의 정보가 포함된다.학습시와 추론시에 정확히 동일한 입력이 들어와야 한다.
+- actions: 관절 제어를 위한 신경망의 output. Joint position target을 나타내며, 추론 시 output scale이 학습 시와 동일해야 한다.
+- command : 로봇에게 무엇을 하라고 시킬 것인지 정의한다. 로봇의 목표 속도에 해당한다.
+- reward : 보상에 대해 정의.
+- termination : 언제 에피소드를 끝내고 처음부터 다시 시작할 것인지에 대한 설정.
+- event : 로봇의 무게를 살짝 바꾸거나, 마찰력을 무작위로 결정하여 학습시 로봇에 강인함을 부여한다.
+- curriculum : 로봇에게 점진적으로 어려운 미션을 부여한다.
 
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/03-manager-based-config.png){: .d-block .mx-auto }
 
@@ -124,11 +126,11 @@ class EventCfg:
     )
 ```
 
-- **CommandsCfg** : 로봇에게 x,y의 선속도와 z의 각속도 명령을 줍니다. head이 지정되어 있어 로봇이 특정 방향으로 움직입니다.
-- **ActionCfg** : 로봇의 Position control 방식을 사용하며 이는 목표 각도를 설정하면 시뮬레이션의 PD controller가 그 각도로 움직이기 위한 힘을 계산하는 방식입니다. use_default_offset = True로 하여 기본자세에서 얼마나 움직일지를 계산합니다. scale을 0.5로 하여 목표각도 = (기본자세 + AI출력 * 0.5)가 됩니다.
-- **ObservationCfg** : 로봇의 감각정보를 정의합니다. base의 선속도, 각속도, 중력방향, 관절의 위치와 속도, 이전 행동들과 target command, height_scan등의 입력값이 있습니다.
-- **eventCfg** : 로봇 몸체의 위치와 속도를 랜덤하게 정하거나 joint의 pose를 랜덤하게 설정해줍니다.
-- 나머지 : RewardsCfg, TerminationsCfg, CurriculumCfg 등은 추론시에 필요하지 않으므로 pass 해줍니다.
+- **CommandsCfg** : 로봇에게 x,y의 선속도와 z의 각속도 명령을 준다. head이 지정되어 있어 로봇이 특정 방향으로 움직인다.
+- **ActionCfg** : 로봇의 Position control 방식을 사용하며 이는 목표 각도를 설정하면 시뮬레이션의 PD controller가 그 각도로 움직이기 위한 힘을 계산하는 방식이다. use_default_offset = True로 하여 기본자세에서 얼마나 움직일지를 계산한다. scale을 0.5로 하여 목표각도 = (기본자세 + AI출력 * 0.5)가 된다.
+- **ObservationCfg** : 로봇의 감각정보를 정의한다. base의 선속도, 각속도, 중력방향, 관절의 위치와 속도, 이전 행동들과 target command, height_scan등의 입력값이 있다.
+- **eventCfg** : 로봇 몸체의 위치와 속도를 랜덤하게 정하거나 joint의 pose를 랜덤하게 설정해준다.
+- 나머지 : RewardsCfg, TerminationsCfg, CurriculumCfg 등은 추론시에 필요하지 않으므로 pass 해준다.
 
 ```python
 @configclass
@@ -212,13 +214,13 @@ def go2_rl_env(env_cfg,cfg):
 
 <https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.envs.html#isaaclab.envs.ManagerBasedRLEnv>
 
-ManagerBasedRlEnvCfg를 상속받는 class로써 다양한 맴버변수와 메소드를 가지고 있다. RL환경에 맞는 scene, observation, actions..와 같은 설정을 넣어준 후 __post_init__() 함수를 통해 다양한 멤버변수를 지정해줍니다.
+ManagerBasedRlEnvCfg를 상속받는 class로써 다양한 맴버변수와 메소드를 가지고 있다. RL환경에 맞는 scene, observation, actions..와 같은 설정을 넣어준 후 __post_init__() 함수를 통해 다양한 멤버변수를 지정해준다.
 
-- **self.viewer** = isaaclab에서의 viewer의 Cfg로써 카메라 초기 시점과 방향을 지정해줍니다.
-- **decimation** : 한번에 업데이트될 action들의 숫자를 나타낸다. actions의 수가 8개 이므로 8로 지정합니다.
-- **episode_length_s** : 한 에피소드의 지속시간을 나타냅니다.
-- **is_finite_horizon** : 에이전트가 시간제한이 있음을 인지하고 학습할지, 아니면 끝이 없는 것처럼 학습할지를 결정합니다.
-- **sim** : simulation physics에 대한 설정으로 dt는 물리엔진이 한 번의 계산으로 점프하는 시간 간격이고 render_interval은 물리계산 몇번당 화면을 한번 새로 고칠지 정하는 설정입니다.
+- **self.viewer** = isaaclab에서의 viewer의 Cfg로써 카메라 초기 시점과 방향을 지정해준다.
+- **decimation** : 한번에 업데이트될 action들의 숫자를 나타낸다. actions의 수가 8개 이므로 8로 지정한다.
+- **episode_length_s** : 한 에피소드의 지속시간을 나타낸다.
+- **is_finite_horizon** : 에이전트가 시간제한이 있음을 인지하고 학습할지, 아니면 끝이 없는 것처럼 학습할지를 결정한다.
+- **sim** : simulation physics에 대한 설정으로 dt는 물리엔진이 한 번의 계산으로 점프하는 시간 간격이고 render_interval은 물리계산 몇번당 화면을 한번 새로 고칠지 정하는 설정.
 
 #### go2_rl_env
 
@@ -261,13 +263,13 @@ def go2_rl_env(env_cfg,cfg):
     return env, policy
 ```
 
-- **gym.make** 를 통해 미리 등록된 Go2 환경의 ID **"Isaac-Velocity-Rough-Unitree-Go2-v0"를 호출** 하여 시뮬레이션을 생성합니다. 이때 앞서서 정의한 env_cfg가 적용됩니다. rsl_rl에 필요한 **하이퍼파라미터가 담긴 yaml파일** 을 읽어옵니다.
-- **RslRlVecEnvWrapper** 를 통해 isaaclab의 환경 객체를 rsl_rl 라이브러리가 이해할 수 있는 규격으로 변환합니다. clip_actions를 통해 agent의 action의 범위를 과도하지 않게 제어합니다.
-- **OnPolicyRunner** 를 통해 환경과 네트워크의 설정을 결합하여 추론을 관리합니다. **환경(Env)과 신경망(Actor-Critic) 사이에서 데이터를 주고받으며 학습과 추론의 모든 과정을 관리** 하는 객체입니다.
-  - **Data Collection** : 환경(Isaac Lab)으로부터 관측값(obs)을 받아 신경망에 넣고 행동(action)을 결정합니다.
-  - **Storage** : 로봇이 움직이며 얻은 보상(reward), 다음 상태, 에피소드 종료 여부 등을 메모리(Rollout Storage)에 차곡차곡 쌓습니다.
-  - **Update** : 데이터가 충분히 쌓이면(예: 24스텝마다), **PPO 알고리즘** 을 사용해 신경망의 가중치를 업데이트합니다.
-- model 폴더 안에 모델파일을 찾고 load해줍니다. 이후 get_inference_policy를 통해 policy객체를 얻습니다.
+- **gym.make** 를 통해 미리 등록된 Go2 환경의 ID **"Isaac-Velocity-Rough-Unitree-Go2-v0"를 호출** 하여 시뮬레이션을 생성한다. 이때 앞서서 정의한 env_cfg가 적용된다. rsl_rl에 필요한 **하이퍼파라미터가 담긴 yaml파일** 을 읽어온다.
+- **RslRlVecEnvWrapper** 를 통해 isaaclab의 환경 객체를 rsl_rl 라이브러리가 이해할 수 있는 규격으로 변환한다. clip_actions를 통해 agent의 action의 범위를 과도하지 않게 제어한다.
+- **OnPolicyRunner** 를 통해 환경과 네트워크의 설정을 결합하여 추론을 관리한다. **환경(Env)과 신경망(Actor-Critic) 사이에서 데이터를 주고받으며 학습과 추론의 모든 과정을 관리** 하는 객체.
+  - **Data Collection** : 환경(Isaac Lab)으로부터 관측값(obs)을 받아 신경망에 넣고 행동(action)을 결정한다.
+  - **Storage** : 로봇이 움직이며 얻은 보상(reward), 다음 상태, 에피소드 종료 여부 등을 메모리(Rollout Storage)에 차곡차곡 쌓는다.
+  - **Update** : 데이터가 충분히 쌓이면(예: 24스텝마다), **PPO 알고리즘** 을 사용해 신경망의 가중치를 업데이트한다.
+- model 폴더 안에 모델파일을 찾고 load해준다. 이후 get_inference_policy를 통해 policy객체를 얻는다.
 
 #### 시뮬레이션 실행
 
@@ -277,9 +279,9 @@ def go2_rl_env(env_cfg,cfg):
   <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/unitree-go2-part-4-rl-policy-isaac-sim/04-policy-command-simulation.mp4" type="video/mp4">
 </video>
 
-`CommandCfg`가 10초마다 새 $(x, y, yaw)$ command를 만들고, policy가 그 command를 따라 joint target을 출력하는 것을 확인했습니다.
+`CommandCfg`가 10초마다 새 $(x, y, yaw)$ command를 만들고, policy가 그 command를 따라 joint target을 출력하는 것을 확인했다.
 
-이 시점에 남아 있던 작업은 세 가지였습니다.
+이 시점에 남아 있던 작업은 세 가지였다.
 
 1. 키보드 입력을 통해 teleop으로 로봇을 조종하는 것
 

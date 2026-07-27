@@ -1,6 +1,7 @@
 ---
 title: "Gaitor: 여러 Gait를 잇는 Latent Space"
 date: 2026-07-25 00:02:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [gaitor, quadruped-locomotion, representation-learning, conditional-vae, gait-transition, anymal-c, whole-body-control, learning-from-demonstration, terrain-aware-locomotion, robotics]
 description: "Gaitor가 전문가의 trot·crawl·pace trajectory를 조건부 VAE에 압축하고, gait label과 2D planning manifold를 분리해 연속 전환과 지형 적응을 만드는 과정을 정리한다."
@@ -10,9 +11,9 @@ image:
   alt: trot, crawl, pace를 연속적인 latent planning manifold로 연결하는 Gaitor
 ---
 
-이전 [MCP 글](/posts/mcp-multiplicative-compositional-policies/)에서는 여러 motor primitive의 action distribution을 곱해 복합 행동을 만드는 방법을 살펴봤다. 이번에는 조합의 대상이 action primitive가 아니라 **보행 궤적의 표현**이다.
+이전 [MCP 글](/posts/mcp-multiplicative-compositional-policies/)에서는 여러 motor primitive의 action distribution을 곱해 복합 행동을 만드는 방법을 살펴봤다. 이번에는 조합의 대상이 action primitive가 아니라 **보행 궤적의 표현**.
 
-사족보행 로봇은 trot, crawl, pace처럼 서로 다른 gait를 사용할 수 있다. 가장 단순한 방법은 gait마다 controller를 따로 만들고 필요할 때 교체하는 것이다. 하지만 이 방식에서는 각 gait가 독립된 기술로 남기 때문에 다음 질문에 답하기 어렵다.
+사족보행 로봇은 trot, crawl, pace처럼 서로 다른 gait를 사용할 수 있다. 가장 단순한 방법은 gait마다 controller를 따로 만들고 필요할 때 교체하는 것. 하지만 이 방식에서는 각 gait가 독립된 기술로 남기 때문에 다음 질문에 답하기 어렵다.
 
 ```text
 trot과 crawl 사이에는 어떤 보행이 존재할까?
@@ -30,9 +31,9 @@ gait를 바꾸는 동안 contact schedule은 어떻게 이어져야 할까?
 
 ![Gaitor의 trot, terrain climb, crawl, pace latent trajectory와 contact schedule](/assets/img/posts/rl/gaitor/01-paper-gait-transition.png){: width="1400" .d-block .mx-auto }
 
-_위쪽은 trot, step climb, crawl, pace에 대응하는 robot motion이고, 가운데는 $z_0$-$z_1$ latent trajectory, 아래는 네 발의 contact schedule이다. 출처: Mitchell et al., Figure 1, [PMLR 논문](https://proceedings.mlr.press/v270/mitchell25a.html), [PDF](https://raw.githubusercontent.com/mlresearch/v270/main/assets/mitchell25a/mitchell25a.pdf) (CC BY 4.0)._
+_위쪽은 trot, step climb, crawl, pace에 대응하는 robot motion이고, 가운데는 $z_0$-$z_1$ latent trajectory, 아래는 네 발의 contact schedule. 출처: Mitchell et al., Figure 1, [PMLR 논문](https://proceedings.mlr.press/v270/mitchell25a.html), [PDF](https://raw.githubusercontent.com/mlresearch/v270/main/assets/mitchell25a/mitchell25a.pdf) (CC BY 4.0)._
 
-그림에서 먼저 볼 것은 검은 latent trajectory의 모양 자체보다 **색과 contact schedule의 관계**다.
+그림에서 먼저 볼 것은 검은 latent trajectory의 모양 자체보다 **색과 contact schedule의 관계**.
 
 - `Trot`: 대각선 발 두 개가 한 쌍으로 움직인다.
 - `Crawl`: 한 번에 한 발씩 순차적으로 움직인다.
@@ -80,7 +81,7 @@ _Gaitor 저자들이 공개한 [공식 영상](https://www.youtube.com/watch?v=e
 
 ## 2. Gait는 단순한 속도 명령이 아니다
 
-Gait는 네 발이 어느 순서와 phase 관계로 지면을 밟는지를 뜻한다. 같은 전진 속도라도 contact pattern이 다르면 다른 gait다.
+Gait는 네 발이 어느 순서와 phase 관계로 지면을 밟는지를 뜻한다. 같은 전진 속도라도 contact pattern이 다르면 다른 gait.
 
 ![Trot, crawl, pace의 대표적인 contact pattern](/assets/img/posts/rl/gaitor/02-gait-contact-patterns.svg){: width="1200" .d-block .mx-auto }
 
@@ -114,7 +115,7 @@ LF + LH
 RF + RH
 ```
 
-Trot과 비교하면 front-hind phase relationship이 반대다. 이 차이가 Gaitor의 연속 전환을 이해하는 핵심이다.
+Trot과 비교하면 front-hind phase relationship이 반대. 이 차이가 Gaitor의 연속 전환을 이해하는 핵심이다.
 
 ## 3. 기존 방식의 두 극단
 
@@ -146,7 +147,7 @@ latent structure를 해석하고 직접 계획에 사용
 
 ## 4. Gait label과 latent trajectory
 
-Gaitor를 처음 읽을 때 가장 헷갈리는 부분은 `gait를 무엇이 결정하는가`다. Decoder 입력에는 gait label $g$도 있고, robot latent $z_r$도 있다.
+Gaitor를 처음 읽을 때 가장 헷갈리는 부분은 `gait를 무엇이 결정하는가`. Decoder 입력에는 gait label $g$도 있고, robot latent $z_r$도 있다.
 
 ![gait label과 latent trajectory가 담당하는 서로 다른 역할](/assets/img/posts/rl/gaitor/03-g-vs-latent.svg){: width="1200" .d-block .mx-auto }
 
@@ -163,7 +164,7 @@ Gaitor를 처음 읽을 때 가장 헷갈리는 부분은 `gait를 무엇이 결
 | $a$ | 원하는 base heading과 velocity |
 | $z_g$ | terrain condition |
 
-Decoder를 단순화해 쓰면 다음과 같다.
+Decoder를 단순화해 쓰면:
 
 $$
 \hat X_r^+
@@ -177,7 +178,7 @@ g
 \right)
 $$
 
-논문에서 gait label은 연속적인 실수다.
+논문에서 gait label은 연속적인 실수.
 
 $$
 g=
@@ -297,7 +298,7 @@ $$
 P_\omega(z_r,a,g)
 $$
 
-$S^+$는 미래의 각 발 contact state다. 전체 VAE loss는 다음과 같다.
+$S^+$는 미래의 각 발 contact state. 전체 VAE loss는:
 
 $$
 \boxed{
@@ -323,7 +324,7 @@ BCE gradient는 contact predictor만 업데이트하는 것이 아니라 VAE enc
 - Figure 4 기준 수직 $z_1$: swing length와 상관
 - 나머지 8개 dimension: 폐기하지 않고 encoder가 계속 추정
 
-따라서 정확한 표현은 다음과 같다.
+따라서 정확한 표현은:
 
 > **10-D VAE를 학습한 뒤, 그 안에서 planning에 유용한 2-D slice가 경험적으로 발견됐다.**
 
@@ -362,7 +363,7 @@ R(k)\cos\phi(k)
 }
 $$
 
-$\sin(\phi+\pi/2)=\cos\phi$이므로 논문의 두 번째 식과 같은 표현이다.
+$\sin(\phi+\pi/2)=\cos\phi$이므로 논문의 두 번째 식과 같은 표현.
 
 $R$이 상수라면 원형 궤적이 된다. 하지만 실제 planner의 $R(k)$는 phase와 terrain에 따라 변한다. 그러므로 발이 obstacle을 넘을 시점에 특정 방향의 반지름만 커지는 **변형된 닫힌 궤적**을 만들 수 있다.
 
@@ -420,7 +421,7 @@ $$
 - Trot, crawl, pace라는 endpoint gait는 사람이 제공했다.
 - $g=1,0,-1$의 순서도 사람이 지정했다.
 - Model이 임의의 locomotion space에서 gait taxonomy 자체를 발견한 것은 아니다.
-- 학습된 조건 사이를 연속적으로 통과할 때 의미 있는 intermediate가 나타난 것이다.
+- 학습된 조건 사이를 연속적으로 통과할 때 의미 있는 intermediate가 나타난 것.
 
 즉 DIAYN처럼 reward 없이 skill identity를 발견한 경우와는 다르다.
 
@@ -428,7 +429,7 @@ $$
 
 ![Gaitor의 encoder, planner, decoder, contact predictor, WBC 데이터 흐름](/assets/img/posts/rl/gaitor/04-gaitor-architecture.svg){: width="1200" .d-block .mx-auto }
 
-Gaitor의 deployment loop를 순서대로 보면 다음과 같다.
+Gaitor의 deployment loop를 순서대로 보면:
 
 ### 8.1 현재 robot history를 encode
 
@@ -492,7 +493,7 @@ WBC
 동역학과 접촉 제약을 만족하도록 최종 control 계산
 ```
 
-이 때문에 Gaitor를 end-to-end torque policy라고 부르는 것은 부정확하다. 정확히는 **학습된 gait representation과 planner를 기존 model-based controller에 연결한 hybrid locomotion system**이다.
+이 때문에 Gaitor를 end-to-end torque policy라고 부르는 것은 부정확하다. 정확히는 **학습된 gait representation과 planner를 기존 model-based controller에 연결한 hybrid locomotion system**.
 
 ## 9. 지형 정보는 latent space를 어떻게 바꾸는가?
 
@@ -500,7 +501,7 @@ WBC
 
 ANYmal C의 네 depth camera로부터 2.5D height map을 만든다. 이후 전체 map을 그대로 network에 넣지 않고, 앞으로 밟을 foothold 위치의 높이를 sampling한다.
 
-처리 순서는 다음과 같다.
+처리 순서는:
 
 ```text
 4 depth cameras
@@ -565,7 +566,7 @@ $$
 
 Planner는 $(\phi,z_g)$에서 expert radius $R^*$를 예측하도록 behavioural cloning으로 학습한다. 논문은 radius를 여러 discrete bin에 대한 확률로 예측한 뒤 weighted sum으로 연속 $R$을 계산한다.
 
-핵심은 다음과 같다.
+핵심은:
 
 > Planner가 trial-and-error reward로 등반을 발견한 것이 아니라, expert trajectory가 latent space에서 그린 반지름 변화를 모방한다.
 
@@ -600,11 +601,11 @@ Robot이 12.5 cm platform에 접근할 때 planner는 latent orbit을 늘리고,
 | Swing length | $10.40\pm0.53$ cm | $13.90\pm1.65$ cm |
 | WBC joint RMSE | $0.012$ rad | $0.013$ rad |
 
-가장 크게 증가한 것은 swing height보다 swing length다. 발을 step 모서리 바로 뒤에 놓기보다 더 안쪽에 놓아 foothold margin을 확보하려는 변화로 해석할 수 있다.
+가장 크게 증가한 것은 swing height보다 swing length. 발을 step 모서리 바로 뒤에 놓기보다 더 안쪽에 놓아 foothold margin을 확보하려는 변화로 해석할 수 있다.
 
 ### 12.1 RMSE는 무엇을 측정하는가?
 
-논문의 RMSE는 Gaitor가 예측한 joint-space trajectory와 WBC가 최종적으로 만든 joint trajectory의 차이다.
+논문의 RMSE는 Gaitor가 예측한 joint-space trajectory와 WBC가 최종적으로 만든 joint trajectory의 차이.
 
 | Mode | WBC joint RMSE |
 |---|---:|
@@ -632,7 +633,7 @@ Robot이 12.5 cm platform에 접근할 때 planner는 latent orbit을 늘리고,
 | [MCP](/posts/mcp-multiplicative-compositional-policies/) | Motion primitive와 조합 gate | Primitive weight | Product-of-Gaussians policy |
 | Gaitor | Expert gait trajectory의 공유 표현 | Continuous $g$, latent orbit $(\phi,R)$ | VAE trajectory + WBC |
 
-차이를 한 줄씩 정리하면 다음과 같다.
+차이를 한 줄씩 정리하면:
 
 ```text
 DIAYN 계열
@@ -645,7 +646,7 @@ Gaitor
 여러 expert gait trajectory를 하나의 연속적인 계획 공간에 정렬
 ```
 
-Gaitor의 장점은 `보행이 달라지는 축`과 `보폭이 달라지는 축`을 사람이 조작할 수 있다는 것이다. 반대로 expert data가 정해 준 gait 범위 밖에서 완전히 새로운 locomotion mode를 탐색하는 능력은 목표가 아니다.
+Gaitor의 장점은 `보행이 달라지는 축`과 `보폭이 달라지는 축`을 사람이 조작할 수 있다는 것. 반대로 expert data가 정해 준 gait 범위 밖에서 완전히 새로운 locomotion mode를 탐색하는 능력은 목표가 아니다.
 
 ## 14. 논문의 강점
 
@@ -663,7 +664,7 @@ Latent space를 시각화하는 데서 끝나지 않고, $z_0,z_1$에 trajectory
 
 ### 14.3 Model-based control과 학습을 현실적으로 결합한다
 
-Learning model은 복잡한 trajectory manifold를 다루고, WBC는 dynamics와 contact feasibility를 담당한다. 실제 robot에서 400 Hz를 달성하기 위한 공학적 분업이다.
+Learning model은 복잡한 trajectory manifold를 다루고, WBC는 dynamics와 contact feasibility를 담당한다. 실제 robot에서 400 Hz를 달성하기 위한 공학적 분업.
 
 ## 15. 한계와 주의할 점
 
@@ -677,7 +678,7 @@ Expert pace가 실제 robot에서 불안정했기 때문에 논문은 완전한 
 
 ### 15.3 2D disentanglement는 경험적 결과다
 
-$z_0,z_1$이 swing height와 length에 연결된 것은 이 dataset과 학습 결과를 분석해 발견한 것이다. 다른 seed, robot morphology, gait set에서도 같은 축이 그대로 나타난다는 보장은 없다.
+$z_0,z_1$이 swing height와 length에 연결된 것은 이 dataset과 학습 결과를 분석해 발견한 것. 다른 seed, robot morphology, gait set에서도 같은 축이 그대로 나타난다는 보장은 없다.
 
 ### 15.4 Gait ordering은 일부 사람이 부여했다
 
@@ -689,7 +690,7 @@ Planner는 10-D latent 전체가 아니라 $z_0,z_1$의 polar orbit만 조절한
 
 ### 15.6 안정성의 공로를 VAE에만 돌릴 수 없다
 
-Expert trajectory, state estimation, terrain mapping, contact prediction, WBC가 모두 시스템의 일부다. Gaitor latent만 떼어 내도 동일한 real-world robustness가 유지된다고 결론 내릴 수 없다.
+Expert trajectory, state estimation, terrain mapping, contact prediction, WBC가 모두 시스템의 일부. Gaitor latent만 떼어 내도 동일한 real-world robustness가 유지된다고 결론 내릴 수 없다.
 
 ## 16. 읽으면서 헷갈렸던 질문
 
@@ -699,7 +700,7 @@ $g$는 다리 사이의 coordination pattern을 정하고, $z_0,z_1$은 현재 c
 
 ### Q2. Latent가 10차원인가, 2차원인가?
 
-Model의 robot latent는 10차원이다. 이 중 두 축이 locomotion planning에 가장 유용하다는 것을 분석으로 발견했고, deployment에서 그 두 축만 planner가 덮어쓴다.
+Model의 robot latent는 10차원. 이 중 두 축이 locomotion planning에 가장 유용하다는 것을 분석으로 발견했고, deployment에서 그 두 축만 planner가 덮어쓴다.
 
 ### Q3. $z_0,z_1$을 덮어쓰면 closed-loop가 아닌 것 아닌가?
 
@@ -707,7 +708,7 @@ Model의 robot latent는 10차원이다. 이 중 두 축이 locomotion planning�
 
 ### Q4. Gaitor는 강화학습인가?
 
-Gaitor의 최종 학습 pipeline은 VAE representation learning과 behavioural cloning이다. Dataset 생성에 RLOC의 RL footstep planner가 사용되지만, Gaitor planner 자체를 reward로 학습한 것은 아니다.
+Gaitor의 최종 학습 pipeline은 VAE representation learning과 behavioural cloning. Dataset 생성에 RLOC의 RL footstep planner가 사용되지만, Gaitor planner 자체를 reward로 학습한 것은 아니다.
 
 ### Q5. Decoder가 torque를 직접 내는가?
 

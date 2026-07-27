@@ -1,6 +1,7 @@
 ---
 title: "SF + GPI: 새 보상에서 정책 재사용"
 date: 2026-07-24 22:25:25 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [successor-features, generalized-policy-improvement, gpi, transfer-reinforcement-learning, successor-representation, policy-reuse, value-function, q-learning, dqn, robotics]
 description: "Successor Features가 정책의 미래 feature 발생량과 reward preference를 분리하고, GPI가 새 task에서 여러 source policy를 즉시 재평가하고 재사용하는 원리를 정리한다."
@@ -57,7 +58,6 @@ $$
 - $\psi^\pi(s,a)$: policy $\pi$를 계속 따를 때 미래에 각 feature가 얼마나 누적되는가
 - $w$: 새 task가 각 feature를 얼마나 좋아하거나 싫어하는가
 
-이다.
 
 Dynamics와 policy가 그대로이고 reward preference만 바뀐다면 $\psi^\pi$는 재사용하고 $w$만 바꿀 수 있다.
 
@@ -94,7 +94,7 @@ p(s'\mid s,a),\quad
 \gamma
 $$
 
-달라지는 것은 reward다.
+달라지는 것은 reward.
 
 $$
 r_w(s,a,s')
@@ -151,7 +151,7 @@ $$
 
 ## 3. Q-function을 왜 분리해야 하는가?
 
-일반적인 action value는 다음과 같다.
+일반적인 action value는:
 
 $$
 Q_w^\pi(s,a)
@@ -218,7 +218,7 @@ $$
 
 가 된다.
 
-이 식의 의미는 계산 편의 이상이다.
+이 식의 의미는 계산 편의 이상.
 
 ```text
 ψ^π(s,a)
@@ -228,7 +228,7 @@ w
 그 결과를 현재 task에서 평가하는 기준
 ```
 
-Reward가 바뀌어도 policy와 dynamics가 같다면 미래 결과 예측 $\psi^\pi$는 그대로다. 새 $w$를 곱하면 같은 policy를 새 task에서 즉시 평가할 수 있다.
+Reward가 바뀌어도 policy와 dynamics가 같다면 미래 결과 예측 $\psi^\pi$는 그대로. 새 $w$를 곱하면 같은 policy를 새 task에서 즉시 평가할 수 있다.
 
 ## 4. Successor Feature는 정확히 무엇을 저장하는가?
 
@@ -304,7 +304,7 @@ environment dynamics
 + feature representation φ
 ```
 
-정확한 표현은 **policy-conditioned predictive representation**이다.
+정확한 표현은 **policy-conditioned predictive representation**.
 
 ```text
 scalar Q
@@ -321,7 +321,7 @@ SF는 scalar value와 full world model 사이에 있는 representation으로 볼
 
 ## 5. Successor Representation과의 관계
 
-Successor Features의 출발점은 Dayan의 Successor Representation, SR이다.
+Successor Features의 출발점은 Dayan의 Successor Representation, SR.
 
 State를 one-hot feature로 두면
 
@@ -391,7 +391,7 @@ $$
 
 ![Successor Feature critic의 vector TD update](/assets/img/posts/rl/sf-gpi/03-sf-bellman.svg){: width="1200" .d-block .mx-auto }
 
-일반 critic의 TD target은 scalar다.
+일반 critic의 TD target은 scalar.
 
 $$
 y_Q
@@ -399,7 +399,7 @@ y_Q
 r+\gamma Q(s',a')
 $$
 
-SF critic의 TD target은 $d$차원 vector다.
+SF critic의 TD target은 $d$차원 vector.
 
 $$
 y_\psi
@@ -531,7 +531,7 @@ $$
 \max_i Q^{\pi_i}(s,a)
 $$
 
-현재 action $a$를 취한 뒤 어느 source policy $\pi_i$를 계속 따를 때 좋은지를 평가하는 것이다.
+현재 action $a$를 취한 뒤 어느 source policy $\pi_i$를 계속 따를 때 좋은지를 평가하는 것.
 
 ## 9. GPI가 보장하는 것과 보장하지 않는 것
 
@@ -564,9 +564,8 @@ Q^{\pi_{\text{GPI}}}(s,a)
 \max_i Q^{\pi_i}(s,a)
 $$
 
-이다.
 
-정확한 해석은 다음과 같다.
+정확한 해석은:
 
 > 새 task에서 GPI policy는 저장된 source policy 중 가장 좋은 것보다 나쁘지 않다.
 
@@ -578,7 +577,7 @@ Policy library에 계단을 오르는 behavior가 전혀 없다면 GPI가 그 �
 
 ### 9.1 비슷한 source task가 있으면 최적에 가까워진다
 
-Target task의 weight를 $w_i$, source task weight들을 $w_j$라고 하자. Feature norm의 최대값을 $\phi_{\max}$라고 하면 논문의 두 번째 bound는 다음 형태다.
+Target task의 weight를 $w_i$, source task weight들을 $w_j$라고 하자. Feature norm의 최대값을 $\phi_{\max}$라고 하면 논문의 두 번째 bound는 다음 형태.
 
 $$
 Q_i^*(s,a)
@@ -698,7 +697,7 @@ w_{\text{fast}}
 \end{bmatrix}
 $$
 
-이고 각 value는 다음과 같다.
+이고 각 value는:
 
 $$
 Q^{\pi_1}
@@ -750,7 +749,7 @@ $$
 
 에서 샘플링해 250개 task를 순서대로 학습한다.
 
-비교 방법은 다음과 같다.
+비교 방법은:
 
 - QL: 새 task의 Q-learning
 - PRQL: 이전 policy 재사용
@@ -762,7 +761,7 @@ _SFQL 계열은 task당 평균 return과 누적 return에서 Q-learning과 PRQL�
 
 ### 12.2 Simulated robotic reacher
 
-두 번째 실험은 MuJoCo의 two-joint torque-controlled arm이다.
+두 번째 실험은 MuJoCo의 two-joint torque-controlled arm.
 
 - 전체 target: 12개
 - 실제 training target: 4개
@@ -772,7 +771,7 @@ _SFQL 계열은 task당 평균 return과 누적 return에서 Q-learning과 PRQL�
 
 ![SFDQN과 DQN의 robotic reacher transfer 결과](/assets/img/posts/rl/sf-gpi/08-paper-reacher-results.png){: width="1100" .d-block .mx-auto }
 
-_실선은 training task, 흐린 점선은 아직 학습하지 않은 task다. 오른쪽 위는 8개 test target에서의 평균 성능이다. SFDQN은 한 task를 학습할 때 다른 target의 성능도 함께 개선되는 transfer를 보인다. 출처: [Barreto et al., Figure 3](https://arxiv.org/abs/1606.05312)._
+_실선은 training task, 흐린 점선은 아직 학습하지 않은 task다. 오른쪽 위는 8개 test target에서의 평균 성능. SFDQN은 한 task를 학습할 때 다른 target의 성능도 함께 개선되는 transfer를 보인다. 출처: [Barreto et al., Figure 3](https://arxiv.org/abs/1606.05312)._
 
 이 실험은 SF+GPI가 tabular navigation에만 한정되지 않고 neural-network value approximation과 결합될 수 있음을 보여준다. 다만 action은 discretized되어 있으며 현대적인 continuous-control actor-critic에 그대로 옮긴 결과는 아니다.
 
@@ -815,7 +814,7 @@ $$
 \psi(s,a,z)
 $$
 
-여기서 $z$는 평가 대상 reward가 아니라 **앞으로 따를 policy의 descriptor**다.
+여기서 $z$는 평가 대상 reward가 아니라 **앞으로 따를 policy의 descriptor**.
 
 $$
 Q(s,a,z,w)
@@ -906,7 +905,7 @@ a^*
 \psi^{\pi_j}(s,a_i)^\top w
 $$
 
-이것은 전체 continuous action space에서의 full GPI가 아니라 source actor가 제안한 후보 집합 위의 **restricted GPI**다. 따라서 원래 theorem을 그대로 적용하기 어렵다.
+이것은 전체 continuous action space에서의 full GPI가 아니라 source actor가 제안한 후보 집합 위의 **restricted GPI**. 따라서 원래 theorem을 그대로 적용하기 어렵다.
 
 ### 15.2 Policy selector와 full GPI를 구분해야 한다
 
@@ -941,7 +940,7 @@ Robot의 low-level torque나 joint target을 매 step 서로 다른 policy가 �
 - Action chattering
 - Safety constraint 위반
 
-실제 robot에서는 다음 구조가 더 보수적이다.
+실제 robot에서는 다음 구조가 더 보수적.
 
 ```text
 high-level GPI
@@ -959,7 +958,7 @@ low-level policy
 
 SF는 특정 dynamics와 policy 아래에서 학습된다. 질량, 마찰, actuator delay, morphology가 바뀌면 $\psi^\pi$도 부정확해진다.
 
-원 논문의 핵심 설정은 **same dynamics, different rewards**다.
+원 논문의 핵심 설정은 **same dynamics, different rewards**.
 
 ### 16.2 새 reward 정보가 필요하다
 
@@ -989,7 +988,7 @@ $$
 \frac{2\epsilon}{1-\gamma}
 $$
 
-이다. $\gamma$가 1에 가까우면 작은 SF 또는 $w$ estimation error도 큰 value error로 확대될 수 있다.
+. $\gamma$가 1에 가까우면 작은 SF 또는 $w$ estimation error도 큰 value error로 확대될 수 있다.
 
 또한
 
@@ -1043,7 +1042,7 @@ GPI theorem에는 skill horizon, termination, phase alignment, switching cost가
 
 ### Q1. SF는 feature encoder인가?
 
-단순한 state embedding이 아니다. Policy를 계속 따랐을 때 미래 feature가 할인되어 얼마나 누적될지 예측하는 vector value function이다.
+단순한 state embedding이 아니다. Policy를 계속 따랐을 때 미래 feature가 할인되어 얼마나 누적될지 예측하는 vector value function.
 
 ### Q2. SF가 dynamics와 reward를 완전히 분리하는가?
 
@@ -1051,7 +1050,7 @@ Reward preference $w$와는 분리한다. 하지만 $\psi^\pi$에는 dynamics, p
 
 ### Q3. 새 reward에서는 SF network를 다시 학습하지 않아도 되는가?
 
-Dynamics와 policy가 같고 $\phi$가 새 reward를 표현한다면 기존 SF로 source policy를 바로 재평가할 수 있다. 새 task에 특화된 policy와 SF를 추가로 학습하는 것은 선택 사항이다.
+Dynamics와 policy가 같고 $\phi$가 새 reward를 표현한다면 기존 SF로 source policy를 바로 재평가할 수 있다. 새 task에 특화된 policy와 SF를 추가로 학습하는 것은 선택 사항.
 
 ### Q4. GPI는 가장 좋은 source policy를 선택하는가?
 
@@ -1063,7 +1062,7 @@ Dynamics와 policy가 같고 $\phi$가 새 reward를 표현한다면 기존 SF�
 
 ### Q6. Zero-shot이면 새 task reward를 몰라도 되는가?
 
-아니다. $w$ 또는 reward sample이 필요하다. Zero-shot은 target-task policy learning 전에 source SF를 재사용할 수 있다는 뜻이다.
+아니다. $w$ 또는 reward sample이 필요하다. Zero-shot은 target-task policy learning 전에 source SF를 재사용할 수 있다는 뜻.
 
 ### Q7. PPO에도 SF를 넣을 수 있는가?
 
@@ -1097,7 +1096,7 @@ $$
 \psi^{\pi_i}(s,a)^\top w
 $$
 
-Skill discovery가 behavior repertoire를 만드는 문제라면, SF+GPI는 그 repertoire의 장기적인 결과를 새 목적함수에서 평가하고 재사용하는 문제다.
+Skill discovery가 behavior repertoire를 만드는 문제라면, SF+GPI는 그 repertoire의 장기적인 결과를 새 목적함수에서 평가하고 재사용하는 문제.
 
 > **Successor Features는 정책의 장기 행동 결과를 reward와 분리된 vector로 저장하고, GPI는 새 reward에서 여러 source policy의 continuation value를 비교해 best source보다 나쁘지 않은 새 policy를 만든다.**
 

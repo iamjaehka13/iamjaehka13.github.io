@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 2] Domain Randomization"
 date: 2026-06-24 17:30:00 +0900
-last_modified_at: 2026-07-27 21:16:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, domain-randomization, visual-domain-randomization, robot-vision, object-localization, fetch-robot, synthetic-data]
 description: Tobin et al.의 visual domain randomization을 random texture, camera·lighting variation, VGG detector, real-image localization ablation과 Fetch grasping 결과까지 원문 기준으로 정리한다.
@@ -423,7 +423,7 @@ Model이 object의 색이나 배경 texture 같은 쉬운 shortcut을 쓰면 rea
 
 첫째, task가 object localization이다.
 
-이 논문은 visual detector의 Sim2Real transfer를 다룬다. Contact-rich manipulation, legged locomotion, closed-loop control dynamics를 직접 다루지는 않다.
+이 논문은 visual detector의 Sim2Real transfer를 다룬다. Contact-rich manipulation, legged locomotion, closed-loop control dynamics를 직접 다루지는 않는다.
 
 둘째, geometric object 중심.
 
@@ -443,7 +443,7 @@ Table height가 고정된 monocular image에서 object center translation을 예
 
 여섯째, randomization distribution은 사람이 설계한다.
 
-어떤 parameter를 얼마나 흔들어야 real domain을 잘 덮는지 자동으로 알려주지는 않다. 결국 domain randomization은 여전히 task와 deployment condition을 이해하고 설계해야 하는 부분이 크다.
+어떤 parameter를 얼마나 흔들어야 real domain을 잘 덮는지 자동으로 알려주지는 않는다. 결국 domain randomization은 여전히 task와 deployment condition을 이해하고 설계해야 하는 부분이 크다.
 
 일곱째, 평균 1.5 cm가 모든 case에 동일한 것은 아니다.
 

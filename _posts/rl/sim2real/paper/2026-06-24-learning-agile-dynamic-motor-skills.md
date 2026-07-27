@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 5] Agile and Dynamic Motor Skills"
 date: 2026-06-24 17:33:00 +0900
-last_modified_at: 2026-07-27 21:20:57 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, legged-robots, anymal, actuator-network, hybrid-simulator, trpo, system-identification, dynamics-randomization]
 description: Hwangbo et al.의 ANYmal Sim2Real을 hybrid simulator, actuator network, stochastic rigid-body model, TRPO policy, 정량 실기체 결과와 ablation까지 원문 기준으로 정리한다.
@@ -219,7 +219,7 @@ Command-to-torque chain 안에는 다음 hidden state가 존재한다.
 
 저자들이 인용한 기존 analytical SEA model은 거의 100개 parameter를 요구했다. 일부 parameter는 측정할 수 있지만, 일부는 datasheet를 믿거나 실험적으로 맞춰야 한다.
 
-특히 limited bandwidth가 있는 SEA에서는 response delay가 amplitude에 따라 달라질 수 있다. 고정 latency 하나를 넣는 것으로는 충분하지 않는다.
+특히 limited bandwidth가 있는 SEA에서는 response delay가 amplitude에 따라 달라질 수 있다. 고정 latency 하나를 넣는 것만으로는 충분하지 않다.
 
 ### **4.2 입력은 현재값 하나가 아니라 짧은 history다**
 
@@ -639,7 +639,7 @@ _2초마다 바뀌는 forward, lateral, yaw command를 30초 동안 추종한 �
 | Average yaw-rate error | 0.174 rad/s |
 | Five-minute continuous test | Failure 0회 |
 
-학습 범위의 forward command는 최대 1.0 m/s였지만, 다른 command를 0으로 두고 1.23 m/s를 명령했을 때 실제 1.2 m/s를 안정적으로 달성했다. 이는 제한된 범위 밖의 아주 가까운 command에 대한 결과이지, arbitrary extrapolation을 의미하지는 않다.
+학습 범위의 forward command는 최대 1.0 m/s였지만, 다른 command를 0으로 두고 1.23 m/s를 명령했을 때 실제 1.2 m/s를 안정적으로 달성했다. 이는 제한된 범위 밖의 아주 가까운 command에 대한 결과이지, arbitrary extrapolation을 의미하지는 않는다.
 
 ### **7.2 기존 model-based controller와 비교**
 

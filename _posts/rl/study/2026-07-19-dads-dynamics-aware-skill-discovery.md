@@ -1,6 +1,7 @@
 ---
 title: "DADS: DIAYN의 다양성에서 예측 가능한 스킬로"
 date: 2026-07-19 21:30:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [dads, diayn, unsupervised-reinforcement-learning, skill-discovery, model-based-rl, soft-actor-critic, mutual-information, mpc]
 description: "DIAYN의 상태 다양성에서 출발해 DADS의 조건부 mutual information, skill dynamics, intrinsic reward, SAC 학습과 latent-space planning을 비교 중심으로 정리한다."
@@ -65,13 +66,13 @@ skill dynamics로 z sequence를 평가하고 실행
 | Skill space | Discrete와 continuous latent 모두 실험 |
 | Source | [arXiv](https://arxiv.org/abs/1907.01657), [OpenReview](https://openreview.net/forum?id=HJgLZR4KvH), [Official code](https://github.com/google-research/dads), [Google Research overview](https://research.google/blog/dads-unsupervised-reinforcement-learning-for-skill-discovery/) |
 
-이 표에서 중요한 것은 task reward가 없는 pretraining과, task reward를 planning 기준으로만 사용하는 downstream phase가 분리된다는 점이다.
+이 표에서 중요한 것은 task reward가 없는 pretraining과, task reward를 planning 기준으로만 사용하는 downstream phase가 분리된다는 점.
 
-따라서 DADS의 zero-shot 주장은 **새 task에서 policy gradient 학습을 다시 하지 않는다**는 뜻이다. Downstream goal이나 후보 trajectory를 평가할 reward까지 필요 없다는 뜻은 아니다.
+따라서 DADS의 zero-shot 주장은 **새 task에서 policy gradient 학습을 다시 하지 않는다**는 뜻. Downstream goal이나 후보 trajectory를 평가할 reward까지 필요 없다는 뜻은 아니다.
 
 ## 2. DIAYN과 DADS는 무엇을 다르게 보는가?
 
-DIAYN과 DADS를 가장 짧게 비교하면 다음과 같다.
+DIAYN과 DADS를 가장 짧게 비교하면:
 
 | 질문 | DIAYN | DADS |
 |---|---|---|
@@ -95,7 +96,7 @@ z = 2
 
 두 skill은 방문하는 상태 영역이 달라 DIAYN의 discriminator로 구별될 수 있다. 그러나 DIAYN 목적함수에는 $z=1$의 반복 trajectory가 얼마나 흔들리는지 직접 줄이는 항이 없다. DADS는 현재 상태와 skill이 정해졌을 때 다음 상태의 불확실성을 줄여 이 predictability를 직접 요구한다.
 
-DADS의 문제의식은 다음과 같다.
+DADS의 문제의식은:
 
 > Diversity만으로는 부족하다. 여러 번 조합할 skill이라면 **어떤 변화를 만들지 예측 가능해야 한다.**
 
@@ -103,7 +104,7 @@ DADS의 문제의식은 다음과 같다.
 
 ## 3. 처음의 $z$에는 여전히 아무 의미가 없다
 
-DADS의 policy도 DIAYN과 마찬가지로 skill-conditioned policy다.
+DADS의 policy도 DIAYN과 마찬가지로 skill-conditioned policy.
 
 $$
 \pi_\theta(a\mid s,z)
@@ -145,7 +146,7 @@ $$
 a_t\sim\pi_\theta(\cdot\mid s_t,z)
 $$
 
-중요한 것은 관절 action이 매번 동일한지가 아니라, **closed-loop policy가 거시적으로 일관된 상태 변화를 만드는가**이다.
+중요한 것은 관절 action이 매번 동일한지가 아니라, **closed-loop policy가 거시적으로 일관된 상태 변화를 만드는가**.
 
 ## 4. 핵심 목적함수: $I(S';Z\mid S)$
 
@@ -200,11 +201,11 @@ DADS는 두 요구를 동시에 둔다.
 → 반복할 때 비슷한 transition
 ```
 
-이것이 논문에서 말하는 **diverse and predictable skills**다.
+이것이 논문에서 말하는 **diverse and predictable skills**.
 
 ## 5. 알 수 없는 transition을 skill dynamics로 근사하기
 
-Policy가 만드는 실제 skill-conditioned transition은 다음과 같다.
+Policy가 만드는 실제 skill-conditioned transition은:
 
 $$
 p(s'\mid s,z)
@@ -241,7 +242,7 @@ $$
 q_\phi(s'-s\mid s,z)
 $$
 
-현재 절대 위치 자체보다 skill이 만든 변화를 중심으로 학습하기 쉽기 때문이다. Mixture-of-Experts와 같은 출력 구조는 논문 구현 선택이며 DADS 목적함수의 필수 조건은 아니다.
+현재 절대 위치 자체보다 skill이 만든 변화를 중심으로 학습하기 쉽기 때문. Mixture-of-Experts와 같은 출력 구조는 논문 구현 선택이며 DADS 목적함수의 필수 조건은 아니다.
 
 ## 6. Skill dynamics가 intrinsic reward를 만드는 방법
 
@@ -272,7 +273,7 @@ q_\phi(s'\mid s,z_i)
 \right)
 $$
 
-각 항을 말로 바꾸면 다음과 같다.
+각 항을 말로 바꾸면:
 
 | 항 | 질문 |
 |---|---|
@@ -310,7 +311,7 @@ SAC
 
 논문은 원칙적으로 DADS reward를 다른 RL 알고리즘으로도 최적화할 수 있다고 설명한다. 실제 실험의 agent optimizer는 **EC-SAC**다.
 
-한 iteration의 흐름은 다음과 같다.
+한 iteration의 흐름은:
 
 1. Prior $p(z)$에서 skill을 뽑는다.
 2. $\pi_\theta(a\mid s,z)$로 새로운 transition batch를 수집한다.
@@ -322,7 +323,7 @@ SAC
 
 ## 8. 학습된 model을 planning에 다시 사용한다
 
-DADS의 가장 중요한 차이는 intrinsic reward를 만드는 데 사용한 $q_\phi$가 학습 후에도 남는다는 것이다.
+DADS의 가장 중요한 차이는 intrinsic reward를 만드는 데 사용한 $q_\phi$가 학습 후에도 남는다는 것.
 
 $$
 q_\phi(s_{t+1}\mid s_t,z_t)
@@ -365,7 +366,7 @@ z0, z1, z2, ..., zK
 
 Planner는 선택한 첫 $z$를 실제 policy에 전달해 $H_Z$ environment step 동안 실행하고, 바뀐 실제 상태에서 다시 계획한다.
 
-이것이 temporal abstraction이다.
+이것이 temporal abstraction.
 
 ```text
 Planner
@@ -379,7 +380,7 @@ Skill policy
 
 새 목표가 주어졌을 때 DADS는 policy를 추가로 fine-tuning하지 않고 learned skill과 dynamics를 사용해 바로 planning한다. 하지만 planner가 후보 trajectory의 좋고 나쁨을 판단할 task reward나 cost는 필요하다.
 
-따라서 정확한 표현은 다음과 같다.
+따라서 정확한 표현은:
 
 > **Task reward 없이 skill repertoire를 사전학습하고, 새 task에서는 그 reward를 planning 기준으로만 사용한다.**
 
@@ -442,7 +443,7 @@ _논문이 보고한 normalized trajectory standard deviation. x-y prior를 사�
 
 이 결과에서 읽어야 하는 것은 "모든 환경에서 DADS가 항상 DIAYN보다 우수하다"가 아니다.
 
-논문이 확인하려던 가설은 더 제한적이다.
+논문이 확인하려던 가설은 더 제한적.
 
 > Transition predictability를 직접 최적화하면, 같은 skill을 반복했을 때 trajectory variance가 줄고 장기 composition이 쉬워지는가?
 
@@ -479,7 +480,7 @@ $q_\phi(s'\mid s,z)$를 여러 번 적용해 긴 미래를 예측하면 작은 �
 
 ### 12.4 발견되는 skill은 state representation에 의존한다
 
-x-y prior처럼 prediction target을 바꾸면 어떤 behavior가 서로 다르다고 평가되는지도 달라진다. Representation 선택은 단순한 구현 세부가 아니라 behavior specification이다.
+x-y prior처럼 prediction target을 바꾸면 어떤 behavior가 서로 다르다고 평가되는지도 달라진다. Representation 선택은 단순한 구현 세부가 아니라 behavior specification.
 
 ### 12.5 원 DADS는 data reuse가 제한적이다
 

@@ -1,17 +1,18 @@
 ---
 title: "Isaac Sim Tutorial 5. ROS2 Publish Rate and QoS"
 date: 2025-12-01 15:41:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [Isaac, Sim]
 tags: [isaac-sim, ros2, publish-rate, qos, omnigraph, imu]
 description: Isaac Sim ROS2 OmniGraph에서 publish rate를 조정하고 QoS profile과 static publisher를 설정하는 흐름을 정리한다.
 image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 ---
 
-이 글은 [TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/), [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/), [RTX Lidar Sensors](/posts/isaac-sim-rtx-lidar/), [TF Trees and Odometry](/posts/isaac-sim-tf-odometry/)에 이어서 ROS2 topic의 publish rate와 QoS를 조정하는 과정을 정리합니다.
+이 글은 [TurtleBot ROS2 연결](/posts/isaac-sim-turtlebot-ros2/), [ROS2 Cameras](/posts/isaac-sim-ros2-cameras/), [RTX Lidar Sensors](/posts/isaac-sim-rtx-lidar/), [TF Trees and Odometry](/posts/isaac-sim-tf-odometry/)에 이어서 ROS2 topic의 publish rate와 QoS를 조정하는 과정을 정리한다.
 
-앞선 글들에서는 topic이 정상적으로 publish되는지만 확인했습니다. 실제 연결에서는 topic의 **publish 주기**와 publisher/subscriber 사이의 **QoS 호환성**도 맞아야 합니다. 두 설정을 Isaac Sim OmniGraph에서 직접 바꿔봤습니다.
+앞선 글들에서는 topic이 정상적으로 publish되는지만 확인했다. 실제 연결에서는 topic의 **publish 주기**와 publisher/subscriber 사이의 **QoS 호환성**도 맞아야 한다. 두 설정을 Isaac Sim OmniGraph에서 직접 바꿔봤다.
 
-참고한 자료는 아래와 같습니다.
+참고한 자료는 아래와 같다.
 
 - [ROS2 Setting Publish Rates](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_publish_rate.html)
 - [ROS 2 Quality of Service (QoS)](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_qos.html)
@@ -19,18 +20,18 @@ image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 
 ## **1. Publish Rate가 Simulation Rate에 묶이는 이유**
 
-지금까지 만든 ROS2 OmniGraph는 대부분 `On Playback Tick`에서 시작했습니다. 이 tick은 simulation frame마다 한 번 실행되므로, downstream node의 publish 주기도 기본적으로 simulation rate의 영향을 받습니다.
+지금까지 만든 ROS2 OmniGraph는 대부분 `On Playback Tick`에서 시작했다. 이 tick은 simulation frame마다 한 번 실행되므로, downstream node의 publish 주기도 기본적으로 simulation rate의 영향을 받는다.
 
-예를 들어 simulation이 60 FPS로 돌고 publisher가 매 tick 실행되면 topic도 대략 60 Hz에 가깝게 publish됩니다. publish 주기를 낮추려면 graph tick 자체를 줄이거나, sensor helper의 frame skip 값을 조정해야 합니다.
+예를 들어 simulation이 60 FPS로 돌고 publisher가 매 tick 실행되면 topic도 대략 60 Hz에 가깝게 publish된다. publish 주기를 낮추려면 graph tick 자체를 줄이거나, sensor helper의 frame skip 값을 조정해야 한다.
 
-즉, publish rate 조절은 크게 두 방식으로 볼 수 있습니다.
+즉, publish rate 조절은 크게 두 방식으로 볼 수 있다.
 
 - graph 실행 빈도를 줄인다.
 - sensor helper가 실제 publish하는 frame을 건너뛰게 한다.
 
 ## **2. Isaac Simulation Gate로 IMU Publish Rate 줄이기**
 
-먼저 TurtleBot의 IMU link 아래에 IMU sensor를 추가합니다.
+먼저 TurtleBot의 IMU link 아래에 IMU sensor를 추가한다.
 
 ```text
 /World/turtlebot3_burger/base_footprint/base_link/imu_link
@@ -38,63 +39,63 @@ image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 
 ![imu_link prim 아래에 IMU sensor 추가](/assets/img/posts/isaac-sim-publish-rate-qos/01-imu-sensor-prim.png)
 
-그 다음 같은 prim 아래에 Action Graph를 만들고 `Isaac Simulation Gate` 노드를 추가합니다. 이 노드는 입력 tick을 일정 frame 간격으로만 통과시켜줍니다.
+그 다음 같은 prim 아래에 Action Graph를 만들고 `Isaac Simulation Gate` 노드를 추가한다. 이 노드는 입력 tick을 일정 frame 간격으로만 통과시켜준다.
 
 ![IMU publish용 Simulation Gate graph](/assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png)
 
-이번 예제에서 바꿀 값은 두 개입니다.
+이번 예제에서 바꿀 값은 두 개.
 
-- `Isaac Simulation Gate`의 `step`을 `2`로 설정합니다.
-- `Isaac Read IMU` 노드의 target에는 추가한 IMU sensor prim을 넣습니다.
-- `ROS2 Publish Imu`의 `frameId`는 IMU가 붙어 있는 link 이름으로 맞춥니다. 예를 들어 namespace가 붙어 있다면 `a__namespace_imu_link`처럼 맞춰줍니다.
+- `Isaac Simulation Gate`의 `step`을 `2`로 설정한다.
+- `Isaac Read IMU` 노드의 target에는 추가한 IMU sensor prim을 넣는다.
+- `ROS2 Publish Imu`의 `frameId`는 IMU가 붙어 있는 link 이름으로 맞춘다. 예를 들어 namespace가 붙어 있다면 `a__namespace_imu_link`처럼 맞춰준다.
 
-`step`이 `2`면 downstream node가 두 frame마다 한 번씩 실행됩니다. simulation이 60 FPS라면 IMU publish rate는 대략 30 Hz가 됩니다.
+`step`이 `2`면 downstream node가 두 frame마다 한 번씩 실행된다. simulation이 60 FPS라면 IMU publish rate는 대략 30 Hz가 된다.
 
 ## **3. topic hz로 확인**
 
-host 터미널에서 topic rate를 확인합니다.
+host 터미널에서 topic rate를 확인한다.
 
 ```bash
 ros2 topic hz /imu
 ```
 
-`step`을 `4`로 둔 경우와 `2`로 둔 경우의 topic hz가 다르게 나옵니다.
+`step`을 `4`로 둔 경우와 `2`로 둔 경우의 topic hz가 다르게 나온다.
 
 ![step size 4일 때 topic hz](/assets/img/posts/isaac-sim-publish-rate-qos/03-topic-hz-step-4.png)
 
 ![step size 2일 때 topic hz](/assets/img/posts/isaac-sim-publish-rate-qos/04-topic-hz-step-2.png)
 
-`Isaac Simulation Gate`의 `step`은 simulation frame 기준 divider로 동작합니다.
+`Isaac Simulation Gate`의 `step`은 simulation frame 기준 divider로 동작한다.
 
 ```text
 publish rate = simulation rate / step
 ```
 
-실제 측정값은 PC 성능, simulation load, ROS2 통신 상태에 따라 조금 흔들릴 수 있습니다. 그래서 설정 후에는 항상 `ros2 topic hz`로 확인하는 습관이 좋습니다.
+실제 측정값은 PC 성능, simulation load, ROS2 통신 상태에 따라 조금 흔들릴 수 있다. 그래서 설정 후에는 항상 `ros2 topic hz`로 확인하는 습관이 좋다.
 
 ## **4. Camera와 Lidar Helper의 Frame Skip**
 
-camera와 RTX Lidar처럼 sensor helper를 사용하는 경우에는 helper node의 속성에서 publish rate를 낮출 수 있습니다. camera helper에서는 `frameSkipCount`를 조정합니다.
+camera와 RTX Lidar처럼 sensor helper를 사용하는 경우에는 helper node의 속성에서 publish rate를 낮출 수 있다. camera helper에서는 `frameSkipCount`를 조정한다.
 
 ![camera helper frame skip 속성](/assets/img/posts/isaac-sim-publish-rate-qos/05-camera-frame-skip-property.png)
 
 ![frame skip count를 11로 설정](/assets/img/posts/isaac-sim-publish-rate-qos/06-camera-frame-skip-count.png)
 
-`frameSkipCount`를 `11`로 두면 12 frame마다 한 번 publish됩니다. 즉, 60 FPS 기준으로는 대략 5 Hz가 됩니다.
+`frameSkipCount`를 `11`로 두면 12 frame마다 한 번 publish된다. 즉, 60 FPS 기준으로는 대략 5 Hz가 된다.
 
 ![frame skip 적용 전 topic rate](/assets/img/posts/isaac-sim-publish-rate-qos/07-camera-topic-rate-before.png)
 
 ![frame skip 적용 후 topic rate](/assets/img/posts/isaac-sim-publish-rate-qos/08-camera-topic-rate-after.png)
 
-sensor data가 너무 자주 publish되어 RViz2나 network가 버거울 때는 이 방식이 가장 간단합니다. 특히 image, point cloud처럼 message 크기가 큰 topic은 publish rate를 낮추는 것만으로도 체감 차이가 큽니다.
+sensor data가 너무 자주 publish되어 RViz2나 network가 버거울 때는 이 방식이 가장 간단하다. 특히 image, point cloud처럼 message 크기가 큰 topic은 publish rate를 낮추는 것만으로도 체감 차이가 크다.
 
 ## **5. Simulation Rate 자체 변경**
 
-전체 simulation rate를 변경하고 싶다면 `Window > Script Editor`에서 Python script를 실행합니다.
+전체 simulation rate를 변경하고 싶다면 `Window > Script Editor`에서 Python script를 실행한다.
 
 ![Script Editor에서 simulation rate 변경](/assets/img/posts/isaac-sim-publish-rate-qos/09-simulation-rate-script-editor.png)
 
-아래 설정은 app run loop의 rate limit과 simulation minimum frame rate를 60 FPS로 맞춥니다.
+아래 설정은 app run loop의 rate limit과 simulation minimum frame rate를 60 FPS로 맞춘다.
 
 ```python
 import carb
@@ -106,7 +107,7 @@ carb_settings.set_int("/app/runLoops/main/rateLimitFrequency", int(physics_rate)
 carb_settings.set_int("/persistent/simulation/minFrameRate", int(physics_rate))
 ```
 
-stage timing까지 함께 맞추려면 stage가 load된 뒤 timeline을 멈추고 time code와 target framerate를 설정합니다.
+stage timing까지 함께 맞추려면 stage가 load된 뒤 timeline을 멈추고 time code와 target framerate를 설정한다.
 
 ```python
 import omni
@@ -121,26 +122,26 @@ timeline.set_target_framerate(physics_rate)
 timeline.play()
 ```
 
-simulation rate를 바꾸면 모든 tick 기반 graph의 실행 빈도에도 영향을 줄 수 있습니다. 따라서 특정 sensor만 줄이고 싶다면 `Isaac Simulation Gate`나 `frameSkipCount`를 먼저 보는 편이 안전합니다.
+simulation rate를 바꾸면 모든 tick 기반 graph의 실행 빈도에도 영향을 줄 수 있다. 따라서 특정 sensor만 줄이고 싶다면 `Isaac Simulation Gate`나 `frameSkipCount`를 먼저 보는 편이 안전하다.
 
 ## **6. ROS2 QoS 기본 개념**
 
-QoS는 ROS2 publisher와 subscriber가 message를 주고받는 방식을 정하는 정책 묶음입니다. sensor topic처럼 손실을 조금 감수하고 최신 data가 중요한 경우와, 설정값처럼 늦게 붙은 subscriber도 반드시 받아야 하는 경우는 서로 다른 QoS가 필요합니다.
+QoS는 ROS2 publisher와 subscriber가 message를 주고받는 방식을 정하는 정책 묶음. sensor topic처럼 손실을 조금 감수하고 최신 data가 중요한 경우와, 설정값처럼 늦게 붙은 subscriber도 반드시 받아야 하는 경우는 서로 다른 QoS가 필요하다.
 
-자주 보는 정책은 아래와 같습니다.
+자주 보는 정책은 아래와 같다.
 
 | 정책 | 의미 |
 | --- | --- |
-| History | message를 얼마나 보관할지 정합니다. `keepLast`와 `keepAll`이 있습니다. |
-| Depth | `keepLast`일 때 queue에 보관할 최대 message 개수입니다. |
-| Reliability | `bestEffort`는 빠르지만 손실 가능성이 있고, `reliable`은 전달 보장을 우선합니다. |
-| Durability | `volatile`은 새 subscriber에게 과거 message를 주지 않고, `transientLocal`은 publisher가 보관한 message를 나중에 연결된 subscriber에게도 줍니다. |
+| History | message를 얼마나 보관할지 정한다. `keepLast`와 `keepAll`이 있다. |
+| Depth | `keepLast`일 때 queue에 보관할 최대 message 개수다. |
+| Reliability | `bestEffort`는 빠르지만 손실 가능성이 있고, `reliable`은 전달 보장을 우선한다. |
+| Durability | `volatile`은 새 subscriber에게 과거 message를 주지 않고, `transientLocal`은 publisher가 보관한 message를 나중에 연결된 subscriber에게도 준다. |
 
-실전에서는 sensor data는 `bestEffort` 계열을 쓰는 경우가 많고, 설정값이나 static message는 `transientLocal`이 필요한 경우가 있습니다.
+실전에서는 sensor data는 `bestEffort` 계열을 쓰는 경우가 많고, 설정값이나 static message는 `transientLocal`이 필요한 경우가 있다.
 
 ## **7. Generic Publisher에 QoS 연결**
 
-QoS를 확인하기 위해 Generic Publisher graph를 만듭니다.
+QoS를 확인하기 위해 Generic Publisher graph를 만든다.
 
 ```text
 Tools > Robotics > ROS 2 OmniGraphs > Generic Publisher
@@ -150,13 +151,13 @@ Tools > Robotics > ROS 2 OmniGraphs > Generic Publisher
 
 ![Generic Publisher 생성 dialog](/assets/img/posts/isaac-sim-publish-rate-qos/11-generic-publisher-dialog.png)
 
-생성된 graph에서 publisher type을 string publish로 바꾸고, QoS profile을 연결합니다.
+생성된 graph에서 publisher type을 string publish로 바꾸고, QoS profile을 연결한다.
 
 ![생성된 Generic Publisher graph](/assets/img/posts/isaac-sim-publish-rate-qos/12-generic-publisher-graph.png)
 
 ![Generic Publisher input 설정](/assets/img/posts/isaac-sim-publish-rate-qos/13-generic-publisher-inputs.png)
 
-ROS2 Publisher는 QoS를 JSON 형태로 받을 수 있습니다. `depth`는 양수여야 하고, `deadline`, `lifespan`, `leaseDuration`은 float 형태로 넣어야 유효하게 인식됩니다.
+ROS2 Publisher는 QoS를 JSON 형태로 받을 수 있다. `depth`는 양수여야 하고, `deadline`, `lifespan`, `leaseDuration`은 float 형태로 넣어야 유효하게 인식된다.
 
 ```json
 {
@@ -171,13 +172,13 @@ ROS2 Publisher는 QoS를 JSON 형태로 받을 수 있습니다. `depth`는 양�
 }
 ```
 
-`ROS2 QoS Profile` 노드를 publisher에 연결하면 node UI에서 profile을 선택할 수 있습니다. sensor data라면 `createProfile`을 sensor data 계열로 맞춥니다.
+`ROS2 QoS Profile` 노드를 publisher에 연결하면 node UI에서 profile을 선택할 수 있다. sensor data라면 `createProfile`을 sensor data 계열로 맞춘다.
 
 ![ROS2 QoS Profile 노드 연결](/assets/img/posts/isaac-sim-publish-rate-qos/14-qos-profile-node.png)
 
 ![QoS Profile 설정](/assets/img/posts/isaac-sim-publish-rate-qos/15-qos-profile-settings.png)
 
-topic의 실제 QoS는 아래 명령으로 확인합니다.
+topic의 실제 QoS는 아래 명령으로 확인한다.
 
 ```bash
 ros2 topic info /topic --verbose
@@ -187,23 +188,23 @@ ros2 topic info /topic --verbose
 
 ## **8. Static Publisher 만들기**
 
-static publisher는 message를 반복해서 publish하기보다 한 번 publish하고, 새 subscriber가 나중에 붙어도 그 값을 받을 수 있게 만드는 패턴입니다. 초기 설정값, map metadata, 변하지 않는 상태값처럼 “늦게 들어와도 알아야 하는 값”에 어울립니다.
+static publisher는 message를 반복해서 publish하기보다 한 번 publish하고, 새 subscriber가 나중에 붙어도 그 값을 받을 수 있게 만드는 패턴. 초기 설정값, map metadata, 변하지 않는 상태값처럼 “늦게 들어와도 알아야 하는 값”에 어울린다.
 
-새 graph를 만들고 `On Playback Tick` 대신 `On Stage Event`를 사용합니다.
+새 graph를 만들고 `On Playback Tick` 대신 `On Stage Event`를 사용한다.
 
 ![Static Publisher graph](/assets/img/posts/isaac-sim-publish-rate-qos/17-static-publisher-graph.png)
 
-설정은 아래 순서로 진행합니다.
+설정은 아래 순서로 진행한다.
 
-1. `On Stage Event`의 event name을 simulation start play로 설정합니다.
-2. `Countdown` 노드의 input duration을 `3`, period를 `1`로 설정해 simulation 시작 후 3 frame 뒤 publisher에 tick이 들어가게 합니다.
-3. `ROS2 QoS Profile`은 publisher/subscriber default 계열로 두고, depth를 `1`, durability를 `transientLocal`로 설정합니다.
+1. `On Stage Event`의 event name을 simulation start play로 설정한다.
+2. `Countdown` 노드의 input duration을 `3`, period를 `1`로 설정해 simulation 시작 후 3 frame 뒤 publisher에 tick이 들어가게 한다.
+3. `ROS2 QoS Profile`은 publisher/subscriber default 계열로 두고, depth를 `1`, durability를 `transientLocal`로 설정한다.
 
 ![On Stage Event와 Countdown 설정](/assets/img/posts/isaac-sim-publish-rate-qos/18-static-publisher-stage-event.png)
 
 ![transientLocal QoS 설정](/assets/img/posts/isaac-sim-publish-rate-qos/19-static-publisher-transient-local.png)
 
-한 터미널에서 topic을 확인한 뒤, 다른 터미널에서 다시 구독해도 같은 message가 들어오면 `transientLocal` 설정이 제대로 적용된 것입니다.
+한 터미널에서 topic을 확인한 뒤, 다른 터미널에서 다시 구독해도 같은 message가 들어오면 `transientLocal` 설정이 제대로 적용된 것.
 
 ```bash
 ros2 topic echo /topic
@@ -213,7 +214,7 @@ ros2 topic echo /topic
 
 ## **9. Rate와 전달 정책은 별도 설정이다**
 
-publish rate와 QoS는 topic이 “보이게 만드는 것” 다음 단계의 튜닝입니다.
+publish rate와 QoS는 topic이 “보이게 만드는 것” 다음 단계의 튜닝이다.
 
 ```text
 publish rate:
@@ -227,4 +228,4 @@ QoS:
   -> subscriber behavior
 ```
 
-Publish rate는 message를 얼마나 자주 만들지 정하고, QoS는 만들어진 message를 어떤 조건으로 전달할지 정합니다. 센서별로 필요한 주기를 먼저 잡은 뒤 reliability와 durability를 subscriber 요구사항에 맞춰야 합니다. 늦게 접속한 subscriber도 마지막 상태값을 받아야 한다면 `transientLocal`이 필요하지만, 계속 갱신되는 고주기 sensor data에 무조건 적용할 설정은 아닙니다.
+Publish rate는 message를 얼마나 자주 만들지 정하고, QoS는 만들어진 message를 어떤 조건으로 전달할지 정한다. 센서별로 필요한 주기를 먼저 잡은 뒤 reliability와 durability를 subscriber 요구사항에 맞춰야 한다. 늦게 접속한 subscriber도 마지막 상태값을 받아야 한다면 `transientLocal`이 필요하지만, 계속 갱신되는 고주기 sensor data에 무조건 적용할 설정은 아니다.

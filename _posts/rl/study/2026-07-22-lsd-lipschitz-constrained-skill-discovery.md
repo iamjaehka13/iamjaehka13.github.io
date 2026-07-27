@@ -1,6 +1,7 @@
 ---
 title: "LSD: 정적인 구별 가능성에서 멀리 이동하는 스킬로"
 date: 2026-07-22 15:08:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [lsd, diayn, dads, unsupervised-reinforcement-learning, skill-discovery, lipschitz-continuity, spectral-normalization, soft-actor-critic, zero-shot-control]
 description: "Lipschitz-constrained Skill Discovery가 기존 mutual-information 기반 스킬의 정적인 해를 어떻게 벗어나는지, Gaussian 목적함수 분해부터 방향성 보상, spectral normalization, zero-shot goal reaching과 한계까지 정리한다."
@@ -14,7 +15,7 @@ image:
 
 > **서로 구별되기만 하면 충분한가, 아니면 실제로 크게 움직여야 하는가?**
 
-Mutual information은 두 skill이 아주 조금만 다른 상태를 만들어도 충분히 높아질 수 있다. Ant가 멀리 걷지 않고 제자리에서 관절 자세만 다르게 만드는 것이 대표적인 쉬운 해다. Skill 번호는 잘 맞힐 수 있지만, locomotion이나 넓은 탐색에 바로 쓰기는 어렵다.
+Mutual information은 두 skill이 아주 조금만 다른 상태를 만들어도 충분히 높아질 수 있다. Ant가 멀리 걷지 않고 제자리에서 관절 자세만 다르게 만드는 것이 대표적인 쉬운 해. Skill 번호는 잘 맞힐 수 있지만, locomotion이나 넓은 탐색에 바로 쓰기는 어렵다.
 
 LSD, **Lipschitz-constrained Skill Discovery**는 목표를 다음처럼 바꾼다.
 
@@ -39,7 +40,7 @@ LSD, **Lipschitz-constrained Skill Discovery**는 목표를 다음처럼 바꾼�
 
 _공식 프로젝트 페이지의 Ant 2-D continuous-skill 비교. DIAYN의 MI 목적은 작은 자세 차이로도 skill을 구별할 수 있지만, LSD는 실제 state variation을 키우도록 설계됐다. 출처: [Park et al., LSD project](https://seohong.me/projects/lsd/)._
 
-여기서 중요한 것은 "DIAYN은 항상 정지하고 LSD는 항상 걷는다"가 아니다. 정확한 주장은 다음과 같다.
+여기서 중요한 것은 "DIAYN은 항상 정지하고 LSD는 항상 걷는다"가 아니다. 정확한 주장은:
 
 - 일반적인 MI 목적은 **큰 이동을 특별히 더 선호하지 않는다**.
 - 따라서 feature engineering이 없으면 작은 자세 차이가 더 쉬운 최적화 해가 될 수 있다.
@@ -62,11 +63,11 @@ _공식 프로젝트 페이지의 Ant 2-D continuous-skill 비교. DIAYN의 MI �
 | Downstream | Hierarchical fine-tuning, zero-shot goal following |
 | Source | [arXiv](https://arxiv.org/abs/2202.00914), [OpenReview](https://openreview.net/forum?id=BGvt0ghNgA), [Official project](https://seohong.me/projects/lsd/), [Official code](https://github.com/seohongpark/LSD) |
 
-논문이 강조하는 것은 단순한 state coverage뿐만이 아니다. 학습한 $\phi$에서 목표 방향을 바로 계산해 별도 planning이나 추가 학습 없이 goal-following에 사용할 수 있다는 점도 핵심 결과다.
+논문이 강조하는 것은 단순한 state coverage뿐만이 아니다. 학습한 $\phi$에서 목표 방향을 바로 계산해 별도 planning이나 추가 학습 없이 goal-following에 사용할 수 있다는 점도 핵심 결과.
 
 ## 2. 왜 MI는 정적인 skill에도 만족할 수 있는가?
 
-Continuous skill을 사용하는 DIAYN류 목적을 단순화하면 다음과 같다.
+Continuous skill을 사용하는 DIAYN류 목적을 단순화하면:
 
 $$
 I(Z;S)
@@ -88,7 +89,7 @@ $$
 -\frac{1}{2}\|z-\mu(s)\|_2^2 + C
 $$
 
-이 목적이 원하는 것은 상태에서 skill $z$를 복원하는 것이다. $mu(s)=z$가 되면 이미 최적이다. 그 상태가 시작점에서 1 cm 떨어졌는지 10 m 떨어졌는지는 직접 묻지 않는다.
+이 목적이 원하는 것은 상태에서 skill $z$를 복원하는 것이다. $mu(s)=z$가 되면 이미 최적. 그 상태가 시작점에서 1 cm 떨어졌는지 10 m 떨어졌는지는 직접 묻지 않는다.
 
 예를 들어 Ant의 각 skill이 다음과 같이 다른 관절 자세를 만든다고 하자.
 
@@ -100,7 +101,7 @@ z3 -> 몸통을 약간 낮춤
 
 Discriminator는 이 차이만으로 $z$를 맞힐 수 있다. MI 관점에서는 성공이지만, 이동 skill 관점에서는 만족스럽지 않을 수 있다.
 
-이것이 LSD가 지적한 **lower-hanging fruit**다. 멀리 이동하는 안정적인 locomotion을 배우는 것보다 제자리 자세를 조금 바꾸는 편이 먼저 학습되기 쉽다.
+이것이 LSD가 지적한 **lower-hanging fruit**. 멀리 이동하는 안정적인 locomotion을 배우는 것보다 제자리 자세를 조금 바꾸는 편이 먼저 학습되기 쉽다.
 
 ## 3. $z$를 표현공간의 이동 방향으로 바꾸기
 
@@ -129,7 +130,7 @@ $$
 \Delta\phi=\phi(s_T)-\phi(s_0)
 $$
 
-라고 쓰면 Gaussian log-likelihood는 다음과 같다.
+라고 쓰면 Gaussian log-likelihood는:
 
 $$
 \log q(z\mid s_0,s_T)
@@ -251,7 +252,7 @@ $$
 
 ### 5.1 Lipschitz는 거리 보존이 아니다
 
-여기서 가장 주의해야 할 부분이다.
+여기서 가장 주의해야 할 부분.
 
 $$
 \|\Delta\phi\|\le\|\Delta s\|
@@ -263,7 +264,7 @@ $$
 \|\Delta s\|=100,\qquad \|\Delta\phi\|=0
 $$
 
-즉 $\phi$는 실제로 큰 차이를 무시하거나 강하게 축소할 수 있다. LSD가 요구하는 것은 isometry나 거리 보존이 아니라 **거리 과장 방지**다.
+즉 $\phi$는 실제로 큰 차이를 무시하거나 강하게 축소할 수 있다. LSD가 요구하는 것은 isometry나 거리 보존이 아니라 **거리 과장 방지**.
 
 ## 6. Spectral normalization은 무엇을 제한하는가?
 
@@ -313,7 +314,7 @@ W=
 \end{bmatrix}
 $$
 
-이 행렬은 첫 번째 축을 3배, 두 번째 축을 0.5배로 바꾼다. 가장 큰 singular value는 3이다.
+이 행렬은 첫 번째 축을 3배, 두 번째 축을 0.5배로 바꾼다. 가장 큰 singular value는 3.
 
 $$
 \bar W
@@ -348,7 +349,7 @@ $$
 - Residual sum, normalization layer, 미정규화 branch가 있다면 전체 상수를 별도로 계산해야 한다.
 - 각 층의 곱은 실제 global Lipschitz constant에 대한 보수적인 upper bound일 수 있다.
 
-LSD에서 spectral normalization의 주목적은 단순한 학습 안정화가 아니다. **Reward를 만드는 latent distance를 실제 state variation에 묶는 것**이다.
+LSD에서 spectral normalization의 주목적은 단순한 학습 안정화가 아니다. **Reward를 만드는 latent distance를 실제 state variation에 묶는 것**.
 
 ## 7. Episode 목적을 step reward로 바꾸기
 
@@ -375,7 +376,7 @@ z^\top
 \right]
 $$
 
-이고 한 step의 intrinsic reward는 다음과 같다.
+이고 한 step의 intrinsic reward는:
 
 $$
 r_t^{\mathrm{LSD}}
@@ -408,7 +409,7 @@ LSD에는 크게 두 학습 대상이 있다.
 | Policy $\pi_\theta(a\mid s,z)$ | state와 skill | 해당 $z$ 방향의 변화를 만드는 action 선택 |
 | Representation $\phi_\psi(s)$ | state | reward에 사용할 latent state 표현 생성 |
 
-학습 흐름은 다음과 같다.
+학습 흐름은:
 
 ![LSD training loop](/assets/img/posts/rl/lsd/10-lsd-training-loop.svg){: width="1150" .d-block .mx-auto }
 _Episode마다 $z$를 뽑아 고정하고, transition의 표현 차이로 reward를 만든다. $\phi$는 spectral normalization 아래 SGD로, policy는 SAC로 번갈아 갱신한다._
@@ -538,7 +539,7 @@ pi(a | s, z) 실행
 ![Continuous skill trajectories](/assets/img/posts/rl/lsd/05-continuous-skill-trajectories.png){: width="1150" .d-block .mx-auto }
 _Ant와 Humanoid의 continuous skill trajectory. LSD는 feature engineering 없이 여러 방향으로 넓은 이동 범위를 만들었다. 각 plot의 축 범위가 같다는 점을 함께 확인해야 한다. 출처: [Park et al., Figure 2](https://arxiv.org/abs/2202.00914)._
 
-DIAYN, DADS 등 일부 baseline에 `-XYO`가 붙은 것은 locomotion을 유도하는 feature engineering을 사용한 변형이다. LSD는 hand-engineered x-y discriminator input 없이 비교했다.
+DIAYN, DADS 등 일부 baseline에 `-XYO`가 붙은 것은 locomotion을 유도하는 feature engineering을 사용한 변형. LSD는 hand-engineered x-y discriminator input 없이 비교했다.
 
 ### 11.2 State-space coverage
 
@@ -570,12 +571,12 @@ _오른쪽 3x4: 같은 reward와 state 표현 조합에 1-Lipschitz 제약을 �
 ![Figure 7의 LSD 핵심 조합 확대](/assets/img/posts/rl/lsd/08-ablation-lsd-detail.png){: width="520" .d-block .mx-auto }
 _핵심 셀 확대: inner product reward + representation difference $\phi(s')-\phi(s)$ + 1-Lipschitz constraint. 색마다 서로 다른 skill trajectory이며, skill 방향별로 넓은 coverage가 형성된다._
 
-Figure 7의 축을 읽는 방법은 다음과 같다.
+Figure 7의 축을 읽는 방법은:
 
 - **행**: Normal distribution, vMF distribution, inner product 순서로 reward 형태를 바꾼다.
 - **열**: $\phi(s)$, $\phi(s')$, $\phi(s'-s)$, $\phi(s')-\phi(s)$ 순서로 현재·다음 state의 표현 방식을 바꾼다.
 - **좌우**: 왼쪽은 Lipschitz 제약이 없고, 오른쪽은 spectral normalization으로 1-Lipschitz를 적용한다.
-- **오른쪽 아래**: LSD가 채택한 세 요소가 함께 들어간 설정이다. 그림에서 유일하게 넓은 방사형 trajectory가 뚜렷하다.
+- **오른쪽 아래**: LSD가 채택한 세 요소가 함께 들어간 설정. 그림에서 유일하게 넓은 방사형 trajectory가 뚜렷하다.
 
 이 ablation은 **DIAYN에 spectral normalization만 추가해도 LSD가 되지 않는다**는 사실을 보여준다.
 
@@ -626,7 +627,7 @@ State에 위치, 관절각, 속도, 방향이 함께 들어 있으면 어떤 차
 
 ### 13.2 Pixel space에는 바로 적용하기 어렵다
 
-두 이미지의 Euclidean pixel distance가 제어 관점의 의미 있는 거리를 나타내지는 않는다. 조명 변화나 배경 texture가 크게 달라질 수 있기 때문이다. 논문도 pixel observation처럼 Lipschitz 기준이 semantically meaningful하지 않은 환경을 한계로 명시한다.
+두 이미지의 Euclidean pixel distance가 제어 관점의 의미 있는 거리를 나타내지는 않는다. 조명 변화나 배경 texture가 크게 달라질 수 있기 때문. 논문도 pixel observation처럼 Lipschitz 기준이 semantically meaningful하지 않은 환경을 한계로 명시한다.
 
 ### 13.3 Continuous LSD는 magnitude를 충분히 사용하지 않는다
 

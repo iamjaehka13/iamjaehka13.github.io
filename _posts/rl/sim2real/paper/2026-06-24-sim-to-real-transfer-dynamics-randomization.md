@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 3] Dynamics Randomization"
 date: 2026-06-24 17:31:00 +0900
-last_modified_at: 2026-07-27 21:24:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, dynamics-randomization, recurrent-policy, implicit-system-identification, fetch-robot, object-pushing, rdpg, her]
 description: Peng et al.의 dynamics randomization을 Fetch puck pushing 실험, RDPG와 HER, LSTM 기반 implicit system identification, omniscient critic, 실물 ablation 결과까지 원문 기준으로 정리한다.
@@ -497,7 +497,7 @@ LSTM policy에서 randomization 항목을 하나씩 제거한 real-robot ablatio
 
 실제 deployment에서 policy가 만나는 control frequency, latency, sensor uncertainty가 simulation과 다르면, 물리 parameter를 넓게 흔들어도 transfer가 실패할 수 있다.
 
-물론 이 ablation도 각 조건의 trial 수가 다르고 seed 수준의 통계가 충분하지 않는다. “Observation noise가 항상 link mass보다 중요하다”는 일반 법칙으로 확대하기보다, **이 Fetch setup에서는 timing과 sensing mismatch가 핵심 bottleneck이었다**고 읽는 편이 정확하다.
+물론 이 ablation도 각 조건의 trial 수가 다르고 seed 수준의 통계가 충분하지 않다. “Observation noise가 항상 link mass보다 중요하다”는 일반 법칙으로 확대하기보다, **이 Fetch setup에서는 timing과 sensing mismatch가 핵심 bottleneck이었다**고 읽는 편이 정확하다.
 
 ### **5.4 Training 범위 밖처럼 보이는 Contact 변화에도 버텼다**
 

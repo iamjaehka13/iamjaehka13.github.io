@@ -1,6 +1,7 @@
 ---
 title: "METRA: 픽셀 거리가 아닌 시간적 거리로 스킬 공간 만들기"
 date: 2026-07-22 20:30:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [metra, lsd, diayn, unsupervised-reinforcement-learning, skill-discovery, wasserstein-distance, temporal-distance, representation-learning, soft-actor-critic, zero-shot-control]
 description: "METRA가 mutual information 대신 Wasserstein dependency measure를 사용하고, 픽셀의 Euclidean 거리가 아닌 temporal distance로 metric-aware skill abstraction을 학습하는 과정을 정리한다."
@@ -60,7 +61,7 @@ _같은 pixel-based Quadruped benchmark에서 그린 global $x$-$y$ trajectory. 
 
 - METRA가 image semantics를 완벽하게 이해했다는 뜻은 아니다.
 - 모든 skill이 유용하거나 안정적인 locomotion이라는 뜻도 아니다.
-- 중요한 차이는 **어떤 distance metric으로 representation을 제한했는가**다.
+- 중요한 차이는 **어떤 distance metric으로 representation을 제한했는가**.
 
 ## 1. 논문 정보
 
@@ -140,7 +141,7 @@ METRA의 목표는 둘 사이에 있다.
 
 ## 3. Pixel L2가 control distance가 아닌 이유
 
-LSD의 1-Lipschitz 제약은 다음 형태다.
+LSD의 1-Lipschitz 제약은 다음 형태.
 
 $$
 \|\phi(s)-\phi(s')\|_2
@@ -160,7 +161,7 @@ $$
 
 _Raw pixel L2는 한 순간의 시각 변화에 크게 반응할 수 있다. Temporal metric은 한 transition의 latent 변화를 제한하고, 큰 latent displacement가 여러 step에 걸쳐 누적되게 만든다._
 
-정확한 표현은 다음과 같다.
+정확한 표현은:
 
 - LSD는 pixel 차이를 state-space metric으로 사용할 경우 nuisance variation을 크게 평가할 수 있다.
 - METRA는 raw pixel L2를 거리로 사용하지 않는다.
@@ -181,7 +182,7 @@ p(s,z),p(s)p(z)
 \right)
 $$
 
-비교하면 다음과 같다.
+비교하면:
 
 | 목적 | Divergence | Metric 사용 |
 |---|---|---|
@@ -195,7 +196,7 @@ Wasserstein distance는 한 분포의 질량을 다른 분포로 운반하는 �
 1. 실제 state-skill 대응은 독립적으로 섞은 대응과 다른가?
 2. 그 차이는 선택한 metric에서 얼마나 큰가?
 
-이것이 단순히 "KL 대신 Wasserstein을 썼다"에서 끝나지 않는 이유다. **어떤 metric을 넣는가가 발견되는 skill의 우선순위를 결정한다.**
+이것이 단순히 "KL 대신 Wasserstein을 썼다"에서 끝나지 않는 이유. **어떤 metric을 넣는가가 발견되는 skill의 우선순위를 결정한다.**
 
 ## 5. WDM에서 intrinsic reward까지
 
@@ -218,7 +219,7 @@ I_{\mathcal{W}}(S;Z)
 \right]
 $$
 
-$f(s,z)$는 실제 joint sample에 높은 score를, 독립 sample에 낮은 score를 주는 함수다. Scale만 무한히 키워 목적을 조작하지 못하도록 Lipschitz constraint가 필요하다.
+$f(s,z)$는 실제 joint sample에 높은 score를, 독립 sample에 낮은 score를 주는 함수. Scale만 무한히 키워 목적을 조작하지 못하도록 Lipschitz constraint가 필요하다.
 
 ### 5.2 State와 skill 표현을 내적으로 분해
 
@@ -287,7 +288,7 @@ $$
 \right)
 $$
 
-따라서 한 step의 intrinsic reward는 다음과 같다.
+따라서 한 step의 intrinsic reward는:
 
 $$
 \boxed{
@@ -301,9 +302,9 @@ $$
 
 이 reward는 skill 방향으로 latent state가 움직였을 때 커진다.
 
-중요한 경계는 다음이다.
+중요한 경계는:
 
-> 이 간결한 reward는 full WDM을 아무 손실 없이 그대로 계산한 것이 아니라, factorization, endpoint dependency, $\psi(z)=z$ 같은 단순화를 거친 tractable objective다.
+> 이 간결한 reward는 full WDM을 아무 손실 없이 그대로 계산한 것이 아니라, factorization, endpoint dependency, $\psi(z)=z$ 같은 단순화를 거친 tractable objective.
 
 ## 6. METRA가 선택한 metric: temporal distance
 
@@ -315,7 +316,7 @@ d_{\mathrm{temp}}(s_1,s_2)
 \text{$s_1$에서 $s_2$에 도달하는 데 필요한 최소 environment step 수}
 $$
 
-예를 들면 다음과 같다.
+예를 들면:
 
 ~~~text
 한 step으로 도달 가능       -> temporal distance 1
@@ -325,7 +326,7 @@ $$
 
 Temporal distance는 observation 좌표계보다 MDP transition dynamics에 의해 결정된다. 그래서 image가 입력이어도 raw pixel L2에 직접 의존하지 않는다.
 
-원래 원하는 Lipschitz 관계는 다음이다.
+원래 원하는 Lipschitz 관계는:
 
 $$
 \|\phi(s_1)-\phi(s_2)\|_2
@@ -342,7 +343,7 @@ $$
 }
 $$
 
-한 step으로 연결됐으므로 temporal distance가 1 이하라는 사실을 이용한 것이다.
+한 step으로 연결됐으므로 temporal distance가 1 이하라는 사실을 이용한 것.
 
 ## 7. Local constraint가 global bound가 되는 이유
 
@@ -390,7 +391,7 @@ $$
 \phi(s)=0,\qquad \forall s
 $$
 
-모든 latent distance가 0이면 constraint를 완벽하게 만족한다. Collapse를 막는 힘은 constraint 자체가 아니라 directional objective다.
+모든 latent distance가 0이면 constraint를 완벽하게 만족한다. Collapse를 막는 힘은 constraint 자체가 아니라 directional objective.
 
 ~~~text
 Constraint
@@ -400,7 +401,7 @@ Objective
 -> 허용된 범위에서 z 방향의 displacement를 크게 만듦
 ~~~
 
-따라서 $\phi$는 temporal distance의 정확한 estimator가 아니다. 제한된 latent dimension에서 objective에 유용한 temporal structure를 선택적으로 펼치는 abstraction이다.
+따라서 $\phi$는 temporal distance의 정확한 estimator가 아니다. 제한된 latent dimension에서 objective에 유용한 temporal structure를 선택적으로 펼치는 abstraction.
 
 ## 8. 실제 학습: SAC와 dual gradient descent
 
@@ -414,7 +415,7 @@ METRA는 세 가지 학습 대상을 가진다.
 
 ![METRA training loop](/assets/img/posts/rl/metra/09-metra-training-loop.svg){: width="1200" .d-block .mx-auto }
 
-학습 루프는 다음과 같다.
+학습 루프는:
 
 ~~~text
 1. z ~ p(z)를 sample하고 episode 동안 고정
@@ -457,7 +458,7 @@ $$
 | Reward | $\Delta\phi^\top z$ | $\Delta\phi^\top z$ |
 | Policy | SAC | SAC |
 
-Reward 모양은 같지만 constraint가 의미하는 metric이 다르다. **METRA는 LSD에 이름만 바꾼 것이 아니라, 같은 inner-product reward를 temporal metric에 연결하고 이를 WDM에서 다시 해석한 방법**이다.
+Reward 모양은 같지만 constraint가 의미하는 metric이 다르다. **METRA는 LSD에 이름만 바꾼 것이 아니라, 같은 inner-product reward를 temporal metric에 연결하고 이를 WDM에서 다시 해석한 방법**.
 
 Representation이 계속 바뀌므로 같은 replay transition의 intrinsic reward도 학습 중 달라질 수 있다. 일반적인 fixed task reward보다 critic target의 non-stationarity가 크다는 점은 구현에서 주의해야 한다.
 
@@ -486,7 +487,7 @@ _64×64 RGB pixel state를 compact latent space로 압축하되, temporally clos
 - 일반 PCA: Euclidean variance가 큰 축을 찾음
 - METRA의 해석: Temporal manifold가 넓게 펼쳐진 축을 찾음
 
-단, 공식 정리는 여러 단순화 아래 **linear squared METRA**가 temporal embedding space에서 PCA와 동등하다는 내용이다. 실제 nonlinear $\phi$가 항상 PCA처럼 동작한다는 일반 정리는 아니다.
+단, 공식 정리는 여러 단순화 아래 **linear squared METRA**가 temporal embedding space에서 PCA와 동등하다는 내용. 실제 nonlinear $\phi$가 항상 PCA처럼 동작한다는 일반 정리는 아니다.
 
 ## 10. Continuous skill과 discrete skill
 
@@ -500,7 +501,7 @@ $$
 
 $z$는 latent displacement가 정렬될 방향과 크기를 제공한다. Ant와 Humanoid는 2-D, pixel Quadruped는 4-D continuous skill을 사용했다.
 
-장점은 다음과 같다.
+장점은:
 
 - Latent 방향을 연속적으로 선택할 수 있음
 - Goal direction을 직접 skill command로 바꿀 수 있음
@@ -510,7 +511,7 @@ $z$는 latent displacement가 정렬될 방향과 크기를 제공한다. Ant와
 
 ### 10.2 Discrete skill
 
-Discrete setting은 zero-centered one-hot vector를 사용한다. $K$개 skill에서 $i$번째 code는 다음과 같다.
+Discrete setting은 zero-centered one-hot vector를 사용한다. $K$개 skill에서 $i$번째 code는:
 
 $$
 [z_i]_j
@@ -529,7 +530,7 @@ Discrete latent는 locomotion 방향뿐 아니라 static pose, flipping, 서로 
 
 Representation $\phi$가 temporal structure를 학습했다면 현재 state $s$에서 goal $g$를 향하는 latent direction을 계산할 수 있다.
 
-Continuous skill은 다음과 같다.
+Continuous skill은:
 
 $$
 z
@@ -549,7 +550,7 @@ z
 \right)
 $$
 
-이 방법은 별도의 goal-conditioned policy 없이 skill을 고를 수 있다는 의미에서 zero-shot이다. 하지만 다음을 보장하지는 않는다.
+이 방법은 별도의 goal-conditioned policy 없이 skill을 고를 수 있다는 의미에서 zero-shot. 하지만 다음을 보장하지는 않는다.
 
 - Obstacle을 고려한 최적 경로
 - 모든 goal의 reachability
@@ -639,7 +640,7 @@ METRA를 이들의 단순한 상위호환으로 읽으면 안 된다.
 
 ### 14.1 Temporal distance는 비대칭일 수 있다
 
-Latent Euclidean distance는 대칭이다.
+Latent Euclidean distance는 대칭.
 
 $$
 \|\phi(s)-\phi(g)\|_2

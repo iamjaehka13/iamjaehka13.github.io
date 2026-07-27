@@ -1,6 +1,7 @@
 ---
 title: "MCP: 여러 Motor Primitive를 곱해 행동을 조합하기"
 date: 2026-07-24 23:10:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [mcp, multiplicative-compositional-policies, product-of-experts, hierarchical-reinforcement-learning, motor-primitives, motion-imitation, transfer-learning, ppo, robotics, humanoid-control]
 description: "MCP가 Gaussian motor primitive를 곱해 한 timestep에서 여러 운동 요소를 조합하고, motion imitation으로 배운 primitive를 새 task에 전달하는 원리를 정리한다."
@@ -33,7 +34,7 @@ image:
 
 ![MCP가 수행한 T-Rex dribbling, biped box carrying, humanoid heading task](/assets/img/posts/rl/mcp/01-paper-teaser.png){: width="1400" .d-block .mx-auto }
 
-_왼쪽부터 T-Rex의 공 dr리블, biped의 상자 운반, humanoid의 heading control이다. 파란 선은 이동 궤적이다. 출처: [MCP 공식 프로젝트 페이지](https://xbpeng.github.io/projects/MCP/)._
+_왼쪽부터 T-Rex의 공 dr리블, biped의 상자 운반, humanoid의 heading control. 파란 선은 이동 궤적. 출처: [MCP 공식 프로젝트 페이지](https://xbpeng.github.io/projects/MCP/)._
 
 논문은 14-DoF Ant, 23-DoF biped, 34-DoF humanoid, 55-DoF T-Rex를 대상으로 실험했다. 가장 어려운 실험은 T-Rex가 접촉 동역학을 이용해 공을 목표 지점까지 드리블하는 task였다.
 
@@ -54,7 +55,7 @@ _MCP 저자들이 공개한 [supplementary video](https://www.youtube.com/watch?
 - MCP가 모든 transfer task에서 항상 최고였다는 뜻은 아니다.
 - 실제 robot 실험이 아니라 physics simulator의 character control 결과다.
 - Primitive가 `걷기`, `돌기`, `균형`처럼 사람이 해석하기 좋은 이름으로 분리된다는 보장은 없다.
-- 논문이 강하게 보여준 것은 **복잡한 고차원 task에서 motion prior를 가진 조합형 action space가 유용할 수 있다**는 점이다.
+- 논문이 강하게 보여준 것은 **복잡한 고차원 task에서 motion prior를 가진 조합형 action space가 유용할 수 있다**는 점.
 
 ## 1. 논문 정보
 
@@ -74,7 +75,7 @@ _MCP 저자들이 공개한 [supplementary video](https://www.youtube.com/watch?
 
 MCP는 [DIAYN](/posts/diayn-diversity-is-all-you-need/), [DADS](/posts/dads-dynamics-aware-skill-discovery/), [CIC](/posts/cic-contrastive-intrinsic-control/), [LSD](/posts/lsd-lipschitz-constrained-skill-discovery/), [METRA](/posts/metra-metric-aware-abstraction/)처럼 외부 task reward 없이 behavior를 발견하는 논문이 아니다.
 
-Motion data를 이용해 운동 구성요소를 배우고, 그 구성요소를 새 task에서 **어떻게 조합할 것인가**가 중심 문제다.
+Motion data를 이용해 운동 구성요소를 배우고, 그 구성요소를 새 task에서 **어떻게 조합할 것인가**가 중심 문제.
 
 ## 2. 기존 계층 정책의 한계: 하나를 고를 것인가, 함께 쓸 것인가?
 
@@ -115,7 +116,7 @@ $$
 }
 $$
 
-$Z(s,g)$는 결과의 적분이 1이 되도록 만드는 normalization constant다.
+$Z(s,g)$는 결과의 적분이 1이 되도록 만드는 normalization constant.
 
 ![Additive mixture와 multiplicative product의 차이](/assets/img/posts/rl/mcp/02-mixture-vs-product.svg){: width="1200" .d-block .mx-auto }
 
@@ -134,7 +135,7 @@ primitive 3: 상자를 놓치는 arm action은 허용하지 않음
 
 ### 2.1 로그 공간에서 보면 더 명확하다
 
-Product에 로그를 취하면 다음과 같다.
+Product에 로그를 취하면:
 
 $$
 \log \pi_{\text{MCP}}(a\mid s,g)
@@ -162,7 +163,7 @@ $$
 하나의 action vector aₜ
 ```
 
-동시에 활성화된다는 뜻은 여러 primitive가 **하나의 최종 distribution을 만드는 데 함께 기여한다**는 뜻이다.
+동시에 활성화된다는 뜻은 여러 primitive가 **하나의 최종 distribution을 만드는 데 함께 기여한다**는 뜻.
 
 ## 3. Gaussian primitive를 곱하면 무엇이 나오는가?
 
@@ -200,7 +201,7 @@ $$
 }
 $$
 
-그러면 최종 variance와 mean은 다음과 같다.
+그러면 최종 variance와 mean은:
 
 $$
 \boxed{
@@ -246,7 +247,7 @@ vᵢ(s): 각 action dimension에서 내 제안을 얼마나 강하게 주장할 
 
 ### 3.1 한 차원에서 직접 유도하기
 
-한 action dimension만 생각하면 weighted product는 다음과 같다.
+한 action dimension만 생각하면 weighted product는:
 
 $$
 \prod_i
@@ -364,7 +365,7 @@ $$
 \right)
 $$
 
-Primitive의 질문은 다음과 같다.
+Primitive의 질문은:
 
 > 현재 몸 상태에서 어떤 action pattern이 물리적으로 자연스러운가?
 
@@ -382,7 +383,7 @@ w_1(s,g),\ldots,w_K(s,g)
 \right]
 $$
 
-Gate의 질문은 다음과 같다.
+Gate의 질문은:
 
 > 현재 goal을 달성하려면 이 운동 구성요소들을 어떤 비율과 강도로 사용할 것인가?
 
@@ -440,7 +441,7 @@ r_t(\theta)
 \right]
 $$
 
-차이는 composite mean과 variance가 다음 parameter들로 만들어진다는 점이다.
+차이는 composite mean과 variance가 다음 parameter들로 만들어진다는 점.
 
 ```text
 gate weight wᵢ
@@ -463,7 +464,7 @@ Positive advantage를 받은 action에 대해 학습은 다음 중 여러 경로
 - Primitive variance $v_{ij}$를 줄여 특정 관절에서 영향력을 높인다.
 - 충돌하는 primitive의 weight를 낮추거나 variance를 키운다.
 
-환경 dynamics를 통과해 직접 미분하는 것은 아니다. PPO가 샘플링한 action의 log probability를 이용하는 score-function gradient 구조는 그대로다.
+환경 dynamics를 통과해 직접 미분하는 것은 아니다. PPO가 샘플링한 action의 log probability를 이용하는 score-function gradient 구조는 그대로.
 
 ## 6. 학습은 두 단계로 나뉜다
 
@@ -567,7 +568,7 @@ primitive 3 = 물체 들기
 action space의 특정 방향
 ```
 
-이 점이 DIAYN 계열의 $z$와 가장 크게 다른 부분이다.
+이 점이 DIAYN 계열의 $z$와 가장 크게 다른 부분.
 
 ### 7.1 진짜 spatial composition은 action dimension별로 일어난다
 
@@ -600,7 +601,7 @@ $\alpha_{ij}$가 action dimension마다 다르므로, 왼쪽 다리는 한 primi
 
 ## 8. 왜 복잡한 task에서 structured exploration이 중요한가?
 
-고차원 character를 raw action space에서 처음부터 학습한다고 하자. 관절마다 독립 Gaussian noise를 넣으면 대부분의 초기 behavior는 다음과 같다.
+고차원 character를 raw action space에서 처음부터 학습한다고 하자. 관절마다 독립 Gaussian noise를 넣으면 대부분의 초기 behavior는:
 
 ```text
 균형을 잃음
@@ -617,7 +618,7 @@ MCP에서는 random gate weight도 motion imitation으로 배운 primitive들을
 균형을 잃지 않은 채 물체 근처로 접근하기
 ```
 
-이 차이는 task reward를 잘 설계했다는 뜻이 아니다. Reward를 받기 위한 의미 있는 state까지 도달할 확률을 높이는 **action prior**의 차이다.
+이 차이는 task reward를 잘 설계했다는 뜻이 아니다. Reward를 받기 위한 의미 있는 state까지 도달할 확률을 높이는 **action prior**의 차이.
 
 ## 9. Temporal composition과 MCP의 composition은 다르다
 
@@ -661,7 +662,7 @@ Carry task에서 `접근 → 들어 올리기 → 운반 → 내려놓기`가 �
 
 ## 10. 실험 결과는 무엇을 보여주는가?
 
-논문 Table 1의 normalized return 중 핵심 결과를 정리하면 다음과 같다.
+논문 Table 1의 normalized return 중 핵심 결과를 정리하면:
 
 | Task | Scratch | Finetune | Latent Space | MCP |
 |---|---:|---:|---:|---:|
@@ -672,7 +673,7 @@ Carry task에서 `접근 → 들어 올리기 → 운반 → 내려놓기`가 �
 | Dribble: T-Rex | 0.065 | 0.074 | 0.115 | **0.781** |
 | Holdout: Ant | **0.951** | 0.885 | 0.745 | 0.812 |
 
-표에서 읽어야 할 핵심은 세 가지다.
+표에서 읽어야 할 핵심은 세 가지.
 
 ### 10.1 쉬운 heading task에서는 차이가 작다
 
@@ -682,7 +683,7 @@ Biped heading에서는 finetune, latent-space, MCP가 모두 높은 성능을 �
 
 Carry와 dribble에서는 이동, 균형, 접촉 제어를 함께 처리해야 한다. 논문의 비교 설정에서 MCP는 task가 복잡해질수록 더 큰 이점을 보였다.
 
-특히 T-Rex dribbling에서는 MCP만 높은 normalized return을 얻었다. 다만 이것은 해당 simulator, reward, baseline, training budget 안에서의 결과다.
+특히 T-Rex dribbling에서는 MCP만 높은 normalized return을 얻었다. 다만 이것은 해당 simulator, reward, baseline, training budget 안에서의 결과.
 
 ### 10.3 MCP가 항상 최고는 아니다
 
@@ -756,7 +757,7 @@ composite_mean           [B, D]
 composite_variance       [B, D]
 ```
 
-핵심 계산은 다음과 같다.
+핵심 계산은:
 
 ```python
 # w: [B, K]
@@ -827,7 +828,7 @@ $$
 
 ### 13.3 Gaussian product는 unimodal이다
 
-Gaussian을 곱한 결과도 하나의 Gaussian이다. 최적 행동이 `왼쪽으로 크게 회피` 또는 `오른쪽으로 크게 회피`처럼 서로 멀리 떨어진 두 mode를 가져야 한다면, 하나의 Gaussian product가 중간의 좋지 않은 action을 만들 수 있다.
+Gaussian을 곱한 결과도 하나의 Gaussian. 최적 행동이 `왼쪽으로 크게 회피` 또는 `오른쪽으로 크게 회피`처럼 서로 멀리 떨어진 두 mode를 가져야 한다면, 하나의 Gaussian product가 중간의 좋지 않은 action을 만들 수 있다.
 
 ### 13.4 Primitive끼리 충돌할 수 있다
 
@@ -848,7 +849,7 @@ $$
 \lambda_{ij}=\frac{w_i}{v_{ij}}
 $$
 
-이다. $w_i$가 커도 variance가 매우 크면 해당 관절에 미치는 영향은 작다.
+. $w_i$가 커도 variance가 매우 크면 해당 관절에 미치는 영향은 작다.
 
 또 $w_i$와 $v_{ij}$를 같은 비율로 함께 바꾸면 $\lambda_{ij}$가 같게 유지될 수 있다. 따라서 parameter 자체의 의미가 완전히 식별되는 것은 아니다.
 
@@ -867,7 +868,7 @@ MCP는 action-space composition에는 강하지만 option termination, subgoal d
 
 > Multiplication은 모든 additive composition보다 항상 우월하다.
 
-논문이 직접 보여준 범위는 다음이다.
+논문이 직접 보여준 범위는:
 
 > 저자들이 구성한 비교 방법과 simulated character benchmark에서 MCP가 복잡한 carry·dribble task에 강한 성능을 보였다.
 
@@ -887,7 +888,7 @@ MCP는 action-space composition에는 강하지만 option termination, subgoal d
 
 ### Q4. MCP가 새로운 RL optimizer인가?
 
-아니다. PPO는 그대로 사용하고 actor의 action distribution 구조를 바꾼 방법이다.
+아니다. PPO는 그대로 사용하고 actor의 action distribution 구조를 바꾼 방법.
 
 ### Q5. MCP는 unsupervised skill discovery인가?
 
@@ -899,7 +900,7 @@ MCP는 action-space composition에는 강하지만 option termination, subgoal d
 
 ### Q7. 왜 새 task에서 primitive를 고정하는가?
 
-Motion prior를 보존하고, 새 task reward가 primitive를 파괴하는 catastrophic forgetting을 줄이기 위해서다.
+목적: motion prior를 보존하면서 새 task reward가 primitive를 파괴하는 catastrophic forgetting 줄이기.
 
 ## 15. Primitive product가 실제 action이 되기까지
 

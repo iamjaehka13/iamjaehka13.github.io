@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
 date: 2026-01-13 14:28:00 +0900
-last_modified_at: 2026-05-25 01:40:57 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: Unitree Go2에 강화학습 기반 보행 policy를 실제 deploy하기 위해 baseline을 정하고, 첫 학습과 real deploy를 시도한 과정을 정리한다.
@@ -11,44 +11,44 @@ math: true
 
 ## **1. 프로젝트 목표**
 
-이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했습니다. 하지만 최종 목표는 단순히 "걷게 만들기"에서 끝나지 않습니다.
+이 프로젝트는 Unitree Go2를 구매한 뒤, 실제 로봇에서 강화학습 기반 보행 policy를 deploy해보는 것을 목표로 시작했다. 하지만 최종 목표는 단순히 "걷게 만들기"에서 끝나지 않는다.
 
-처음 세운 장기 목표는 아래 가설을 실제 데이터로 검증하는 것이었습니다.
+처음 세운 장기 목표는 아래 가설을 실제 데이터로 검증하는 것이었다.
 
 > 실로봇 장시간 보행에서는 nominal RL policy가 command tracking은 잘해도, 특정 actuator에 열과 부하가 불균일하게 쌓여 thermal bottleneck이 될 수 있다. 따라서 `/lowstate`에서 얻을 수 있는 per-actuator reported temperature, current/load, torque, joint state를 이용해 runtime에서 보행 입력을 조절하는 thermal-aware regulator가 필요하다.
 
-여기서 temperature는 실제 winding temperature를 직접 측정한 값이라고 단정하기보다, robot이 onboard로 report하는 actuator temperature로 다루는 편이 안전합니다.
+여기서 temperature는 실제 winding temperature를 직접 측정한 값이라고 단정하기보다, robot이 onboard로 report하는 actuator temperature로 다루는 편이 안전하다.
 
-즉 목표는 새로운 보행 policy 하나를 더 만드는 것이 아니라, **기본 보행 policy 위에 per-actuator reported temperature와 current-derived load를 보는 runtime regulation layer를 얹어, 비슷한 walking task를 유지하면서 peak reported temperature와 temperature rise를 줄일 수 있는지** 확인하는 것입니다.
+즉 목표는 새로운 보행 policy 하나를 더 만드는 것이 아니라, **기본 보행 policy 위에 per-actuator reported temperature와 current-derived load를 보는 runtime regulation layer를 얹어, 비슷한 walking task를 유지하면서 peak reported temperature와 temperature rise를 줄일 수 있는지** 확인하는 것.
 
-이 글은 그 첫 단계로, 이후 실험의 기준선이 될 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 다룹니다. 이 baseline은 나중에 proposed thermal-aware controller가 정말 나아졌는지 비교하기 위한 control group이 됩니다.
+이 글은 그 첫 단계로, 이후 실험의 기준선이 될 기본 보행 policy를 학습하고 실제 로봇에 올려보는 과정을 다룬다. 이 baseline은 나중에 proposed thermal-aware controller가 정말 나아졌는지 비교하기 위한 control group이 된다.
 
 ## **2. 베이스라인 선택**
 
-가장 먼저 정해야 할 것은 baseline이었습니다. 처음부터 모든 환경과 deploy 코드를 직접 만들기보다는, 이미 real robot deploy까지 고려된 reference를 기준으로 잡는 편이 안전하다고 판단했습니다.
+가장 먼저 정해야 할 것은 baseline이었다. 처음부터 모든 환경과 deploy 코드를 직접 만들기보다는, 이미 real robot deploy까지 고려된 reference를 기준으로 잡는 편이 안전하다고 판단했다.
 
-여기서 baseline은 단순한 출발 코드가 아닙니다. 나중에 thermal-aware regulator를 붙였을 때 비교할 nominal policy이기도 합니다. 그래서 baseline은 "걷는 것"뿐 아니라, 같은 command profile에서 reported actuator temperature, torque, current, runtime이 어떻게 나오는지 측정할 수 있어야 합니다.
+여기서 baseline은 단순한 출발 코드가 아니다. 나중에 thermal-aware regulator를 붙였을 때 비교할 nominal policy이기도 하다. 그래서 baseline은 "걷는 것"뿐 아니라, 같은 command profile에서 reported actuator temperature, torque, current, runtime이 어떻게 나오는지 측정할 수 있어야 한다.
 
-baseline을 고르는 기준은 아래와 같았습니다.
+baseline을 고르는 기준은 아래와 같았다.
 
 1. Unitree Go2를 real robot에서 걷게 할 수 있는 RL 보행 모델일 것
 2. Isaac Lab 또는 Unitree에서 공개한 환경 설정을 기반으로 할 것
 3. 이후 Sim2Real gap을 줄이기 위해 설정을 확장하기 쉬울 것
 4. 이후 `/lowstate` 기반 thermal/current logging과 연결하기 쉬울 것
 
-결론적으로 baseline은 Unitree에서 공개한 `unitree_rl_lab`을 따르기로 했습니다.
+결론적으로 baseline은 Unitree에서 공개한 `unitree_rl_lab`을 따르기로 했다.
 
 <https://github.com/unitreerobotics/unitree_rl_lab>
 
-선택한 이유는 세 가지였습니다.
+선택한 이유는 세 가지였다.
 
-1. Unitree에서 직접 배포한 repository라 사용 설명과 deploy 흐름이 비교적 잘 정리되어 있었습니다.
-2. G1 humanoid 예제가 실제 로봇에서 걷는 것을 확인했기 때문에, Go2에서도 같은 방향으로 시작해볼 수 있다고 판단했습니다.
-3. Unitree SDK2와의 연동 코드가 포함되어 있어 real deploy까지 이어가기 쉬웠습니다.
+1. Unitree에서 직접 배포한 repository라 사용 설명과 deploy 흐름이 비교적 잘 정리되어 있었다.
+2. G1 humanoid 예제가 실제 로봇에서 걷는 것을 확인했기 때문에, Go2에서도 같은 방향으로 시작해볼 수 있다고 판단했다.
+3. Unitree SDK2와의 연동 코드가 포함되어 있어 real deploy까지 이어가기 쉬웠다.
 
 ## **3. Isaac Sim 학습**
 
-simulation에서 학습하는 과정 자체는 비교적 단순했습니다. 첫 시도였기 때문에 기본 설정을 최대한 유지하고, iteration을 10000으로 두고 학습했습니다.
+simulation에서 학습하는 과정 자체는 비교적 단순했다. 첫 시도였기 때문에 기본 설정을 최대한 유지하고, iteration을 10000으로 두고 학습했다.
 
 ```bash
 python scripts/rsl_rl/train.py --headless --task Unitree-Go2-Velocity --video --video_interval 1000 --num_envs 4096 --seed 42 --max_iterations 10000
@@ -56,15 +56,15 @@ python scripts/rsl_rl/train.py --headless --task Unitree-Go2-Velocity --video --
 
 [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80b5-bdf0-f4eb03b0e2ff.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-80b5-bdf0-f4eb03b0e2ff.gif){.popup .img-link .shimmer}
 
-`--video` 옵션을 사용해 학습 중간 결과가 자동으로 저장되도록 했습니다. 영상만 보면 policy가 simulation 안에서는 나쁘지 않게 걷는 것처럼 보였습니다.
+`--video` 옵션을 사용해 학습 중간 결과가 자동으로 저장되도록 했다. 영상만 보면 policy가 simulation 안에서는 나쁘지 않게 걷는 것처럼 보였다.
 
 ## **4. 실제 로봇 Deploy 준비**
 
-원래는 real robot에 올리기 전에 CPU 기반 시뮬레이터인 **MuJoCo**에서 sim-to-sim 테스트를 먼저 해보는 편이 맞습니다. 하지만 첫 학습 결과가 꽤 좋아 보였기 때문에, 이 단계에서는 바로 실제 로봇에 deploy해보기로 했습니다.
+원래는 real robot에 올리기 전에 CPU 기반 시뮬레이터인 **MuJoCo**에서 sim-to-sim 테스트를 먼저 해보는 편이 맞는다. 하지만 첫 학습 결과가 꽤 좋아 보였기 때문에, 이 단계에서는 바로 실제 로봇에 deploy해보기로 했다.
 
 ### **4.1 Unitree Python SDK 기반 제어**
 
-모델을 deploy하기 위해 `/lowstate` topic에서 `joint_pose`, `joint_vel`, `imu`, pressure sensor, `last_action` 등을 observation으로 구성했습니다. 이후 ONNX 모델로 action을 추론하고, 50 Hz로 `/lowcmd`에 command를 발행하는 구조를 사용했습니다.
+모델을 deploy하기 위해 `/lowstate` topic에서 `joint_pose`, `joint_vel`, `imu`, pressure sensor, `last_action` 등을 observation으로 구성했다. 이후 ONNX 모델로 action을 추론하고, 50 Hz로 `/lowcmd`에 command를 발행하는 구조를 사용했다.
 
 - Joint Pos: $q_{rel} = q - \text{default joint pos}$
 - Joint Vel: $dq$
@@ -610,9 +610,9 @@ if __name__ == "__main__":
 
 ## **5. 첫 Deploy 결과**
 
-- 로봇에 랜선을 연결하자 `eno1` 네트워크 인터페이스가 잡혔습니다.
-- Go2에 `/lowcmd`를 전달하려면, 기존에 내부에서 동작하던 control system을 먼저 shutdown해야 했습니다.
-  - 이를 위해 `unitree_sdk2_python`의 `msc` interface를 사용해 RL mode로 전환했습니다.
+- 로봇에 랜선을 연결하자 `eno1` 네트워크 인터페이스가 잡혔다.
+- Go2에 `/lowcmd`를 전달하려면, 기존에 내부에서 동작하던 control system을 먼저 shutdown해야 했다.
+  - 이를 위해 `unitree_sdk2_python`의 `msc` interface를 사용해 RL mode로 전환했다.
 
             self.msc = MotionSwitcherClient()
             self.msc.SetTimeout(5.0)
@@ -622,12 +622,12 @@ if __name__ == "__main__":
 
 [![](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp)](/assets/img/posts/unitree/sim2real/unitree-go2-part-1-sim2real-first-challenge/321cbb7d-7937-804d-a349-ddca6da9759a.webp){.popup .img-link .shimmer}
 
-`[1.0, 0.4, -1.0]` 같은 command를 주었는데도 Go2는 발을 떼지 못했습니다. command 방향에 따라 base를 기울이기는 했지만, 실제 보행으로 이어지지는 않았습니다.
+`[1.0, 0.4, -1.0]` 같은 command를 주었는데도 Go2는 발을 떼지 못했다. command 방향에 따라 base를 기울이기는 했지만, 실제 보행으로 이어지지는 않았다.
 
-이 시점에서 예상한 원인은 아래와 같았습니다.
+이 시점에서 예상한 원인은 아래와 같았다.
 
-1. deploy에서 구성한 observation이 training 때의 observation과 다를 수 있습니다.
-2. IMU 정보를 읽는 과정에서 좌표계가 어긋났을 수 있습니다.
-3. `feet_air_time`, `feet_slide`처럼 발을 떼는 동작과 관련된 reward weight가 적절하지 않을 수 있습니다.
+1. deploy에서 구성한 observation이 training 때의 observation과 다를 수 있다.
+2. IMU 정보를 읽는 과정에서 좌표계가 어긋났을 수 있다.
+3. `feet_air_time`, `feet_slide`처럼 발을 떼는 동작과 관련된 reward weight가 적절하지 않을 수 있다.
 
-첫 시도는 실패였지만, 문제를 좁히기 위한 기준은 생겼습니다. 다음 단계에서는 reward 설정과 sim-to-sim 검증을 중심으로 원인을 확인합니다.
+첫 시도는 실패였지만, 문제를 좁히기 위한 기준은 생겼다. 다음 단계에서는 reward 설정과 sim-to-sim 검증을 중심으로 원인을 확인한다.

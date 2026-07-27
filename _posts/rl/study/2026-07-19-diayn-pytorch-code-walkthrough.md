@@ -1,6 +1,7 @@
 ---
 title: "[DIAYN 코드 읽기] PyTorch 구현 흐름"
 date: 2026-07-19 04:05:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [diayn, pytorch, soft-actor-critic, mujoco, hopper, skill-discovery]
 description: "DIAYN-PyTorch의 transition 흐름을 추적하고 robot_obs, behavior_features, skill horizon, safety constraint를 갖춘 범용 로봇 구조로 연결한다."
@@ -12,7 +13,7 @@ image:
 
 [이전 글](/posts/diayn-diversity-is-all-you-need/)에서는 DIAYN의 mutual information 목적함수와 intrinsic reward를 유도했다. 이번 글의 목표는 수식을 한 번 더 설명하는 것이 아니다. **환경 transition 하나가 코드 안에서 어떻게 저장되고, discriminator reward가 되고, 다시 Policy와 Critic의 gradient로 연결되는지**를 실제 구현 순서대로 추적한다.
 
-읽으면서 계속 붙잡을 질문은 네 가지다.
+읽으면서 계속 붙잡을 질문은 네 가지.
 
 1. 같은 Policy인데 `z`만 바꾸면 왜 다른 행동이 나오는가?
 2. 환경 reward를 쓰지 않는다면 Q target의 reward는 언제 만들어지는가?
@@ -25,7 +26,7 @@ image:
 
 ## 0. 결과부터 보기: 같은 Policy, 다른 `z`
 
-아래 두 실행은 서로 다른 Policy 두 개가 아니다. **동일한 Policy network**에 서로 다른 one-hot skill을 넣은 결과다.
+아래 두 실행은 서로 다른 Policy 두 개가 아니다. **동일한 Policy network**에 서로 다른 one-hot skill을 넣은 결과.
 
 <div class="row g-3 mb-4">
   <figure class="col-md-6 mb-0">
@@ -64,7 +65,7 @@ Action만 달라서는 충분하지 않다. Discriminator가 **도달한 물리 
 | 4 | [`Brain/agent.py`](https://github.com/akazemipour/DIAYN-PyTorch/blob/master/Brain/agent.py) | intrinsic reward와 각 loss는 어디서 만들어지는가? |
 | 5 | [`Common/play.py`](https://github.com/akazemipour/DIAYN-PyTorch/blob/master/Common/play.py) | 학습된 각 skill을 어떻게 고정해서 재생하는가? |
 
-이번 Hopper 실행은 physical state 11차원, action 3차원, categorical skill 20개를 사용한다. 따라서 Policy가 받는 입력은 `11 + 20 = 31`차원이다.
+이번 Hopper 실행은 physical state 11차원, action 3차원, categorical skill 20개를 사용한다. 따라서 Policy가 받는 입력은 `11 + 20 = 31`차원.
 
 | Network | Tensor 흐름과 역할 |
 |---|---|
@@ -89,11 +90,11 @@ Action만 달라서는 충분하지 않다. Discriminator가 **도달한 물리 
 
 이 저장소는 별도의 Value network와 target Value network를 사용하는 **초기 형태의 SAC**를 구현한다. 최근 SAC 구현에서 흔한 `twin Q + target Q` 구성과 모양이 다르지만, DIAYN에서 중요한 `z` 조건, discriminator reward, maximum-entropy Policy의 연결은 그대로 확인할 수 있다.
 
-또한 의존성은 `gym 0.17.3`, `torch 1.6.0`, `mujoco-py 2.0.2.13` 세대다. 이 코드는 최신 실행 기반이라기보다 **논문 메커니즘을 읽기 위한 코드 동반 자료**로 보는 편이 정확하다.
+또한 의존성은 `gym 0.17.3`, `torch 1.6.0`, `mujoco-py 2.0.2.13` 세대. 이 코드는 최신 실행 기반이라기보다 **논문 메커니즘을 읽기 위한 코드 동반 자료**로 보는 편이 정확하다.
 
 ## 2. Episode 단위: `z`를 한 번 뽑고 끝까지 유지한다
 
-전체 실행 흐름부터 보면 다음과 같다.
+전체 실행 흐름부터 보면:
 
 ![DIAYN episode execution flow](/assets/img/posts/rl/diayn-pytorch/01-episode-flow.svg){: width="920" .d-block .mx-auto }
 _바깥쪽 episode loop가 경험을 만들고, 각 environment step 뒤의 `agent.train()`이 replay batch를 사용해 네트워크를 갱신한다._
@@ -111,7 +112,7 @@ p_z = np.full(
 agent = SACAgent(p_z=p_z, **params)
 ```
 
-20개 skill이라면 다음과 같다.
+20개 skill이라면:
 
 $$
 p(z=k)=\frac{1}{20},
@@ -181,7 +182,7 @@ action = actor.sample(policy_obs)
 skill_age += 1
 ```
 
-여기서 지켜야 할 조건은 세 가지다.
+여기서 지켜야 할 조건은 세 가지.
 
 1. `z`는 control step마다 바꾸지 않고 최소 $H$ step 동안 유지한다.
 2. 병렬 환경에서는 `skill_age`와 `z`를 environment별로 따로 관리한다.
@@ -193,7 +194,7 @@ skill_age += 1
 bootstrap_done = env_done | safety_done | skill_boundary
 ```
 
-반대로 episode 전체에서 같은 `z`를 유지하면 원 논문과 가장 가까운 설정이다. `skill_horizon`을 도입하는 순간 continuing control 또는 option termination이라는 추가 설계가 생긴다는 점을 숨기면 안 된다.
+반대로 episode 전체에서 같은 `z`를 유지하면 원 논문과 가장 가까운 설정. `skill_horizon`을 도입하는 순간 continuing control 또는 option termination이라는 추가 설계가 생긴다는 점을 숨기면 안 된다.
 
 ## 3. Environment step과 replay buffer
 
@@ -209,7 +210,7 @@ agent.store(state, z, done, action, next_state)
 agent.train()
 ```
 
-이 네 줄을 데이터 흐름으로 읽으면 다음과 같다.
+이 네 줄을 데이터 흐름으로 읽으면:
 
 ```text
 [s, z]
@@ -288,13 +289,13 @@ $$
 
 ### 4.2. Discriminator에는 `z`를 넣으면 안 된다
 
-Discriminator의 목표는 다음 posterior를 근사하는 것이다.
+Discriminator의 목표는 다음 posterior를 근사하는 것.
 
 $$
 q_\phi(z\mid s)
 $$
 
-따라서 입력은 physical state, 정답 label은 `z`다. 코드에서는 `[s, one_hot(z)]`의 뒤쪽을 잘라내고 physical state만 전달한다.
+따라서 입력은 physical state, 정답 label은 `z`. 코드에서는 `[s, one_hot(z)]`의 뒤쪽을 잘라내고 physical state만 전달한다.
 
 ```python
 physical_states = torch.split(
@@ -316,7 +317,7 @@ logits = self.discriminator(physical_states)
 Policy가 서로 다른 상태를 만들 필요가 없음
 ```
 
-분류 정확도와 intrinsic reward는 높아지지만 skill diversity는 생기지 않는다. 이것이 **label leakage**다. DIAYN 구현을 볼 때 가장 먼저 확인해야 할 입력 분리다.
+분류 정확도와 intrinsic reward는 높아지지만 skill diversity는 생기지 않는다. 이것이 **label leakage**다. DIAYN 구현을 볼 때 가장 먼저 확인해야 할 입력 분리.
 
 ### 4.3. Physical state와 `behavior_features`는 항상 같지 않다
 
@@ -331,7 +332,7 @@ behavior_features = select_behavior_features(robot_obs)
 logits = discriminator(behavior_features)
 ```
 
-`behavior_features`는 단순한 입력 축소가 아니라 behavior specification이다.
+`behavior_features`는 단순한 입력 축소가 아니라 behavior specification.
 
 - 이동 skill을 원하면 body velocity, heading, local trajectory를 사용할 수 있다.
 - Manipulation skill을 원하면 object-relative end-effector pose와 contact를 사용할 수 있다.
@@ -367,7 +368,7 @@ rewards = (
 )
 ```
 
-Tensor 역할을 분리하면 다음과 같다.
+Tensor 역할을 분리하면:
 
 | Tensor | Shape | 의미 |
 |---|---:|---|
@@ -401,7 +402,7 @@ $$
 | $q=0.90$ | $\log 18\approx2.89$ | 거의 확실히 구별 |
 | $q=1.00$ | $\log 20\approx3.00$ | 이론적 최대치 |
 
-따라서 reward가 크다는 것은 skill이 **더 모호하다**는 뜻이 아니다. 반대로 현재 상태에서 실제 skill이 prior보다 훨씬 쉽게 식별된다는 뜻이다.
+따라서 reward가 크다는 것은 skill이 **더 모호하다**는 뜻이 아니다. 반대로 현재 상태에서 실제 skill이 prior보다 훨씬 쉽게 식별된다는 뜻.
 
 Bayes rule로 보면 이 상대평가 구조가 더 선명하다.
 
@@ -428,7 +429,7 @@ Discriminator가 충분히 정확하다고 가정하면 높은 reward는 다음 
 같은 (s, z, a, s′)라도 intrinsic reward가 달라짐
 ```
 
-장점은 과거 데이터도 최신 분류 기준으로 다시 평가할 수 있다는 것이다. 반면 Critic이 따라가는 target 자체가 학습 중 움직이므로 일반적인 고정 task reward보다 non-stationarity가 크다.
+장점은 과거 데이터도 최신 분류 기준으로 다시 평가할 수 있다는 것. 반면 Critic이 따라가는 target 자체가 학습 중 움직이므로 일반적인 고정 task reward보다 non-stationarity가 크다.
 
 ### 5.3. `detach()`는 gradient 경계를 만든다
 
@@ -648,20 +649,20 @@ def _get_obs(self):
 
 `z=8`과 `z=17`은 모두 양의 x 방향으로 움직이지만 생존 길이와 속도·자세 패턴이 다를 수 있다. DIAYN은 사람이 붙인 "전진"이라는 한 단어가 아니라 전체 상태 분포를 구별 대상으로 사용한다.
 
-측정 결과를 behavior family로 거칠게 묶으면 다음과 같다.
+측정 결과를 behavior family로 거칠게 묶으면:
 
 - `0, 5, 6, 10, 14, 16`: 긴 episode를 유지하면서 수평 이동이 작음
 - `7, 8, 17, 18`: 평균적으로 큰 양의 x 이동
 - `9, 19`: 음의 x 이동 경향
 - `3, 12, 13`: 평균 생존 길이가 짧음
 
-이 분류는 학습 label이 아니라 관찰 후 붙인 설명이다. 실제 Discriminator가 사용하는 경계는 x 변위 하나가 아니라 11차원 state feature 전체에 놓인다.
+이 분류는 학습 label이 아니라 관찰 후 붙인 설명. 실제 Discriminator가 사용하는 경계는 x 변위 하나가 아니라 11차원 state feature 전체에 놓인다.
 
 ### 8.3. 유사한 행동이 여러 `z`에 할당되는 현상
 
 20개의 label이 있다고 해서 사람이 구별할 수 있는 의미 있는 행동도 반드시 20개가 되는 것은 아니다. 실제 영상을 함께 놓고 보면 서로 다른 `z`인데도 같은 행동 범주로 보이는 경우가 있다.
 
-정량 지표까지 가까운 세 쌍을 골라 비교하면 다음과 같다.
+정량 지표까지 가까운 세 쌍을 골라 비교하면:
 
 | Skill pair | 평균 x 변위 | 평균 step | 사람이 보는 공통점 |
 |---|---:|---:|---|
@@ -678,7 +679,7 @@ def _get_obs(self):
 
 <figure class="mb-4">
   <img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-pytorch/gifs/similar-skill6-skill16.gif" alt="수평 이동 없이 자세를 유지하는 Skill 6과 Skill 16 비교" decoding="async" style="width: 100%; border-radius: 6px;">
-  <figcaption class="text-center mt-2"><strong>왼쪽 z=6 · 오른쪽 z=16</strong> — x 변위와 생존 길이만 보면 가장 유사한 쌍이다.</figcaption>
+  <figcaption class="text-center mt-2"><strong>왼쪽 z=6 · 오른쪽 z=16</strong> — x 변위와 생존 길이만 보면 가장 유사한 쌍.</figcaption>
 </figure>
 
 <figure class="mb-4">
@@ -707,11 +708,11 @@ z=16 → 자세 B + 속도 패턴 B
 
 따라서 이 결과를 바로 **mode collapse**라고 부르는 것은 과하다. 정확히 같은 상태분포로 붕괴했다면 Discriminator도 두 skill을 구별하기 어려워야 한다. 현재 영상과 `x displacement`, `episode length`만으로는 11차원 전체 상태분포가 같은지 판단할 수 없다.
 
-현재 증거로 안전하게 말할 수 있는 것은 다음이다.
+현재 증거로 안전하게 말할 수 있는 것은:
 
 > **서로 다른 latent skill이 사람 기준으로는 유사한 행동 의미를 갖는 semantic redundancy가 관찰된다.**
 
-이것은 DIAYN의 중요한 한계 중 하나다.
+이것은 DIAYN의 중요한 한계 중 하나.
 
 1. $I(S;Z)$가 커도 각 skill이 사람에게 유용하거나 의미적으로 고유하다는 보장은 없다.
 2. 정해진 skill 수 $K$가 환경에 존재하는 의미 있는 행동 mode 수보다 크면, 하나의 행동 범주가 미세한 state 차이로 여러 label에 나뉠 수 있다.
@@ -722,7 +723,7 @@ z=16 → 자세 B + 속도 패턴 B
 
 ### 8.4. GIF 한 개와 정량 평균은 다른 자료다
 
-각 GIF는 고정된 `z`로 실행한 sampled rollout 하나의 앞부분이다. 표는 skill마다 5회 실행한 평균이다. 이 구현은 Policy를 `eval()` 모드로 바꾼 뒤에도 Gaussian 평균 action만 고정해서 쓰지 않고 계속 sample한다.
+각 GIF는 고정된 `z`로 실행한 sampled rollout 하나의 앞부분. 표는 skill마다 5회 실행한 평균이다. 이 구현은 Policy를 `eval()` 모드로 바꾼 뒤에도 Gaussian 평균 action만 고정해서 쓰지 않고 계속 sample한다.
 
 따라서 같은 `z`도 실행할 때마다 trajectory, x 변위, 종료 시점이 달라질 수 있다. GIF의 한 장면을 skill 전체의 확정적 의미로 읽으면 안 된다.
 
@@ -746,7 +747,7 @@ z=16 → 자세 B + 속도 패턴 B
 4. **Checkpoint 재개**: replay buffer는 checkpoint에 포함되지 않아 재개 직후 데이터 분포가 달라질 수 있다. 저장소 README도 이 구간의 Discriminator 거동을 주의한다.
 5. **평가의 stochasticity**: `eval()`은 layer mode만 바꾸며 action sampling은 계속된다. deterministic evaluation이 필요하면 평균 action 경로를 별도로 구현해야 한다.
 
-이 한계들은 DIAYN 식이 틀렸다는 뜻이 아니다. **논문에서 반드시 유지해야 할 구조와 참고 구현의 세부 선택을 분리해서 읽어야 한다**는 뜻이다.
+이 한계들은 DIAYN 식이 틀렸다는 뜻이 아니다. **논문에서 반드시 유지해야 할 구조와 참고 구현의 세부 선택을 분리해서 읽어야 한다**는 뜻.
 
 ## 10. Hopper 구현을 범용 로봇 코드로 번역하기
 
@@ -754,7 +755,7 @@ z=16 → 자세 B + 속도 패턴 B
 
 ### 10.1. `robot_obs`와 `behavior_features`
 
-`robot_obs`는 Actor와 Critic이 제어에 사용하는 관측값이다. `behavior_features`는 Discriminator가 skill identity를 판별하는 관측값이다.
+`robot_obs`는 Actor와 Critic이 제어에 사용하는 관측값. `behavior_features`는 Discriminator가 skill identity를 판별하는 관측값이다.
 
 ```python
 robot_obs = observation_builder(sensor_data)
@@ -866,7 +867,7 @@ with torch.no_grad():
     )
 ```
 
-이 코드는 특정 로봇의 완성된 구현이 아니라 ownership boundary를 보여주는 구조다. 실제 시스템에서는 observation timestamp, control frequency, action unit, actuator limit, sensor latency를 기존 로봇 stack과 일치시켜야 한다.
+이 코드는 특정 로봇의 완성된 구현이 아니라 ownership boundary를 보여주는 구조. 실제 시스템에서는 observation timestamp, control frequency, action unit, actuator limit, sensor latency를 기존 로봇 stack과 일치시켜야 한다.
 
 ## 11. Transition 하나로 전체 흐름 다시 연결하기
 

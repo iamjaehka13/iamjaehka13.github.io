@@ -1,6 +1,7 @@
 ---
 title: "CIC: Contrastive Learning으로 다양한 행동을 연속 Skill에 연결하기"
 date: 2026-07-20 22:00:00 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [cic, contrastive-learning, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, ddpg, urlb]
 description: "DIAYN과 DADS 이후 CIC가 transition-skill contrastive learning과 particle entropy를 결합해 고차원 연속 skill을 학습하는 원리, 실제 DDPG 학습 구조, URLB 실험과 한계를 정리한다."
@@ -23,7 +24,7 @@ CIC는 이 두 문제를 분리해 해결한다.
 > **Contrastive learning으로 skill과 state transition의 관계를 정리하고, particle entropy로 그 transition 공간을 넓게 탐색한다.**
 
 ![CIC가 발견한 Walker, Quadruped, Jaco skill](/assets/img/posts/rl/cic/00-cic-discovered-skills.png){: width="1000" .d-block .mx-auto }
-_같은 reward-free pretraining에서 발견된 Walker의 leap·jog, Quadruped의 일어나기·좌측 이동, Jaco의 물체 밀기 행동. 사람이 이 이름을 미리 부여한 것이 아니라 학습 후 관찰해 붙인 의미다. 출처: [Laskin et al., Figure 2](https://arxiv.org/abs/2202.00161)._
+_같은 reward-free pretraining에서 발견된 Walker의 leap·jog, Quadruped의 일어나기·좌측 이동, Jaco의 물체 밀기 행동. 사람이 이 이름을 미리 부여한 것이 아니라 학습 후 관찰해 붙인 의미. 출처: [Laskin et al., Figure 2](https://arxiv.org/abs/2202.00161)._
 
 ## 0. 먼저 보는 전체 구조
 
@@ -65,11 +66,11 @@ embedding의 k-NN 거리로 particle entropy 계산
 | 평가 | state-based URLB, 2M-step pretraining + 100K-step downstream adaptation |
 | Source | [NeurIPS](https://proceedings.neurips.cc/paper_files/paper/2022/hash/debf482a7dbdc401f9052dbe15702837-Abstract.html), [arXiv](https://arxiv.org/abs/2202.00161), [Official code](https://github.com/rll-research/cic) |
 
-CIC의 `reward-free`는 **pretraining 중 task reward를 사용하지 않는다**는 뜻이다. 이후 downstream task에서는 extrinsic reward로 후보 skill을 평가하고 policy를 추가로 fine-tuning한다. 따라서 task reward 없이 완성된 범용 controller를 만드는 방법이 아니라, 새 task에 적응하기 좋은 policy initialization과 행동 repertoire를 만드는 방법이다.
+CIC의 `reward-free`는 **pretraining 중 task reward를 사용하지 않는다**는 뜻. 이후 downstream task에서는 extrinsic reward로 후보 skill을 평가하고 policy를 추가로 fine-tuning한다. 따라서 task reward 없이 완성된 범용 controller를 만드는 방법이 아니라, 새 task에 적응하기 좋은 policy initialization과 행동 repertoire를 만드는 방법이다.
 
 ## 2. 앞선 방법과 CIC의 차이
 
-CIC는 DIAYN이나 DADS를 반드시 대체하는 방법이 아니다. 세 방법은 skill diversity를 어디에서 측정하고, 발견한 skill을 무엇에 사용하려는지가 다르다. CIC의 위치를 APT·APS까지 함께 놓으면 다음과 같다.
+CIC는 DIAYN이나 DADS를 반드시 대체하는 방법이 아니다. 세 방법은 skill diversity를 어디에서 측정하고, 발견한 skill을 무엇에 사용하려는지가 다르다. CIC의 위치를 APT·APS까지 함께 놓으면:
 
 | 방법 | 행동 다양성을 측정하는 기준 | 얻는 구조 | 남는 질문 |
 |---|---|---|---|
@@ -79,7 +80,7 @@ CIC는 DIAYN이나 DADS를 반드시 대체하는 방법이 아니다. 세 방�
 | APS | particle entropy와 successor feature | 탐색 가능한 continuous skill | 큰 skill space를 안정적으로 구별할 방법 |
 | CIC | $z$-transition contrastive representation의 거리 | 넓은 탐색과 64D continuous skill | task-to-skill mapping과 latent 해석은 별도 문제 |
 
-CIC가 선택한 변화는 두 가지다.
+CIC가 선택한 변화는 두 가지.
 
 1. **상태가 아니라 transition을 구별한다.** 같은 위치를 지나더라도 전진과 후진처럼 변화 방향이 다른 행동을 나눌 수 있다.
 2. **분류 확률이나 명시적 density model 대신 contrastive learning을 사용한다.** 실제 $z$와 transition pair를 batch 안의 다른 pair와 비교하므로 큰 continuous skill space에도 적용하기 쉽다.
@@ -94,13 +95,13 @@ $$
 I(\tau;Z)
 $$
 
-여기서 가장 먼저 주의할 것은 $\tau$의 의미다. 일반적으로 $\tau$는 긴 trajectory를 뜻하기도 하지만, CIC에서 사용한 $\tau$는 연속한 두 상태의 tuple이다.
+여기서 가장 먼저 주의할 것은 $\tau$의 의미. 일반적으로 $\tau$는 긴 trajectory를 뜻하기도 하지만, CIC에서 사용한 $\tau$는 연속한 두 상태의 tuple이다.
 
 $$
 \tau_t=(s_t,s_{t+1})
 $$
 
-즉 CIC가 구별하는 것은 episode 전체가 아니라 **한 step에서 상태가 어떻게 변했는가**다.
+즉 CIC가 구별하는 것은 episode 전체가 아니라 **한 step에서 상태가 어떻게 변했는가**.
 
 ```text
 단일 상태만 보는 경우
@@ -139,7 +140,7 @@ CIC는 두 번째 **forward decomposition**을 선택한다.
 | $H(\tau)$ 증가 | 전체적으로 다양한 상태 변화를 탐색 |
 | $H(\tau\mid Z)$ 감소 | 같은 $z$에서는 일정한 종류의 변화를 생성 |
 
-따라서 CIC가 원하는 것은 다음과 같다.
+따라서 CIC가 원하는 것은:
 
 ```text
 전체 skill을 합치면 넓은 transition 공간을 탐색
@@ -156,7 +157,7 @@ H(\tau)
 \mathbb{E}_{\tau,z}[\log q(\tau\mid z)]
 $$
 
-문제는 두 항을 어떻게 추정할 것인가다. CIC는 $H(\tau)$에는 particle estimator를, $q(\tau\mid z)$에는 contrastive density estimator를 사용한다.
+문제는 두 항을 어떻게 추정할 것인가. CIC는 $H(\tau)$에는 particle estimator를, $q(\tau\mid z)$에는 contrastive density estimator를 사용한다.
 
 ## 5. Contrastive learning으로 skill과 transition 연결하기
 
@@ -208,7 +209,7 @@ $$
 
 ### 5.1 Raw observation을 사용하지 않는 것인가?
 
-아니다. Raw state는 여전히 encoder의 입력이다.
+아니다. Raw state는 여전히 encoder의 입력.
 
 ```text
 (raw s_t, raw s_{t+1})
@@ -218,7 +219,7 @@ transition encoder
 h_tau
 ```
 
-차이는 novelty를 raw observation의 Euclidean distance로 직접 계산하지 않는다는 점이다. 각 상태 차원은 scale과 의미가 다르기 때문에, raw distance는 큰 관절 속도나 센서 변화에 과도하게 반응할 수 있다.
+차이는 novelty를 raw observation의 Euclidean distance로 직접 계산하지 않는다는 점. 각 상태 차원은 scale과 의미가 다르기 때문에, raw distance는 큰 관절 속도나 센서 변화에 과도하게 반응할 수 있다.
 
 CIC는 $z$와 transition을 연결하도록 학습된 representation에서 거리를 측정한다. 하지만 이 공간이 반드시 인간이 생각하는 `전진`, `회전`, `일어나기` 축으로 정리된다는 보장은 없다. Encoder는 loss를 줄이는 특징을 학습하며, observation 설계에 따라 위치·자세·접촉 패턴 같은 shortcut을 사용할 수도 있다.
 
@@ -226,7 +227,7 @@ CIC는 $z$와 transition을 연결하도록 학습된 representation에서 거�
 
 ## 6. Particle entropy로 표현 공간을 넓게 탐색하기
 
-Contrastive representation은 `어떤 transition이 어떤 skill과 대응하는가`를 학습한다. 그러나 이것만으로 policy가 새로운 행동을 적극적으로 찾는 것은 아니다. 이미 방문한 좁은 영역에서도 positive pair와 negative pair를 구별할 수 있기 때문이다.
+Contrastive representation은 `어떤 transition이 어떤 skill과 대응하는가`를 학습한다. 그러나 이것만으로 policy가 새로운 행동을 적극적으로 찾는 것은 아니다. 이미 방문한 좁은 영역에서도 positive pair와 negative pair를 구별할 수 있기 때문.
 
 CIC는 현재 transition embedding $h_i$와 가까운 $k$개 이웃 사이의 거리를 사용한다.
 
@@ -310,7 +311,7 @@ Contrastive loss는 표현을 학습하고, particle entropy는 actor-critic rew
 
 ## 7. 실제 학습은 DDPG로 어떻게 이어지는가?
 
-DIAYN과 DADS의 주요 구현은 SAC였지만 CIC는 DDPG를 사용한다. CIC 목적함수가 DDPG를 반드시 요구해서가 아니다. URLB의 모든 baseline과 같은 RL backbone으로 비교하고, state-based DeepMind Control에서 사용된 설정을 맞추기 위한 선택이다.
+DIAYN과 DADS의 주요 구현은 SAC였지만 CIC는 DDPG를 사용한다. CIC 목적함수가 DDPG를 반드시 요구해서가 아니다. URLB의 모든 baseline과 같은 RL backbone으로 비교하고, state-based DeepMind Control에서 사용된 설정을 맞추기 위한 선택.
 
 Policy와 critic은 skill-conditioned 형태다.
 
@@ -322,7 +323,7 @@ $$
 Q_\phi(s,a,z)
 $$
 
-Pretraining 한 iteration을 코드 흐름에 가깝게 쓰면 다음과 같다.
+Pretraining 한 iteration을 코드 흐름에 가깝게 쓰면:
 
 1. $z\sim U([0,1]^{64})$에서 continuous skill을 뽑는다.
 2. 같은 $z$를 50 environment step 동안 유지한다.
@@ -333,7 +334,7 @@ Pretraining 한 iteration을 코드 흐름에 가깝게 쓰면 다음과 같다.
 7. DDPG critic과 actor를 업데이트한다.
 8. Target critic을 soft update한다.
 
-이를 한 줄로 연결하면 다음과 같다.
+이를 한 줄로 연결하면:
 
 ```text
 sample z → collect transition → CPC encoder update
@@ -352,7 +353,7 @@ $$
 z\in[0,1]^{64}
 $$
 
-여기서 64차원은 사람이 해석할 수 있는 동작 축 64개를 뜻하지 않는다. 많은 행동을 서로 다른 latent 영역에 담을 수 있도록 skill space의 용량을 늘린 것이다.
+여기서 64차원은 사람이 해석할 수 있는 동작 축 64개를 뜻하지 않는다. 많은 행동을 서로 다른 latent 영역에 담을 수 있도록 skill space의 용량을 늘린 것.
 
 논문의 ablation에서는 다음 경향이 나타났다.
 
@@ -399,7 +400,7 @@ _12개 URLB downstream task의 aggregate statistics. Optimality Gap은 낮을수
 - 비교한 competence-based 방법 중 다음 성능인 APS보다 79% 높은 score
 - 전체 차선 방법인 ProtoRL보다 18% 높은 score
 
-이 결과를 `CIC가 모든 환경에서 항상 우수하다`로 일반화하면 안 된다. 정확한 범위는 **state observation을 사용하는 URLB, 2M-step pretraining, 100K-step adaptation 조건**이다.
+이 결과를 `CIC가 모든 환경에서 항상 우수하다`로 일반화하면 안 된다. 정확한 범위는 **state observation을 사용하는 URLB, 2M-step pretraining, 100K-step adaptation 조건**.
 
 ### 9.1 왜 두 구성 요소가 모두 필요한가?
 
@@ -474,14 +475,14 @@ CIC의 실험 결과가 좋다고 해서 continuous skill space가 곧바로 범
 | 남은 문제 | 정확한 의미 |
 |---|---|
 | Task-to-skill mapping | `오른쪽으로 빠르게 이동` 같은 command를 적절한 $z$로 바꾸는 controller가 없다. Grid sweep은 평가 절차이지 범용 task encoder가 아니다. |
-| Latent 해석과 합성 | 두 $z$의 평균이나 합이 두 행동의 의미 있는 조합이 된다는 보장이 없다. Continuous latent와 compositional latent는 다른 성질이다. |
+| Latent 해석과 합성 | 두 $z$의 평균이나 합이 두 행동의 의미 있는 조합이 된다는 보장이 없다. Continuous latent와 compositional latent는 다른 성질. |
 | State-based 검증 | 논문은 full-state URLB를 다뤘다. 부분 관측이나 고차원 camera image에서도 같은 결과가 유지되는지는 검증하지 않았다. |
 | Representation 의존성 | Encoder가 강조하는 특징에 따라 k-NN 거리와 intrinsic reward의 의미가 달라진다. 학습 중 embedding geometry 변화는 critic의 reward distribution도 바꾼다. |
 | 행동의 유용성과 안전 | Diversity는 안정성, 에너지 효율, 충돌 회피를 뜻하지 않는다. 불안정하거나 거친 행동도 새로운 transition이면 높은 보상을 받을 수 있다. |
 
 마지막 항은 실제 로봇 적용에서 특히 중요하다. 논문도 Walker와 Quadruped의 거친 탐색을 물리 시스템에 그대로 적용하면 손상 위험이 있다고 명시한다. 최소한 joint·torque·velocity limit, fall·collision constraint, workspace 제한, 안전한 reset과 emergency stop을 별도 계층으로 두어야 한다.
 
-즉 CIC가 학습하는 것은 **다양한 행동의 후보 공간**이다. 어떤 행동이 유용하고 안전한지는 downstream objective와 constraint가 추가로 결정해야 한다.
+즉 CIC가 학습하는 것은 **다양한 행동의 후보 공간**. 어떤 행동이 유용하고 안전한지는 downstream objective와 constraint가 추가로 결정해야 한다.
 
 ## 12. Representation과 탐색을 함께 묶기
 

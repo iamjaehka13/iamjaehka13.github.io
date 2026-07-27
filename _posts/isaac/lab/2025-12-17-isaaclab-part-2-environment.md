@@ -1,7 +1,7 @@
 ---
 title: "[IsaacLab Part 2] Unitree Go2 환경 구성하기"
 date: 2025-12-17 23:36:43 +0900
-last_modified_at: 2025-12-17 23:36:43 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [Isaac, Lab]
 tags: [unitree-go2, isaac-lab, isaac-sim, interactive-scene, robotics]
 description: Isaac Lab의 InteractiveSceneCfg와 SimulationContext로 Unitree Go2 scene을 구성하는 과정을 정리한다.
@@ -10,7 +10,9 @@ math: true
 ---
 ## 프로젝트 목표
 
-Go2가 도착한 뒤부터 simulation 설정을 실제 배포까지 이어갈 수 있게 됐습니다. 이때 잡은 프로젝트 목표는 두 단계였습니다.
+Go2가 도착한 뒤부터 simulation 설정을 실제 배포까지 이어갈 수 있게 됐다.
+
+프로젝트 목표: simulation 학습에서 real deployment까지 이어지는 두 단계.
 
 1. Isaac Lab에서 Go2 walking policy를 학습한다.
 2. Sim-to-real 배포와 ROS2 제어를 연결한다.
@@ -57,11 +59,11 @@ class Myscene(InteractiveSceneCfg):
     )
 ```
 
-`InteractiveSceneCfg`에는 terrain, robot, sensor와 light를 함께 정의할 수 있습니다.
+`InteractiveSceneCfg`에는 terrain, robot, sensor와 light를 함께 정의할 수 있다.
 
-- **Terrain:** `prim_path`와 type을 지정해 plane을 생성했습니다.
-- **Robot:** `UNITREE_GO2_CFG`를 가져와 각 environment namespace에 Go2를 배치했습니다.
-- **Sensor:** `height_scanner`가 robot base 주변에서 ground까지 ray를 쏴 지형 높이를 측정합니다. 이 값은 이후 locomotion policy의 terrain observation으로 사용할 수 있습니다.
+- **Terrain:** `prim_path`와 type을 지정해 plane을 생성했다.
+- **Robot:** `UNITREE_GO2_CFG`를 가져와 각 environment namespace에 Go2를 배치했다.
+- **Sensor:** `height_scanner`가 robot base 주변에서 ground까지 ray를 쏴 지형 높이를 측정한다. 이 값은 이후 locomotion policy의 terrain observation으로 사용할 수 있다.
 
 ## Simulation 설정
 
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     run_simulator()
 ```
 
-Hydra로 config를 읽고 `SimulationContext`를 만든 뒤, 위에서 정의한 scene config로 실제 scene을 생성합니다. `scene["go2"]`로 articulation에 접근하고 300 step마다 root와 joint state를 reset했습니다.
+Hydra로 config를 읽고 `SimulationContext`를 만든 뒤, 위에서 정의한 scene config로 실제 scene을 생성한다. `scene["go2"]`로 articulation에 접근하고 300 step마다 root와 joint state를 reset했다.
 
 ![관절이 기묘하게 뒤틀린 go2..](/assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/01-go2-twisted-joints.png){: .d-block .mx-auto }
 
@@ -151,4 +153,4 @@ Hydra로 config를 읽고 `SimulationContext`를 만든 뒤, 위에서 정의한
   <source src="/assets/img/posts/isaac/lab/unitree-go2-part-2-isaaclab-environment/02-isaaclab-scene-random-joints.mp4" type="video/mp4">
 </video>
 
-Random joint target을 그대로 넣었기 때문에 동작 자체는 의미가 없지만, terrain·robot·sensor가 config대로 생성되고 reset loop가 동작하는 것까지 확인했습니다.
+Random joint target을 그대로 넣었기 때문에 동작 자체는 의미가 없지만, terrain·robot·sensor가 config대로 생성되고 reset loop가 동작하는 것까지 확인했다.

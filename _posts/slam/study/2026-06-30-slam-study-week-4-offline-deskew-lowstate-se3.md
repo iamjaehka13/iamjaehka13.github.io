@@ -2,7 +2,7 @@
 title: "[SLAM Study 4주차] 실제 rosbag Offline Deskew: UNIST Livox와 Go2 연결"
 date: 2026-06-30 15:27:00 +0900
 published: false
-last_modified_at: 2026-06-30 20:18:21 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, deskew, offline-deskew, livox, mcap, imu, unitree-go2, lowstate, ros2]
 description: SLAM 공부 4주차에 실제 rosbag에서 UNIST Livox gyro-integrated rotation deskew를 메인 시각화로 보고, Go2 LowState estimated SE(3) deskew를 연구 연결용 보조 근거로 정리한다.
@@ -12,7 +12,7 @@ math: true
 
 ## **0. 이번 주에 잡아야 하는 것**
 
-3주차에는 synthetic world에서 deskew 수식이 맞는지 확인했습니다.
+3주차에는 synthetic world에서 deskew 수식이 맞는지 확인했다.
 
 ```text
 clean cloud 생성
@@ -21,13 +21,13 @@ clean cloud 생성
 -> clean cloud 복원 확인
 ```
 
-4주차는 실제 rosbag으로 넘어갑니다.
+4주차는 실제 rosbag으로 넘어간다.
 
-처음에는 Go2 walking bag으로 LowState 기반 SE(3) deskew까지 연결했습니다. 연구 주제와는 잘 맞지만, 야외 scan이라 블로그 대표 그림으로는 구조가 선명하지 않았습니다.
+처음에는 Go2 walking bag으로 LowState 기반 SE(3) deskew까지 연결했다. 연구 주제와는 잘 맞지만, 야외 scan이라 블로그 대표 그림으로는 구조가 선명하지 않았다.
 
-그래서 새로 받은 UNIST Livox MCAP bag을 4주차 대표 시각화로 다시 돌렸습니다.
+그래서 새로 받은 UNIST Livox MCAP bag을 4주차 대표 시각화로 다시 돌렸다.
 
-이번 글의 구성은 다음처럼 잡습니다.
+이번 글의 구성은 다음처럼 잡는다.
 
 ```text
 UNIST Livox:
@@ -41,17 +41,17 @@ Go2 May 7 bag:
   LowState contact-kinematic estimated SE(3) pipeline
 ```
 
-즉 주연은 UNIST Livox이고, Go2는 연구적 의미를 잡아주는 조연입니다.
+즉 주연은 UNIST Livox이고, Go2는 연구적 의미를 잡아주는 조연.
 
-이렇게 해야 그림은 보기 좋게 가져가면서도, 전체 연구 주제인 quadruped gait-induced LiDAR motion과의 연결을 잃지 않습니다.
+이렇게 해야 그림은 보기 좋게 가져가면서도, 전체 연구 주제인 quadruped gait-induced LiDAR motion과의 연결을 잃지 않는다.
 
 ## **1. 4주차의 중심 질문**
 
-이번 주 질문은 다음입니다.
+이번 주 질문은 다음.
 
 > 실제 rosbag에서 point time과 IMU를 이용해 한 scan을 deskew하면, point cloud geometry가 어떻게 달라지는가?
 
-여기서 가장 중요한 구분은 `correction`과 `error`입니다.
+여기서 가장 중요한 구분은 `correction`과 `error`이다.
 
 ```text
 deskew correction:
@@ -61,11 +61,11 @@ deskew error:
 deskewed point가 정답 clean/reference point와 얼마나 다른가
 ```
 
-실제 rosbag에는 3주차 synthetic 실험처럼 정답 clean cloud가 없습니다.
+실제 rosbag에는 3주차 synthetic 실험처럼 정답 clean cloud가 없다.
 
-따라서 이번 글의 p95 displacement는 정확도 개선량이 아닙니다.
+따라서 이번 글의 p95 displacement는 정확도 개선량이 아니다.
 
-정확한 표현은 다음입니다.
+정확한 표현은 다음.
 
 ```text
 p95 correction magnitude
@@ -73,7 +73,7 @@ deskew correction size
 raw-to-deskewed displacement
 ```
 
-틀린 표현은 다음입니다.
+틀린 표현은 다음.
 
 ```text
 p95 error
@@ -83,7 +83,7 @@ ground-truth deskew result
 
 ## **2. Deskew 기본식은 그대로**
 
-4주차에서도 deskew 식은 같습니다.
+4주차에서도 deskew 식은 같다.
 
 $$
 {}^{L(t_r)}\mathbf{p}_i =
@@ -92,9 +92,9 @@ $$
 {}^{L(t_i)}\mathbf{p}_i
 $$
 
-3주차와 다른 점은 ${}^W T_L(t_i)$를 synthetic trajectory에서 가져오지 않는다는 것입니다.
+3주차와 다른 점은 ${}^W T_L(t_i)$를 synthetic trajectory에서 가져오지 않는다는 것이다.
 
-실제 rosbag에서는 trajectory를 다음 중 하나로 만들어야 합니다.
+실제 rosbag에서는 trajectory를 다음 중 하나로 만들어야 한다.
 
 ```text
 IMU gyro integration
@@ -105,32 +105,32 @@ external odometry
 LowState 기반 proprioceptive trajectory
 ```
 
-UNIST bag에는 pose, odometry, LowState가 없었습니다. 그래서 이번 대표 시각화는 full SE(3)가 아니라 gyro-integrated rotation-only deskew입니다.
+UNIST bag에는 pose, odometry, LowState가 없었다. 그래서 이번 대표 시각화는 full SE(3)가 아니라 gyro-integrated rotation-only deskew.
 
-Go2 bag은 `/lowstate`가 있어서 estimated translation을 넣은 SE(3) code path까지 연결했습니다. 하지만 그 translation은 ground truth가 아니라 contact-kinematic estimate입니다.
+Go2 bag은 `/lowstate`가 있어서 estimated translation을 넣은 SE(3) code path까지 연결했다. 하지만 그 translation은 ground truth가 아니라 contact-kinematic estimate.
 
 ## **3. UNIST Livox MCAP 데이터**
 
-대표 시각화에 사용한 bag은 다음입니다.
+대표 시각화에 사용한 bag은 다음이다.
 
 ```text
 /home/iamjaehka13/unist_rosbag/6_24_204_2_0-001.mcap
 ```
 
-사용 topic은 다음입니다.
+사용 topic은 다음.
 
 ```text
 LiDAR: /livox/lidar
 IMU:   /livox/imu
 ```
 
-LiDAR message type은 `livox_ros_driver2/msg/CustomMsg`입니다.
+LiDAR message type은 `livox_ros_driver2/msg/CustomMsg`.
 
-이 bag의 장점은 point time을 만들기 쉽다는 것입니다. Livox custom point에는 `offset_time`이 있고, message에는 `timebase`가 있습니다.
+이 bag의 장점은 point time을 만들기 쉽다는 것이다. Livox custom point에는 `offset_time`이 있고, message에는 `timebase`가 있다.
 
-이번 데이터에서는 `offset_time` 단위가 nanoseconds였습니다.
+이번 데이터에서는 `offset_time` 단위가 nanoseconds이었다.
 
-따라서 point별 시각은 다음처럼 만듭니다.
+따라서 point별 시각은 다음처럼 만든다.
 
 $$
 t_i =
@@ -139,13 +139,13 @@ t_i =
 \mathrm{offset\_time}_i \times 10^{-9}
 $$
 
-이 구조 덕분에 각 point가 scan 안에서 언제 측정됐는지 직접 만들 수 있습니다.
+이 구조 덕분에 각 point가 scan 안에서 언제 측정됐는지 직접 만들 수 있다.
 
 ## **4. IMU orientation 대신 gyro integration**
 
-UNIST bag의 `/livox/imu`에는 orientation quaternion field가 있었습니다.
+UNIST bag의 `/livox/imu`에는 orientation quaternion field가 있었다.
 
-하지만 전체 IMU message를 확인했을 때 orientation quaternion은 identity였습니다.
+하지만 전체 IMU message를 확인했을 때 orientation quaternion은 identity이었다.
 
 ```text
 imu_orientation_all_identity: True
@@ -153,9 +153,9 @@ orientation_max_abs_xyz: 0.000e+00
 orientation_max_abs_w_minus_1: 0.000e+00
 ```
 
-따라서 orientation field를 그대로 쓰면 scan 내부 회전이 없는 것처럼 됩니다.
+따라서 orientation field를 그대로 쓰면 scan 내부 회전이 없는 것처럼 된다.
 
-이번 구현에서는 `/livox/imu`의 `angular_velocity`를 scan window에서 적분해서 rotation trajectory를 만들었습니다.
+이번 구현에서는 `/livox/imu`의 `angular_velocity`를 scan window에서 적분해서 rotation trajectory를 만들었다.
 
 ```text
 trajectory_source:
@@ -165,17 +165,17 @@ deskew_type:
 rotation_only_gyro_integrated
 ```
 
-translation은 보정하지 않았습니다.
+translation은 보정하지 않았다.
 
 ```text
 translation_compensated: false
 ```
 
-이 bag에는 pose/odometry topic이 없었기 때문입니다.
+이 bag에는 pose/odometry topic이 없었기 때문.
 
 ### **Gyro Integration이 실제로 하는 일**
 
-IMU gyro는 angular velocity를 줍니다.
+IMU gyro는 angular velocity를 준다.
 
 $$
 \boldsymbol{\omega}(t)
@@ -187,7 +187,7 @@ $$
 \end{bmatrix}
 $$
 
-짧은 시간 $\Delta t$ 동안 회전은 작은 rotation vector로 근사할 수 있습니다.
+짧은 시간 $\Delta t$ 동안 회전은 작은 rotation vector로 근사할 수 있다.
 
 $$
 \Delta \boldsymbol{\theta}
@@ -207,9 +207,8 @@ R_k
 \right)
 $$
 
-입니다.
 
-이번 UNIST deskew는 이 과정을 scan window 안에서 수행한 것입니다.
+이번 UNIST deskew는 이 과정을 scan window 안에서 수행한 것이다.
 
 ```text
 /livox/imu angular_velocity
@@ -218,44 +217,44 @@ $$
 -> rotation-only deskew
 ```
 
-여기서 중요한 제한이 있습니다.
+여기서 중요한 제한이 있다.
 
-gyro integration은 orientation 변화량을 만들 수 있지만, translation은 만들지 못합니다.
+gyro integration은 orientation 변화량을 만들 수 있지만, translation은 만들지 못한다.
 
-또한 gyro bias가 있으면 시간이 길어질수록 orientation drift가 누적됩니다.
+또한 gyro bias가 있으면 시간이 길어질수록 orientation drift가 누적된다.
 
-이번 scan은 약 `0.1 s`로 짧기 때문에 rotation-only 시각화에는 쓸 수 있지만, 이것을 긴 구간의 reference trajectory라고 부르면 안 됩니다.
+이번 scan은 약 `0.1 s`로 짧기 때문에 rotation-only 시각화에는 쓸 수 있지만, 이것을 긴 구간의 reference trajectory라고 부르면 안 된다.
 
 ### **Rotation-only Deskew의 한계**
 
-rotation-only deskew는 다음을 가정하는 것과 비슷합니다.
+rotation-only deskew는 다음을 가정하는 것과 비슷하다.
 
 ```text
 scan 동안 LiDAR 원점 translation은 무시할 수 있다.
 하지만 LiDAR orientation 변화는 보정한다.
 ```
 
-이 가정은 회전이 dominant한 장면에서는 꽤 큰 geometry 변화를 보여줄 수 있습니다.
+이 가정은 회전이 dominant한 장면에서는 꽤 큰 geometry 변화를 보여줄 수 있다.
 
-하지만 실제 rigid body motion은 SE(3)입니다.
+하지만 실제 rigid body motion은 SE(3).
 
 ```text
 pose(t) = rotation(t) + translation(t)
 ```
 
-translation이 큰 구간에서는 rotation-only 결과가 오히려 일부 metric에서 애매하게 보일 수 있습니다.
+translation이 큰 구간에서는 rotation-only 결과가 오히려 일부 metric에서 애매하게 보일 수 있다.
 
-그래서 UNIST 결과는 "rotation deskew가 point geometry를 크게 바꾼다"는 시각화에는 좋지만, full SE(3) deskew 검증으로 쓰면 안 됩니다.
+그래서 UNIST 결과는 "rotation deskew가 point geometry를 크게 바꾼다"는 시각화에는 좋지만, full SE(3) deskew 검증으로 쓰면 안 된다.
 
 ## **5. 새 Livox MCAP explorer**
 
-UNIST MCAP용으로 새 스크립트를 추가했습니다.
+UNIST MCAP용으로 새 스크립트를 추가했다.
 
 ```text
 study/livox_mcap_deskew_explorer.py
 ```
 
-이 스크립트가 하는 일은 다음입니다.
+이 스크립트가 하는 일은 다음.
 
 ```text
 1. /livox/lidar CustomMsg를 읽는다.
@@ -267,7 +266,7 @@ study/livox_mcap_deskew_explorer.py
 7. 보기 좋은 후보 scan을 ranking한다.
 ```
 
-이번 대표 후보는 rank 1입니다.
+이번 대표 후보는 rank 1이다.
 
 ```text
 study/results/offline_deskew/unist_livox/rank_01_scan_001896/
@@ -280,11 +279,11 @@ study/results/offline_deskew/unist_livox/rank_01_scan_001896/
 
 ## **6. UNIST 대표 결과**
 
-대표 이미지는 `scan_id=1896`입니다.
+대표 이미지는 `scan_id=1896`인다.
 
 ![UNIST Livox scan 1896 raw and gyro-integrated deskew comparison](/assets/img/posts/slam/study/week-4-offline-deskew/unist-livox-scan1896-gyro-deskew-comparison.png){: .d-block .mx-auto }
 
-그림은 다음을 보여줍니다.
+그림은 다음을 보여준다.
 
 ```text
 top-left: raw top-view
@@ -295,7 +294,7 @@ bottom-middle: gyro-deskewed side-view
 bottom-right: raw front-view
 ```
 
-UNIST 결과의 핵심 수치는 다음입니다.
+UNIST 결과의 핵심 수치는 다음.
 
 | 항목 | 값 |
 |---|---:|
@@ -311,9 +310,9 @@ UNIST 결과의 핵심 수치는 다음입니다.
 | raw ground RMS | 0.246322 m |
 | gyro-deskewed ground RMS | 0.245906 m |
 
-이 scan은 블로그 대표 예제로 좋습니다.
+이 scan은 블로그 대표 예제로 좋다.
 
-이유는 세 가지입니다.
+이유는 세 가지.
 
 ```text
 1. point 수가 충분히 많다.
@@ -323,38 +322,38 @@ UNIST 결과의 핵심 수치는 다음입니다.
 
 ## **7. UNIST 결과 해석**
 
-이번 UNIST scan은 약 `100 ms` 길이입니다.
+이번 UNIST scan은 약 `100 ms` 길이다.
 
-그 scan 안에서 gyro-integrated rotation delta는 약 `5.85 deg`였습니다.
+그 scan 안에서 gyro-integrated rotation delta는 약 `5.85 deg`이었다.
 
-그래서 rotation-only deskew correction의 p95가 약 `0.636 m`까지 나왔습니다.
+그래서 rotation-only deskew correction의 p95가 약 `0.636 m`까지 나왔다.
 
-이 값은 꽤 큽니다. 하지만 다시 말하면 이것은 error가 아니라 correction magnitude입니다.
+이 값은 꽤 크다. 하지만 다시 말하면 이것은 error가 아니라 correction magnitude.
 
-정확한 해석은 다음입니다.
+정확한 해석은 다음.
 
 ```text
 한 scan 안에서 rotation trajectory를 반영하면,
 raw point 위치가 p95 기준 약 0.64 m 정도 이동한다.
 ```
 
-틀린 해석은 다음입니다.
+틀린 해석은 다음이다.
 
 ```text
 deskew로 0.64 m 정확도가 좋아졌다.
 ```
 
-ground RMS도 조심해서 봐야 합니다.
+ground RMS도 조심해서 봐야 한다.
 
 | Metric | Raw | Gyro-deskewed | Difference |
 |---|---:|---:|---:|
 | ground RMS | 0.246322 m | 0.245906 m | 0.000416 m lower |
 
-수치상으로는 아주 조금 낮아졌지만, 차이는 약 `0.4 mm`입니다.
+수치상으로는 아주 조금 낮아졌지만, 차이는 약 `0.4 mm`.
 
-따라서 이번 결과를 정량 성능 개선으로 주장하면 안 됩니다.
+따라서 이번 결과를 정량 성능 개선으로 주장하면 안 된다.
 
-이번 UNIST 결과의 역할은 이것입니다.
+이번 UNIST 결과의 역할은 이것.
 
 ```text
 실제 Livox scan에서 point time과 gyro integration만으로도
@@ -363,15 +362,15 @@ rotation deskew가 point geometry를 크게 바꾸는 것을 보여주는 시각
 
 ## **8. 왜 Go2 결과를 버리면 안 되는가**
 
-UNIST 결과는 예쁘고 deskew 효과가 잘 보입니다.
+UNIST 결과는 예쁘고 deskew 효과가 잘 보인다.
 
-하지만 이것만 쓰면 4주차 글은 일반 Livox deskew 예제가 됩니다.
+하지만 이것만 쓰면 4주차 글은 일반 Livox deskew 예제가 된다.
 
-내 연구 주제는 단순한 일반 LiDAR deskew가 아니라, 로봇개 보행에서 생기는 body motion이 LiDAR SLAM에 어떤 영향을 주는지 보는 것입니다.
+내 연구 주제는 단순한 일반 LiDAR deskew가 아니라, 로봇개 보행에서 생기는 body motion이 LiDAR SLAM에 어떤 영향을 주는지 보는 것이다.
 
-그래서 Go2 결과는 조연으로 필요합니다.
+그래서 Go2 결과는 조연으로 필요하다.
 
-Go2 결과의 역할은 다음입니다.
+Go2 결과의 역할은 다음.
 
 ```text
 1. 로봇개 walking scan에서도 cm-scale correction이 생긴다.
@@ -379,7 +378,7 @@ Go2 결과의 역할은 다음입니다.
 3. 따라서 이 연구가 quadruped gait-induced LiDAR motion 문제와 연결된다.
 ```
 
-다만 Go2 결과를 메인 그림으로 쓰기에는 약했습니다.
+다만 Go2 결과를 메인 그림으로 쓰기에는 약했다.
 
 ```text
 outdoor scan이라 구조가 덜 선명함
@@ -387,7 +386,7 @@ point 수가 UNIST scan보다 적음
 SE(3) translation이 ground truth가 아니라 estimated term
 ```
 
-따라서 역할 분리가 맞습니다.
+따라서 역할 분리가 맞는다.
 
 ```text
 UNIST: 메인 시각화
@@ -396,7 +395,7 @@ Go2: 연구 연결
 
 ## **9. Go2 LowState SE(3) 보조 결과**
 
-Go2 결과는 이전에 만든 다음 scan입니다.
+Go2 결과는 이전에 만든 다음 scan.
 
 ```text
 bag: may07_bag1_walk_clean
@@ -404,13 +403,13 @@ scan_id: 14327
 segment: walk_like
 ```
 
-새로 만든 스크립트는 다음입니다.
+새로 만든 스크립트는 다음이다.
 
 ```text
 study/go2_lowstate_leg_odometry.py
 ```
 
-이 스크립트는 `/lowstate`에서 다음 정보를 읽습니다.
+이 스크립트는 `/lowstate`에서 다음 정보를 읽는다.
 
 ```text
 관절각 q
@@ -420,11 +419,11 @@ IMU gyro
 Go2 URDF
 ```
 
-핵심은 역기구학만으로 base pose를 직접 뽑는 것이 아닙니다.
+핵심은 역기구학만으로 base pose를 직접 뽑는 것이 아니다.
 
-stance foot이 짧은 순간 world에서 고정되어 있다고 보고, FK + Jacobian + contact constraint로 body velocity를 추정했습니다.
+stance foot이 짧은 순간 world에서 고정되어 있다고 보고, FK + Jacobian + contact constraint로 body velocity를 추정했다.
 
-사용한 식은 다음입니다.
+사용한 식은 다음.
 
 $$
 \mathbf{v}_B
@@ -437,15 +436,15 @@ J(\mathbf{q})\dot{\mathbf{q}}
 \right)
 $$
 
-이 식은 다음 contact constraint에서 나온 직관입니다.
+이 식은 다음 contact constraint에서 나온 직관.
 
-stance foot이 순간적으로 world에서 고정되어 있다고 보면, foot의 world velocity는 0에 가깝습니다.
+stance foot이 순간적으로 world에서 고정되어 있다고 보면, foot의 world velocity는 0에 가깝다.
 
 ```text
 stance foot world velocity ~= 0
 ```
 
-base frame에서 foot 위치를 $\mathbf{p}_{BF}$라고 하면, foot velocity에는 세 항이 섞입니다.
+base frame에서 foot 위치를 $\mathbf{p}_{BF}$라고 하면, foot velocity에는 세 항이 섞인다.
 
 ```text
 base translation velocity
@@ -482,19 +481,19 @@ J(\mathbf{q})\dot{\mathbf{q}}
 \right)
 $$
 
-가 됩니다.
+가 된다.
 
-즉 이것은 "관절각으로 base pose를 직접 푼 것"이 아닙니다.
+즉 이것은 "관절각으로 base pose를 직접 푼 것"이 아니다.
 
-짧은 순간의 contact constraint를 이용해 body translation velocity를 추정한 것입니다.
+짧은 순간의 contact constraint를 이용해 body translation velocity를 추정한 것이다.
 
-그래서 이름도 `measured odometry`가 아니라 `contact-kinematic estimated translation`에 가깝습니다.
+그래서 이름도 `measured odometry`가 아니라 `contact-kinematic estimated translation`에 가깝다.
 
 ### **왜 Foot Slip이 핵심 리스크인가**
 
-위 식은 stance foot이 world에서 고정되어 있다는 가정에 기대고 있습니다.
+위 식은 stance foot이 world에서 고정되어 있다는 가정에 기대고 있다.
 
-하지만 실제 보행에서는 다음 일이 생길 수 있습니다.
+하지만 실제 보행에서는 다음 일이 생길 수 있다.
 
 ```text
 foot slip
@@ -504,13 +503,13 @@ foot force threshold error
 URDF / joint calibration error
 ```
 
-이 경우 $\mathbf{v}_F \approx 0$ 가정이 깨집니다.
+이 경우 $\mathbf{v}_F \approx 0$ 가정이 깨진다.
 
-그러면 추정된 $\mathbf{v}_B$도 bias를 갖습니다.
+그러면 추정된 $\mathbf{v}_B$도 bias를 갖는다.
 
-그래서 LowState SE(3) deskew는 연구적으로 흥미로운 proprioceptive path이지만, 외부 odometry나 SLAM trajectory와 비교하기 전까지는 reference trajectory가 아닙니다.
+그래서 LowState SE(3) deskew는 연구적으로 흥미로운 proprioceptive path이지만, 외부 odometry나 SLAM trajectory와 비교하기 전까지는 reference trajectory가 아니다.
 
-이 translation estimate를 기존 `offline_deskew_explorer.py`에 넣기 위해 다음 option도 추가했습니다.
+이 translation estimate를 기존 `offline_deskew_explorer.py`에 넣기 위해 다음 option도 추가했다.
 
 ```text
 --scan-id
@@ -518,7 +517,7 @@ URDF / joint calibration error
 --trajectory-translation-kind estimated
 ```
 
-Go2 결과의 주요 수치는 다음입니다.
+Go2 결과의 주요 수치는 다음.
 
 | 항목 | 값 |
 |---|---:|
@@ -533,7 +532,7 @@ Go2 결과의 주요 수치는 다음입니다.
 | LowState estimated SE(3) p95 correction | 0.072625 m |
 | SE(3) vs rotation-only p95 difference | 0.015644 m |
 
-이 결과에서 말할 수 있는 것은 다음입니다.
+이 결과에서 말할 수 있는 것은 다음.
 
 ```text
 Go2 walking scan에서도 rotation-only correction이 cm-scale로 생긴다.
@@ -541,7 +540,7 @@ LowState estimated translation을 넣으면 SE(3) correction이 조금 더 커�
 translation term은 0이 아니다.
 ```
 
-하지만 이렇게 쓰면 안 됩니다.
+하지만 이렇게 쓰면 안 된다.
 
 ```text
 LowState SE(3) deskew가 정답이다.
@@ -549,13 +548,13 @@ Go2 odometry가 검증됐다.
 SLAM 성능이 좋아졌다는 증거다.
 ```
 
-정확한 이름은 다음입니다.
+정확한 이름은 다음이다.
 
 ```text
 LowState contact-kinematic estimated-translation SE(3) deskew
 ```
 
-짧게는 다음처럼 쓸 수 있습니다.
+짧게는 다음처럼 쓸 수 있다.
 
 ```text
 LowState estimated SE(3) deskew
@@ -564,34 +563,34 @@ proprioceptive SE(3) deskew
 
 ## **10. Go2 시간축 문제**
 
-Go2 결과에서 중요한 문제는 시간축이었습니다.
+Go2 결과에서 중요한 문제는 시간축이었다.
 
-LiDAR cloud와 IMU는 header time을 씁니다.
+LiDAR cloud와 IMU는 header time을 쓴다.
 
-하지만 `/lowstate`에는 header stamp가 없습니다. 그래서 LowState는 rosbag2 storage time으로 읽었습니다.
+하지만 `/lowstate`에는 header stamp가 없다. 그래서 LowState는 rosbag2 storage time으로 읽었다.
 
-그대로 섞으면 두 trajectory가 서로 다른 시간축에 놓입니다.
+그대로 섞으면 두 trajectory가 서로 다른 시간축에 놓인다.
 
-이번 Go2 bag에서는 다음 offset을 적용했습니다.
+이번 Go2 bag에서는 다음 offset을 적용했다.
 
 ```text
 header_timestamp - bag_timestamp = -995.347479105 s
 ```
 
-즉 LowState bag timestamp에 이 offset을 더해서 LiDAR header time 축에 맞췄습니다.
+즉 LowState bag timestamp에 이 offset을 더해서 LiDAR header time 축에 맞췄다.
 
 ```text
 lowstate_output_time =
 lowstate_bag_timestamp + (-995.347479105)
 ```
 
-이 alignment를 하지 않으면 LiDAR scan window와 LowState trajectory window가 서로 다른 구간을 가리키게 됩니다.
+이 alignment를 하지 않으면 LiDAR scan window와 LowState trajectory window가 서로 다른 구간을 가리키게 된다.
 
-그 상태에서 SE(3) deskew를 하면 결과가 틀어질 수밖에 없습니다.
+그 상태에서 SE(3) deskew를 하면 결과가 틀어질 수밖에 없다.
 
 ## **11. 결과를 해석할 수 있는 범위**
 
-이번 4주차 글의 claim은 다음 정도로 제한해야 합니다.
+이번 4주차 글의 claim은 다음 정도로 제한해야 한다.
 
 ```text
 UNIST Livox MCAP:
@@ -603,7 +602,7 @@ rotation-only correction이 cm-scale로 생겼고,
 LowState contact-kinematic odometry로 estimated translation SE(3) path를 열었다.
 ```
 
-아직 말하면 안 되는 것은 다음입니다.
+아직 말하면 안 되는 것은 다음.
 
 ```text
 ground-truth deskew를 했다.
@@ -613,15 +612,15 @@ Go2 LowState odometry가 외부 기준으로 검증됐다.
 UNIST 결과로 로봇개 보행 claim을 증명했다.
 ```
 
-UNIST는 시각화용 실제 Livox deskew 예제입니다.
+UNIST는 시각화용 실제 Livox deskew 예제.
 
-Go2는 로봇개 연구 연결용 보조 근거입니다.
+Go2는 로봇개 연구 연결용 보조 근거다.
 
-둘을 섞어서 하나의 강한 claim으로 만들면 안 됩니다.
+둘을 섞어서 하나의 강한 claim으로 만들면 안 된다.
 
 ## **12. 남은 리스크**
 
-UNIST 쪽 리스크는 다음입니다.
+UNIST 쪽 리스크는 다음.
 
 | 리스크 | 의미 |
 |---|---|
@@ -631,7 +630,7 @@ UNIST 쪽 리스크는 다음입니다.
 | ground RMS 약함 | ground RMS 차이가 매우 작아서 성능 개선 claim으로 쓰기 어려움 |
 | correction vs error | p95 displacement는 error가 아니라 correction magnitude |
 
-Go2 쪽 리스크는 다음입니다.
+Go2 쪽 리스크는 다음.
 
 | 리스크 | 의미 |
 |---|---|
@@ -641,9 +640,9 @@ Go2 쪽 리스크는 다음입니다.
 | external odometry 없음 | LowState estimate가 실제 body translation과 얼마나 맞는지 아직 검증하지 않음 |
 | surface metric 약함 | outdoor scan에서는 plane metric이 품질 판단에 약할 수 있음 |
 
-따라서 이번 결과는 구현과 시각화 단계입니다.
+따라서 이번 결과는 구현과 시각화 단계다.
 
-정량 연구 결과로 쓰려면 다음이 필요합니다.
+정량 연구 결과로 쓰려면 다음이 필요하다.
 
 ```text
 external odometry
@@ -655,9 +654,9 @@ scan-to-map residual 또는 odometry drift와의 연결
 
 ## **13. 다음 단계**
 
-다음 단계는 두 갈래입니다.
+다음 단계는 두 갈래.
 
-첫째, UNIST처럼 구조가 선명한 bag에서 surface consistency metric을 더 잘 잡습니다.
+첫째, UNIST처럼 구조가 선명한 bag에서 surface consistency metric을 더 잘 잡는다.
 
 ```text
 wall thickness
@@ -666,7 +665,7 @@ normal dispersion
 scan-to-map residual
 ```
 
-둘째, Go2 쪽에서는 LowState trajectory를 검증해야 합니다.
+둘째, Go2 쪽에서는 LowState trajectory를 검증해야 한다.
 
 ```text
 LowState odometry vs external odometry
@@ -675,7 +674,7 @@ LowState contact estimate vs foot slip condition
 validated trajectory 기반 SE(3) deskew
 ```
 
-이 두 가지가 연결되면 다음 claim으로 갈 수 있습니다.
+이 두 가지가 연결되면 다음 claim으로 갈 수 있다.
 
 ```text
 quadruped gait-induced body motion
@@ -689,6 +688,6 @@ quadruped gait-induced body motion
 
 > 실제 rosbag에서 point time과 IMU를 이용해 offline deskew를 수행했고, UNIST Livox는 시각화 예제로, Go2 LowState는 로봇개 연구 연결용 보조 근거로 정리했다.
 
-UNIST Livox 결과는 point time과 gyro integration으로 raw scan geometry가 얼마나 달라지는지 보여주는 시각화입니다. 여기서 p95 displacement는 error 감소량이 아니라 correction magnitude입니다. Go2 결과는 walking scan에서 rotation-only correction에 LowState 기반 estimated translation을 더한 보조 실험이며, translation이 0이 아니라는 연구 연결을 제공합니다.
+UNIST Livox 결과는 point time과 gyro integration으로 raw scan geometry가 얼마나 달라지는지 보여주는 시각화. 여기서 p95 displacement는 error 감소량이 아니라 correction magnitude이다. Go2 결과는 walking scan에서 rotation-only correction에 LowState 기반 estimated translation을 더한 보조 실험이며, translation이 0이 아니라는 연구 연결을 제공한다.
 
-두 결과 모두 reference trajectory나 ground truth 정확도 검증은 아닙니다. UNIST는 main visualization, Go2는 quadruped 연구 맥락으로 역할을 나누고, 둘을 합쳐 deskew가 SLAM 정확도를 개선했다고 주장하지 않는 것이 현재 증거에 맞습니다.
+두 결과 모두 reference trajectory나 ground truth 정확도 검증은 아니다. UNIST는 main visualization, Go2는 quadruped 연구 맥락으로 역할을 나누고, 둘을 합쳐 deskew가 SLAM 정확도를 개선했다고 주장하지 않는 것이 현재 증거에 맞는다.

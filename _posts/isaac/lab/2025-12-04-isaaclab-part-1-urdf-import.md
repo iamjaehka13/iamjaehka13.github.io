@@ -1,7 +1,7 @@
 ---
 title: "[IsaacLab Part 1] Unitree Go2 URDF import"
 date: 2025-12-04 18:49:09 +0900
-last_modified_at: 2025-12-04 22:38:25 +0900
+last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [Isaac, Lab]
 tags: [unitree-go2, isaac-lab, isaac-sim, urdf, robotics]
 description: Isaac Lab을 설치하고 Unitree Go2 URDF를 Isaac Sim scene에 load하는 과정을 정리한다.
@@ -12,15 +12,17 @@ math: true
 
 <https://isaac-sim.github.io/IsaacLab/release/2.2.0/source/setup/installation/binaries_installation.html>
 
-Isaac Lab을 설치한 뒤 `isaaclab_assets`에 포함된 Unitree Go2 configuration을 이용해 로봇을 Isaac Sim에 불러왔습니다.
+Isaac Lab을 설치한 뒤 `isaaclab_assets`에 포함된 Unitree Go2 configuration을 이용해 로봇을 Isaac Sim에 불러왔다.
+
+이번 단계의 목표: 빈 scene에 Go2 articulation 배치.
 
 ## Load script 작성
 
 ![image](/assets/img/posts/isaac/lab/unitree-go2-part-1-urdf-import/01-custom-script-folder.png){: .d-block .mx-auto }
 
-Isaac Lab의 `scripts` 아래에 custom 폴더를 만들고 Go2를 load하는 Python 파일을 생성했습니다.
+Isaac Lab의 `scripts` 아래에 custom 폴더를 만들고 Go2를 load하는 Python 파일을 생성했다.
 
-`scripts/tutorials/00_sim/create_empty.py`와 `scripts/demos/quadrupeds.py`를 참고해 빈 scene에 Go2 articulation을 배치했습니다.
+`scripts/tutorials/00_sim/create_empty.py`와 `scripts/demos/quadrupeds.py`를 참고해 빈 scene에 Go2 articulation을 배치했다.
 
 ```python
 import argparse
@@ -113,4 +115,4 @@ if __name__ == "__main__":
 *Go2를 Isaac Sim에 load한 모습*
 {: .text-center}
 
-초기 joint pose는 한 번만 기록했기 때문에 로봇이 땅에 떨어진 뒤 자세를 유지하지 못했습니다. 서 있는 자세를 유지하려면 매 step에 joint target을 적용하거나 balance policy로 폐루프 제어해야 합니다.
+초기 joint pose는 한 번만 기록했기 때문에 로봇이 땅에 떨어진 뒤 자세를 유지하지 못했다. 서 있는 자세를 유지하려면 매 step에 joint target을 적용하거나 balance policy로 폐루프 제어해야 한다.
