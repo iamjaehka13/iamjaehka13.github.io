@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 3] Dynamics Randomization"
 date: 2026-06-24 17:31:00 +0900
-last_modified_at: 2026-07-27 19:52:00 +0900
+last_modified_at: 2026-07-27 21:24:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, dynamics-randomization, recurrent-policy, implicit-system-identification, fetch-robot, object-pushing, rdpg, her]
 description: Peng et al.의 dynamics randomization을 Fetch puck pushing 실험, RDPG와 HER, LSTM 기반 implicit system identification, omniscient critic, 실물 ablation 결과까지 원문 기준으로 정리한다.
@@ -13,9 +13,7 @@ image:
 
 ## **0. 전체 그림: Appearance가 아니라 Transition을 흔들기**
 
-이전 글에서는 Tobin et al.의 **visual domain randomization**을 봤습니다.
-
-Texture, lighting, camera pose처럼 image를 만드는 요소를 계속 바꾸면, network가 특정 simulation appearance에 과적합하지 않고 real image에도 남아 있는 feature를 찾게 할 수 있었습니다.
+이전 글인 **[Domain Randomization](/posts/domain-randomization/)**에서는 texture, lighting, camera pose를 바꿔 network가 특정 simulation appearance에 과적합하지 않도록 만들었습니다.
 
 Peng et al.의 **Sim-to-Real Transfer of Robotic Control with Dynamics Randomization**은 이 관점을 control로 옮깁니다.
 
@@ -38,12 +36,12 @@ $$
 ![Fetch 로봇의 puck pushing 연속 장면](/assets/img/posts/rl/sim2real/dynamics-randomization/02-real-pushing-sequence.png){: width="1200" .d-block .mx-auto }
 _Fetch 로봇 팔이 puck을 빨간 목표점까지 미는 실제 실행 장면. Policy는 real robot data로 추가 학습하지 않고 simulation에서만 학습되었다. 출처: [Peng et al., Figure 1 source](https://arxiv.org/pdf/1710.06537)._
 
-따라서 이 글에서 확인할 질문은 네 가지입니다.
+이 글에서 먼저 기억할 결과는 네 가지입니다.
 
-1. 어떤 dynamics를 어느 범위까지 randomize했는가?
-2. Policy는 숨겨진 dynamics를 어떻게 history에서 읽어내는가?
-3. RDPG, HER, omniscient critic은 왜 함께 사용되었는가?
-4. 실제 Fetch robot에서 무엇이 성공했고, 어디까지를 주장할 수 있는가?
+1. Mass와 friction뿐 아니라 control timing과 observation noise까지 포함해 총 95개 parameter를 randomize했습니다.
+2. Actor는 parameter를 직접 받지 않고 LSTM history로 task-relevant dynamics context를 암묵적으로 추론했습니다.
+3. Critic만 simulation의 dynamics parameter를 보는 asymmetric training을 사용했습니다.
+4. LSTM policy는 real Fetch에서 28회 중 약 0.89의 success를 보였지만, 실험 규모와 task는 tabletop pushing으로 제한됩니다.
 
 ---
 
@@ -65,15 +63,12 @@ _Fetch 로봇 팔이 puck을 빨간 목표점까지 미는 실제 실행 장면.
 
 이 논문은 locomotion 논문이 아니라 **tabletop object pushing** 논문입니다. 하지만 이후 legged robot Sim2Real에서 반복해서 등장하는 구성이 이미 들어 있습니다.
 
-```text
-simulation dynamics randomization
-        +
-history-based adaptation
-        +
-training 때만 privileged information을 보는 critic
-        ↓
-real robot zero-shot transfer
-```
+| 구성 | 역할 |
+|---|---|
+| Dynamics randomization | 서로 다른 closed-loop transition을 training에 노출 |
+| History-based adaptation | 현재 system response를 바탕으로 action을 조정 |
+| Privileged critic | training에서만 dynamics parameter를 사용해 value estimation을 도움 |
+| Deployable actor | real robot에서는 observation과 recurrent memory만 사용 |
 
 즉, 이 논문은 단순히 “마찰을 흔들자”는 아이디어보다 더 넓은 구조를 제시합니다.
 
@@ -120,15 +115,12 @@ Policy가 torque를 직접 출력하는 것이 아니라 position controller가 
 
 이 구분이 중요합니다.
 
-```text
-policy action
-    ↓ target joint-angle offset
-position controller
-    ↓ motor command
-robot + contact dynamics
-    ↓
-next state
-```
+| Closed-loop 단계 | 전달되는 값 |
+|---|---|
+| Policy | 7D target joint-angle offset |
+| Position controller | target을 추종할 motor command |
+| Robot와 puck contact | 실제 joint와 puck motion |
+| Sensor와 state estimator | 다음 52D policy state |
 
 Dynamics randomization은 이 전체 closed loop의 불확실성을 다루어야 합니다.
 
@@ -151,13 +143,9 @@ Real puck은 약 0.2 kg, 반지름은 0.065 m입니다. Puck 위치는 PhaseSpac
 
 그래서 **Hindsight Experience Replay, HER**를 사용합니다.
 
-```text
-원래 목표 g에는 실패한 trajectory
-        ↓
-실제로 도달한 최종 위치 g'를 새 목표로 재해석
-        ↓
-같은 transition을 성공 example로 replay
-```
+1. 원래 목표 $g$에는 실패한 trajectory를 replay buffer에서 꺼냅니다.
+2. 실제로 도달한 최종 위치 $g'$를 새로운 목표로 해석합니다.
+3. 같은 transition의 reward를 $g'$ 기준으로 다시 계산해 성공 example로 재사용합니다.
 
 논문에서는 replay한 episode의 goal을 HER로 바꿀 확률을 $k=0.8$로 둡니다.
 
@@ -223,13 +211,10 @@ Observation에는 feature별 running standard deviation의 5%를 표준편차로
 
 이 구분을 정리하면 다음과 같습니다.
 
-```text
-episode-level latent context
-    mass, damping, friction, gain, table height, latency rate
-
-step-level stochasticity
-    realized action delay, sensor-noise sample
-```
+| 시간 척도 | 예시 | Policy가 해야 하는 일 |
+|---|---|---|
+| Episode-level latent context | mass, damping, friction, gain, table height, latency rate | history에서 일관된 system response를 추론 |
+| Step-level stochasticity | realized action delay, sensor-noise sample | 정확히 식별하기보다 feedback으로 견딤 |
 
 Policy가 추론할 수 있는 것은 첫 번째 종류의 지속적인 context입니다. 두 번째 종류는 매번 달라지므로 정확히 식별하기보다 feedback으로 견뎌야 합니다.
 
@@ -284,15 +269,7 @@ $$
 
 하지만 현재 puck이 무거운지, friction이 낮은지, controller response가 느린지에 따라 가장 좋은 action은 달라집니다. 현재 state 한 장만으로는 그 차이를 구분하기 어려울 수 있습니다.
 
-예를 들어 같은 puck position에서도,
-
-```text
-이전 push에 거의 움직이지 않음
--> mass 또는 friction이 큰 상황일 수 있음
-
-이전 push에 크게 미끄러짐
--> friction이 작거나 puck이 가벼울 수 있음
-```
+예를 들어 같은 puck position이라도 이전 push에 거의 움직이지 않았다면 큰 mass 또는 friction을 의심할 수 있고, 크게 미끄러졌다면 낮은 friction이나 가벼운 puck을 의심할 수 있습니다.
 
 이 차이는 **이전 action과 그 결과**를 함께 봐야 드러납니다.
 
@@ -362,10 +339,10 @@ Goal은 dynamics를 알려 주지 않으므로 recurrent branch에 넣지 않습
 
 이 설계는 단순히 LSTM을 네트워크 앞에 붙인 것보다 해석이 분명합니다.
 
-```text
-history-dependent information -> recurrent path
-instantaneous task information -> direct feedforward path
-```
+| Information | Network path |
+|---|---|
+| System response처럼 history가 필요한 정보 | recurrent branch |
+| Goal과 current geometry처럼 즉시 필요한 정보 | direct feedforward branch |
 
 ### **4.3 Policy에는 숨기고 critic에는 보여 준 $\mu$**
 
@@ -385,14 +362,10 @@ $$
 
 Simulator는 이번 episode의 mass, friction, damping, gain을 알고 있으므로 critic에 이 privileged information을 줄 수 있습니다. Critic은 “서로 다른 hidden dynamics에서 같은 transition이 왜 다른 return을 만드는지”를 더 쉽게 설명할 수 있고, actor에게 variance가 작은 gradient를 제공할 수 있습니다.
 
-```text
-training:
-    actor  <- deployable observations only
-    critic <- observations + sampled dynamics parameters
-
-deployment:
-    actor only
-```
+| 단계 | Actor 입력 | Critic 입력 |
+|---|---|---|
+| Simulation training | deployable observation와 recurrent memory | observation, action, memory, goal, sampled $\mu$ |
+| Real deployment | deployable observation와 recurrent memory | 사용하지 않음 |
 
 이것은 이후 robotics RL에서 자주 보이는 **asymmetric actor-critic**의 초기 형태로 읽을 수 있습니다.
 
@@ -410,14 +383,12 @@ deployment:
 
 간략한 흐름은 다음과 같습니다.
 
-```text
-1. goal g와 dynamics mu를 sample
-2. recurrent policy로 한 episode rollout
-3. episode 전체를 replay buffer에 저장
-4. 0.8 확률로 achieved goal을 사용해 HER relabeling
-5. sequence를 처음부터 통과시켜 actor/critic memory 계산
-6. critic TD target과 deterministic policy gradient 업데이트
-```
+1. Goal $g$와 dynamics $\mu$를 sample합니다.
+2. Recurrent policy로 한 episode를 rollout합니다.
+3. Episode 전체와 $\mu$를 replay buffer에 저장합니다.
+4. 0.8 확률로 achieved goal을 사용해 HER relabeling을 수행합니다.
+5. Sequence를 처음부터 통과시켜 actor와 critic memory를 복원합니다.
+6. Critic TD target과 deterministic policy gradient를 업데이트합니다.
 
 Episode 전체를 replay하는 이유는 recurrent memory가 과거 state-action sequence에 의존하기 때문입니다. Transition 한 개만 무작위로 꺼내면 그 시점의 LSTM state를 복원할 수 없습니다.
 
@@ -668,22 +639,13 @@ $$
 
 ### **6.4 Randomization range는 task design의 일부다**
 
-Range가 너무 좁으면 real system이 distribution 밖에 남습니다.
+Range는 coverage와 learnability를 함께 결정합니다.
 
-```text
-narrow range
--> nominal simulator overfitting
--> real transition is unfamiliar
-```
-
-Range가 너무 넓으면 task 자체가 모호하거나 지나치게 어려워질 수 있습니다.
-
-```text
-overly broad range
--> incompatible optimal actions mixed together
--> slow or conservative behavior
--> training instability
-```
+| Randomization range | 효과 | 위험 |
+|---|---|---|
+| 너무 좁음 | nominal dynamics 근처만 학습 | real transition이 낯설어 transfer failure |
+| Deployment variation과 비슷함 | 필요한 dynamics 차이를 경험 | feedback과 adaptation을 학습할 가능성이 커짐 |
+| 너무 넓음 | 서로 양립하기 어려운 optimal action이 섞임 | 느리거나 conservative한 behavior, training instability |
 
 그리고 모든 parameter를 독립적으로 randomize하면 현실에 존재하지 않는 조합이 생길 수 있습니다. 예를 들어 motor strength, battery voltage, latency, damping은 실제 hardware에서 서로 상관될 수 있습니다.
 
@@ -719,17 +681,11 @@ overly broad range
 
 Legged robot에서는 deployment failure mode에서 거꾸로 randomization axis를 정해야 합니다.
 
-```text
-real failure observation
-    ↓
-which transition/observation mismatch caused it?
-    ↓
-add physically plausible randomization
-    ↓
-check whether reward hacking or conservative gait appears
-    ↓
-holdout dynamics + real low-risk validation
-```
+1. Real failure에서 어떤 transition 또는 observation mismatch가 나타났는지 기록합니다.
+2. 해당 mismatch를 설명할 수 있는 physically plausible randomization을 추가합니다.
+3. Reward hacking이나 지나치게 conservative한 gait가 생기는지 확인합니다.
+4. Training에 쓰지 않은 holdout dynamics를 먼저 통과시킵니다.
+5. 낮은 energy와 제한된 command에서 real validation을 진행합니다.
 
 또한 actuator model과 action semantics를 보존해야 합니다. Torque policy, joint-position target policy, learned actuator model은 같은 randomization range를 공유하지 않습니다.
 
@@ -780,33 +736,13 @@ Training distribution의 tail이나 support 밖 조건에서는 실패할 수 �
 
 ## **9. 정리하며: Randomization만큼 중요한 것은 Adaptation이다**
 
-이번 논문의 흐름은 다음과 같습니다.
+이번 글에서 남겨야 할 결론은 다섯 가지입니다.
 
-```text
-정확한 real dynamics를 알기 어렵다
-        ↓
-simulation의 dynamics를 episode마다 randomize한다
-        ↓
-policy에는 mu를 숨긴다
-        ↓
-state-action history로 현재 dynamics에 필요한 context를 추론한다
-        ↓
-critic은 training 때 mu를 보고 더 안정적으로 value를 학습한다
-        ↓
-simulation-only policy를 real Fetch에 바로 배포한다
-```
-
-핵심을 다시 정리하면 다음과 같습니다.
-
-- Dynamics randomization은 fixed simulator가 아니라 dynamics distribution에서 policy를 학습하는 방법입니다.
-- 이 논문은 mass와 friction뿐 아니라 controller gain, action timing, observation noise까지 randomize했습니다.
-- Task는 7-DOF Fetch arm의 puck pushing이며, state는 52D, action은 7D relative joint target입니다.
-- Sparse binary reward를 학습하기 위해 HER를 사용했고, recurrent off-policy learning을 위해 RDPG를 사용했습니다.
-- LSTM은 state-action history를 task-relevant dynamics context로 압축합니다.
-- Actor는 dynamics parameter를 보지 않지만, critic은 simulation에서만 $\mu$를 받는 omniscient critic입니다.
-- LSTM은 real robot에서 $0.89\pm0.06$ success를 보였고, randomization 없는 FF는 0/10이었습니다.
-- Action timestep과 observation noise를 고정하면 real success가 각각 0.29, 0.25로 크게 떨어졌습니다.
-- 다만 small-scale pushing 실험이며, explicit parameter identification이나 broad real-world guarantee를 증명한 것은 아닙니다.
+- Dynamics randomization은 fixed simulator 하나가 아니라 sampled dynamics distribution에서 policy를 학습하는 방법입니다.
+- 이 논문은 mass와 friction뿐 아니라 controller gain, action timing, observation noise까지 closed-loop uncertainty에 포함했습니다.
+- LSTM은 physical parameter의 정답을 맞히는 estimator가 아니라, state-action history를 control에 필요한 latent context로 압축합니다.
+- Actor에는 $\mu$를 숨기고 critic에만 제공하는 asymmetric training과, sparse reward를 재활용하는 HER·RDPG가 함께 사용됐습니다.
+- Real success 결과는 randomization과 memory의 가치를 보여주지만, 10-28회의 tabletop pushing trial을 넘어선 broad guarantee는 아닙니다.
 
 2편의 visual domain randomization이
 
@@ -818,7 +754,7 @@ simulation-only policy를 real Fetch에 바로 배포한다
 
 라고 정리할 수 있습니다.
 
-다음 글에서는 이 생각이 quadruped locomotion으로 넘어가면서 actuator model, latency, reference motion, system identification과 어떻게 결합되는지 살펴보겠습니다.
+다음 글인 **[Learning Agile Locomotion](/posts/learning-agile-locomotion-quadruped-robots/)**에서는 이 생각이 quadruped locomotion으로 넘어가며 actuator model, latency, reference motion, system identification과 어떻게 결합되는지 살펴봅니다.
 
 ## **참고 자료**
 
