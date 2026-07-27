@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 8] Learning to Walk in Minutes: 4096개 로봇으로 PPO를 다시 설계하기"
 date: 2026-06-24 17:36:00 +0900
-last_modified_at: 2026-07-27 22:20:00 +0900
+last_modified_at: 2026-07-27 21:25:26 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, isaac-gym, legged-gym, massively-parallel-rl, quadruped-locomotion, ppo, terrain-curriculum, anymal, gpu-simulation]
 description: Rudin et al.의 Learning to Walk in Minutes를 end-to-end GPU pipeline, PPO batch와 rollout horizon, timeout bootstrapping, game-inspired terrain curriculum, reward와 Sim2Real 구성, 실제 ANYmal 배포 및 공개 코드 차이까지 원문 기준으로 분석한다.
@@ -12,6 +12,8 @@ image:
 ---
 
 ## **0. 제목의 “몇 분”은 정확히 무엇을 뜻하는가**
+
+이전 글: [RMA: recent history로 environment latent를 추정하는 online adaptation](/posts/rma-rapid-motor-adaptation/)
 
 Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 제목만 보면 “GPU를 많이 쓰면 강화학습이 빨라진다”는 논문처럼 보입니다.
 
@@ -39,12 +41,12 @@ Rough-terrain policy는:
 
 따라서 “20분”은 robot 한 대가 20분 동안 걸어서 배운다는 뜻이 아닙니다.
 
-```text
-4096 robots
-x 24 steps per update
-x 1500 updates
-= 147,456,000 transitions
-```
+$$
+4096\;\text{robots}
+\times24\;\text{steps/update}
+\times1500\;\text{updates}
+=147{,}456{,}000\;\text{transitions}
+$$
 
 거대한 simulation experience를 한 GPU에서 20분 이내의 wall-clock time으로 처리했다는 뜻입니다.
 
@@ -98,36 +100,18 @@ _하나의 GPU simulation 안에서 수천 개 ANYmal이 서로 다른 terrain�
 
 ### **2.1 PPO update만 GPU에 있어서는 충분하지 않다**
 
-일반적인 robot RL loop는 다음 작업을 반복합니다.
-
-```text
-policy inference
--> physics simulation
--> contact computation
--> reward calculation
--> observation calculation
--> reset
--> rollout storage
--> PPO update
-```
+일반적인 robot RL loop는 policy inference, physics·contact simulation, reward·observation calculation, reset, rollout storage와 PPO update를 반복합니다.
 
 Neural network update는 GPU에서 병렬화하기 쉽습니다.
 
 하지만 physics, reward와 observation이 CPU에 있으면 매 step 또는 update마다 data가 CPU와 GPU 사이를 오갑니다.
 
-```text
-CPU:
-physics + reward + observation
-
-PCIe copy:
-observation -> GPU
-
-GPU:
-policy inference
-
-PCIe copy:
-action -> CPU
-```
+| 위치 | 매 control step의 작업 |
+|---|---|
+| CPU | Physics, reward와 observation |
+| CPU $\rightarrow$ GPU | Observation을 PCIe로 복사 |
+| GPU | Policy inference |
+| GPU $\rightarrow$ CPU | Action을 PCIe로 복사 |
 
 Environment 수가 커질수록 이 전송과 synchronization 비용도 커집니다.
 
@@ -135,18 +119,7 @@ Environment 수가 커질수록 이 전송과 synchronization 비용도 커집�
 
 Isaac Gym은 simulation state를 GPU tensor로 제공합니다.
 
-Rudin et al.의 pipeline은:
-
-```text
-GPU physics
--> GPU state tensors
--> GPU observation/reward
--> GPU policy inference
--> GPU rollout buffer
--> GPU PPO update
-```
-
-로 이어집니다.
+Rudin et al.의 pipeline은 GPU physics $\rightarrow$ state tensor $\rightarrow$ observation/reward $\rightarrow$ policy inference $\rightarrow$ rollout buffer $\rightarrow$ PPO update로 이어집니다.
 
 핵심은 “GPU simulator” 하나가 아니라 **data collection과 optimization 사이에 CPU round trip이 거의 없는 구조**입니다.
 
@@ -282,14 +255,10 @@ Final rollout은 24 step, 0.48초지만 episode는 최대 20초입니다.
 
 PPO update가 끝날 때 environment를 reset하지 않습니다.
 
-```text
-episode: 최대 20 s
-
-rollout 1: 0.48 s -> PPO update
-rollout 2: 다음 0.48 s -> PPO update
-rollout 3: 다음 0.48 s -> PPO update
-...
-```
+| 시간 단위 | 길이 | 끝날 때 일어나는 일 |
+|---|---:|---|
+| Episode | 최대 20 s | Failure 또는 timeout이면 environment reset |
+| Rollout segment | 0.48 s | PPO update, episode는 계속 이어질 수 있음 |
 
 즉 하나의 episode가 여러 policy version과 update boundary를 가로지릅니다.
 
@@ -330,12 +299,7 @@ Robot 수가 적으면 각 robot에서 긴 trajectory를 얻습니다.
 
 하지만 인접한 step은 서로 매우 비슷합니다.
 
-```text
-same robot
-s_t, s_{t+1}, s_{t+2}, ...
--> 강한 temporal correlation
--> 같은 batch 안의 sample diversity 감소
-```
+같은 robot의 $s_t,s_{t+1},s_{t+2},\ldots$를 길게 모으면 temporal correlation이 강해지고, 같은 batch 안의 sample diversity가 감소합니다.
 
 논문은 robot 수가 너무 적을 때 reward가 완만하게 떨어지는 이유를, sample이 IID 가정에서 더 멀어지는 현상으로 해석합니다.
 
@@ -537,14 +501,7 @@ _위쪽은 flat terrain, 아래쪽은 rough terrain이다. Timeout을 bootstrap�
 
 이 결과는 작은 API detail이 learning objective를 실제로 바꿀 수 있음을 보여줍니다.
 
-Gym 환경을 구현할 때:
-
-```text
-terminated = task-defined terminal
-truncated  = time/resource limit
-```
-
-을 분리해야 하는 이유가 여기에 있습니다.
+Gym 환경에서 task-defined terminal인 `terminated`와 time/resource limit인 `truncated`를 분리해야 하는 이유가 여기에 있습니다.
 
 ---
 
@@ -725,16 +682,11 @@ $$
 
 Rule은 간단합니다.
 
-```text
-terrain 경계를 넘어감
--> level + 1
-
-목표 속도로 갔어야 할 거리의 절반도 못 감
--> level - 1
-
-최고 level 해결
--> random level로 loop
-```
+| Episode 결과 | 다음 terrain level |
+|---|---|
+| Terrain 경계를 넘어감 | Level + 1 |
+| 기대 이동 거리의 절반도 못 감 | Level - 1 |
+| 최고 level을 해결 | Random level로 loop |
 
 수식으로 쓰면 episode 동안 실제 이동 거리를 $d$, command 기준 기대 거리를 $d^*$라고 할 때:
 
@@ -754,15 +706,11 @@ $$
 
 논문은 모든 terrain type과 level을 하나의 큰 tiled mesh에 미리 생성합니다.
 
-```text
-one global terrain mesh
-
-row    = difficulty level
-column = terrain type
-
-level update
--> robot의 reset origin을 다른 tile로 이동
-```
+| Global mesh 축 | 의미 |
+|---|---|
+| Row | Difficulty level |
+| Column | Terrain type |
+| Curriculum update | Robot의 reset origin을 다른 tile로 이동 |
 
 Geometry를 재생성하지 않으므로 curriculum update 비용이 거의 없습니다.
 
@@ -806,13 +754,10 @@ Simulation에서는 ground-truth terrain에서 height를 query할 수 있습니�
 
 Real robot에서는 LiDAR scan으로 만든 elevation map에서 같은 위치의 height를 query합니다.
 
-```text
-simulation:
-perfect terrain mesh -> sampled heights
-
-real:
-LiDAR -> state estimation -> elevation map -> sampled heights
-```
+| Domain | Height input 생성 경로 |
+|---|---|
+| Simulation | Perfect terrain mesh $\rightarrow$ sampled heights |
+| Real | LiDAR + state estimation $\rightarrow$ elevation map $\rightarrow$ sampled heights |
 
 이 interface가 Sim2Real의 중요한 gap이 됩니다.
 
@@ -1065,19 +1010,11 @@ _20분 이내에 학습한 fixed policy를 실제 ANYmal C에 배포했다. 계�
 
 ### **14.1 Deployment data flow**
 
-```text
-robot sensors
--> base/joint state
-
-LiDAR
--> elevation map
--> local terrain heights
-
-state + command + heights
--> fixed policy
--> desired joint positions
--> real motors
-```
+| Runtime input | 처리 경로 |
+|---|---|
+| Robot sensors | Base·joint state |
+| LiDAR | Elevation map $\rightarrow$ local terrain heights |
+| State + command + heights | Fixed policy $\rightarrow$ desired joint positions $\rightarrow$ motors |
 
 Real robot에서 policy weight를 fine-tune하지 않습니다.
 
@@ -1179,13 +1116,10 @@ $$
 
 공개 code를 실행할 때는 해당 commit의 config가 실제 runtime truth입니다.
 
-```text
-paper reproduction claim
--> paper/supplementary 값 사용
-
-official repo experiment
--> commit hash + config dump 기록
-```
+| 목적 | 기준 |
+|---|---|
+| Paper reproduction claim | Paper와 supplementary 수치 사용 |
+| Official repo experiment | Commit hash와 runtime config dump 기록 |
 
 “공식 코드니까 논문과 모든 숫자가 같을 것”이라고 가정하면 observation shape부터 달라집니다.
 
@@ -1438,20 +1372,7 @@ Holdout terrain, 다른 physics setting과 real test를 분리해야 합니다.
 | RMA | Runtime environment adaptation |
 | Learning in Minutes | 이 구성들을 빠르게 반복하는 GPU training infrastructure |
 
-마지막 논문은 앞선 방법을 대체하지 않습니다.
-
-오히려:
-
-```text
-reward
-observation
-randomization
-actuator model
-terrain curriculum
-policy architecture
-```
-
-를 여러 번 바꿔 학습해야 하는 Sim2Real 연구에서 iteration cost를 줄입니다.
+마지막 논문은 앞선 방법을 대체하지 않습니다. Reward, observation, randomization, actuator model, terrain curriculum과 policy architecture를 여러 번 바꿔 학습해야 하는 Sim2Real 연구에서 iteration cost를 줄입니다.
 
 ---
 
@@ -1546,18 +1467,14 @@ N_{\text{robots}}
 T_{\text{rollout}}
 $$
 
-하지만 이 식을 실제 4096-environment locomotion에 적용하려면 다음이 모두 필요했습니다.
+하지만 이 식을 실제 4096-environment locomotion에 적용하려면 다음 여섯 층이 함께 필요했습니다.
 
-- Physics, reward, observation, inference와 PPO를 GPU에 유지
-- 약 0.5초의 per-robot horizon 보존
-- 98,304 sample batch와 큰 mini-batch
-- Timeout value bootstrapping
-- 하나의 tiled terrain mesh
-- Robot별 game-inspired curriculum
-- Contact body와 terrain representation 최적화
-- Friction/noise/push randomization
-- LSTM actuator network
-- LiDAR elevation-map 기반 real interface
+1. **GPU residency:** Physics, reward, observation, inference와 PPO를 GPU에 유지합니다.
+2. **On-policy semantics:** 약 0.5초의 per-robot horizon, 98,304 sample batch와 timeout bootstrapping을 보존합니다.
+3. **Physics throughput:** Contact body, terrain representation과 robot placement를 최적화합니다.
+4. **Curriculum:** 하나의 tiled terrain mesh에서 robot별 level을 이동시킵니다.
+5. **Transfer stack:** Friction, noise, push randomization과 LSTM actuator network를 사용합니다.
+6. **Real interface:** Simulation height sample을 LiDAR elevation-map input으로 교체합니다.
 
 대표 rough-terrain policy는:
 
@@ -1585,18 +1502,18 @@ Simulation에서는 20 cm stairs를 거의 완벽하게 통과했고, 실제 ANY
 
 > 빠른 학습의 진짜 가치는 한 번에 정답 policy를 얻는 것이 아니라, reward·observation·randomization·perception interface를 실제 robot 결과와 대조하며 더 자주 수정할 수 있게 만드는 데 있다.
 
-이 글로 8편의 Sim2Real paper 흐름은:
+이 글로 8편의 Sim2Real paper 흐름은 다음처럼 연결됩니다.
 
-```text
-reality gap
--> randomization
--> actuator/dynamics modeling
--> rough-terrain perception
--> online adaptation
--> massively parallel iteration
-```
+| 흐름 | 핵심 질문 |
+|---|---|
+| Reality gap | Simulation과 real observation·dynamics는 왜 다른가 |
+| Randomization | 불확실성을 어떤 distribution으로 학습할 것인가 |
+| Actuator/dynamics modeling | Action-to-torque gap을 어떻게 줄일 것인가 |
+| Rough-terrain perception | Hidden contact와 terrain을 무엇으로 관측할 것인가 |
+| Online adaptation | 현재 environment context에 맞춰 action을 어떻게 바꿀 것인가 |
+| Massively parallel iteration | 이 모든 설계를 얼마나 빠르게 검증할 것인가 |
 
-으로 연결됩니다.
+전체 목록: [Sim2Real Paper 아카이브](/categories/paper/)
 
 ---
 
