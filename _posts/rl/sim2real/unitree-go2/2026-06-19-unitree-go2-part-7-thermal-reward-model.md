@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 7] 모터 온도를 Reward로 넣기"
-date: 2026-06-19 15:00:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-04-18 15:00:00 +0900
+last_modified_at: 2026-04-18 15:00:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, thermal-model, reward-shaping, reported-temperature]
 description: Unitree Go2 lowstate 로그에서 reported actuator temperature를 보고, 온도 자체가 아니라 load 기반 temperature-rate proxy를 thermal-aware reinforcement learning reward로 연결한 과정을 정리한다.

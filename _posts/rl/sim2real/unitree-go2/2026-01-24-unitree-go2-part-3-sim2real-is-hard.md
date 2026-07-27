@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 3] Reward 수정과 Real Gap"
-date: 2026-01-24 21:03:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-02-15 21:03:00 +0900
+last_modified_at: 2026-02-15 21:03:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: reward 수정으로 MuJoCo 보행은 개선되었지만, 실제 Go2 deploy에서 다시 드러난 real gap과 torque 문제를 정리한다.

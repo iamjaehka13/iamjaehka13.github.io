@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 0] Unitree Go2와 Unitree ROS2 구조 분석"
 date: 2026-01-09 11:20:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+last_modified_at: 2026-01-09 11:20:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, unitree-ros2, unitree-sdk2, ros2, dds, lowstate, lowcmd, sim2real]
 description: Unitree Go2에서 강화학습 policy를 deploy하기 전에 알아야 하는 하드웨어, Unitree SDK2, DDS, Unitree ROS2, lowstate, lowcmd 구조를 정리한다.

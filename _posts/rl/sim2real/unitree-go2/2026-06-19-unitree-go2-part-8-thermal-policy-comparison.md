@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 8] 온도 Reward는 왜 한 번 실패했나"
-date: 2026-06-19 15:25:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-05-20 15:25:00 +0900
+last_modified_at: 2026-05-20 15:25:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, thermal-reward, reward-hacking, mujoco]
 description: Unitree Go2 thermal-only reward가 왜 기대와 다르게 동작했는지 ablation으로 분석하고, torque와 positive power를 reward에 직접 묶어야 했던 이유를 정리한다.

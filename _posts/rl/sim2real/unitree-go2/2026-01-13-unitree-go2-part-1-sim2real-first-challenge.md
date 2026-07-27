@@ -1,7 +1,7 @@
 ---
 title: "[Unitree Go2 part 1] Sim2Real 첫 도전"
 date: 2026-01-13 14:28:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+last_modified_at: 2026-01-13 14:28:00 +0900
 categories: [RL, Sim2Real, Unitree Go2]
 tags: [unitree-go2, sim2real, reinforcement-learning, isaac-sim, deployment]
 description: Unitree Go2에 강화학습 기반 보행 policy를 실제 deploy하기 위해 baseline을 정하고, 첫 학습과 real deploy를 시도한 과정을 정리한다.
