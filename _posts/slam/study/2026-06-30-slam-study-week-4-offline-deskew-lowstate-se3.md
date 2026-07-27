@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 4주차] 실제 rosbag Offline Deskew: UNIST Livox와 Go2 연결"
 date: 2026-06-30 15:27:00 +0900
+published: false
 last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, deskew, offline-deskew, livox, mcap, imu, unitree-go2, lowstate, ros2]

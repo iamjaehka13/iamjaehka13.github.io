@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 2주차] LiDAR Timestamp와 측정 시간"
 date: 2026-06-29 11:20:00 +0900
+published: false
 last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, timestamp, pointcloud2, imu, deskew, ros2, robotics]

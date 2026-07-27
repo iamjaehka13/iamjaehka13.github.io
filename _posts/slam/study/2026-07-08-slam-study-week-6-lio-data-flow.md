@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 6주차] LIO 내부 데이터 흐름 추적"
 date: 2026-07-08 16:04:24 +0900
+published: false
 last_modified_at: 2026-07-10 15:47:18 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lio, lidar-inertial-odometry, imu, deskew, fast-lio, lio-sam, loam, state-estimation, residual, mapping, ros2]

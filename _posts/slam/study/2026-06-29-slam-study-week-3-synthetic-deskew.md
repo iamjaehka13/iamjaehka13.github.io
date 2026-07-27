@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 3주차] Synthetic Deskew와 Scan Distortion"
 date: 2026-06-29 14:35:00 +0900
+published: false
 last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, deskew, scan-distortion, pointcloud, se3, synthetic, robotics]

@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 1주차] 좌표계와 SE(3)"
 date: 2026-06-25 22:00:00 +0900
+published: false
 last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, se3, so3, coordinate-frame, transform, lidar, imu, robotics]

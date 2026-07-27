@@ -1,6 +1,7 @@
 ---
 title: "[SLAM Study 5주차] Fixed Map Registration과 Point-to-Plane Residual"
 date: 2026-06-30 19:44:50 +0900
+published: false
 last_modified_at: 2026-06-30 20:18:21 +0900
 categories: [SLAM, Study]
 tags: [slam, lidar-slam, lidar, registration, scan-matching, point-to-plane, fixed-map, residual, inlier, deskew, ros2]
