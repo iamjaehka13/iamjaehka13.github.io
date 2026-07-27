@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 7] RMA: 0.5초의 이력으로 환경에 적응하는 로봇"
 date: 2026-06-24 17:35:00 +0900
-last_modified_at: 2026-07-27 21:45:00 +0900
+last_modified_at: 2026-07-27 21:23:41 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, rapid-motor-adaptation, rma, quadruped-locomotion, online-adaptation, privileged-learning, domain-randomization, ppo, unitree-a1]
 description: Kumar et al.의 RMA를 base policy, 17D privileged environment, 8D extrinsics, 50-step adaptation history, PPO와 on-policy supervised learning, 비동기 배포, 시뮬레이션 및 실제 A1 실험까지 원문 기준으로 분석한다.
@@ -13,6 +13,8 @@ image:
 
 ## **0. 전체 그림: 강건하게 버티는 것과 지금 환경에 맞춰 바꾸는 것은 다르다**
 
+이전 글: [Challenging Terrain Locomotion: proprioceptive history와 privileged learning](/posts/learning-quadrupedal-locomotion-challenging-terrain/)
+
 앞선 Sim2Real 논문들에서는 dynamics randomization으로 여러 물리 조건을 경험시키고, proprioceptive history로 보이지 않는 접촉 상태를 추론하는 방법을 살펴봤습니다.
 
 그렇다면 다음 질문이 생깁니다.
@@ -23,18 +25,11 @@ Kumar et al.의 **RMA: Rapid Motor Adaptation for Legged Robots**는 그렇지 �
 
 같은 자세의 robot이라도 현재 조건이 다르면 필요한 action도 달라집니다.
 
-```text
-같은 관절 자세
-
-마른 바닥
--> 평소 크기의 torque와 gait
-
-미끄러운 바닥
--> slip을 줄이고 회복할 수 있는 torque와 contact pattern
-
-무거운 payload
--> 더 큰 지지력과 달라진 gait
-```
+| 같은 관절 자세에서의 환경 | 필요한 control response |
+|---|---|
+| 마른 바닥 | Nominal torque와 gait |
+| 미끄러운 바닥 | Slip을 줄이고 회복하는 torque·contact pattern |
+| 무거운 payload | 더 큰 지지력과 달라진 gait |
 
 일반적인 domain-randomized policy가 환경 조건을 입력받지 않으면, 이 조건들을 하나의 policy mapping 안에서 평균내야 합니다. 반면 RMA는 현재 환경을 나타내는 **extrinsics**를 policy input으로 넣습니다.
 
@@ -54,26 +49,11 @@ _같은 RMA pipeline으로 grass, vegetation, sand, mud, stairs와 construction 
 
 핵심 흐름은 다음과 같습니다.
 
-```text
-Phase 1
-privileged environment e_t
--> encoder mu
--> behavior-relevant latent z_t
--> base policy pi
--> PPO
-
-Phase 2
-recent state-action history
--> adaptation module phi
--> estimated latent z_hat_t
--> frozen base policy pi
--> supervised MSE with on-policy rollout
-
-Deployment
-phi at 10 Hz + pi at 100 Hz
--> latest z_hat_t로 desired joint positions 생성
--> fixed-gain PD controller
-```
+| 단계 | 입력과 학습 | 결과 |
+|---|---|---|
+| Phase 1 | Privileged $e_t\rightarrow\mu\rightarrow z_t$, $\pi$와 함께 PPO | Environment-conditioned base policy |
+| Phase 2 | Recent history $\rightarrow\phi\rightarrow\hat z_t$, on-policy supervised MSE | Deployable adaptation module |
+| Deployment | $\phi$ 10 Hz + $\pi$ 100 Hz + fixed-gain PD | Latest $\hat z_t$에 조건화된 joint target |
 
 이 글에서 가장 중요하게 구분할 것은 세 가지입니다.
 
@@ -108,17 +88,10 @@ RMA는 현재 한 trajectory의 최근 0.5초를 입력으로 사용하며, 저�
 
 즉 차이는 다음입니다.
 
-```text
-offline test-time adaptation
-새 환경에서 여러 rollout 수집
--> parameter 또는 latent 최적화
--> 다시 policy 실행
-
-RMA
-걷는 동안 최근 history를 계속 갱신
--> latent 즉시 추정
--> 다음 action부터 반영
-```
+| 방식 | 새 환경에서 필요한 절차 |
+|---|---|
+| Offline test-time adaptation | 여러 rollout 수집 $\rightarrow$ parameter·latent 최적화 $\rightarrow$ policy 재실행 |
+| RMA | 걷는 동안 history 갱신 $\rightarrow$ latent 추정 $\rightarrow$ 다음 action에 반영 |
 
 실제 robot에서 adaptation을 위해 실패 rollout을 반복하지 않아도 된다는 점이 안전과 하드웨어 비용 측면에서 중요합니다.
 
@@ -215,12 +188,7 @@ $$
 
 Environment condition은 action과 response의 차이에서 드러납니다.
 
-```text
-desired joint position을 보냄
--> 실제 joint velocity와 contact가 달라짐
--> body roll/pitch와 foot contact pattern에 흔적이 남음
--> 최근 state-action sequence로 hidden dynamics를 추론
-```
+Policy가 desired joint position을 보내면 environment에 따라 실제 joint velocity와 contact가 달라집니다. 그 차이가 body roll/pitch와 foot-contact pattern에 남고, adaptation module은 최근 state-action sequence에서 hidden dynamics의 흔적을 추론합니다.
 
 RMA의 adaptation module은 다음을 계산합니다.
 
@@ -351,13 +319,10 @@ Flattened CNN output은 linear projection을 거쳐 8D $\hat z_t$가 됩니다.
 
 이 구조는 raw history 전체를 base policy가 매 control step 직접 처리하게 하지 않습니다.
 
-```text
-slow temporal inference
-50-step history -> phi -> z_hat
-
-fast feedback control
-current state + previous action + latest z_hat -> pi -> action
-```
+| 경로 | 입력 | 주기와 출력 |
+|---|---|---|
+| Slow temporal inference | 50-step history | $\phi\rightarrow\hat z$, 10 Hz |
+| Fast feedback control | Current state + previous action + latest $\hat z$ | $\pi\rightarrow$ action, 100 Hz |
 
 이 분리가 RMA의 계산 효율뿐 아니라 학습 문제의 역할 분리에도 중요합니다.
 
@@ -490,13 +455,10 @@ $e_t$를 policy에 그대로 넣는 대신 8D latent로 압축하는 이유는 �
 
 Adaptation module의 target도 $e_t$가 아니라 $z_t$가 됩니다.
 
-```text
-direct SysID
-history -> mass, friction, motor strength, terrain height
-
-RMA
-history -> policy가 필요로 하는 compressed context
-```
+| Target | History에서 추정하는 것 |
+|---|---|
+| Direct SysID | Mass, friction, motor strength와 terrain height |
+| RMA | Policy가 행동을 바꾸는 데 필요한 compressed context |
 
 Physical parameter는 짧은 history에서 정확히 식별하기 어려울 수 있습니다. 반면 서로 다른 parameter 조합이 같은 행동 보정을 요구한다면 하나의 latent region으로 묶어도 locomotion에는 문제가 없습니다.
 
@@ -553,7 +515,7 @@ Base frame의 linear velocity를 $\mathbf v$, angular velocity를 $\boldsymbol\o
 |---:|---|---|---:|
 | 1 | Forward | $\min(v_x^t,0.35)$ | 20 |
 | 2 | Lateral & yaw | $-\lVert v_y^t\rVert^2-\lVert\omega_{\text{yaw}}^t\rVert^2$ | 21 |
-| 3 | Work | $-\left|\boldsymbol\tau^\top(\mathbf q^t-\mathbf q^{t-1})\right|$ | 0.002 |
+| 3 | Work | $-\lvert\boldsymbol\tau^\top(\mathbf q^t-\mathbf q^{t-1})\rvert$ | 0.002 |
 | 4 | Ground impact | $-\lVert\mathbf f^t-\mathbf f^{t-1}\rVert^2$ | 0.02 |
 | 5 | Smoothness | $-\lVert\boldsymbol\tau^t-\boldsymbol\tau^{t-1}\rVert^2$ | 0.001 |
 | 6 | Action magnitude | $-\lVert\mathbf a^t\rVert^2$ | 0.07 |
@@ -566,22 +528,13 @@ Base frame의 linear velocity를 $\mathbf v$, angular velocity를 $\boldsymbol\o
 
 Reward가 유도하는 행동은 다음과 같습니다.
 
-```text
-forward + lateral/yaw
--> 앞으로 진행하고 옆으로 새지 않기
-
-work + action + joint speed
--> 과도한 actuator 사용 억제
-
-impact + torque smoothness
--> 충격과 급격한 torque 변화 억제
-
-orientation + vertical motion
--> body 자세와 상하 진동 안정화
-
-foot slip
--> contact 중 발 미끄러짐 억제
-```
+| Reward 묶음 | 유도하는 행동 |
+|---|---|
+| Forward + lateral/yaw | 앞으로 진행하고 옆으로 새지 않기 |
+| Work + action + joint speed | 과도한 actuator 사용 억제 |
+| Impact + torque smoothness | 충격과 급격한 torque 변화 억제 |
+| Orientation + vertical motion | Body 자세와 상하 진동 안정화 |
+| Foot slip | Contact 중 발 미끄러짐 억제 |
 
 ### **7.2 자연스러운 reward와 자연스러운 gait는 같은 말이 아니다**
 
@@ -643,8 +596,8 @@ Mass, friction과 motor strength perturbation의 난이도도 학습 중 선형�
 | z-scale | 0.27 |
 | Maximum episode | 1,000 steps |
 | Height termination | Base height $<0.28$ m |
-| Roll termination | $|\text{roll}|>0.4$ rad |
-| Pitch termination | $|\text{pitch}|>0.2$ rad |
+| Roll termination | $\lvert\text{roll}\rvert>0.4$ rad |
+| Pitch termination | $\lvert\text{pitch}\rvert>0.2$ rad |
 | Policy frequency | 100 Hz |
 
 Main paper는 policy frequency 100 Hz와 simulation time step 0.025 s를 함께 보고합니다. 두 수치가 단순히 같은 step을 뜻하면 일치하지 않지만, substep 또는 decimation 관계는 원문에 자세히 설명되어 있지 않습니다.
@@ -721,26 +674,11 @@ $$
 
 ### **9.2 Oracle trajectory만 사용하면 covariate shift가 생긴다**
 
-가장 쉬운 데이터 수집은 true $z_t$를 base policy에 넣어 완벽한 trajectory를 생성하는 것입니다.
-
-```text
-true z_t
--> base policy
--> 안정적인 expert trajectory
--> history와 z_t로 phi 학습
-```
+가장 쉬운 데이터 수집은 true $z_t$를 base policy에 넣어 안정적인 expert trajectory를 만들고, 그 history와 $z_t$로 $\phi$를 학습하는 것입니다.
 
 하지만 deployment 초기의 $\hat z_t$는 틀릴 수 있습니다.
 
-틀린 latent:
-
-```text
-wrong z_hat
--> imperfect action
--> body가 흔들리고 contact가 달라짐
--> expert dataset에 없던 history
--> phi가 더 틀림
-```
+하지만 틀린 $\hat z$는 imperfect action을 만들고, body motion과 contact distribution을 바꿉니다. Expert dataset에 없던 history가 생기면 $\phi$의 오차가 다시 커지는 feedback loop가 발생합니다.
 
 이것이 supervised imitation에서 흔한 covariate shift입니다.
 
@@ -748,19 +686,10 @@ wrong z_hat
 
 RMA는 randomly initialized adaptation module의 $\hat z_t$를 실제 base policy에 넣어 trajectory를 수집합니다.
 
-```text
-history
--> current phi
--> z_hat_t
--> frozen pi(x_t, a_{t-1}, z_hat_t)
--> next state
-
-simulation oracle:
-e_t -> frozen mu -> z_t
-
-training:
-minimize ||z_hat_t - z_t||^2
-```
+1. Current $\phi$가 history에서 $\hat z_t$를 추정합니다.
+2. Frozen $\pi(x_t,a_{t-1},\hat z_t)$가 action을 내고 next state를 만듭니다.
+3. Simulation oracle은 frozen $\mu(e_t)$로 target $z_t$를 계산합니다.
+4. 현재 $\phi$가 실제로 만든 history에서 $\lVert\hat z_t-z_t\rVert^2$를 최소화합니다.
 
 즉 $\phi$가 만든 오류 때문에 방문하게 된 state에서도 target $z_t$를 제공합니다.
 
@@ -783,15 +712,10 @@ minimize ||z_hat_t - z_t||^2
 
 전체 학습 비용은 대략 다음처럼 분리됩니다.
 
-```text
-Phase 1
-1.2B steps / 24 h
--> 좋은 privileged conditional controller 생성
-
-Phase 2
-80M steps / 3 h
--> deployable history encoder 생성
-```
+| 단계 | Simulation steps | 1 GPU 시간 | 학습 결과 |
+|---|---:|---:|---|
+| Phase 1 | 약 1.2B | 약 24 h | Privileged conditional controller |
+| Phase 2 | 약 80M | 약 3 h | Deployable history encoder |
 
 RMA가 real deployment에서 빠르게 적응할 수 있는 이유는 많은 학습 비용을 미리 simulation에 지불했기 때문입니다.
 
@@ -921,17 +845,7 @@ Adaptation을 제거하면 52.1%로 더 크게 떨어집니다.
 
 그러나 RMA는 매 순간 최근 50 step의 sensor/action history를 사용합니다.
 
-따라서:
-
-```text
-correct:
-추가 test-time optimization sample이 0
-
-incorrect:
-관측 데이터 없이 adaptation
-```
-
-입니다.
+정확한 뜻은 **추가 test-time optimization sample이 0**이라는 것입니다. 관측 data 없이 adaptation한다는 뜻은 아닙니다.
 
 ### **11.5 Extreme simulation generalization**
 
@@ -1001,17 +915,10 @@ RMA는 최대 12 kg, 즉 robot body weight와 같은 payload를 높은 성공률
 
 여기서 성능은 단순한 fall avoidance가 아닙니다.
 
-```text
-RMA w/o adaptation
-안 넘어질 수는 있음
--> 그러나 전진하지 못함
-
-RMA
-payload response를 history에서 감지
--> latent 변경
--> torque와 gait 조정
--> 지정 거리 전진
-```
+| Method | Heavy payload에서 관찰된 차이 |
+|---|---|
+| RMA w/o adaptation | 넘어지지 않고 버틸 수 있어도 전진 task를 완료하지 못함 |
+| RMA | Payload response에 따라 latent, torque와 gait를 바꾸며 지정 거리 전진 |
 
 즉 robust하게 웅크리고 버티는 것과 task를 수행하며 적응하는 것을 구분해야 합니다.
 
@@ -1026,18 +933,7 @@ payload response를 history에서 감지
 ![Oil patch에서 나타난 latent와 gait 변화](/assets/img/posts/rl/sim2real/rma/04-friction-adaptation.png){: width="1200" .d-block .mx-auto }
 _약 2초에 slip이 시작된 뒤 knee torque, contact gait와 $\hat z$의 1·5번째 component가 변한다. 적응 후 gait period가 대체로 회복되고 torque magnitude는 커지며 latent는 미끄러운 조건을 계속 반영한다. 출처: [Kumar et al., Figure 4](https://arxiv.org/pdf/2107.04034)._
 
-저자들이 보고한 흐름은 다음과 같습니다.
-
-```text
-normal surface
--> regular gait
-
-around 2 s: slip
--> gait/contact disturbance
--> z_hat component 변화
--> knee torque magnitude 증가
--> gait period 대체로 회복
-```
+저자들이 보고한 흐름은 normal gait $\rightarrow$ 약 2초에서 slip $\rightarrow$ gait/contact disturbance $\rightarrow$ $\hat z$ component 변화 $\rightarrow$ knee torque 증가 $\rightarrow$ gait period 회복입니다.
 
 RMA는 oily patch trial의 90%에서 성공했습니다.
 
@@ -1376,14 +1272,7 @@ RMA는 proprioceptive adaptation입니다.
 
 $z$는 control return에 맞춰 학습되므로 각 축의 물리 의미가 보장되지 않습니다.
 
-Plot에서 component 1과 5가 slip 뒤 변했다고 해서:
-
-```text
-z_1 = friction coefficient
-z_5 = slip probability
-```
-
-라고 이름 붙이면 안 됩니다.
+Plot에서 component 1과 5가 slip 뒤 변했다고 해서 $z_1$을 friction coefficient, $z_5$를 slip probability라고 이름 붙이면 안 됩니다.
 
 Latent intervention, disentanglement test 또는 decoder 검증이 추가로 필요합니다.
 
@@ -1430,17 +1319,10 @@ Joint target clipping, torque saturation, watchdog와 fallback controller 같은
 
 앞선 Challenging Terrain 논문과 RMA는 history를 쓰지만 목적과 구조가 다릅니다.
 
-```text
-Lee et al.
-2초 proprioceptive history
--> teacher latent와 action 모방
--> blind rough-terrain control
-
-RMA
-0.5초 state-action history
--> environment-conditioned policy의 latent 추정
--> changing dynamics에 rapid adaptation
-```
+| Paper | History supervision | Control 목표 |
+|---|---|---|
+| Lee et al. | 2초 proprioception으로 teacher latent와 action 모방 | Blind rough-terrain control |
+| RMA | 0.5초 state-action history로 environment-conditioned latent 추정 | Changing dynamics에 rapid adaptation |
 
 또한 RMA는 predefined foot trajectory generator를 사용하지 않지만, Lee et al.은 PMTG와 analytic IK를 사용했습니다.
 
@@ -1517,13 +1399,11 @@ Latent는 행동에 유용한 representation이지 자동으로 해석 가능한
 
 ## **22. 정리: RMA가 실제로 바꾼 것**
 
-RMA를 “history를 넣은 PPO”라고만 보면 contribution이 흐려집니다.
+RMA를 “history를 넣은 PPO”라고만 보면 contribution이 흐려집니다. 핵심은 locomotion adaptation을 세 부분으로 분해한 것입니다.
 
-이 논문은 locomotion adaptation 문제를 다음 세 부분으로 분해했습니다.
-
-1. **환경을 알 때 잘 걷는 policy**를 privileged RL로 학습
-2. Policy가 필요로 하는 environment 정보를 **8D behavior-relevant latent**로 압축
-3. 실제 robot에서는 최근 **50-step state-action history**로 그 latent를 추정
+1. **환경을 알 때 잘 걷는 policy**를 privileged PPO로 학습합니다.
+2. Policy가 필요로 하는 environment 정보를 **8D behavior-relevant latent**로 압축합니다.
+3. 실제 robot에서는 최근 **50-step state-action history**로 그 latent를 추정합니다.
 
 정확한 data flow는 다음입니다.
 
@@ -1545,19 +1425,9 @@ $$
 \hat z_t\in\mathbb{R}^{8}
 $$
 
-Phase 1은 PPO로 1.2 billion simulation step을 사용하고, Phase 2는 predicted latent가 만든 trajectory에서 supervised MSE로 adaptation module을 학습합니다.
+Phase 1은 PPO로 1.2 billion simulation step을 사용하고, Phase 2는 predicted latent가 만든 trajectory에서 supervised MSE로 adaptation module을 학습합니다. Deployment에서는 base policy 100 Hz, adaptation module 10 Hz와 fixed-gain PD controller가 비동기로 동작합니다.
 
-Deployment에서는:
-
-- Base policy 100 Hz
-- Adaptation module 10 Hz
-- Fixed-gain PD controller
-
-가 비동기로 동작합니다.
-
-Simulation에서 RMA는 73.5% success로 Robust 62.4%, direct SysID 56.5%, adaptation 제거 52.1%를 앞섰고 oracle latent를 쓰는 Expert 76.2%에 근접했습니다.
-
-실제 A1에서는 payload, foam, mattress, incline, oil, sand, mud, vegetation, stairs와 debris에서 adaptation behavior를 보였습니다.
+Simulation에서 RMA는 73.5% success로 Robust 62.4%, direct SysID 56.5%, adaptation 제거 52.1%를 앞섰고 oracle latent를 쓰는 Expert 76.2%에 근접했습니다. 실제 A1에서는 payload, foam, mattress, incline, oil, sand, mud, vegetation, stairs와 debris를 평가했습니다.
 
 그러나 결론은 “0.5초면 현실의 모든 물리를 알아낸다”가 아닙니다.
 
@@ -1565,7 +1435,9 @@ Simulation에서 RMA는 73.5% success로 Robust 62.4%, direct SysID 56.5%, adapt
 
 이것이 이 논문의 가장 정확한 핵심입니다.
 
-다음 글에서는 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**을 통해, 이런 locomotion policy 학습을 GPU 병렬 simulation이 어떻게 수 분 단위로 줄였는지 살펴보겠습니다.
+다음 글: [Learning to Walk in Minutes](/posts/learning-to-walk-in-minutes/)
+
+다음 편에서는 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**을 통해, 이런 locomotion policy 학습을 GPU 병렬 simulation이 어떻게 수 분 단위로 줄였는지 살펴보겠습니다.
 
 ---
 
