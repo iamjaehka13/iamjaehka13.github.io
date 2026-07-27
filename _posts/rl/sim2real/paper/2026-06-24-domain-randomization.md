@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 2] Domain Randomization"
 date: 2026-06-24 17:30:00 +0900
-last_modified_at: 2026-07-27 19:46:00 +0900
+last_modified_at: 2026-07-27 21:16:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, domain-randomization, visual-domain-randomization, robot-vision, object-localization, fetch-robot, synthetic-data]
 description: Tobin et al.의 visual domain randomization을 random texture, camera·lighting variation, VGG detector, real-image localization ablation과 Fetch grasping 결과까지 원문 기준으로 정리한다.
@@ -13,21 +13,19 @@ image:
 
 ## **0. 전체 그림: 현실을 하나의 variation으로 만들기**
 
-이전 글에서는 Jakobi et al.의 **Noise and The Reality Gap**을 통해 Sim2Real의 기본 문제를 봤습니다.
-
-Simulation은 현실과 완전히 같을 수 없습니다. Sensor, actuator, contact, lighting, texture, camera, friction 같은 요소들이 조금씩 다르고, 그 차이가 쌓이면 simulation에서 잘 되던 policy나 model이 real world에서 깨질 수 있습니다.
-
-Jakobi et al.이 말한 핵심은 simulation에 적절한 noise를 넣어 현실의 불확실성을 미리 경험시키자는 것이었습니다.
-
-Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World**는 이 생각을 modern deep learning 기반 Sim2Real로 확장합니다.
+이전 글인 **[Noise and The Reality Gap](/posts/noise-and-the-reality-gap/)**에서는 sensor·motor variation을 simulation에 넣어 controller의 과적합을 줄이는 관점을 봤습니다. Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World**는 같은 문제를 visual perception으로 옮깁니다.
 
 핵심 문장은 이렇게 볼 수 있습니다.
 
 > Real world를 simulation distribution 안의 하나의 sample처럼 보이게 만들자.
 
-즉, simulator를 현실과 똑같이 만들려고만 하는 것이 아니라, simulator를 아주 다양하게 흔들어서 model이 특정 simulation appearance에 과적합되지 않도록 만드는 것입니다.
+Simulator 한 장을 현실과 똑같이 만들기보다 texture, lighting, camera pose, distractor, image noise를 계속 바꿔 model이 특정 simulation appearance에 의존하지 못하게 만드는 것입니다.
 
-이 논문은 특히 **visual domain randomization**의 대표적인 초기 논문입니다. 여기서 randomization의 대상은 주로 texture, lighting, camera pose, distractor object, image noise 같은 시각 요소입니다.
+이 글의 핵심은 세 가지입니다.
+
+1. Target-domain real image를 training에 사용하지 않고도 geometric object를 평균 약 1.5 cm 오차로 localization했습니다.
+2. Randomization은 realism을 높이는 작업이 아니라 **task와 무관한 visual cue를 불안정하게 만드는 작업**입니다.
+3. Robustness는 training에 포함한 variation axis에 대해서만 생겼으며, distractor를 빼면 clutter 성능이 크게 무너졌습니다.
 
 ![Randomized simulation training image와 실제 test image](/assets/img/posts/rl/sim2real/domain-randomization/01-training-vs-real.png){: width="1150" .d-block .mx-auto }
 _왼쪽의 비현실적인 simulation image만으로 detector를 학습한 뒤, 오른쪽 실제 webcam image에 추가 학습 없이 적용한다. 출처: [Tobin et al., Figure 1](https://arxiv.org/pdf/1703.06907)._
@@ -211,13 +209,11 @@ Detector가 실제 control에 충분한지 확인하기 위해 Fetch robot과 of
 
 그러나 이것은 simulation에서 학습한 **end-to-end grasping policy transfer**가 아닙니다.
 
-```text
-sim-only visual detector
-        ↓ target Cartesian position
-기존 motion planner
-        ↓
-미리 정한 방식으로 grasp
-```
+| Pipeline 단계 | 역할 |
+|---|---|
+| Sim-only visual detector | RGB image에서 target Cartesian position을 예측 |
+| 기존 motion planner | 예측된 위치까지 robot arm trajectory를 생성 |
+| 미리 정한 grasp routine | geometric object 또는 Spam can을 집음 |
 
 논문이 증명한 것은 randomized RGB로 학습한 localization network가 real manipulation pipeline에 쓸 만큼 정확했다는 것입니다. Contact-rich manipulation dynamics까지 simulation에서 real로 이전한 것은 아닙니다.
 
@@ -281,28 +277,12 @@ $$
 
 ### **3.2 Photorealism과 Domain Randomization의 차이**
 
-Photorealistic simulation은 simulation image를 real image와 최대한 비슷하게 만들려고 합니다.
+Photorealistic simulation과 domain randomization은 서로 반대라기보다, reality gap을 줄이는 서로 다른 전략입니다.
 
-```text
-photorealism
--> make one simulator close to real world
-```
-
-Domain randomization은 방향이 다릅니다.
-
-```text
-domain randomization
--> make many simulated worlds
--> train model on broad visual variation
--> make real world look like one possible sample
-```
-
-두 접근은 서로 반대라기보다 다른 전략입니다.
-
-| 접근 | 목표 | 위험 |
+| 접근 | Training distribution을 만드는 방식 | 주요 위험 |
 |---|---|---|
-| photorealism | simulation을 real과 가깝게 만듦 | 놓친 visual detail에 취약 |
-| domain randomization | real을 포함할 만큼 넓은 domain을 만듦 | range가 너무 넓으면 학습이 어려움 |
+| Photorealism | 하나의 simulator를 real domain에 가깝게 맞춤 | 모델링하지 못한 visual detail에 취약 |
+| Domain randomization | 서로 다른 appearance를 가진 simulated domain을 많이 생성 | range가 너무 넓거나 task signal까지 훼손할 수 있음 |
 
 Domain randomization의 장점은 photorealistic renderer 없이도 시작할 수 있다는 점입니다. Simulator가 예쁘지 않아도, label을 자동으로 만들고 appearance를 다양하게 바꿀 수 있으면 training data를 많이 만들 수 있습니다.
 
@@ -312,15 +292,7 @@ Visual model이 object 위치를 맞추려면 image에서 어떤 feature를 사�
 
 Clean simulation에서 object가 항상 같은 색이고, table texture가 항상 같고, camera angle이 거의 고정되어 있다면 model은 쉬운 shortcut을 사용할 수 있습니다.
 
-예를 들어 다음과 같은 cue에 과적합될 수 있습니다.
-
-```text
-specific object color
-specific background texture
-fixed camera viewpoint
-fixed lighting direction
-absence of distractors
-```
+예를 들어 specific object color, background texture, 고정된 camera viewpoint와 lighting direction, distractor가 없다는 사실에 과적합될 수 있습니다.
 
 이런 cue는 simulation에서는 잘 맞지만 real image에서는 쉽게 깨집니다.
 
@@ -339,12 +311,10 @@ $$
 
 여기서 $\phi$는 texture, lighting, camera pose, distractor 같은 nuisance factor입니다.
 
-즉 model이 학습해야 하는 것은 다음 관계입니다.
-
-```text
-task-relevant signal: object geometry / position
-nuisance variation: texture / lighting / camera / distractor
-```
+| 구분 | 이 논문에서의 예 |
+|---|---|
+| Task-relevant signal | object geometry와 tabletop position |
+| Nuisance variation | texture, lighting, camera pose, distractor |
 
 Randomization은 nuisance variation을 일부러 크게 만들어, model이 task-relevant signal을 찾게 합니다.
 
@@ -384,26 +354,13 @@ Training 때 distractor를 넣지 않으면, real test에서 distractor나 occlu
 
 반면 image noise를 제거한 결과는 full method와 거의 같았습니다. 이 실험에서는 모든 randomization axis가 똑같이 중요하지 않았습니다.
 
-```text
-No image noise
--> 거의 변화 없음
+| 제거한 요소 | Real test에서 관찰된 변화 |
+|---|---|
+| Image noise | full method와 거의 차이 없음 |
+| Camera randomization | 세 평가 조건에서 일관되게 소폭 악화 |
+| Training distractor | clutter와 occlusion error가 약 4배로 증가 |
 
-No camera randomization
--> 일관된 소폭 악화
-
-No distractors during training
--> clutter/occlusion error가 약 4배 증가
-```
-
-이것은 domain randomization의 coverage 문제입니다.
-
-```text
-real variation included in training distribution
--> model can become robust to it
-
-real variation missing from training distribution
--> model may fail on that axis
-```
+이것은 domain randomization의 coverage 문제입니다. Real variation이 training distribution에 포함되면 그 축에 대한 robustness를 배울 기회가 생기지만, 빠진 variation에 대해서는 보장이 없습니다.
 
 따라서 domain randomization에서 중요한 것은 randomization을 많이 넣는 것이 아니라, real deployment에서 실제로 만날 variation을 빠뜨리지 않는 것입니다.
 
@@ -417,15 +374,11 @@ Texture, lighting, camera, noise가 너무 강하게 흔들리면 image 안의 t
 
 즉 domain randomization에는 trade-off가 있습니다.
 
-```text
-too narrow
--> real world outside training support
--> transfer failure
-
-too broad
--> task signal becomes hard to learn
--> lower sample efficiency or conservative model
-```
+| Randomization range | Training에서 생기는 일 | 예상되는 문제 |
+|---|---|---|
+| 너무 좁음 | simulation appearance가 제한됨 | real domain이 training support 밖에 남음 |
+| Deployment variation과 비슷함 | nuisance cue가 흔들리고 task cue는 유지됨 | 유효한 invariant feature를 배울 가능성이 커짐 |
+| 너무 넓음 | task-relevant signal까지 불안정해짐 | sample efficiency와 localization accuracy가 떨어질 수 있음 |
 
 그래서 domain randomization은 "크게 흔들면 된다"가 아니라, **real world를 덮으면서 task structure는 유지하는 distribution을 설계하는 문제**입니다.
 
@@ -510,27 +463,19 @@ Photorealistic simulator를 완벽하게 만들지 못해도, model이 simulatio
 
 ## **6. 정리하며: Visual Randomization에서 Dynamics Randomization으로**
 
-이번 글에서는 Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks from Simulation to the Real World**를 정리했습니다.
+이번 글에서 남겨야 할 결론은 다섯 가지입니다.
 
-- Domain randomization은 simulator를 하나의 고정된 world가 아니라 여러 world의 distribution으로 보는 방법입니다.
-- 이 논문은 visual domain randomization의 대표적인 초기 논문입니다.
-- 핵심 아이디어는 real world를 simulation variation 중 하나처럼 보이게 만드는 것입니다.
-- 이론적으로는 randomized simulation domains의 mixture distribution을 만들고, 그 안에서 domain-invariant feature를 학습하는 것으로 볼 수 있습니다.
-- Photorealistic rendering이 없어도, 충분히 다양한 simulated image로 real image transfer가 가능함을 보였습니다.
-- Detector는 real test image로 fine-tuning하지 않았고, Fetch grasping에서 geometric object 38/40, Spam can 9/10을 성공했습니다.
-- 하지만 randomization은 넣은 variation에 대해서만 robustness를 줍니다.
-- 이 결과는 tabletop center localization과 기존 motion planner의 조합이지 end-to-end contact policy transfer는 아닙니다.
-- Randomization range는 real domain을 덮을 만큼 넓어야 하지만, task-relevant signal을 망가뜨릴 만큼 넓어서는 안 됩니다.
+- Domain randomization은 simulator를 하나의 고정된 world가 아니라 **simulated domain의 distribution**으로 보는 방법입니다.
+- 이 논문은 photorealistic rendering 없이도 target-domain fine-tuning 없는 real-image localization이 가능함을 보였습니다.
+- Texture 개수와 distractor coverage가 중요했고, image noise는 이 실험에서 영향이 작았습니다.
+- Geometric object grasping 38/40과 Spam can 9/10은 detector가 manipulation pipeline에 쓸 만큼 정확했음을 보여주지만, end-to-end contact policy transfer는 아닙니다.
+- Randomization range와 axis는 deployment condition에 대한 가설이므로, 무조건 많이 흔드는 것이 아니라 ablation으로 검증해야 합니다.
 
-1편의 질문이 이것이었다면,
+1편이 "simulation의 오차를 어떻게 다룰 것인가"를 물었다면, 2편의 답은 다음과 같습니다.
 
-> Simulation을 믿을 수 있는가?
+> 하나의 simulation을 믿지 말고, real world가 그 안의 한 variation처럼 보일 수 있는 distribution을 학습에 사용하자.
 
-2편의 답은 이렇게 정리할 수 있습니다.
-
-> 하나의 simulation을 믿지 말고, 가능한 simulation들의 distribution을 학습에 사용하자.
-
-다음 글에서는 이 domain randomization 아이디어가 vision이 아니라 robot control dynamics 쪽으로 어떻게 확장되는지 살펴보겠습니다.
+다음 글인 **[Dynamics Randomization](/posts/sim-to-real-transfer-dynamics-randomization/)**에서는 appearance가 아니라 mass, friction, damping, timing처럼 robot의 transition을 바꾸는 parameter를 다룹니다.
 
 ## **참고 자료**
 
