@@ -1,41 +1,54 @@
 ---
 title: "[Sim2Real Paper 4] Learning Agile Locomotion"
 date: 2026-06-24 17:32:00 +0900
+last_modified_at: 2026-07-27 20:01:00 +0900
 categories: [RL, Sim2Real, Paper]
-tags: [sim2real, quadruped-locomotion, dynamics-randomization, actuator-model, latency]
-description: "Tan et al.의 Sim-to-Real: Learning Agile Locomotion For Quadruped Robots를 통해 quadruped Sim2Real의 actuator model, latency, system identification, randomization을 정리한다."
+tags: [sim2real, quadruped-locomotion, minitaur, ppo, actuator-model, latency, dynamics-randomization, system-identification]
+description: Tan et al.의 Minitaur Sim2Real을 PPO, leg-space action, open-loop reference와 feedback, actuator model, latency, randomization, compact observation ablation까지 원문 기준으로 정리한다.
 math: true
+image:
+  path: /assets/img/posts/rl/sim2real/agile-locomotion/00-preview.png
+  alt: Simulation과 실제 Minitaur가 gallop하는 장면
 ---
 
-## **0. 전체 그림: Quadruped Sim2Real의 기본 조합**
+## **0. 전체 그림: Randomization만으로는 부족하다**
 
-3편에서는 Peng et al.의 dynamics randomization을 봤습니다.
+앞선 Peng et al.의 dynamics randomization 논문에서는 여러 mass, friction, controller timing에서 recurrent policy를 학습해 Fetch robot으로 transfer했습니다.
 
-Mass, friction, damping, controller gain, action timestep, observation noise 같은 physical parameter를 흔들면 real dynamics에 더 잘 버티는 policy를 만들 수 있다는 내용이었습니다.
+Tan et al.의 **Sim-to-Real: Learning Agile Locomotion For Quadruped Robots**는 이 문제를 quadruped locomotion으로 가져옵니다.
 
-Tan et al.의 **Sim-to-Real: Learning Agile Locomotion For Quadruped Robots**는 이 아이디어를 quadruped locomotion으로 가져옵니다.
+Legged locomotion의 reality gap은 contact 때문에 더 까다롭습니다.
 
-이 논문은 quadruped Sim2Real 입문에서 중요합니다. 이유는 하나입니다.
+```text
+작은 motor-response 오차
+    ↓
+발이 예상보다 일찍 또는 늦게 닿음
+    ↓
+contact force와 body attitude가 달라짐
+    ↓
+다음 action이 더 큰 오차를 만듦
+    ↓
+넘어짐
+```
 
-> 실제 보행 transfer는 randomization 하나로 끝나지 않고, actuator model, latency, system identification, compact observation, perturbation이 같이 필요하다는 것을 보여준다.
+따라서 “parameter를 넓게 randomize하면 언젠가 real robot도 포함될 것”이라는 접근만으로는 부족할 수 있습니다.
 
-실험 robot은 Ghost Robotics의 **Minitaur**입니다. 논문은 simulation에서 trotting과 galloping policy를 학습하고, real Minitaur에 올립니다.
+이 논문이 제시한 전략은 두 축입니다.
 
-Quadruped locomotion은 manipulation보다 transfer가 더 까다롭습니다. 로봇은 계속 contact를 만들고 끊습니다. 발이 지면에 닿는 순간 force가 생기고, body attitude가 흔들리며, actuator가 원하는 target을 못 따라가면 바로 넘어질 수 있습니다.
+1. **Simulation fidelity를 먼저 높인다.** Robot geometry와 mass를 측정하고, actuator와 latency를 따로 모델링합니다.
 
-Simulation에서 좋은 gait가 나왔다고 해도 real robot에서는 다음 차이 때문에 깨질 수 있습니다.
+2. **남은 mismatch에는 robust policy를 학습한다.** Dynamics randomization, 외력 perturbation, compact observation을 사용합니다.
 
-- actuator torque-speed 특성
-- motor command와 sensor feedback 사이의 latency
-- body mass와 inertia 오차
-- foot-ground friction 차이
-- IMU bias와 sensor noise
-- control step 변동
-- battery voltage와 motor strength 변화
+![Simulation과 real Minitaur의 gallop](/assets/img/posts/rl/sim2real/agile-locomotion/00-preview.png){: width="1100" .d-block .mx-auto }
+_위는 PyBullet simulation, 아래는 실제 Minitaur의 gallop이다. Policy는 simulation에서 PPO로 학습한 뒤 real robot에 추가 fine-tuning 없이 배포되었다. 출처: [Tan et al., Figure 1](https://arxiv.org/pdf/1804.10332)._
 
-이 논문의 질문은 다음입니다.
+이 논문의 가장 중요한 결론은 “randomization이 좋다”가 아닙니다.
 
-> Deep RL로 학습한 quadruped gait를 real robot에 안정적으로 옮기려면 simulator와 policy 학습 구조를 어떻게 만들어야 하는가?
+> Actuator와 latency model의 오차가 너무 크면, random perturbation으로 robust하게 학습해도 real robot으로 transfer되지 않는다.
+
+즉 Sim2Real은 **정확한 nominal model과 적절한 robustness의 조합**입니다.
+
+---
 
 ## **1. 논문 정보**
 
@@ -43,372 +56,848 @@ Simulation에서 좋은 gait가 나왔다고 해도 real robot에서는 다음 �
 |---|---|
 | Title | Sim-to-Real: Learning Agile Locomotion For Quadruped Robots |
 | Authors | Jie Tan, Tingnan Zhang, Erwin Coumans, Atil Iscen, Yunfei Bai, Danijar Hafner, Steven Bohez, Vincent Vanhoucke |
-| Year | 2018 |
-| Venue | Robotics: Science and Systems 2018 |
+| Venue | Robotics: Science and Systems, RSS 2018 |
 | Robot | Ghost Robotics Minitaur |
-| Tasks | galloping, trotting |
-| Simulator | Bullet |
-| Key transfer tools | system identification, actuator model, latency simulation, dynamics randomization, perturbation, compact observation |
-| Source | [arXiv](https://arxiv.org/abs/1804.10332), [RSS PDF](https://www.roboticsproceedings.org/rss14/p10.pdf) |
+| Tasks | Galloping, trotting |
+| Simulator | PyBullet |
+| RL algorithm | Proximal Policy Optimization, PPO |
+| Transfer | Simulation-only training 후 real robot zero-shot deployment |
+| Main tools | System identification, nonlinear actuator model, latency model, dynamics randomization, perturbation, compact observation |
+| Source | [arXiv](https://arxiv.org/abs/1804.10332), [RSS paper](https://www.roboticsproceedings.org/rss14/p10.pdf), [Video](https://www.youtube.com/watch?v=lUZUr7jxoqM) |
 
-이 논문은 "quadruped RL policy를 sim에서 학습해서 real robot에 올린다"는 흐름에서 초기에 매우 중요한 예시입니다.
-
-## **2. 핵심 아이디어: Simulator를 고치고 Policy도 robust하게 만들기**
-
-이 논문은 reality gap을 두 방향에서 줄입니다.
-
-첫째, simulator 자체를 현실에 가깝게 만듭니다.
-
-- robot body parameter를 system identification으로 맞춥니다.
-- actuator model을 더 현실적으로 만듭니다.
-- latency를 simulation에 넣습니다.
-
-둘째, policy가 남아 있는 gap에 버티도록 학습합니다.
-
-- dynamics parameter를 randomize합니다.
-- random perturbation을 넣습니다.
-- observation space를 compact하게 만듭니다.
-
-즉 구조는 다음과 같습니다.
-
-| 축 | 역할 |
-|---|---|
-| system identification | 평균적인 robot model을 현실에 가깝게 맞춤 |
-| actuator model | motor command와 실제 motion 차이를 줄임 |
-| latency simulation | feedback delay로 인한 instability를 미리 반영 |
-| dynamics randomization | 남은 parameter error에 robust하게 만듦 |
-| perturbation | 외란에 버티는 gait를 유도 |
-| compact observation | real에서 불안정하거나 unreliable한 정보를 줄임 |
-
-이 조합이 quadruped Sim2Real의 기본 감각입니다.
-
-논문은 두 가지 gait를 real Minitaur에서 보여줍니다.
-
-첫 번째는 galloping입니다. 기본 simulator에서는 agile gait가 잘 나오지 않았고, real robot에서는 gap 때문에 바로 넘어졌습니다. 하지만 actuator model과 latency를 개선한 뒤에는 galloping gait가 학습되었습니다. 논문은 galloping speed를 simulation에서 약 1.34 m/s, real world에서 약 1.18 m/s로 보고합니다.
-
-두 번째는 trotting입니다. Trotting은 open-loop reference signal을 제공해서 원하는 gait style을 유도합니다. 이 reference만으로는 real robot에서 안정적으로 움직일 수 없고, learned feedback controller가 balance를 유지해야 합니다.
-
-Trotting에서는 compact observation이 특히 중요했습니다. Observation을 줄여 IMU 중심의 정보로 재학습했을 때 simulation과 real robot에서 더 안정적인 움직임이 나왔습니다.
-
-## **3. 핵심 아이디어의 이론적 원리**
-
-이 논문의 이론적 핵심은 quadruped Sim2Real을 하나의 문제로 보지 않고, 여러 gap을 서로 다른 방식으로 줄이는 조합 문제로 본다는 점입니다.
+이 논문은 현재 legged RL에서도 익숙한 설계들을 일찍 한데 묶었습니다.
 
 ```text
-model mismatch
--> system identification / actuator model / latency model
-
-residual uncertainty
--> dynamics randomization / perturbation
-
-unreliable observation
--> compact observation
+PPO
++ parallel simulation
++ joint-position target
++ actuator model
++ domain randomization
++ privileged simulator state는 reward 계산에 사용
++ deployable sensor만 policy observation에 사용
 ```
 
-### **3.1 System identification은 nominal dynamics를 맞춘다**
+다만 오늘날의 command-conditioned locomotion과는 차이가 있습니다. 이 policy는 임의의 velocity command를 추종하는 범용 policy가 아니라, **flat ground에서 정해진 방향으로 gallop 또는 trot하는 gait policy**입니다.
 
-3편에서 본 dynamics randomization은 가능한 dynamics distribution을 넓게 잡는 방법이었습니다.
+---
 
-하지만 randomization만으로 모든 것을 해결하려고 하면 distribution이 너무 넓어질 수 있습니다. 그러면 policy가 지나치게 보수적이거나 둔한 gait를 학습할 수 있습니다.
+## **2. Robot과 Control Problem을 먼저 정확히 보기**
 
-그래서 이 논문은 먼저 system identification으로 nominal model을 현실에 가깝게 맞춥니다.
+### **2.1 Minitaur hardware와 control loop**
 
-Simulator parameter를 $\theta$라고 두면, simulation transition은 다음처럼 볼 수 있습니다.
+Minitaur에는 direct-drive actuator가 8개 있습니다. 각 다리는 motor 2개로 sagittal plane에서 움직입니다.
+
+Sensor는 다음과 같습니다.
+
+- Motor encoder: 8개 motor angle
+- IMU: base orientation과 angular velocity
+
+STM32 microcontroller가 actuator command와 sensor I/O를 처리하고, neural-network inference는 Nvidia Jetson TX2가 수행합니다.
+
+![Minitaur hardware control loop](/assets/img/posts/rl/sim2real/agile-locomotion/01-hardware-control-loop.png){: width="1200" .d-block .mx-auto }
+_Jetson TX2가 policy action을 STM32로 보내고, STM32가 motor command를 실행한 뒤 encoder와 IMU observation을 되돌려 준다. 출처: [Tan et al., Figure 2](https://arxiv.org/pdf/1804.10332)._
+
+Control loop를 풀어 쓰면 다음과 같습니다.
+
+```text
+encoder + IMU
+    ↓ UART
+Jetson TX2 policy inference
+    ↓ action
+STM32 position controller
+    ↓ PWM / motor torque
+Minitaur dynamics and contact
+```
+
+TX2는 real-time operating system에서 동작하지 않았습니다. 실제 control frequency는 약 150-200 Hz 사이에서 변했습니다.
+
+이 구조만 봐도 reality gap의 원인이 단순 rigid-body parameter가 아니라는 것을 알 수 있습니다.
+
+- UART communication delay
+- TX2 inference와 scheduling jitter
+- Microcontroller PD-loop delay
+- Battery voltage에 따른 motor response
+- Encoder/IMU noise와 bias
+
+이 모든 요소가 observation-to-action closed loop를 바꿉니다.
+
+### **2.2 왜 POMDP인가**
+
+논문은 locomotion을 POMDP로 정의합니다.
+
+Robot의 완전한 physical state에는 base position, velocity, foot contact force 등이 들어갈 수 있지만, Minitaur에서 모두 직접 측정할 수 있는 것은 아닙니다.
 
 $$
-s_{t+1}
-\sim
-P_{\theta}(\cdot \mid s_t, a_t)
+s_t \in \mathcal{S},
+\qquad
+o_t \sim O(\cdot \mid s_t)
 $$
 
-System identification은 real robot trajectory와 simulation trajectory의 차이가 작아지도록 $\theta$를 찾는 과정입니다.
+Policy는 full state가 아니라 observation만 보고 action을 냅니다.
 
 $$
-\theta^{*}
+a_t \sim \pi_{\theta}(a_t\mid o_t)
+$$
+
+이 논문은 recurrent policy를 사용하지 않습니다. 제한된 observation을 feedforward PPO policy에 넣습니다. 따라서 policy가 긴 history로 hidden state를 추정하기보다, 현재 측정값만으로 안정적인 feedback을 만들도록 설계했습니다.
+
+### **2.3 12D observation과 4D observation**
+
+처음 사용한 observation은 12차원입니다.
+
+| Feature | Dimension |
+|---|---:|
+| Base roll, pitch | 2 |
+| Roll/pitch angular velocity | 2 |
+| Eight motor angles | 8 |
+| Total | 12 |
+
+사용 가능한 sensor 값을 무조건 모두 넣지는 않았습니다.
+
+- IMU yaw는 drift가 빠르므로 제외했습니다.
+- Motor velocity는 계산할 수 있지만 noise가 커서 제외했습니다.
+- Base position과 foot contact force는 해당 sensor가 없어 제외했습니다.
+
+Gallop policy는 이 12D observation을 사용합니다.
+
+Trotting에서는 처음에 12D를 사용했지만 real transfer가 seed마다 불안정했습니다. 이후 motor angle을 제거하고 다음 4D IMU observation만 남겼습니다.
+
+$$
+o_t =
+[\phi_t,\theta_t,\omega^x_t,\omega^y_t]
+$$
+
+그 결과 simulation과 real에서 안정적으로 비슷한 trot이 나타났습니다.
+
+“더 많은 observation은 항상 좋다”는 생각과 반대되는 결과입니다. Simulation에서 정확한 motor angle을 policy가 적극 활용할수록, real observation distribution의 작은 차이에 더 민감해질 수 있습니다.
+
+### **2.4 Action은 motor angle 8개가 아니라 leg-space pose다**
+
+각 leg action은 swing $s$와 extension $e$로 표현됩니다.
+
+$$
+\theta_1=e+s,
+\qquad
+\theta_2=e-s
+$$
+
+네 다리에 각각 $(s,e)$가 있으므로 policy action은 총 8차원 target pose입니다.
+
+![Motor space와 leg space action](/assets/img/posts/rl/sim2real/agile-locomotion/02-leg-space-action.png){: width="1100" .d-block .mx-auto }
+_왼쪽은 두 motor angle $\theta_1,\theta_2$, 오른쪽은 swing $s$와 extension $e$로 같은 leg pose를 표현한다. 출처: [Tan et al., Figure 3](https://arxiv.org/pdf/1804.10332)._
+
+Motor-angle space를 그대로 사용하면 self-collision을 만드는 invalid configuration이 non-convex하게 흩어져 있습니다. 반면 leg space에서는 rectangle bound로 invalid action을 쉽게 제외할 수 있습니다.
+
+이것은 단순 좌표 변환 이상의 의미가 있습니다.
+
+> Action space에 robot kinematics의 유효 구조를 넣어 exploration이 물리적으로 가능한 영역에서 일어나게 한다.
+
+Policy는 safety와 학습 용이성을 위해 torque가 아니라 position target을 출력합니다. Low-level actuator model이 target angle을 motor torque로 바꿉니다.
+
+### **2.5 Reward는 전진 거리와 mechanical energy 두 항이다**
+
+Reward는 복잡한 gait-shaping 항으로 구성되지 않습니다.
+
+$$
+r_n
 =
-\arg\min_{\theta}
-\mathcal{L}
-\left(
-\tau_{\mathrm{real}},
-\tau_{\mathrm{sim}}(\theta)
-\right)
+(\mathbf{p}_n-\mathbf{p}_{n-1})\cdot\mathbf{d}
+-
+w\Delta t
+\left|
+\boldsymbol{\tau}_n\cdot\dot{\mathbf{q}}_n
+\right|
 $$
 
-여기서 $\tau_{\mathrm{real}}$은 실제 robot trajectory이고, $\tau_{\mathrm{sim}}(\theta)$는 parameter $\theta$로 굴린 simulation trajectory입니다.
+| Term | 의미 |
+|---|---|
+| $(\mathbf{p}_n-\mathbf{p}_{n-1})\cdot\mathbf{d}$ | 원하는 방향으로 이동한 거리 |
+| $\Delta t|\boldsymbol{\tau}\cdot\dot{\mathbf{q}}|$ | 한 step의 mechanical-energy proxy |
+| $w=0.008$ | 두 항의 trade-off |
 
-이 접근의 목적은 real robot을 완벽하게 복사하는 것이 아닙니다. 평균적인 body parameter, mass, inertia, actuator behavior를 현실 근처로 가져와서 randomization이 덮어야 할 gap을 줄이는 것입니다.
+Episode는 1,000 steps 후 끝나거나, base tilt가 0.5 rad를 넘으면 넘어졌다고 보고 종료합니다.
 
-즉 구조는 다음과 같습니다.
+이 reward는 “어떤 leg pair를 언제 움직여라”를 직접 지시하지 않습니다. Gallop은 단순 forward-progress와 energy objective에서 emergent behavior로 나타납니다.
+
+다만 reward 계산에는 simulation에서 아는 base position, torque, motor velocity가 필요합니다. 이것들이 policy observation에 들어가는 것은 아닙니다.
+
+---
+
+## **3. Policy는 완전 Scratch와 Reference-guided 사이를 연결한다**
+
+### **3.1 Open-loop reference + learned feedback**
+
+Action은 두 부분의 합입니다.
+
+$$
+a(t,o)
+=
+\bar{a}(t)
++
+\pi_{\theta}(o)
+$$
+
+- $\bar{a}(t)$: 사용자가 주는 periodic open-loop reference
+- $\pi_{\theta}(o)$: observation을 보고 balance와 motion을 보정하는 learned feedback
+
+이 식은 human guidance의 양을 연속적으로 조절할 수 있게 합니다.
+
+| Setting | 의미 |
+|---|---|
+| $\bar a(t)=0$, 넓은 policy bound | Scratch learning |
+| Reference + 작은 residual bound | 원하는 gait style을 유지하며 feedback 학습 |
+| Policy bound $=0$ | 완전한 hand-designed open loop |
+
+이 구조는 현재의 residual policy, reference-conditioned locomotion과도 연결됩니다.
+
+### **3.2 Gallop은 scratch에서 emergent하게 나왔다**
+
+Gallop에서는
+
+$$
+\bar{a}(t)=0
+$$
+
+으로 두고 feedback action bound를 넓게 설정합니다.
+
+- Swing: $[-0.5,0.5]$ rad
+- Extension: $[\frac{\pi}{2}-0.5,\frac{\pi}{2}+0.5]$ rad
+
+Baseline Bullet actuator model에서는 빠른 gait가 아니라 느린 walk만 학습됐습니다. 실제 Minitaur에 올리면 즉시 넘어졌습니다.
+
+Actuator와 latency model을 개선한 뒤에는 대부분의 hyperparameter/seed run에서 gallop이 나타났습니다. 일부 run에서는 trot, pace, 일반적인 동물 gait와 다른 움직임도 나타났습니다.
+
+이 결과는 simulator fidelity가 transfer만 바꾼 것이 아니라 **학습 가능한 behavior family 자체도 바꿨다**는 의미가 있습니다.
+
+### **3.3 Trot은 reference로 gait topology를 지정했다**
+
+Trot에서는 diagonal leg pair가 같은 phase로 움직이고, 다른 diagonal pair는 180도 위상이 다르게 움직여야 합니다.
+
+논문은 다음 reference를 사용합니다.
+
+$$
+\bar{s}(t)=0.3\sin(4\pi t)
+$$
+
+$$
+\bar{e}(t)=0.35\sin(4\pi t)+2
+$$
+
+다른 diagonal pair에는 180도 phase offset을 줍니다. Learned feedback bound는 swing과 extension 모두 $[-0.25,0.25]$ rad로 제한합니다.
+
+중요한 점은 이 reference만으로는 real robot이 전진하지 못한다는 것입니다. Minitaur는 balance를 잃고 뒤로 주저앉았습니다.
+
+```text
+reference
+-> gait rhythm과 style 제공
+
+learned feedback
+-> balance, perturbation recovery, forward motion 보정
+```
+
+즉 “trot을 hand-code했다”와 “trot이 완전히 scratch에서 발견됐다” 사이의 방법입니다.
+
+---
+
+## **4. Simulation Fidelity를 어떻게 높였는가**
+
+### **4.1 System identification: 평균 model을 먼저 맞춘다**
+
+저자들은 Minitaur를 분해해 다음 값을 측정했습니다.
+
+- 각 link dimension
+- Link mass
+- Center of mass
+- Motor friction
+
+Inertia는 직접 측정하기 어려워 link shape와 mass, uniform-density 가정으로 추정했습니다.
+
+이 nominal model은 randomization의 중심이 됩니다.
+
+$$
+\mu_{\text{train}}
+\sim
+\rho(\mu\mid\hat{\mu}_{\text{identified}})
+$$
+
+System identification과 dynamics randomization은 경쟁 관계가 아닙니다.
 
 ```text
 system identification
--> center of simulation distribution을 real 근처로 이동
+-> plausible center를 찾음
 
-dynamics randomization
--> 남은 uncertainty를 distribution으로 덮음
+randomization
+-> residual error와 time variation을 덮음
 ```
 
-### **3.2 Actuator model은 action과 motion 사이의 gap을 줄인다**
+Nominal model이 너무 틀리면, 필요한 randomization range가 지나치게 넓어지고 policy가 conservative해질 수 있습니다.
 
-Legged robot에서 policy action은 곧바로 body motion이 되지 않습니다.
+### **4.2 Bullet의 기본 position constraint가 실제 motor와 달랐다**
 
-Policy가 joint target이나 motor command를 내면, actuator와 low-level controller가 그 command를 실제 joint torque와 motion으로 바꿉니다.
-
-이상적인 simulator에서는 다음처럼 단순하게 생각할 수 있습니다.
+Bullet의 기본 position control은 step 끝에서 target error constraint를 만족하도록 계산됩니다.
 
 $$
-\tau
+e_{n+1}
 =
-K_p(q_{\mathrm{des}} - q)
+k_p(\bar q-q_{n+1})
 +
-K_d(\dot{q}_{\mathrm{des}} - \dot{q})
+k_d(\dot{\bar q}-\dot q_{n+1})
+=0
 $$
 
-하지만 real actuator는 이보다 복잡합니다.
+이 방식은 실제 PD servo처럼 현재 state에서 torque를 계산하는 것과 다릅니다.
 
-Motor torque는 joint state, motor speed, battery voltage, internal controller, friction, saturation, delay에 영향을 받습니다.
+큰 gain을 사용하면 simulation에서는 constraint가 안정적으로 만족되지만, real motor에서는 oscillation이 생길 수 있습니다. 또한 기본 model은 overdamped하게 동작해 빠른 gait exploration을 제한했습니다.
 
-더 일반적으로는 다음처럼 볼 수 있습니다.
+### **4.3 DC motor + nonlinear torque saturation**
+
+저자들은 ideal DC motor 관계를 출발점으로 사용합니다.
 
 $$
-\tau_t
+\tau=K_tI
+$$
+
+$$
+I
 =
-g(u_t, q_t, \dot{q}_t, V_t, h_t)
+\frac{V_{\mathrm{pwm}}-V_{\mathrm{emf}}}{R},
+\qquad
+V_{\mathrm{emf}}=K_t\dot q
 $$
 
-여기서 $u_t$는 command, $V_t$는 battery voltage, $h_t$는 actuator나 controller의 history를 나타냅니다.
-
-Tan et al.은 Minitaur actuator에 대해 더 현실적인 actuator model을 넣습니다. 이 점이 중요한 이유는 quadruped locomotion에서는 actuator mismatch가 바로 gait mismatch로 이어지기 때문입니다.
-
-```text
-wrong actuator model
--> wrong joint tracking
--> wrong contact timing
--> wrong body attitude
--> fall or unstable gait
-```
-
-즉 actuator model은 단순한 low-level detail이 아닙니다. Policy가 학습하는 transition $P(s_{t+1} \mid s_t, a_t)$ 자체를 바꾸는 핵심 요소입니다.
-
-### **3.3 Latency는 closed-loop stability를 바꾼다**
-
-논문에서 actuator model과 함께 중요한 것이 latency입니다.
-
-Simulation에서는 command가 즉시 적용되고, sensor feedback도 즉시 들어오는 것처럼 보이기 쉽습니다.
-
-하지만 real robot에서는 action과 observation 사이에 시간이 걸립니다.
-
-```text
-policy computes action at time t
--> command reaches controller after delay
--> actuator moves after delay
--> sensor measurement returns after delay
--> policy sees delayed state
-```
-
-이를 수식으로 단순화하면, policy가 실제로 보고 있는 것은 현재 state가 아니라 delayed state입니다.
+Position control의 PWM command는 현재 motor state로 계산합니다.
 
 $$
-a_t = \pi(o_{t-d_o})
-$$
-
-그리고 action도 즉시 적용되지 않고 delayed action으로 들어갑니다.
-
-$$
-s_{t+1}
-\sim
-P(s_t, a_{t-d_a})
-$$
-
-여기서 $d_o$는 observation delay, $d_a$는 action delay에 해당합니다.
-
-이 차이는 closed-loop control에서 매우 큽니다. Feedback controller는 현재 상태를 보고 바로 보정한다고 가정하는데, 실제로는 과거 상태를 보고 늦게 action을 적용할 수 있습니다.
-
-그래서 latency를 무시한 simulation은 실제보다 안정적인 controller를 허용합니다.
-
-> Simulation에서 feedback이 즉시 돌아오면 controller의 안정 영역이 실제보다 훨씬 커질 수 있다.
-
-논문은 latency를 measurement history에서 interpolation하는 방식으로 simulation에 넣습니다. 또한 microcontroller의 PD servo latency와 Jetson TX2에서 실행되는 locomotion controller latency를 따로 측정합니다. TX2 쪽 locomotion controller latency는 대략 15-19ms 수준으로 보고됩니다.
-
-이론적으로 보면 latency modeling은 transition을 다음처럼 바꾸는 것입니다.
-
-```text
-ideal transition:
-s_t, a_t -> s_{t+1}
-
-delayed transition:
-s_t, a_{t-d_a}, o_{t-d_o} -> s_{t+1}
-```
-
-즉 latency는 단순한 implementation detail이 아니라, policy가 학습해야 하는 closed-loop dynamics의 일부입니다.
-
-### **3.4 Dynamics randomization은 남은 uncertainty를 덮는다**
-
-System identification과 actuator model, latency modeling을 해도 simulator는 여전히 현실과 다릅니다.
-
-Body mass, inertia, motor friction, foot-ground friction, control step, battery voltage, IMU noise 같은 요소는 정확히 고정하기 어렵습니다.
-
-그래서 논문은 system identification으로 맞춘 nominal model 주변에서 dynamics randomization을 사용합니다.
-
-논문에서 randomize한 축은 다음과 같습니다.
-
-| Randomization axis | 의미 |
-|---|---|
-| mass | body parameter uncertainty |
-| inertia | uniform density 가정 등으로 생기는 오차 |
-| motor friction | actuator wear, friction 차이 |
-| motor strength | motor 출력 변화 |
-| control step | control timing 변동 |
-| latency | non-real-time system delay 변동 |
-| battery voltage | fully charged 여부에 따른 motor behavior 차이 |
-| lateral friction | foot와 carpet floor 사이의 마찰 |
-| IMU noise / bias | sensor measurement error |
-
-3편에서 쓴 notation으로 보면, dynamics randomization은 다음 objective를 학습하는 것입니다.
-
-$$
-\max_{\pi}
-\mathbb{E}_{\xi \sim p(\xi)}
+V_{\mathrm{pwm}}
+=
+V
 \left[
-J(\pi; \mathcal{M}_{\xi})
+k_p(\bar q-q_n)
++
+k_d(\dot{\bar q}-\dot q_n)
 \right]
 $$
 
-여기서 이 논문의 특징은 $p(\xi)$를 완전히 임의로 크게 잡는 것이 아니라, system identification으로 얻은 nominal value 주변에 둔다는 것입니다.
+Microcontroller 구현에 맞춰 target velocity는 $\dot{\bar q}=0$으로 둡니다.
+
+하지만 실제 motor에서 torque-current relation은 큰 current에서 linear하지 않고 saturate합니다. 저자들은 측정 기반 piecewise-linear function으로 이 비선형성을 추가했습니다.
+
+![Actuator model의 sim-real trajectory validation](/assets/img/posts/rl/sim2real/agile-locomotion/03-actuator-model-validation.png){: width="900" .d-block .mx-auto }
+_점선은 desired motor angle, 파랑은 real response, 빨강은 개선된 simulation response다. Sim과 real이 비슷한 phase lag와 amplitude를 보인다. 출처: [Tan et al., Figure 4](https://arxiv.org/pdf/1804.10332)._
+
+이 figure에서 simulation이 desired signal을 완벽하게 따라가는 것이 목표가 아닙니다. **Real actuator가 target을 따라가지 못하는 방식까지 simulation이 재현하는 것**이 목표입니다.
+
+### **4.4 Latency는 observation history로 재현했다**
+
+Feedback controller에서 latency는 stability를 직접 바꿉니다.
+
+$$
+a_t=\pi(o_{t-\ell})
+$$
+
+저자들은 simulation observation history와 timestamp를 저장하고, 현재 시각에서 latency만큼 과거인 두 observation을 찾아 linear interpolation합니다.
+
+실제 system에서 PWM spike를 한 step 보내고 motor motion이 sensor로 보고될 때까지 측정한 latency는 다음과 같습니다.
+
+| Control layer | Measured latency |
+|---|---:|
+| STM32 microcontroller의 PD servo | 약 3 ms |
+| Jetson TX2 locomotion policy loop | 보통 15-19 ms |
+
+Real-time OS가 아니기 때문에 control step과 latency 모두 변할 수 있습니다. 논문은 이 값을 simulation nominal model과 randomization range에 반영합니다.
+
+---
+
+## **5. 남은 Gap에 Robustness를 학습시키기**
+
+### **5.1 Dynamics randomization range**
+
+Episode 시작에 physical parameter를 uniform range에서 sample합니다.
+
+| Parameter | Lower | Upper |
+|---|---:|---:|
+| Link mass | nominal의 80% | 120% |
+| Motor friction | 0 Nm | 0.05 Nm |
+| Link inertia | nominal의 50% | 150% |
+| Motor strength | nominal의 80% | 120% |
+| Control step | 3 ms | 20 ms |
+| Latency | 0 ms | 40 ms |
+| Battery voltage | 14.0 V | 16.8 V |
+| Foot-ground contact friction | 0.5 | 1.25 |
+| IMU bias | -0.05 rad | 0.05 rad |
+| IMU noise standard deviation | 0 rad | 0.05 rad |
+
+Range가 parameter마다 다른 이유도 중요합니다.
+
+- Mass와 motor friction은 직접 측정했으므로 비교적 좁게 둡니다.
+- Inertia는 uniform-density 가정으로 추정했으므로 50-150%로 넓게 둡니다.
+- Motor strength는 wear에 따라 달라질 수 있습니다.
+- Battery voltage는 charge state에 따라 바뀝니다.
+- Control step과 latency는 non-real-time system 때문에 흔들립니다.
+- Contact friction은 rubber foot와 여러 carpet의 일반적인 범위를 사용합니다.
+
+즉 무작정 모든 값을 같은 비율로 흔든 것이 아니라 **측정 confidence와 deployment variation**에 따라 범위를 정했습니다.
+
+### **5.2 Random external perturbation**
+
+Training 중 simulated base에 외력을 가합니다.
+
+| 항목 | 값 |
+|---|---:|
+| Perturbation interval | 200 steps, 약 1.2 s |
+| Duration | 10 steps, 약 0.06 s |
+| Magnitude | 130-220 N |
+| Direction | Random |
+
+짧고 큰 force로 balance를 무너뜨리고, policy가 여러 attitude에서 recovery하도록 만듭니다.
+
+Perturbation은 특정 parameter mismatch를 직접 모델링하지 않습니다. 대신 model error가 만들어낼 수 있는 state deviation을 외력으로 넓게 경험시킵니다.
+
+다만 perturbation이 actuator model을 대체하지는 못했습니다. 뒤의 ablation에서 baseline simulator에 perturbation만 추가해도 real transfer가 실패합니다.
+
+### **5.3 Compact observation은 정보 손실이자 regularization이다**
+
+Observation을 줄이면 policy가 사용할 수 있는 정보도 줄어듭니다. Simulation performance만 보면 12D observation이 유리합니다.
+
+하지만 motor angle distribution이 sim과 real에서 다르면, 12D policy가 simulation-specific correlation을 배울 수 있습니다.
+
+4D observation은 다음 trade-off를 택합니다.
 
 ```text
-identified nominal parameter
--> add realistic margin
--> train robust policy around that region
+less information in simulation
+        ↓
+lower peak return
+
+fewer mismatched channels at deployment
+        ↓
+smaller observation distribution gap
+        ↓
+better real transfer
 ```
 
-따라서 system identification과 dynamics randomization은 경쟁 관계가 아니라 보완 관계입니다.
+이것은 observation을 무조건 최소화하라는 뜻이 아닙니다. Task에 필요한 정보와 deployment에서 신뢰할 수 있는 정보의 교집합을 사용하라는 뜻입니다.
 
-| 역할 | 의미 |
+---
+
+## **6. PPO Training Setting**
+
+논문은 PPO를 선택한 이유로 stable한 on-policy method이며 parallelization이 쉽다는 점을 듭니다.
+
+Policy와 value function은 각각 fully connected hidden layer 두 개를 사용합니다. Network size는 hyperparameter search로 정합니다.
+
+| Gait | Observation | Policy hidden layers | Value hidden layers | Training time |
+|---|---:|---:|---:|---:|
+| Trotting | 4D | (125, 89) | (89, 55) | 4.35 h |
+| Galloping | 12D | (185, 95) | (95, 85) | 3.25 h |
+
+각 PPO update에서 최대 1,000 steps의 rollout 25개를 parallel하게 수집합니다. 각 task는 7 million simulation steps까지 학습합니다.
+
+![Trotting과 galloping PPO learning curves](/assets/img/posts/rl/sim2real/agile-locomotion/04-learning-curves.png){: width="780" .d-block .mx-auto }
+_위는 trotting, 아래는 galloping return이다. 각 policy는 최대 7 million simulation steps까지 학습했다. 출처: [Tan et al., Figure 5](https://arxiv.org/pdf/1804.10332)._
+
+Paper 3의 RDPG+HER와 비교하면 차이가 분명합니다.
+
+| Peng et al. pushing | Tan et al. locomotion |
 |---|---|
-| system identification | distribution 중심을 real 근처로 이동 |
-| dynamics randomization | 중심 주변의 residual uncertainty를 덮음 |
+| Sparse goal reward | Dense forward-distance/energy reward |
+| HER replay 필요 | HER 불필요 |
+| Off-policy RDPG | On-policy PPO |
+| LSTM implicit adaptation | Feedforward feedback policy |
+| Dynamics $\mu$를 critic에 입력 | 논문은 별도 privileged critic 구조를 제시하지 않음 |
 
-### **3.5 Compact observation은 unreliable signal에 대한 의존을 줄인다**
+Dynamics randomization은 특정 RL algorithm에 종속된 기법이 아닙니다. Task reward, action, observation, data-collection 구조에 따라 SAC, DDPG, PPO 등과 결합할 수 있습니다.
 
-Simulation에서는 많은 값을 쉽게 볼 수 있습니다.
+---
 
-하지만 real robot에서 같은 값을 안정적으로 얻는 것은 별개의 문제입니다. 어떤 값은 noisy하고, 어떤 값은 latency가 크고, 어떤 값은 estimator가 필요합니다.
+## **7. 실제 결과와 Ablation**
 
-Policy가 이런 값에 과하게 의존하면 simulation에서는 잘 걷지만 real robot에서는 깨질 수 있습니다.
+### **7.1 Gallop과 trot의 sim-real speed**
 
-Compact observation은 policy에게 꼭 필요한 정보만 주고, unreliable하거나 sim-specific한 정보를 줄이는 접근입니다.
+| Gait | Simulation | Real |
+|---|---:|---:|
+| Galloping | 1.34 m/s, 2.48 body lengths/s | 1.18 m/s, 2.18 body lengths/s |
+| Trotting | 0.50 m/s, 0.93 body lengths/s | 0.60 m/s, 1.11 body lengths/s |
 
-이것은 일종의 information bottleneck처럼 볼 수 있습니다.
+Gallop은 simulation보다 real에서 느렸고, trot은 real에서 오히려 조금 빨랐습니다. 따라서 “sim과 real trajectory가 완전히 같다”는 결과가 아닙니다.
+
+중요한 것은 두 policy 모두 real robot에서 gait를 유지했고, real data fine-tuning 없이 실행되었다는 점입니다.
+
+### **7.2 Handcrafted gait와 energy 비교**
+
+| Real gait | Speed | Average mechanical power |
+|---|---:|---:|
+| Handcrafted trot | 0.56 m/s | 92.72 W |
+| Learned trot | 0.60 m/s | 71.78 W |
+| Handcrafted gallop | 1.21 m/s | 290.00 W |
+| Learned gallop | 1.18 m/s | 188.79 W |
+
+Learned gait는 비슷한 speed에서 mechanical power를 줄였습니다.
+
+- Trot: 약 23% 감소
+- Gallop: 약 35% 감소
+
+Reward에 energy term이 있었기 때문에 단순히 최대 속도만 추구하지 않고, 비슷한 속도에서 더 낮은 mechanical power의 gait를 찾았습니다.
+
+단, 이 table은 Minitaur의 두 handcrafted controller와 비교한 결과입니다. 모든 classical controller보다 RL이 효율적이라는 일반 결론은 아닙니다.
+
+### **7.3 Reality gap을 return difference로 측정했다**
+
+논문은 success/failure만으로 reality gap을 재지 않습니다. Full episode인 1,000 steps, 약 6초 동안 balance했는지는 중요한 지표지만 speed와 energy 차이를 놓칩니다.
+
+그래서 같은 reward return을 simulation과 real에서 계산하고 차이를 봅니다.
+
+$$
+G_{\text{gap}}
+=
+\left|
+\mathbb{E}[R_{\text{sim}}]
+-
+\mathbb{E}[R_{\text{real}}]
+\right|
+$$
+
+Evaluation protocol도 단일 lucky seed만 보는 것보다 넓습니다.
+
+1. 각 configuration에서 hyperparameter와 seed가 다른 controller 100개를 학습합니다.
+2. Simulation return이 높은 top 3를 선택합니다.
+3. 각 controller를 real Minitaur에서 3번 실행합니다.
+4. 총 9회 real run의 평균 return을 보고합니다.
+
+다만 top 3를 simulation performance로 고르는 selection protocol이므로 전체 100개 policy의 transfer success distribution을 보고한 것은 아닙니다.
+
+### **7.4 Simulator가 틀리면 perturbation으로도 못 막았다**
+
+![Simulation fidelity와 perturbation ablation](/assets/img/posts/rl/sim2real/agile-locomotion/05-simulation-fidelity-ablation.png){: width="900" .d-block .mx-auto }
+_왼쪽은 baseline simulation, 가운데는 baseline simulation+perturbation, 오른쪽은 개선된 actuator/latency simulation+perturbation이다. 파랑은 sim, 빨강은 real expected return이다. 출처: [Tan et al., Figure 6](https://arxiv.org/pdf/1804.10332)._
+
+세 group 모두 simulation에서는 높은 return을 보였습니다.
+
+그러나 real에서는 다음 차이가 나타났습니다.
+
+| Training setup | Real behavior |
+|---|---|
+| Baseline simulation | 큰 sim-real gap |
+| Baseline + perturbation | 여전히 큰 sim-real gap |
+| Improved actuator/latency + perturbation | sim과 real return이 가까워짐 |
+
+저자들은 actuator model과 latency simulation 중 하나만 빠져도 learned controller가 real robot에서 동작하지 않았다고 보고합니다.
+
+이 ablation의 결론은 명확합니다.
+
+> Robustness는 잘못된 simulator를 무한히 보상해 주는 대체재가 아니다.
+
+먼저 dominant mismatch를 model에 반영하고, 남은 오차를 randomization과 perturbation으로 덮어야 합니다.
+
+### **7.5 Randomization은 peak performance를 낮추고 variance를 줄였다**
+
+![Body inertia 변화에 대한 randomization 효과](/assets/img/posts/rl/sim2real/agile-locomotion/06-inertia-randomization.png){: width="900" .d-block .mx-auto }
+_Blue policy는 nominal inertia 근처에서 높은 peak return을 보이지만 range 양끝에서 급격히 무너진다. Randomized policy는 peak는 낮지만 inertia 변화 전반에서 비슷한 return을 유지한다. 출처: [Tan et al., Figure 7](https://arxiv.org/pdf/1804.10332)._
+
+Randomization 없는 policy는 학습한 nominal inertia 근처에서 더 높은 return을 냅니다. 그러나 inertia가 달라지면 성능이 급격히 떨어집니다.
+
+Randomized policy는 반대입니다.
+
+- 평균 peak는 낮아집니다.
+- Dynamics 변화에 따른 return variance도 낮아집니다.
+
+모든 parameter test를 합친 결과도 같은 경향입니다.
+
+![Randomization의 robustness-optimality trade-off](/assets/img/posts/rl/sim2real/agile-locomotion/07-robustness-optimality.png){: width="900" .d-block .mx-auto }
+_Randomization을 사용하면 small/large observation 모두에서 mean return과 standard deviation이 함께 낮아진다. 낮은 mean은 보수적 behavior, 낮은 standard deviation은 dynamics 변화에 대한 robustness를 뜻한다. 출처: [Tan et al., Figure 8](https://arxiv.org/pdf/1804.10332)._
+
+논문 표현대로 randomization은 “free meal”이 아닙니다.
+
+$$
+\text{robustness increase}
+\quad\Longleftrightarrow\quad
+\text{nominal optimality decrease}
+$$
+
+그래서 randomization range는 넓을수록 좋은 것이 아니라, 실제 deployment variation을 덮는 데 필요한 만큼이어야 합니다.
+
+### **7.6 12D는 sim에서 좋았지만 4D가 real에서 좋았다**
+
+![Observation size와 randomization의 sim-real transfer](/assets/img/posts/rl/sim2real/agile-locomotion/08-observation-transfer.png){: width="900" .d-block .mx-auto }
+_Large 12D observation은 simulation return이 높지만 real return이 크게 떨어진다. Small 4D observation과 randomization을 함께 사용한 조건에서 sim-real gap이 가장 작았다. 출처: [Tan et al., Figure 9](https://arxiv.org/pdf/1804.10332)._
+
+Figure 9의 조합은 네 가지입니다.
+
+1. Small 4D observation
+2. Small 4D + randomization
+3. Large 12D observation
+4. Large 12D + randomization
+
+Simulation에서는 12D가 유리합니다. Policy가 motor angle까지 사용할 수 있기 때문입니다.
+
+Real에서는 반대입니다. 12D policy의 sim-real gap이 더 큽니다. 저자들은 차원이 커질수록 training observation이 sparse해지고, real에서 비슷한 observation을 만날 가능성이 낮아진다고 해석합니다.
+
+Small observation + randomization 조건에서는 top 3 controller의 real run 9회가 모두 3 m 이상 trot했고, 약 6초의 episode 전체에서 balance를 유지했습니다.
+
+다만 이 결과를 “proprioception은 적을수록 좋다”로 일반화하면 위험합니다. Motor angle이 command tracking과 terrain adaptation에 필수인 현대 quadruped policy도 많습니다. 이 Minitaur setup에서는 motor-angle channel의 sim-real mismatch가 extra information의 이득보다 컸다고 읽어야 합니다.
+
+---
+
+## **8. 이론적으로 정리하면**
+
+### **8.1 Fidelity와 robustness는 서로 다른 축이다**
+
+Real transition을
+
+$$
+P_{\text{real}}
+$$
+
+identified nominal simulation을
+
+$$
+P_{\hat{\mu}}
+$$
+
+라고 하겠습니다.
+
+System identification, actuator model, latency model은 중심 오차를 줄입니다.
+
+$$
+d(P_{\hat{\mu}},P_{\text{real}})\downarrow
+$$
+
+Randomization은 그 중심 주변의 distribution에서 policy를 학습합니다.
+
+$$
+\mu\sim\rho(\mu\mid\hat{\mu})
+$$
+
+두 단계의 역할은 다릅니다.
 
 ```text
-large observation
--> policy can exploit simulator-specific detail
+fidelity:
+    train distribution의 중심을 reality 쪽으로 이동
 
-compact observation
--> policy must rely on robust, deployable signal
+robustness:
+    중심 주변에서 policy가 성공하는 폭을 넓힘
 ```
 
-논문에서 trotting policy는 observation을 줄였을 때 transfer가 더 안정적이었습니다. 특히 IMU 중심의 정보와 필요한 joint/motor state를 사용하는 쪽이 real deployment에 더 적합했습니다.
+중심이 너무 멀리 있으면 폭만 넓혀도 real system을 포함하지 못하거나, 지나치게 conservative한 policy가 됩니다.
 
-이 관점에서 observation design은 단순히 input dimension을 줄이는 문제가 아닙니다.
+### **8.2 Actuator model은 action semantics를 보존한다**
 
-> Policy가 real에서 믿을 수 있는 정보만 사용하도록 만드는 Sim2Real regularization이다.
+Policy가 출력하는 것은 leg-space position target입니다. Simulation과 real의 low-level actuator가 같은 target을 서로 다르게 실현하면 high-level policy의 action 의미가 달라집니다.
 
-### **3.6 Perturbation은 recovery behavior를 학습시킨다**
+$$
+a_t^{\text{policy}}
+\xrightarrow{\text{actuator}}
+\tau_t
+$$
 
-Quadruped locomotion은 nominal gait만 잘한다고 충분하지 않습니다.
+따라서 action semantics를 맞추려면,
 
-Real robot에서는 작은 충격, contact slip, sensor noise, uneven floor 때문에 state가 nominal trajectory에서 벗어납니다. Policy가 이런 state를 학습 중에 경험하지 못하면, 작은 외란에도 복구하지 못하고 넘어질 수 있습니다.
+- Torque-current saturation
+- Back EMF
+- PD implementation
+- Battery voltage
+- Delay
 
-Perturbation은 policy가 nominal rollout 주변의 off-nominal state를 경험하게 만듭니다.
+를 다뤄야 합니다.
+
+URDF mass를 잘 맞춰도 actuator mapping이 틀리면 policy가 학습한 control authority가 real에서 존재하지 않을 수 있습니다.
+
+### **8.3 Compact observation은 deployment-aware feature selection이다**
+
+Training observation distribution을 $p_{\text{sim}}(o)$, real distribution을 $p_{\text{real}}(o)$라고 하겠습니다.
+
+Observation feature를 추가하면 simulation에서 value estimation이 쉬워질 수 있습니다. 하지만 추가 channel의 domain gap이 크면
+
+$$
+D\!\left(
+p_{\text{sim}}(o),
+p_{\text{real}}(o)
+\right)
+$$
+
+가 커질 수 있습니다.
+
+따라서 observation design의 기준은 “simulator에서 얻을 수 있는가?”가 아닙니다.
+
+1. Real robot에서 같은 의미로 측정 가능한가?
+2. Noise, bias, latency가 허용 가능한가?
+3. Task에 실제로 필요한가?
+4. Randomization으로 gap을 현실적으로 모델링할 수 있는가?
+
+이 기준은 현재 robot RL에서도 그대로 유효합니다.
+
+### **8.4 Open-loop reference는 behavior prior다**
+
+$$
+a(t,o)=\bar a(t)+\pi(o)
+$$
+
+에서 $\bar a(t)$는 gait의 phase relationship을 미리 제공합니다. Policy는 전체 behavior topology를 처음부터 찾는 대신 balance와 efficiency correction에 집중합니다.
+
+장점은 다음과 같습니다.
+
+- 원하는 gait style을 쉽게 지정할 수 있습니다.
+- Exploration space가 줄어듭니다.
+- User control과 learned feedback을 분리할 수 있습니다.
+
+단점도 있습니다.
+
+- Reference에 없는 behavior를 발견하기 어려울 수 있습니다.
+- Phase와 frequency가 fixed prior가 됩니다.
+- Terrain과 command가 바뀌면 reference generator도 확장해야 합니다.
+
+Gallop scratch 실험과 trot reference 실험을 함께 둔 이유는 이 spectrum을 보여 주기 위해서입니다.
+
+---
+
+## **9. 현재 Quadruped Sim2Real에 주는 실전 교훈**
+
+### **9.1 먼저 dominant mismatch를 측정해야 한다**
+
+Randomization config를 만들기 전에 실제 hardware에서 다음을 측정해야 합니다.
+
+- Command-to-motion latency
+- Control-frequency jitter
+- Motor target tracking
+- Torque/current saturation
+- Battery-voltage dependence
+- Sensor bias/noise
+- Ground-contact friction range
+
+측정 없이 모든 parameter를 넓게 흔들면 학습 난이도만 높아지고 failure 원인을 알기 어렵습니다.
+
+### **9.2 Nominal calibration과 randomization margin을 분리해야 한다**
+
+예를 들어 link mass를 측정했다면,
 
 ```text
-nominal training only
--> policy learns to walk near ideal trajectory
-
-training with perturbation
--> policy learns how to recover from nearby failures
+measured nominal mass
+        +
+manufacturing/payload uncertainty margin
 ```
 
-이것은 dynamics randomization과 비슷하지만, 초점이 조금 다릅니다.
+으로 구성해야 합니다.
 
-Dynamics randomization은 environment parameter를 바꿉니다. Perturbation은 rollout 중 robot state를 흔들어 recovery behavior를 학습하게 합니다.
+Nominal 값 자체가 틀린 것을 넓은 range로 숨기면 sim holdout에서 성능은 좋아 보여도 real policy가 불필요하게 보수적일 수 있습니다.
 
-둘 다 real deployment에서 policy가 fragile해지는 것을 막는 역할을 합니다.
+### **9.3 Control timestep과 latency는 별도로 다뤄야 한다**
 
-## **4. Sim2Real 관점에서의 해석**
+Control timestep은 action update 간격이고, latency는 observation이나 action이 실제로 늦게 반영되는 시간입니다.
 
-이 논문은 quadruped Sim2Real에서 중요한 교훈을 줍니다.
-
-첫째, randomization만으로 충분하지 않을 수 있습니다.
-
-Actuator model과 latency가 너무 틀리면, policy는 real robot에서 첫 발도 제대로 못 뗄 수 있습니다. 이 경우 randomization range를 아무리 넓혀도 policy가 필요한 actuator behavior를 제대로 학습하지 못할 수 있습니다.
-
-둘째, simulator fidelity만으로도 충분하지 않습니다.
-
-아무리 system identification을 해도 foot friction, IMU noise, battery state, control timing 같은 uncertainty는 남습니다. 그래서 randomization과 perturbation이 필요합니다.
-
-셋째, observation design이 transfer에 영향을 줍니다.
-
-Simulation에서는 알 수 있는 정보라도 real robot에서 noisy하거나 latency가 있거나 추정이 불안정하면 policy가 그 정보에 의존하다가 real에서 깨질 수 있습니다.
-
-이 논문의 Sim2Real 구조는 다음처럼 정리할 수 있습니다.
+둘은 비슷해 보이지만 같은 값이 아닙니다.
 
 ```text
-fit nominal model
--> add realistic actuator and latency model
--> randomize residual uncertainty
--> train policy with compact deployable observation
--> add perturbation for recovery
+control-step jitter:
+    next policy query 시각이 변함
+
+latency:
+    policy가 오래된 state를 보거나 action이 늦게 적용됨
 ```
 
-정리하면 다음입니다.
+Modern deployment에서도 simulator의 `dt`, action decimation, inference delay, DDS/communication delay를 한 숫자로 뭉치면 원인을 놓치기 쉽습니다.
 
-> Quadruped Sim2Real은 actuator fidelity와 policy robustness를 동시에 맞춰야 한다.
+### **9.4 Real validation은 낮은 위험부터 단계적으로 해야 한다**
 
-이 점이 앞선 dynamics randomization 논문과의 차이입니다. Peng et al.은 physical parameter distribution을 넓히는 관점을 보여줬고, Tan et al.은 legged locomotion에서는 actuator, latency, observation, perturbation까지 같이 맞춰야 한다는 것을 보여줍니다.
+이 논문은 research demonstration이지만, 실제 robot 적용에서는 다음 순서가 안전합니다.
 
-## **5. 이 논문의 한계**
+1. Motor target tracking과 latency 단독 검증
+2. Suspended or supported low-amplitude action test
+3. Stand policy와 perturbation recovery
+4. Low-speed gait
+5. Command range 확대
+6. Terrain과 payload holdout
 
-이 논문은 quadruped Sim2Real의 핵심 입문 논문이지만, 그대로 모든 robot에 적용되지는 않습니다.
+Randomized simulation return이 높다는 이유만으로 바로 agile gait를 실행하면 안 됩니다.
 
-첫째, robot이 Minitaur입니다.
+---
 
-Minitaur는 direct-drive actuator에 가까운 구조라 actuator analytic model을 만들기 상대적으로 쉽습니다. 더 복잡한 actuator와 low-level controller stack을 가진 robot에서는 analytic actuator model만으로 부족할 수 있습니다.
+## **10. 한계와 Claim Boundary**
 
-둘째, terrain generalization이 주제는 아닙니다.
+**첫째, flat ground와 고정 running direction을 다룹니다.**
 
-논문은 주로 carpet/floor 위의 galloping과 trotting transfer를 다룹니다. Rough terrain, deformable terrain, outdoor terrain generalization은 이후 논문들이 더 직접적으로 다룹니다.
+Velocity command를 실시간으로 바꾸거나 turn하는 범용 locomotion policy가 아닙니다.
 
-셋째, trotting은 open-loop reference를 사용합니다.
+**둘째, terrain perception이 없습니다.**
 
-Trotting policy는 reference signal을 통해 gait style을 유도합니다. 따라서 완전히 unconstrained하게 gait를 발견하는 문제와는 조금 다릅니다.
+Heightmap, depth camera, LiDAR를 사용한 perceptive locomotion은 다음 문제입니다.
 
-넷째, randomization range는 여전히 수동 설계에 의존합니다.
+**셋째, Minitaur의 leg kinematics가 제한적입니다.**
 
-System identification을 통해 nominal value를 잡지만, 각 parameter를 어느 범위로 randomize할지는 여전히 사람이 정해야 합니다.
+각 leg가 sagittal plane에서 움직이는 8-actuator platform입니다. 12-DOF quadruped의 lateral stepping과 yaw control로 그대로 일반화할 수 없습니다.
 
-다섯째, actuator model이 robot-specific합니다.
+**넷째, trot은 user-provided periodic reference에 의존합니다.**
 
-이 논문에서 사용한 actuator model과 latency calibration은 Minitaur에 맞춘 것입니다. 다른 quadruped에 적용하려면 해당 robot의 actuator, controller, communication, sensor stack을 다시 분석해야 합니다.
+Gallop은 scratch에서 나왔지만 trot의 diagonal phase structure는 reference로 지정했습니다.
 
-그래도 quadruped Sim2Real에서 actuator, latency, randomization을 한 번에 봐야 한다는 감각은 이 논문에서 잘 잡힙니다.
+**다섯째, feedforward policy이며 online adaptation module이 없습니다.**
 
-## **6. 정리하며: Robust Policy만으로는 부족하다**
+History로 dynamics를 추정하는 RNN이나 RMA-style adaptation은 사용하지 않습니다.
 
-이번 글에서는 Tan et al.의 **Sim-to-Real: Learning Agile Locomotion For Quadruped Robots**를 정리했습니다.
+**여섯째, real evaluation은 top simulation policies를 선택해 수행합니다.**
 
-- Quadruped Sim2Real에서는 actuator model과 latency가 매우 중요합니다.
-- System identification은 nominal dynamics를 real 근처로 맞추고, randomization은 남은 uncertainty를 덮습니다.
-- Actuator model은 policy action이 실제 joint torque와 motion으로 바뀌는 mapping을 현실적으로 만듭니다.
-- Latency는 closed-loop stability를 바꾸므로 simulation 안에 반영해야 합니다.
-- Compact observation은 real에서 unreliable한 signal에 대한 의존을 줄입니다.
-- Random perturbation은 nominal gait 주변에서 recovery behavior를 학습하게 합니다.
-- Galloping과 trotting policy가 simulation에서 학습된 뒤 real Minitaur로 transfer되었습니다.
+각 condition에서 100개를 학습했지만 real에는 top 3만 배포했습니다. 전체 seed의 transfer success rate는 아닙니다.
 
-4편의 핵심은 이렇게 정리할 수 있습니다.
+**일곱째, actuator와 latency ablation은 중요하지만 정밀한 component별 수치 table은 제한적입니다.**
 
-> Legged Sim2Real에서는 simulator를 고치는 것과 policy를 robust하게 만드는 것을 같이 해야 한다.
+논문은 둘 중 하나가 없어도 real에서 동작하지 않았다고 보고하지만, motor-model error와 latency error 각각의 continuous sensitivity curve를 제공하지는 않습니다.
 
-다음 글에서는 이 흐름이 ANYmal처럼 더 복잡한 actuator와 full-size quadruped로 넘어가면서 어떻게 바뀌는지 보겠습니다.
+**여덟째, randomization range는 수동 설계입니다.**
+
+Real failure data로 distribution을 자동 업데이트하지 않습니다.
+
+**아홉째, hardware safety layer는 자세히 다루지 않습니다.**
+
+Torque/temperature limit, fall detection 이후 recovery, emergency stop 절차는 논문의 핵심 범위가 아닙니다.
+
+---
+
+## **11. 정리하며: Sim2Real은 Model과 Policy를 함께 설계하는 문제다**
+
+이 논문의 전체 pipeline은 다음과 같습니다.
+
+```text
+real Minitaur 측정
+    ↓
+URDF mass/CoM/friction identification
+    ↓
+nonlinear actuator + latency model
+    ↓
+physically motivated randomization range
+    ↓
+external perturbation + deployable observation
+    ↓
+PPO locomotion training
+    ↓
+real robot zero-shot deployment
+```
+
+핵심을 다시 정리하면 다음과 같습니다.
+
+- Minitaur는 8개의 direct-drive actuator와 encoder, IMU를 사용하고, Jetson TX2에서 policy를 실행했습니다.
+- Control loop는 non-real-time 환경에서 약 150-200 Hz로 동작했습니다.
+- Policy는 PPO로 학습한 feedforward network이며, action은 네 leg의 swing/extension target 8개입니다.
+- Reward는 forward distance와 mechanical energy 두 항으로 단순하게 구성했습니다.
+- Gallop은 scratch에서 emergent하게 나왔고, trot은 periodic reference 위에 learned feedback을 더했습니다.
+- System identification으로 nominal model을 맞춘 뒤 nonlinear motor saturation과 3 ms/15-19 ms latency를 simulation에 반영했습니다.
+- Mass, inertia, motor strength, battery, control step, latency, friction, IMU noise를 randomize했습니다.
+- Baseline simulator에 perturbation만 추가해서는 real transfer가 되지 않았습니다.
+- Randomization은 peak return을 낮추지만 dynamics 변화에 대한 variance를 줄였습니다.
+- 12D observation은 simulation에서 유리했지만, trot의 real transfer에는 4D IMU-only observation이 더 안정적이었습니다.
+- Learned gait는 handcrafted gait와 비슷한 speed에서 trot 약 23%, gallop 약 35% 낮은 mechanical power를 보였습니다.
+
+Paper 3이
+
+> Dynamics distribution을 넓히고 history로 그 차이에 적응하자.
+
+였다면, Paper 4는 다음 문장을 추가합니다.
+
+> Randomization 전에 actuator, latency, action, observation이 real system과 같은 의미를 갖도록 simulator를 먼저 고쳐야 한다.
+
+다음 글에서는 이 흐름이 더 큰 quadruped의 dynamic motor skill과 terrain interaction으로 확장될 때, reward와 motion curriculum, real-world deployment가 어떻게 달라지는지 살펴보겠습니다.
+
+## **참고 자료**
+
+- [Tan et al., arXiv paper and source](https://arxiv.org/abs/1804.10332)
+- [RSS 2018 proceedings paper](https://www.roboticsproceedings.org/rss14/p10.pdf)
+- [Official accompanying video](https://www.youtube.com/watch?v=lUZUr7jxoqM)
+- [PPO paper](https://arxiv.org/abs/1707.06347)
+- [PyBullet project](https://github.com/bulletphysics/bullet3)
