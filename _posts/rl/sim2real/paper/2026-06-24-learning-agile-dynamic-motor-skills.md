@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 5] Agile and Dynamic Motor Skills"
-date: 2026-06-24 17:33:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-01-16 17:33:00 +0900
+last_modified_at: 2026-01-16 17:33:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, legged-robots, anymal, actuator-network, hybrid-simulator, trpo, system-identification, dynamics-randomization]
 description: Hwangbo et al.의 ANYmal Sim2Real을 hybrid simulator, actuator network, stochastic rigid-body model, TRPO policy, 정량 실기체 결과와 ablation까지 원문 기준으로 정리한다.

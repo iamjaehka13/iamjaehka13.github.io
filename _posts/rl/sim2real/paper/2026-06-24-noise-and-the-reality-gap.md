@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 1] Noise and The Reality Gap"
-date: 2026-06-24 12:45:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-01-14 12:45:00 +0900
+last_modified_at: 2026-01-14 12:45:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, reality-gap, robot-simulation, noise, evolutionary-robotics, robust-control, khepera]
 description: Jakobi et al.의 1995년 논문을 바탕으로 실측 기반 Khepera simulator, 세 가지 noise 조건, simulation-real trajectory correspondence, envelope-of-noise 가설과 현대 domain randomization과의 차이를 정리한다.

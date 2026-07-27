@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 8] Learning to Walk in Minutes: 4096개 로봇으로 PPO를 다시 설계하기"
-date: 2026-06-24 17:36:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-01-18 17:36:00 +0900
+last_modified_at: 2026-01-18 17:36:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, isaac-gym, legged-gym, massively-parallel-rl, quadruped-locomotion, ppo, terrain-curriculum, anymal, gpu-simulation]
 description: Rudin et al.의 Learning to Walk in Minutes를 end-to-end GPU pipeline, PPO batch와 rollout horizon, timeout bootstrapping, game-inspired terrain curriculum, reward와 Sim2Real 구성, 실제 ANYmal 배포 및 공개 코드 차이까지 원문 기준으로 분석한다.

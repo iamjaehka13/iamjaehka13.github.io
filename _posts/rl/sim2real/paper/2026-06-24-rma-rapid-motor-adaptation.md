@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 7] RMA: 0.5초의 이력으로 환경에 적응하는 로봇"
-date: 2026-06-24 17:35:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+date: 2026-01-17 17:35:00 +0900
+last_modified_at: 2026-01-17 17:35:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, rapid-motor-adaptation, rma, quadruped-locomotion, online-adaptation, privileged-learning, domain-randomization, ppo, unitree-a1]
 description: Kumar et al.의 RMA를 base policy, 17D privileged environment, 8D extrinsics, 50-step adaptation history, PPO와 on-policy supervised learning, 비동기 배포, 시뮬레이션 및 실제 A1 실험까지 원문 기준으로 분석한다.
