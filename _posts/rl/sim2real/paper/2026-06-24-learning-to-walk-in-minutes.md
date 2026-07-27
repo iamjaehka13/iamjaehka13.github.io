@@ -1,39 +1,64 @@
 ---
-title: "[Sim2Real Paper 8] Learning to Walk in Minutes"
+title: "[Sim2Real Paper 8] Learning to Walk in Minutes: 4096개 로봇으로 PPO를 다시 설계하기"
 date: 2026-06-24 17:36:00 +0900
+last_modified_at: 2026-07-27 22:20:00 +0900
 categories: [RL, Sim2Real, Paper]
-tags: [sim2real, isaac-gym, legged-gym, massively-parallel-rl, quadruped-locomotion]
-description: Rudin et al.의 Learning to Walk in Minutes를 통해 Isaac Gym과 legged gym 계열의 massively parallel RL locomotion 학습 흐름을 정리한다.
+tags: [sim2real, isaac-gym, legged-gym, massively-parallel-rl, quadruped-locomotion, ppo, terrain-curriculum, anymal, gpu-simulation]
+description: Rudin et al.의 Learning to Walk in Minutes를 end-to-end GPU pipeline, PPO batch와 rollout horizon, timeout bootstrapping, game-inspired terrain curriculum, reward와 Sim2Real 구성, 실제 ANYmal 배포 및 공개 코드 차이까지 원문 기준으로 분석한다.
 math: true
+image:
+  path: /assets/img/posts/rl/sim2real/walk-minutes/00-preview.png
+  alt: Isaac Gym의 거대한 terrain에서 동시에 학습하는 수천 대의 ANYmal
 ---
 
-## **0. 전체 그림: Sim2Real Iteration Loop를 빠르게 만들기**
+## **0. 제목의 “몇 분”은 정확히 무엇을 뜻하는가**
 
-지금까지 본 논문들은 대부분 "어떻게 transfer를 잘할 것인가"를 다뤘습니다.
+Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 제목만 보면 “GPU를 많이 쓰면 강화학습이 빨라진다”는 논문처럼 보입니다.
 
-- noise로 reality gap 다루기
-- visual domain randomization
-- dynamics randomization
-- actuator model과 latency
-- learned actuator net
-- proprioceptive rough terrain locomotion
-- online adaptation
+하지만 핵심은 단순한 simulator 가속이 아닙니다.
 
-Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**은 조금 다른 축을 봅니다.
+> 4096개 robot이 동시에 만드는 대규모 on-policy batch를 PPO가 제대로 사용할 수 있도록 rollout horizon, mini-batch, timeout, terrain curriculum과 simulation layout을 함께 다시 설계한 논문이다.
 
-질문은 다음입니다.
+논문이 보고한 대표 결과는 다음과 같습니다.
 
-> Real robot에 transfer 가능한 legged locomotion policy를 얼마나 빠르게 학습하고 반복할 수 있는가?
+| Task | Training time |
+|---|---:|
+| Flat-terrain locomotion | 4분 미만 |
+| Perceptive rough-terrain locomotion | 20분 미만 |
 
-이 논문은 Isaac Gym을 사용해 수천 개 robot을 single workstation GPU에서 병렬로 시뮬레이션합니다.
+Rough-terrain policy는:
 
-그 결과 flat terrain locomotion policy는 4분 이내, uneven terrain policy는 약 20분 안에 학습됩니다.
+- 4096 parallel robots
+- Robot당 24 consecutive steps
+- Batch size 98,304
+- 1,500 PPO updates
+- 약 147 million transitions
+- Intel i9-11900K + NVIDIA RTX A6000
 
-이 논문의 중요성은 단순히 "빠르다"가 아닙니다.
+설정으로 학습되었습니다.
 
-Sim2Real에서 reward, observation, randomization, terrain curriculum, actuator model을 계속 바꾸며 실험해야 하는데, 학습 시간이 분 단위가 되면 실험 방식 자체가 바뀝니다.
+따라서 “20분”은 robot 한 대가 20분 동안 걸어서 배운다는 뜻이 아닙니다.
 
-> 빠른 simulator는 좋은 policy를 한 번에 주는 도구가 아니라, 좋은 policy를 찾는 iteration loop를 빠르게 만드는 도구다.
+```text
+4096 robots
+x 24 steps per update
+x 1500 updates
+= 147,456,000 transitions
+```
+
+거대한 simulation experience를 한 GPU에서 20분 이내의 wall-clock time으로 처리했다는 뜻입니다.
+
+![수천 개 ANYmal을 병렬로 학습하는 Isaac Gym terrain](/assets/img/posts/rl/sim2real/walk-minutes/00-preview.png){: width="1250" .d-block .mx-auto }
+_하나의 GPU simulation 안에서 수천 개 ANYmal이 서로 다른 terrain과 level을 동시에 경험한다. 빠른 학습은 robot 하나의 trajectory를 가속한 결과가 아니라 대규모 parallel rollout의 결과다. 출처: [Rudin et al., Figure 1](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+이 논문을 제대로 읽으려면 다음 네 질문에 답해야 합니다.
+
+1. 왜 environment 수를 무작정 늘리면 오히려 PPO 성능이 떨어지는가?
+2. 24-step rollout과 20초 episode는 어떻게 동시에 가능한가?
+3. Time-limit reset을 true terminal처럼 처리하면 왜 critic이 망가지는가?
+4. 수천 개 robot의 curriculum을 terrain 재생성 없이 어떻게 갱신하는가?
+
+---
 
 ## **1. 논문 정보**
 
@@ -41,418 +66,1546 @@ Sim2Real에서 reward, observation, randomization, terrain curriculum, actuator 
 |---|---|
 | Title | Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning |
 | Authors | Nikita Rudin, David Hoeller, Philipp Reist, Marco Hutter |
-| Year | 2022 |
-| Venue | Conference on Robot Learning 2021 / PMLR 2022 |
-| Robot | ANYmal C, plus simulation examples on ANYmal B, A1, Cassie |
-| Simulator | NVIDIA Isaac Gym |
-| RL algorithm | PPO |
-| Key idea | end-to-end GPU pipeline with thousands of parallel robots |
-| Training result | flat terrain under 4 minutes, uneven terrain under about 20 minutes |
-| Code | legged_gym |
-| Source | [arXiv](https://arxiv.org/abs/2109.11978), [PMLR PDF](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf), [legged_gym](https://github.com/leggedrobotics/legged_gym), [Project](https://leggedrobotics.github.io/legged_gym/) |
+| Venue | 5th Conference on Robot Learning, CoRL 2021 |
+| Proceedings | PMLR 164:91-100, 2022 |
+| Main robot | ANYbotics ANYmal C |
+| Additional simulation | ANYmal B, arm을 단 ANYmal C, Unitree A1, Cassie |
+| Simulator | NVIDIA Isaac Gym, GPU PhysX |
+| RL algorithm | Custom GPU PPO |
+| Rough policy | 4096 envs, 98,304 batch, 1,500 updates |
+| Control | 50 Hz policy, desired joint positions |
+| Terrain input | Base 주변 sampled height measurements |
+| Main result | Flat <4 min, rough terrain <20 min |
+| Real deployment | Fixed rough-terrain policy를 실제 ANYmal C에 배포 |
+| Source | [PMLR](https://proceedings.mlr.press/v164/rudin22a.html), [arXiv](https://arxiv.org/abs/2109.11978), [Project](https://leggedrobotics.github.io/legged_gym/), [Official code](https://github.com/leggedrobotics/legged_gym) |
 
-이 논문은 Isaac Gym / legged_gym / Isaac Lab 계열의 quadruped RL을 이해할 때 거의 기준점처럼 등장합니다.
+논문의 목적은 당시 가능한 최고 robustness를 달성하는 것이 아니었습니다.
 
-특히 Unitree 계열이나 ANYmal 계열 policy를 GPU 병렬 환경에서 학습하는 흐름은 이 논문의 영향을 강하게 받았습니다.
+저자들은 결론에서 목표를 명확히 제한합니다.
 
-## **2. 핵심 아이디어: End-to-End GPU Pipeline**
+> 복잡한 실제 robotics task도 분 단위로 학습할 수 있으며, 그렇게 얻은 policy가 실제 hardware에서 사용할 수 있음을 보이는 것.
 
-Massively parallel RL에서 중요한 것은 단순히 environment 수를 늘리는 것이 아닙니다.
+이 claim boundary가 중요합니다.
 
-Policy inference, physics simulation, reward computation, observation computation, rollout buffer, policy update가 모두 GPU pipeline 안에서 효율적으로 돌아야 합니다.
+- 최고 성능의 perceptive locomotion architecture를 제안한 논문은 아님
+- 모든 Sim2Real gap을 없앤 논문도 아님
+- GPU throughput만 측정한 benchmark도 아님
+- 빠른 policy를 실제 ANYmal에 배포해 end-to-end 유효성을 확인한 논문
 
-기존 CPU simulator 기반 pipeline은 대략 다음과 같습니다.
+---
+
+## **2. 기존 CPU 중심 RL Pipeline의 병목**
+
+### **2.1 PPO update만 GPU에 있어서는 충분하지 않다**
+
+일반적인 robot RL loop는 다음 작업을 반복합니다.
 
 ```text
-CPU simulation
--> CPU reward / observation
--> copy rollout data to GPU
--> GPU policy update
--> copy policy action/state back
+policy inference
+-> physics simulation
+-> contact computation
+-> reward calculation
+-> observation calculation
+-> reset
+-> rollout storage
+-> PPO update
 ```
 
-이때 CPU-GPU data transfer가 병목이 됩니다.
+Neural network update는 GPU에서 병렬화하기 쉽습니다.
 
-Rudin et al.은 Isaac Gym을 사용해 이 loop를 GPU 중심으로 바꿉니다.
+하지만 physics, reward와 observation이 CPU에 있으면 매 step 또는 update마다 data가 CPU와 GPU 사이를 오갑니다.
 
 ```text
-GPU physics simulation
--> GPU reward / observation
+CPU:
+physics + reward + observation
+
+PCIe copy:
+observation -> GPU
+
+GPU:
+policy inference
+
+PCIe copy:
+action -> CPU
+```
+
+Environment 수가 커질수록 이 전송과 synchronization 비용도 커집니다.
+
+### **2.2 End-to-end GPU pipeline**
+
+Isaac Gym은 simulation state를 GPU tensor로 제공합니다.
+
+Rudin et al.의 pipeline은:
+
+```text
+GPU physics
+-> GPU state tensors
+-> GPU observation/reward
 -> GPU policy inference
 -> GPU rollout buffer
 -> GPU PPO update
 ```
 
-이 구조 덕분에 thousands of robots를 동시에 굴릴 수 있습니다.
+로 이어집니다.
 
-논문의 핵심 구성은 다음입니다.
+핵심은 “GPU simulator” 하나가 아니라 **data collection과 optimization 사이에 CPU round trip이 거의 없는 구조**입니다.
 
-| 구성 | 역할 |
-|---|---|
-| Isaac Gym / PhysX GPU simulation | thousands of robots를 single GPU에서 병렬 simulation |
-| PPO on GPU | rollout storage와 update를 GPU에서 처리 |
-| large parallel rollout | 짧은 시간에 많은 experience 수집 |
-| game-inspired curriculum | terrain difficulty를 policy performance에 맞게 조절 |
-| Sim2Real additions | randomization, noise, pushes, actuator network |
+### **2.3 하나의 simulation에 수천 개 robot을 넣는다**
 
-즉 이 논문은 "GPU를 쓰면 빠르다"가 아니라, on-policy RL 전체 pipeline을 massively parallel regime에 맞게 다시 조정한 논문입니다.
+각 robot마다 별도 process를 띄우는 CPU 방식과 달리, Isaac Gym은 하나의 simulation world에서 수천 actor를 vectorized tensor로 처리합니다.
 
-## **3. 핵심 아이디어의 이론적 원리**
-
-이 논문의 이론적 핵심은 on-policy RL에서 data collection과 policy update의 균형을 병렬 환경에 맞게 다시 잡는 것입니다.
-
-단순히 robot 수를 늘리면 좋은 것이 아닙니다.
-
-Robot 수, batch size, rollout horizon, GAE, timeout handling, terrain curriculum이 함께 맞아야 분 단위 학습이 가능합니다.
-
-### **3.1 On-policy RL의 병목은 data collection이다**
-
-PPO 같은 on-policy RL은 다음 두 단계를 반복합니다.
-
-```text
-collect rollout with current policy
--> update policy using collected rollout
-```
-
-수식으로 보면 objective는 다음과 같습니다.
+State shape는 개념적으로 다음과 같습니다.
 
 $$
-\max_{\pi}
-\mathbb{E}_{\tau \sim p(\tau|\pi)}
-\left[
-\sum_{t=0}^{T-1}
-\gamma^t r_t
-\right]
+\mathbf X_t
+\in
+\mathbb{R}^{N_{\text{env}}\times d_x}
 $$
 
-여기서 문제는 $\tau$를 모으는 데 시간이 많이 든다는 점입니다.
+$$
+\mathbf A_t
+=
+\pi_\theta(\mathbf X_t)
+\in
+\mathbb{R}^{N_{\text{env}}\times d_a}
+$$
 
-Legged locomotion에서는 한 step마다 다음 계산이 필요합니다.
+4096개 robot의 observation과 action이 Python loop가 아니라 batched tensor operation으로 계산됩니다.
 
-```text
-policy inference
-physics step
-contact handling
-reward computation
-observation computation
-reset handling
-```
+하지만 robot 수만 늘린다고 학습이 무조건 빨라지는 것은 아닙니다.
 
-Policy update는 GPU에서 병렬화하기 쉽습니다. 하지만 simulation과 reward/observation이 CPU에 있으면 data collection이 느려지고, GPU로 rollout data를 옮기는 비용도 커집니다.
+---
 
-그래서 논문은 data collection 자체를 GPU로 가져옵니다.
+## **3. On-policy Batch를 분해해서 보기**
 
-이것이 "end-to-end GPU pipeline"의 핵심입니다.
+### **3.1 Batch size는 두 축의 곱이다**
 
-### **3.2 Batch size는 robot 수와 rollout horizon의 곱이다**
+PPO는 현재 policy로 rollout을 모은 뒤 policy를 update합니다.
 
-Massively parallel PPO에서 batch size는 다음처럼 볼 수 있습니다.
+한 update의 batch size는:
 
 $$
 B
 =
-n_{\mathrm{robots}}
+N_{\text{robots}}
 \times
-n_{\mathrm{steps}}
+T_{\text{rollout}}
 $$
 
-$n_{\mathrm{robots}}$는 동시에 simulation하는 robot 수이고, $n_{\mathrm{steps}}$는 policy update 전에 각 robot이 걷는 step 수입니다.
+입니다.
 
-Robot 수를 크게 늘리면 짧은 시간에 많은 sample을 모을 수 있습니다.
+- $N_{\text{robots}}$: 동시에 굴리는 environment 수
+- $T_{\text{rollout}}$: update 전 robot 하나가 연속해서 걷는 step 수
 
-하지만 batch size를 고정한 상태에서 robot 수만 늘리면 각 robot의 rollout horizon이 짧아집니다.
+Final rough-terrain 설정은:
 
 $$
-n_{\mathrm{steps}}
+B
 =
-\frac{B}{n_{\mathrm{robots}}}
-$$
-
-이때 문제가 생깁니다.
-
-Legged locomotion은 single transition만으로 배우기 어렵습니다. Gait, balance, contact, fall recovery는 시간 흐름 속에서 reward를 봐야 합니다.
-
-논문은 너무 적은 consecutive steps를 주면 PPO가 좋은 policy로 수렴하지 못한다고 설명합니다. 특히 GAE는 여러 time step의 reward가 있어야 advantage estimate가 의미를 갖습니다.
-
-따라서 massively parallel regime에는 trade-off가 있습니다.
-
-| 너무 적은 robot | 너무 많은 robot |
-|---|---|
-| samples가 서로 비슷해져 diversity가 낮음 | robot당 horizon이 너무 짧아 temporal information 부족 |
-| wall-clock time이 길어짐 | GAE와 locomotion dynamics를 배우기 어려움 |
-
-논문은 이 trade-off를 실험했고, 2048-4096 robots와 약 100k-200k batch size가 좋은 균형이라고 봅니다.
-
-실제 deployment experiment에서는 4096 robots, batch size 98304를 사용해 1500 policy updates를 20분 이내에 학습합니다.
-
-### **3.3 Timeout과 failure termination은 다르게 처리해야 한다**
-
-대규모 병렬 환경에서는 reset이 자주 일어납니다.
-
-Reset은 크게 두 종류입니다.
-
-| Reset type | 의미 |
-|---|---|
-| failure termination | robot이 넘어지거나 base contact가 생김 |
-| time-out termination | episode max length에 도달했을 뿐 실패는 아님 |
-
-이 둘을 같은 terminal state로 처리하면 critic 학습이 왜곡됩니다.
-
-Failure termination은 실제로 future return이 낮아지는 terminal event입니다.
-
-하지만 time-out은 단순히 rollout을 잘라낸 것입니다. Observation에 episode time을 넣지 않았다면 policy는 time-out을 예측할 수도 없습니다.
-
-따라서 time-out에서는 value target을 0으로 끊으면 안 됩니다.
-
-Critic target을 단순화하면 다음처럼 볼 수 있습니다.
-
-Failure terminal이면:
-
-$$
-V_{\mathrm{target}}
+4096\times24
 =
+98,304
+$$
+
+입니다.
+
+### **3.2 Batch를 고정하고 robot 수를 늘리면 horizon이 줄어든다**
+
+$$
+T_{\text{rollout}}
+=
+\frac{B}{N_{\text{robots}}}
+$$
+
+예를 들어 $B=98,304$일 때:
+
+| Robots | Steps per robot |
+|---:|---:|
+| 128 | 768 |
+| 512 | 192 |
+| 2,048 | 48 |
+| 4,096 | 24 |
+| 8,192 | 12 |
+| 16,384 | 6 |
+
+Robot 수를 늘리면 같은 batch를 더 빨리 모을 수 있지만, 각 trajectory의 연속 구간은 짧아집니다.
+
+Legged locomotion에서는 contact sequence, gait cycle과 fall consequence가 시간에 걸쳐 나타납니다.
+
+GAE도 연속 reward를 사용합니다.
+
+$$
+\hat A_t^{\text{GAE}}
+=
+\sum_{l=0}^{T-t-1}
+(\gamma\lambda)^l
+\delta_{t+l}
+$$
+
+$$
+\delta_t
+=
+r_t
++
+\gamma V(s_{t+1})
+-
+V(s_t)
+$$
+
+Rollout이 지나치게 짧으면 advantage가 충분한 temporal structure를 담지 못하고 bootstrap 의존도가 커집니다.
+
+### **3.3 이 task의 practical threshold는 약 0.5초였다**
+
+Policy는 50 Hz입니다.
+
+$$
+\Delta t_{\text{policy}}
+=
+0.02\;\text{s}
+$$
+
+24 step은:
+
+$$
+24\times0.02
+=
+0.48\;\text{s}
+$$
+
+입니다.
+
+논문은 25 consecutive steps, 약 0.5초보다 짧아지면 학습이 어려워졌다고 설명합니다. Final config는 24 step이므로 25를 엄밀한 hard threshold라기보다 **약 0.5초 부근의 경험적 경계**로 읽는 것이 맞습니다.
+
+### **3.4 Rollout horizon과 episode length는 다르다**
+
+Final rollout은 24 step, 0.48초지만 episode는 최대 20초입니다.
+
+PPO update가 끝날 때 environment를 reset하지 않습니다.
+
+```text
+episode: 최대 20 s
+
+rollout 1: 0.48 s -> PPO update
+rollout 2: 다음 0.48 s -> PPO update
+rollout 3: 다음 0.48 s -> PPO update
+...
+```
+
+즉 하나의 episode가 여러 policy version과 update boundary를 가로지릅니다.
+
+이 구조 때문에 timeout 처리가 특히 중요해집니다.
+
+---
+
+## **4. Parallelism은 많을수록 좋은가**
+
+### **4.1 논문의 scaling experiment**
+
+저자들은 robot 수를 128에서 16,384까지 변화시키고 세 batch size를 비교했습니다.
+
+| Batch | Plot marker |
+|---:|---|
+| 49,152 | Circle |
+| 98,304 | Cross |
+| 196,608 | Triangle |
+
+별도의 high-quality baseline으로:
+
+$$
+20,000\;\text{robots}
+\times
+50\;\text{steps}
+=
+1,000,000
+$$
+
+sample batch도 실험했습니다.
+
+![Robot 수에 따른 final reward와 training time](/assets/img/posts/rl/sim2real/walk-minutes/04-parallelism-reward-time.png){: width="1300" .d-block .mx-auto }
+_왼쪽은 1,500 update 뒤 final reward, 오른쪽은 total training time이다. Robot 수가 늘면 학습 시간은 줄지만, 고정 batch에서 robot당 horizon이 너무 짧아지는 지점부터 final reward가 급격히 떨어진다. 점선은 20,000 robots와 1M batch의 고품질·고비용 baseline이다. 출처: [Rudin et al., Figure 4a-b](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+### **4.2 Robot이 너무 적을 때**
+
+Robot 수가 적으면 각 robot에서 긴 trajectory를 얻습니다.
+
+하지만 인접한 step은 서로 매우 비슷합니다.
+
+```text
+same robot
+s_t, s_{t+1}, s_{t+2}, ...
+-> 강한 temporal correlation
+-> 같은 batch 안의 sample diversity 감소
+```
+
+논문은 robot 수가 너무 적을 때 reward가 완만하게 떨어지는 이유를, sample이 IID 가정에서 더 멀어지는 현상으로 해석합니다.
+
+### **4.3 Robot이 너무 많을 때**
+
+Robot 수가 지나치게 많으면:
+
+- Robot당 consecutive horizon 감소
+- GAE의 temporal context 감소
+- Value bootstrap 비중 증가
+- Contact와 gait cycle의 장기 효과 포착 어려움
+
+으로 성능이 급격히 떨어집니다.
+
+### **4.4 Sweet spot**
+
+![Training time과 final reward의 trade-off](/assets/img/posts/rl/sim2real/walk-minutes/05-parallelism-tradeoff.png){: width="900" .d-block .mx-auto }
+_왼쪽 위가 높은 reward와 짧은 time을 동시에 만족하는 영역이다. 이 task에서는 약 2,048~4,096 robots와 100k~200k batch가 좋은 절충점이었다. 색은 robot 수, marker는 batch size다. 출처: [Rudin et al., Figure 4c](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+Throughput은 약 4,000 robot까지 거의 선형으로 좋아지지만 이후 증가폭이 둔화됩니다.
+
+논문의 결론은:
+
+> `num_envs`를 GPU memory가 허용하는 최대값으로 설정하는 것이 아니라, 최소한의 temporal horizon을 보존하면서 throughput과 sample diversity를 함께 최적화해야 한다.
+
+입니다.
+
+---
+
+## **5. Final PPO 설정**
+
+Supplementary가 공개한 hyperparameter는 다음과 같습니다.
+
+| 항목 | 값 |
+|---|---:|
+| Environments | 4,096 |
+| Steps per environment | 24 |
+| Batch size | 98,304 |
+| Mini-batch size | 24,576 |
+| Mini-batches per epoch | 4 |
+| Learning epochs | 5 |
+| PPO clip | 0.2 |
+| Entropy coefficient | 0.01 |
+| Discount $\gamma$ | 0.99 |
+| GAE $\lambda$ | 0.95 |
+| Desired KL | 0.01 |
+| Learning rate | KL 기반 adaptive |
+| Rough updates | 1,500 |
+| Flat updates | 공개 config 기준 300 |
+
+### **5.1 큰 mini-batch**
+
+Mini-batch 하나가 24,576 sample입니다.
+
+$$
+\frac{98,304}{4}
+=
+24,576
+$$
+
+일반적인 small-scale PPO보다 매우 큽니다.
+
+수천 environment에서 같은 시점에 얻은 sample은 trajectory source가 다양하므로 큰 mini-batch가 gradient variance를 낮추면서도 정보 중복을 과도하게 만들지 않았습니다.
+
+### **5.2 Adaptive learning rate**
+
+현재 policy와 update된 policy의 KL divergence를 측정합니다.
+
+$$
+D_{\mathrm{KL}}
+\left(
+\pi_{\text{new}}
+\parallel
+\pi_{\text{old}}
+\right)
+$$
+
+Target은:
+
+$$
+D_{\mathrm{KL}}^*=0.01
+$$
+
+입니다.
+
+Update가 너무 크면:
+
+$$
+D_{\mathrm{KL}}>2D_{\mathrm{KL}}^*
+\Rightarrow
+\alpha
+\leftarrow
+\max(10^{-5},\alpha/1.5)
+$$
+
+너무 작으면:
+
+$$
+D_{\mathrm{KL}}<0.5D_{\mathrm{KL}}^*
+\Rightarrow
+\alpha
+\leftarrow
+\min(10^{-2},1.5\alpha)
+$$
+
+로 learning rate를 조절합니다.
+
+Massive batch가 gradient noise를 줄인다고 해도 policy update magnitude를 자동으로 안전하게 제한해 주는 것은 아닙니다. KL 기반 schedule은 PPO clip과 별도로 update scale을 조절합니다.
+
+### **5.3 총 sample 수**
+
+Rough policy:
+
+$$
+98,304
+\times
+1,500
+=
+147,456,000
+$$
+
+transition입니다.
+
+Flat config를 300 update로 보면:
+
+$$
+98,304
+\times
+300
+=
+29,491,200
+$$
+
+transition입니다.
+
+“분 단위 학습”은 sample-efficient하다는 주장과 다릅니다.
+
+> 이 논문의 핵심은 같은 wall-clock 시간에 매우 많은 simulation sample을 처리하는 compute efficiency와 throughput이다.
+
+Sample efficiency를 평가하려면 transition 수 대비 성능을 별도로 비교해야 합니다.
+
+---
+
+## **6. Timeout은 Failure가 아니다**
+
+### **6.1 두 종류의 reset**
+
+| Reset | 의미 | Future return 처리 |
+|---|---|---|
+| Failure / crash | Base contact 등 실제 실패 | Terminal로 끊어도 됨 |
+| Time limit | 20초가 지나 episode를 관리상 reset | 다음 value를 bootstrap해야 함 |
+
+Episode time이 observation에 없으면 agent는 20초 timeout을 예측할 수 없습니다.
+
+Timeout 직전 state가 안정적인 보행 중이어도 value target을 0으로 만들면:
+
+$$
+\hat V_t
+\approx
 r_t
 $$
 
-Time-out이면 다음 state의 value를 bootstrap해야 합니다.
+가 되어 critic에게 “이 좋은 state 뒤에는 미래가 없다”는 잘못된 label을 줍니다.
+
+### **6.2 올바른 truncated transition**
+
+Time limit에서는:
 
 $$
-V_{\mathrm{target}}
+\hat V_t
 =
 r_t
 +
 \gamma V(s_{t+1})
 $$
 
-논문은 time-out bootstrapping이 critic loss를 줄이고 total reward를 약 10-20% 개선한다고 보고합니다.
+처럼 bootstrap해야 합니다.
 
-이 디테일은 작아 보이지만, 짧은 rollout horizon과 많은 reset이 있는 massively parallel training에서는 중요합니다.
+Implementation에서는 timeout indicator를 별도로 전달해 reward/return에 final state value를 더할 수 있습니다.
 
-### **3.4 Game-inspired curriculum은 terrain difficulty를 robot별로 조절한다**
+```python
+if timed_out:
+    reward += gamma * value(next_observation)
 
-Rough terrain 학습에서는 처음부터 너무 어려운 terrain을 주면 policy가 실패만 반복합니다.
-
-너무 쉬운 terrain만 주면 real rough terrain에서 깨집니다.
-
-논문은 game-inspired curriculum을 사용합니다.
-
-각 robot은 terrain type과 terrain level을 가집니다.
-
-Terrain type은 다음과 같습니다.
-
-| Terrain type | 예시 |
-|---|---|
-| flat | flat ground |
-| sloped | smooth / rough slope |
-| random rough | uneven surface |
-| discrete obstacles | randomized blocks |
-| stairs | up/down stairs |
-
-Terrain level은 같은 terrain type 안에서 difficulty를 나타냅니다.
-
-예를 들어 stairs와 obstacles는 step height가 5cm에서 20cm로 커지고, slope는 0도에서 25도까지 어려워집니다.
-
-Rule은 단순합니다.
-
-```text
-robot crosses terrain border
--> level up
-
-robot progresses less than half of target distance
--> level down
-
-robot solves highest level
--> loop back to random level for diversity
+if failed:
+    bootstrap_mask = 0
 ```
 
-이 방식은 6편의 adaptive terrain curriculum과 닮았지만, particle filter보다 단순하고 massively parallel setting에 잘 맞습니다.
+### **6.3 왜 massively parallel setting에서 더 중요했나**
 
-수천 개 robot이 동시에 여러 level에 퍼져 있으므로, 현재 policy가 어느 난이도까지 풀 수 있는지 자체가 curriculum distribution이 됩니다.
+Robot당 rollout은 0.48초이고 episode는 20초입니다.
 
-### **3.5 Terrain을 tiled mesh로 만들고 robot을 이동시킨다**
+각 batch에 서로 다른 episode age를 가진 4096개 robot이 섞여 있으므로, 어떤 update에서도 timeout transition이 들어올 수 있습니다.
 
-GPU에서 수천 robot을 하나의 simulation으로 굴리면 terrain 생성에도 제약이 생깁니다.
+“Timeout이 batch 마지막 step에서만 발생한다”는 가정을 사용할 수 없습니다.
 
-각 robot reset마다 terrain mesh를 새로 만들면 비쌉니다.
+![Timeout bootstrapping의 reward와 critic loss 효과](/assets/img/posts/rl/sim2real/walk-minutes/08-timeout-bootstrap.png){: width="1300" .d-block .mx-auto }
+_위쪽은 flat terrain, 아래쪽은 rough terrain이다. Timeout을 bootstrap하면 critic loss가 크게 낮아지고 total reward가 약 10~20% 높아진다. 학습 자체는 bootstrapping 없이도 가능했지만 final quality가 떨어졌다. 출처: [Rudin et al., Appendix Figure 9](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
 
-논문은 terrain type과 level을 하나의 큰 mesh에 tile처럼 깔아둡니다.
+이 결과는 작은 API detail이 learning objective를 실제로 바꿀 수 있음을 보여줍니다.
 
-그리고 robot의 terrain level을 바꿀 때 terrain을 regenerate하는 것이 아니라, robot을 해당 tile 위치로 이동시킵니다.
+Gym 환경을 구현할 때:
 
 ```text
-one large terrain mesh
--> tiles contain terrain type x level
--> robot level changes by moving robot to another tile
+terminated = task-defined terminal
+truncated  = time/resource limit
 ```
 
-이 구조는 curriculum을 거의 zero overhead로 구현하게 해줍니다.
+을 분리해야 하는 이유가 여기에 있습니다.
 
-또한 논문은 contact computation이 simulator time의 큰 부분을 차지한다고 보고, collision body를 feet, shanks, knees, base처럼 필요한 부분으로 줄이고, terrain representation도 throughput을 고려해 최적화합니다.
+---
 
-즉 빠른 학습은 알고리즘만의 문제가 아니라 environment 구현 문제이기도 합니다.
+## **7. Simulation Throughput은 Physics 구현 문제이기도 하다**
 
-### **3.6 Sim2Real additions는 빠른 학습 안에 같이 들어간다**
+### **7.1 실제 병목은 simulation과 contact**
 
-이 논문은 infrastructure 논문처럼 보이지만, real robot transfer를 위해 필요한 요소도 포함합니다.
+Supplementary의 timing 분석에서는:
 
-중요한 Sim2Real 요소는 다음입니다.
+1. Physics simulation
+2. Observation와 reward 계산
+3. Policy/actuator inference
 
-| 요소 | 역할 |
-|---|---|
-| friction randomization | foot-ground friction mismatch 대응 |
-| observation noise | state estimator / sensor noise 대응 |
-| random pushes | disturbance robustness |
-| actuator network | ANYmal series elastic actuator dynamics 반영 |
-| terrain curriculum | rough terrain robustness |
-| terrain height measurements | perceptive locomotion input |
+순으로 비용이 컸습니다.
 
-논문은 ground friction을 uniform range에서 randomize하고, robot에 random pushes를 줍니다. Push는 일정 시간마다 base velocity disturbance 형태로 들어갑니다.
+Policy와 actuator network inference는 batch size가 커져도 GPU에서 비교적 일정하게 유지됩니다.
 
-ANYmal의 series elastic actuator는 단순 PD model로 정확히 표현하기 어렵기 때문에, 이전 Hwangbo et al. 흐름처럼 actuator network를 사용합니다. 이 논문에서는 current measurement를 LSTM actuator model에 넣어 torque를 계산합니다.
+반면 contact가 많은 physics는 robot 수와 scene 상태에 따라 증가합니다.
 
-Action은 desired joint position입니다.
+![Environment step time, iteration time과 VRAM](/assets/img/posts/rl/sim2real/walk-minutes/09-throughput-vram.png){: width="1300" .d-block .mx-auto }
+_왼쪽 위는 environment step 구성별 시간, 오른쪽 위는 고정 batch의 learning iteration 시간이다. 아래는 flat/rough terrain의 VRAM 사용량이다. Robot 수 증가로 data collection은 빨라지지만 policy update 시간은 거의 고정되고, rough mesh와 rendering이 memory를 더 사용한다. 출처: [Rudin et al., Appendix Figures 7-8](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+### **7.2 Physics와 policy의 time scale**
+
+Policy는 50 Hz입니다.
 
 $$
-a_t
+\Delta t_{\text{policy}}
+=
+0.02\;\text{s}
+$$
+
+Simulation step은:
+
+$$
+\Delta t_{\text{sim}}
+=
+0.005\;\text{s}
+$$
+
+이고 action 하나당 네 번의 physics/actuator step을 수행합니다.
+
+$$
+\text{decimation}
+=
+\frac{0.02}{0.005}
+=
+4
+$$
+
+Time step을 더 작게 하면 안정성 여유는 생길 수 있지만 계산량이 선형으로 늘어납니다. 더 크게 하면 actuator network와 contact simulation 안정성이 깨질 수 있습니다.
+
+원문 부록에는 “0.005초보다 작은 step을 사용할 수 없다”는 문장이 있지만, 앞뒤 문맥은 throughput을 위해 step을 최대화하다 actuator model 안정성 한계에 도달했다는 설명입니다. 공개 설정도 `dt=0.005`, `decimation=4`입니다.
+
+재현에서는 문장 하나를 해석해 임의로 바꾸기보다 이 pair를 기준으로 확인하는 편이 안전합니다.
+
+### **7.3 Collision body를 줄인다**
+
+Contact detection은 비쌉니다.
+
+논문은 필요한 collision body만 남깁니다.
+
+- Feet
+- Shanks
+- Knees
+- Base
+
+Visual mesh의 모든 세부 부위에 collision을 붙이면 realism보다 계산 비용과 불안정성이 커질 수 있습니다.
+
+### **7.4 Height field를 triangle mesh로 바꾼 이유**
+
+Height field는 같은 $(x,y)$에 하나의 높이만 가질 수 있어 수직 벽을 표현하기 어렵습니다.
+
+계단 edge를 steep slope로 근사하려면 resolution을 높여야 하고 contact 비용이 커집니다.
+
+논문은 low-resolution height field를 triangle mesh로 변환한 뒤 vertical surface를 보정합니다.
+
+이 선택은:
+
+- Step geometry 유지
+- Terrain resolution 비용 감소
+- GPU contact throughput 확보
+
+를 함께 노립니다.
+
+### **7.5 Robot 배치도 성능에 영향을 준다**
+
+PhysX는 robot 간 collision response를 무시하도록 설정해도 potential contact pair를 detect할 수 있습니다.
+
+Robot을 너무 가깝게 두면 broad-phase contact 비용이 늘어납니다.
+
+Curriculum 초기에는 쉬운 level에 robot이 몰려 있고 넘어짐과 base contact도 많습니다. 학습이 진행되면 robot이 terrain 전체로 퍼지고 crash가 줄어 simulation time이 감소합니다.
+
+저자들은 training 초반과 후반 simulator time이 약 2배 차이 날 수 있다고 보고합니다.
+
+따라서 steps/s 하나만 기록할 때도:
+
+- 학습 초기인지 후기인지
+- Rendering이 켜져 있는지
+- Flat인지 rough mesh인지
+- Contact와 reset 빈도가 어떤지
+
+를 함께 기록해야 합니다.
+
+### **7.6 VRAM**
+
+4096 robot 기준 부록의 대략적인 값은 다음과 같습니다.
+
+| Terrain | Rendering | VRAM |
+|---|---|---:|
+| Rough | On | 약 9 GB |
+| Rough | Off | 약 6 GB |
+| Flat | On | 약 7 GB |
+| Flat | Off | 약 5 GB |
+
+이 값은 RTX A6000과 당시 Isaac Gym implementation 기준입니다. 다른 GPU, driver, framework와 terrain buffer에서는 달라질 수 있습니다.
+
+---
+
+## **8. Task: 단순히 앞으로 걷는 Policy가 아니다**
+
+Robot은 다음을 따라야 합니다.
+
+- Base heading command
+- Linear velocity command
+- Rough terrain traversal
+
+Training 중 randomized heading과 velocity command가 주어집니다.
+
+Main paper는 command가 episode 동안 고정된다고 설명합니다.
+
+Simulation traversability 평가는:
+
+$$
+v_x^{cmd}=0.75\;\text{m/s}
+$$
+
+$$
+v_y^{cmd}
+\sim
+\mathcal U(-0.1,0.1)\;\text{m/s}
+$$
+
+에서 수행됩니다.
+
+따라서 RMA 글의 forward-only policy와 달리 이 논문은 command-conditioned locomotion입니다.
+
+---
+
+## **9. Terrain과 Game-Inspired Curriculum**
+
+### **9.1 다섯 terrain family**
+
+![Rough, slope, stair와 discrete obstacle terrain](/assets/img/posts/rl/sim2real/walk-minutes/02-terrain-types.png){: width="1200" .d-block .mx-auto }
+_왼쪽 위부터 randomly rough terrain, 25도 slope, 20 cm stairs, 최대 ±20 cm discrete obstacles다. Flat terrain까지 포함해 다섯 family를 사용한다. 출처: [Rudin et al., Figure 2](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+| Terrain | Difficulty axis |
+|---|---|
+| Flat | 기준 |
+| Smooth / rough slope | $0^\circ$ → $25^\circ$ |
+| Random rough | Height variation |
+| Stairs up/down | 5 cm → 20 cm step |
+| Discrete obstacles | 5 cm → 20 cm magnitude |
+
+각 terrain tile은 8 m × 8 m입니다.
+
+Slope와 stairs는 pyramid 형태로 배치해 여러 방향으로 traversable하게 만듭니다.
+
+### **9.2 Robot마다 type과 level을 가진다**
+
+각 environment는:
+
+$$
+(\text{terrain type},\text{terrain level})
+$$
+
+을 가집니다.
+
+Rule은 간단합니다.
+
+```text
+terrain 경계를 넘어감
+-> level + 1
+
+목표 속도로 갔어야 할 거리의 절반도 못 감
+-> level - 1
+
+최고 level 해결
+-> random level로 loop
+```
+
+수식으로 쓰면 episode 동안 실제 이동 거리를 $d$, command 기준 기대 거리를 $d^*$라고 할 때:
+
+$$
+d
+<
+0.5d^*
+\Rightarrow
+\text{level down}
+$$
+
+최고 level에서 random level로 보내는 이유는 쉬운 terrain을 완전히 잊는 catastrophic forgetting을 줄이고 training distribution을 넓히기 위해서입니다.
+
+### **9.3 Terrain을 매번 다시 만들지 않는다**
+
+수천 개 environment마다 reset 시 mesh를 생성하면 병목이 됩니다.
+
+논문은 모든 terrain type과 level을 하나의 큰 tiled mesh에 미리 생성합니다.
+
+```text
+one global terrain mesh
+
+row    = difficulty level
+column = terrain type
+
+level update
+-> robot의 reset origin을 다른 tile로 이동
+```
+
+Geometry를 재생성하지 않으므로 curriculum update 비용이 거의 없습니다.
+
+### **9.4 500 update와 1000 update의 차이**
+
+![500·1000 update에서의 terrain curriculum 분포](/assets/img/posts/rl/sim2real/walk-minutes/03-curriculum-progress.png){: width="1250" .d-block .mx-auto }
+_위는 500 update, 아래는 1000 update다. 초기에는 slope와 내려가는 stairs에서 먼저 높은 level로 이동하고, 올라가는 stairs와 obstacle은 더 오래 걸린다. 1000 update에는 robot이 모든 terrain의 높은 level까지 넓게 퍼진다. 출처: [Rudin et al., Figure 3](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+Curriculum 자체가 performance visualization 역할도 합니다.
+
+- Easy row에 robot이 몰림: 해당 terrain을 아직 못 풂
+- High level까지 분포: 점차 어려운 terrain을 해결
+- Top에서 random loop로 전체 분산: 최고 level을 반복적으로 통과
+
+저자들은 1000 update에 모든 terrain의 최고 level에 도달했고, final convergence를 위해 1500 update까지 학습했습니다.
+
+---
+
+## **10. Observation, Action과 Control**
+
+### **10.1 논문이 설명한 observation**
+
+| Component | 의미 |
+|---|---|
+| Base linear velocity | Body-frame translational motion |
+| Base angular velocity | Roll/pitch/yaw rate |
+| Projected gravity | Body orientation을 yaw-independent하게 표현 |
+| Joint positions | 12 actuated joints |
+| Joint velocities | 12 actuated joints |
+| Previous action | Action smoothness와 short history |
+| Terrain heights | Base 주변 grid의 108 measurements |
+| Commands | Heading와 linear velocity target |
+
+Terrain measurement 하나는 terrain surface와 robot base 높이 사이의 거리입니다.
+
+이 policy는 blind policy가 아닙니다.
+
+### **10.2 Height samples는 elevation map에서 온다**
+
+Simulation에서는 ground-truth terrain에서 height를 query할 수 있습니다.
+
+Real robot에서는 LiDAR scan으로 만든 elevation map에서 같은 위치의 height를 query합니다.
+
+```text
+simulation:
+perfect terrain mesh -> sampled heights
+
+real:
+LiDAR -> state estimation -> elevation map -> sampled heights
+```
+
+이 interface가 Sim2Real의 중요한 gap이 됩니다.
+
+### **10.3 Action**
+
+Policy는 12개 desired joint position을 출력합니다.
+
+$$
+\mathbf a_t
 \equiv
-\hat{q}_t
+\mathbf q_t^*
+\in
+\mathbb{R}^{12}
 $$
 
-Motor torque는 low-level position control이나 actuator model을 통해 만들어집니다.
+PD controller 또는 learned actuator model이 torque를 만듭니다.
 
-이 흐름은 4편과 5편의 actuator modeling과 직접 연결됩니다.
+$$
+\boldsymbol\tau_t
+\approx
+f_{\text{act}}
+\left(
+\mathbf q_t^*,
+\mathbf q_t,
+\dot{\mathbf q}_t,
+h_t^{act}
+\right)
+$$
 
-### **3.7 Observation과 reward는 gait-specific prior 없이 구성된다**
+Policy action과 실제 motor torque를 구분해야 합니다.
 
-Policy observation에는 proprioceptive state와 terrain height measurement가 들어갑니다.
+### **10.4 Gait phase나 foot trajectory는 없다**
 
-논문은 terrain around base에서 108개 height measurement를 사용합니다.
+Reward와 action에:
 
-Action은 12개 joint의 desired position입니다.
+- Gait phase
+- Desired contact schedule
+- Predefined foot trajectory
+- Reference motion
 
-Reward는 velocity tracking과 안정성/효율성 항으로 구성됩니다.
+을 넣지 않습니다.
 
-| Reward / penalty | 의미 |
+그럼에도 ANYmal policy는 반복적으로 trot gait에 수렴했습니다.
+
+하지만 이것을 “trot이 수학적으로 최적임을 증명했다”고 해석하면 안 됩니다. Robot morphology, command distribution, reward와 action regularization이 만든 결과입니다.
+
+---
+
+## **11. Reward를 정확히 보기**
+
+Tracking kernel을 다음처럼 정의합니다.
+
+$$
+\phi(\mathbf x)
+=
+\exp
+\left(
+-
+\frac{\lVert\mathbf x\rVert^2}{0.25}
+\right)
+$$
+
+Supplementary의 아홉 term은 다음과 같습니다.
+
+| Reward term | Definition | Weight |
+|---|---|---:|
+| Linear velocity tracking | $\phi(\mathbf v^*_{b,xy}-\mathbf v_{b,xy})$ | $1\,dt$ |
+| Angular velocity tracking | $\phi(\omega^*_{b,z}-\omega_{b,z})$ | $0.5\,dt$ |
+| Vertical velocity | $-v_{b,z}^2$ | $4\,dt$ |
+| Roll/pitch angular velocity | $-\lVert\boldsymbol\omega_{b,xy}\rVert^2$ | $0.05\,dt$ |
+| Joint motion | $-\lVert\ddot{\mathbf q}\rVert^2-\lVert\dot{\mathbf q}\rVert^2$ | $0.001\,dt$ |
+| Joint torque | $-\lVert\boldsymbol\tau\rVert^2$ | $0.00002\,dt$ |
+| Action rate | $-\lVert\dot{\mathbf q}^*\rVert^2$ | $0.25\,dt$ |
+| Collision | $-n_{\text{collision}}$ | $0.001\,dt$ |
+| Feet air time | $\sum_f(t_{\text{air},f}-0.5)$ | $2\,dt$ |
+
+모든 scale에 $dt$를 곱하는 것은 control rate가 바뀌어도 초당 reward scale이 크게 달라지지 않게 하기 위한 방법입니다.
+
+### **11.1 Tracking은 exponential kernel**
+
+Squared error를 그대로 빼는 대신:
+
+$$
+r_v
+=
+\exp
+\left(
+-
+\frac{\lVert\mathbf v^*-\mathbf v\rVert^2}{0.25}
+\right)
+$$
+
+를 사용합니다.
+
+Error가 작을 때 높은 reward를 주고, 매우 큰 error에서는 0에 가까워져 gradient contribution이 포화됩니다.
+
+### **11.2 Feet air-time reward**
+
+발이 contact하기 전 air time이 0.5초보다 길면 양의 값을 줍니다.
+
+이 term은 짧고 잦은 foot shuffle보다 분명한 swing phase와 긴 step을 유도합니다.
+
+Reference gait는 아니지만 gait morphology에 영향을 주는 prior입니다.
+
+### **11.3 Collision과 crash**
+
+- Knee, shank contact
+- Foot가 vertical surface에 닿는 contact
+
+는 collision penalty를 받습니다.
+
+Base contact는 crash로 간주해 reset합니다.
+
+Stair를 오를 때 foot만 쓰도록 유도하면서 body가 obstacle에 기대는 simulator exploit을 줄입니다.
+
+### **11.4 빠른 학습이 reward engineering을 없애지는 않는다**
+
+저자들은 simple reward에서도 trot이 나오지만:
+
+- Leg dragging
+- 비정상적으로 높은 base
+- 비정상적으로 낮은 base
+
+같은 artifact가 발생했다고 설명합니다.
+
+Reward weight를 반복해서 조정한 뒤 실제 robot에 옮길 수 있는 policy를 얻었습니다.
+
+즉 빠른 pipeline의 가치는 reward 설계가 필요 없어지는 것이 아니라:
+
+> 잘못된 reward가 만든 behavior를 몇 시간 또는 며칠이 아니라 몇 분 단위로 확인하고 다시 실험할 수 있다는 것.
+
+입니다.
+
+---
+
+## **12. Sim2Real을 위한 네 가지 구성**
+
+### **12.1 Friction randomization**
+
+논문 설정:
+
+$$
+\mu
+\sim
+\mathcal U(0.5,1.25)
+$$
+
+각 robot은 서로 다른 foot-ground friction을 경험합니다.
+
+### **12.2 Observation noise**
+
+Supplementary의 uniform noise range는 다음과 같습니다.
+
+| Observation | Noise |
+|---|---:|
+| Joint position | $\pm0.01$ rad |
+| Joint velocity | $\pm1.5$ rad/s |
+| Base linear velocity | $\pm0.01$ m/s |
+| Base angular velocity | $\pm0.2$ rad/s |
+| Projected gravity | $\pm0.05$, 원문 표의 단위 표기는 불명확 |
+| Commands | 0 |
+| Terrain heights | $\pm0.1$ m |
+
+Command에는 noise를 넣지 않습니다. Command는 센서 측정치가 아니라 controller가 알고 있는 target이기 때문입니다.
+
+Terrain height noise $\pm0.1$ m는 상당히 큽니다. 완벽한 simulation height에 의존하는 것을 막지만, structured mapping error나 occlusion을 모두 재현하는 것은 아닙니다.
+
+### **12.3 Random push**
+
+논문은 10초마다 robot base의 x-y velocity를 최대 $\pm1$ m/s 범위로 바꿉니다.
+
+이는 force pulse를 정밀하게 적분한 model이라기보다 instantaneous velocity disturbance에 가깝습니다.
+
+넘어질 듯한 상태에서 recovery action을 학습하는 데 도움을 줍니다.
+
+### **12.4 LSTM actuator network**
+
+ANYmal의 series elastic actuator는 ideal PD와 다릅니다.
+
+논문은 Hwangbo et al.의 learned actuator model 흐름을 따르되:
+
+- 과거 fixed-step measurement를 concat한 feed-forward network 대신
+- Current measurement를 입력받는 LSTM
+
+을 사용합니다.
+
+LSTM hidden state가 actuator temporal dynamics를 보존합니다.
+
+Policy 자체에 actuator history를 추가하는 여러 방식도 시도했지만 final performance 향상을 찾지 못했다고 보고합니다.
+
+### **12.5 A1에서는 actuator model을 그대로 쓰지 않았다**
+
+Unitree A1 simulation으로 확장할 때는:
+
+- ANYdrive actuator model 제거
+- PD gain 감소
+- Torque penalty 감소
+- Default joint configuration 변경
+
+이 필요했습니다.
+
+따라서 “같은 config가 모든 robot에 그대로 적용됐다”는 설명은 틀립니다.
+
+---
+
+## **13. Simulation 결과**
+
+### **13.1 Traversability**
+
+![Stairs, obstacle와 slope 난이도별 success rate](/assets/img/posts/rl/sim2real/walk-minutes/06-traversability.png){: width="1300" .d-block .mx-auto }
+_왼쪽은 discrete obstacle와 stairs, 오른쪽은 slope의 success rate다. 평가는 0.75 m/s 전진 command와 [-0.1, 0.1] m/s lateral command에서 수행됐다. 출처: [Rudin et al., Figure 5](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+논문이 보고한 핵심은 다음과 같습니다.
+
+- 20 cm까지 stairs up/down은 거의 100% success
+- 20 cm는 training의 최대 stair height이자 ANYmal kinematic limit에 가까움
+- Discrete obstacle은 height가 커질수록 success가 점진적으로 감소
+- Neighbor cell이 +h와 -h이면 실제 step difference는 $2h$가 될 수 있음
+- 25도보다 큰 uphill은 거의 오르지 못함
+- Downhill은 더 큰 angle에서도 미끄러져 내려오는 방식으로 moderate success
+
+Success는 terrain을 건너면서 base contact가 발생하지 않는 것으로 정의합니다.
+
+따라서 foot slip, motion quality와 energy가 모두 성공률에 직접 반영되는 metric은 아닙니다.
+
+### **13.2 여러 morphology**
+
+![ANYmal C+arm, ANYmal B, A1과 Cassie](/assets/img/posts/rl/sim2real/walk-minutes/07-other-robots.png){: width="1200" .d-block .mx-auto }
+_왼쪽 위부터 20% 추가 무게의 arm을 단 ANYmal C, ANYmal B, Unitree A1, Cassie. 동일한 massively parallel pipeline의 적용 범위를 확인한 simulation 결과다. 출처: [Rudin et al., Figure 6](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)._
+
+| Robot | 변경 사항 |
 |---|---|
-| commanded velocity tracking | 명령 속도와 heading 추종 |
-| undesired velocity penalty | 옆/수직 방향 움직임 억제 |
-| torque penalty | actuator effort 감소 |
-| joint acceleration penalty | 거친 움직임 억제 |
-| action rate penalty | joint target 변화 부드럽게 |
-| collision penalty | shank/knee/base collision 억제 |
-| long step reward | 더 자연스러운 stepping 유도 |
+| ANYmal C + fixed arm | Reward와 PPO hyperparameter 변경 없이 재학습 |
+| ANYmal B | Reward와 PPO hyperparameter 변경 없이 재학습 |
+| Unitree A1 | Actuator model, PD gains, torque penalty와 default pose 변경 |
+| Cassie | Single-foot stance를 유도하는 reward 추가 |
 
-중요한 점은 reward나 action space에 특정 gait schedule을 넣지 않는다는 것입니다.
+여기서 generality는 **동일한 trained policy weight가 morphology 사이에 zero-shot transfer**됐다는 뜻이 아닙니다.
 
-논문은 gait-dependent element 없이도 policy가 trotting gait로 수렴한다고 설명합니다.
+각 robot을 simulation에서 다시 학습했습니다.
 
-하지만 동시에 artifact도 생길 수 있습니다. 예를 들어 dragging leg나 이상한 base height 같은 behavior가 나올 수 있고, reward tuning을 통해 이를 정리해야 합니다.
+입력, action, reward와 actuator interface의 일부도 robot에 맞게 수정했습니다.
 
-즉 빠른 training은 reward design의 중요성을 없애지 않습니다.
+---
 
-### **3.8 Parallelism은 무조건 많을수록 좋은 것이 아니다**
+## **14. 실제 ANYmal C 배포**
 
-이 논문에서 중요한 실험은 robot 수를 늘렸을 때 성능과 training time이 어떻게 바뀌는지입니다.
+![계단과 obstacle에서 실제 ANYmal C를 배포한 결과](/assets/img/posts/rl/sim2real/walk-minutes/10-real-deployment.png){: width="1250" .d-block .mx-auto }
+_20분 이내에 학습한 fixed policy를 실제 ANYmal C에 배포했다. 계단과 불규칙 obstacle을 동적으로 통과하지만, 논문은 이 실기 결과에 대해 terrain별 대규모 success-rate 표를 제공하지 않는다. 출처: [Rudin et al., Figure 7 and project media](https://leggedrobotics.github.io/legged_gym/)._
 
-직관적으로는 robot 수가 많을수록 좋을 것 같지만, 실제로는 upper limit이 있습니다.
-
-이유는 앞에서 본 것처럼 batch size와 rollout horizon의 trade-off 때문입니다.
-
-| 경우 | 결과 |
-|---|---|
-| robot 수가 너무 적음 | wall-clock time이 길고 sample diversity가 낮음 |
-| robot 수가 적당함 | throughput과 temporal information 균형 |
-| robot 수가 너무 많음 | robot당 consecutive steps가 너무 짧아 performance 하락 |
-
-논문은 rough terrain에서 16384 robots까지 실험하지만, 최종 실험에서는 4096 robots와 batch size 98304를 사용합니다.
-
-이 점은 실전적으로 중요합니다.
-
-Massively parallel RL은 "env 수를 최대한 크게"가 아니라, "policy update에 필요한 temporal structure를 보존하는 범위에서 크게"가 맞습니다.
-
-## **4. Sim2Real 관점에서의 해석**
-
-이 논문은 Sim2Real 자체의 technique이라기보다, Sim2Real workflow를 바꾸는 infrastructure 논문에 가깝습니다.
-
-앞선 논문들이 transfer mechanism을 다뤘다면, 이 논문은 그 mechanism들을 실험하고 조합하는 속도를 크게 올립니다.
-
-Sim2Real 관점에서 pipeline은 다음처럼 볼 수 있습니다.
+### **14.1 Deployment data flow**
 
 ```text
-massively parallel simulation
--> fast PPO training
--> terrain curriculum and randomization
--> quick policy iteration
--> real robot deployment
--> inspect failure modes
--> adjust reward / observation / randomization / curriculum
+robot sensors
+-> base/joint state
+
+LiDAR
+-> elevation map
+-> local terrain heights
+
+state + command + heights
+-> fixed policy
+-> desired joint positions
+-> real motors
 ```
 
-핵심은 빠른 학습이 검증을 대체하지 않는다는 점입니다.
+Real robot에서 policy weight를 fine-tune하지 않습니다.
 
-빠른 학습은 오히려 더 많은 검증을 가능하게 합니다.
+논문은 additional action filtering이나 constraint satisfaction check도 적용하지 않았다고 설명합니다. 이것은 해당 실험의 단순한 deployment path를 보여주는 것이지, 새로운 hardware에서 safety layer를 제거하라는 권고가 아닙니다.
 
-예를 들어 다음 실험을 빠르게 반복할 수 있습니다.
+### **14.2 Height map이 실제 bottleneck이었다**
 
-| 실험 축 | 확인할 것 |
+Simulation에서는 terrain height가 정확합니다.
+
+Real elevation map에는:
+
+- LiDAR occlusion
+- Sparse return
+- Mapping latency
+- State-estimation drift
+- Foot 주변 self-occlusion
+- Moving body와 map alignment error
+
+가 있습니다.
+
+논문은 이 gap 때문에 고속에서 robustness가 떨어졌다고 보고합니다.
+
+Hardware에서는 maximum linear velocity command를:
+
+$$
+v_{\max}^{real}
+=
+0.6\;\text{m/s}
+$$
+
+로 낮췄습니다.
+
+Simulation traversability test의 0.75 m/s보다 낮습니다.
+
+즉 “simulation policy를 아무 수정 없이 동일 운용 envelope로 실행했다”는 주장은 정확하지 않습니다. Weight는 고정했지만 command envelope는 실제 perception 품질에 맞게 보수적으로 조정했습니다.
+
+### **14.3 실기 evidence의 범위**
+
+논문과 video는:
+
+- Stair ascent/descent
+- Discrete obstacle traversal
+- Outdoor motion
+
+을 보여줍니다.
+
+그러나 각 terrain에서 수백 trial을 수행한 정량 benchmark는 아닙니다.
+
+이 논문의 main evidence는 최고 robustness가 아니라:
+
+> 분 단위로 학습된 perceptive policy가 실제 hardware에서 의미 있는 terrain locomotion을 수행했다.
+
+는 점입니다.
+
+---
+
+## **15. 논문과 공개 `legged_gym` 코드를 섞지 않기**
+
+Official code는 논문 구현을 이해하는 데 매우 유용합니다.
+
+하지만 paper prose와 최초 공개 commit `ae614c0`의 default config가 완전히 같지는 않습니다.
+
+| 항목 | Paper | Initial public code |
+|---|---|---|
+| Terrain height samples | 108 | 17×11 = 187 |
+| Total rough observation | 직접 명시 없음 | 235 |
+| Push interval | 10 s | 15 s |
+| Command duration | Episode 동안 고정 | 10 s마다 resample |
+| Base linear velocity noise | $\pm0.01$ m/s | Config scale 0.1, normalization과 함께 적용 |
+| Reward weights | Supplementary Table 2 | 일부 scale이 다름 |
+
+Public code의 235D observation은:
+
+$$
+3\;\text{linear velocity}
++
+3\;\text{angular velocity}
++
+3\;\text{gravity}
++
+3\;\text{commands}
++
+12\;\text{joint position}
++
+12\;\text{joint velocity}
++
+12\;\text{previous action}
++
+187\;\text{heights}
+=
+235
+$$
+
+입니다.
+
+### **15.1 이것이 의미하는 것**
+
+논문의 정량 claim을 설명할 때는 paper 값을 기준으로 해야 합니다.
+
+공개 code를 실행할 때는 해당 commit의 config가 실제 runtime truth입니다.
+
+```text
+paper reproduction claim
+-> paper/supplementary 값 사용
+
+official repo experiment
+-> commit hash + config dump 기록
+```
+
+“공식 코드니까 논문과 모든 숫자가 같을 것”이라고 가정하면 observation shape부터 달라집니다.
+
+### **15.2 지금은 Isaac Lab migration도 고려해야 한다**
+
+Official repository는 Isaac Gym에서 Isaac Sim / Isaac Lab으로 환경이 이전됐고, 기존 `legged_gym`은 제한적으로 유지된다고 안내합니다.
+
+새 실습에서는 선택지가 두 개입니다.
+
+| 목적 | 권장 기준 |
 |---|---|
-| reward weights | dragging leg, base height, foot clearance, torque artifact |
-| observation set | terrain height, velocity estimate, previous action 필요성 |
-| randomization range | real condition을 덮는지, 너무 넓어 보수적인지 |
-| curriculum | terrain이 너무 쉽거나 어려운지 |
-| actuator model | real actuator dynamics와 action response mismatch |
-| command distribution | real deployment에서 필요한 speed/turning range |
+| 논문 역사적 재현 | Isaac Gym Preview 3 + pinned `legged_gym` + `rsl_rl` v1.0.2 |
+| 현재 framework에서 연구 확장 | Isaac Lab locomotion task |
 
-즉 이 논문의 Sim2Real 메시지는 다음입니다.
+두 환경의 PhysX version, tensor API, contact behavior와 config default가 다를 수 있으므로 result를 직접 동일선상에서 비교하면 안 됩니다.
 
-> Sim2Real은 한 번에 맞히는 문제가 아니라, 빠르게 학습하고 빠르게 실패를 확인하며 gap을 줄이는 반복 과정이다.
+---
 
-## **5. 이 논문의 한계**
+## **16. 공개 코드에서 논문 아이디어 찾기**
 
-이 논문을 읽을 때 주의할 점도 있습니다.
+### **16.1 Observation**
 
-첫째, 빠른 training이 좋은 reward를 자동으로 만들어주지는 않습니다.
+```python
+self.obs_buf = torch.cat((
+    self.base_lin_vel,
+    self.base_ang_vel,
+    self.projected_gravity,
+    self.commands[:, :3],
+    self.dof_pos - self.default_dof_pos,
+    self.dof_vel,
+    self.actions,
+), dim=-1)
 
-논문도 reward tuning 후에야 dragging leg나 이상한 base height 같은 artifact를 줄일 수 있었다고 설명합니다.
+if self.cfg.terrain.measure_heights:
+    self.obs_buf = torch.cat((self.obs_buf, heights), dim=-1)
+```
 
-둘째, Isaac Gym physics와 real robot 사이의 gap은 여전히 존재합니다.
+논문의 deployable input이 tensor concatenation으로 그대로 나타납니다.
 
-GPU simulator가 빠르다고 해서 contact, actuator, terrain sensing이 현실과 완전히 같아지는 것은 아닙니다.
+### **16.2 Curriculum**
 
-셋째, terrain height map에 의존하는 perceptive policy는 map 품질에 영향을 받습니다.
+```python
+distance = norm(root_xy - terrain_origin_xy)
 
-논문은 real deployment에서 height map이 완벽하지 않아 high velocity에서 robustness가 감소했고, hardware에서는 maximum linear velocity command를 줄였다고 설명합니다.
+move_up = distance > terrain_length / 2
+move_down = (
+    distance
+    < norm(command_xy) * max_episode_length_s * 0.5
+) & ~move_up
 
-넷째, massively parallel regime은 PPO hyperparameter를 다시 생각해야 합니다.
+terrain_level += move_up - move_down
+```
 
-Batch size, number of steps, mini-batch size, timeout handling을 기존 small-scale PPO 방식 그대로 두면 좋은 성능이 나오지 않을 수 있습니다.
+Highest level을 넘으면 random level로 보냅니다.
 
-다섯째, simulation curve만 보고 real transfer를 판단하면 위험합니다.
+### **16.3 Control decimation**
 
-빠른 학습은 sim-only exploit도 빠르게 만들 수 있습니다. Real deployment나 sim-to-sim validation이 여전히 필요합니다.
+```python
+for _ in range(decimation):
+    torques = compute_torques(actions)
+    simulate()
+```
 
-그래도 이 논문의 가치는 큽니다.
+Config:
 
-> Legged Sim2Real에서 iteration speed 자체가 연구와 개발의 질을 바꿀 수 있다는 것을 보여준다.
+```python
+sim.dt = 0.005
+control.decimation = 4
+```
 
-## **6. 정리하며: 빠른 학습은 빠른 검증 루프를 만든다**
+이므로 policy rate는:
 
-이번 글에서는 Rudin et al.의 **Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning**을 정리했습니다.
+$$
+\frac{1}{0.005\times4}
+=
+50\;\text{Hz}
+$$
 
-- Isaac Gym을 사용해 thousands of robots를 single workstation GPU에서 병렬로 시뮬레이션합니다.
-- PPO pipeline 전체를 GPU 중심으로 구성해 data collection과 update를 빠르게 만듭니다.
-- Batch size는 $B = n_{\mathrm{robots}} n_{\mathrm{steps}}$이며, robot 수와 rollout horizon 사이에 trade-off가 있습니다.
-- Time-out termination은 failure termination과 다르게 bootstrap해야 critic 학습이 안정됩니다.
-- Game-inspired curriculum은 terrain type과 level을 robot별로 조절합니다.
-- Terrain을 tiled mesh로 구성하고 robot을 tile 사이로 이동시켜 curriculum overhead를 줄입니다.
-- Sim2Real을 위해 friction randomization, observation noise, random pushes, actuator network를 함께 사용합니다.
-- Flat terrain은 4분 이내, uneven terrain은 약 20분 안에 학습됩니다.
-- 빠른 학습은 검증을 대체하는 것이 아니라 reward, observation, randomization, curriculum을 더 자주 검증하게 해줍니다.
+입니다.
 
-8편의 핵심은 이렇게 정리할 수 있습니다.
+### **16.4 PPO runner**
 
-> Sim2Real에서 빠른 학습은 빠른 실패 분석과 빠른 수정으로 이어질 때 가장 강력하다.
+```python
+num_envs = 4096
+num_steps_per_env = 24
+max_iterations = 1500
 
-여기까지 오면 Sim2Real paper 흐름은 하나로 이어집니다.
+batch_size = 4096 * 24
+```
 
-Reality gap을 이해하고, visual/dynamics randomization을 배우고, actuator와 latency를 다루고, rough terrain과 online adaptation을 본 뒤, 마지막으로 Isaac Gym 계열의 빠른 반복 학습으로 연결됩니다.
+Paper의 핵심 scaling equation이 config level에서 직접 보입니다.
+
+---
+
+## **17. 재현할 때 기록해야 할 것**
+
+### **17.1 Hardware와 software**
+
+- GPU model과 VRAM
+- Driver와 CUDA
+- Isaac Gym 또는 Isaac Lab version
+- PhysX setting
+- PyTorch version
+- `legged_gym` commit
+- `rsl_rl` commit/tag
+- Headless/rendering 여부
+
+20분은 RTX A6000 기준 wall-clock 결과입니다.
+
+GPU가 다르면 단순하게 FLOPS 비율로 시간을 환산할 수 없습니다. Contact throughput과 memory bandwidth, kernel occupancy가 함께 영향을 줍니다.
+
+### **17.2 Training throughput**
+
+- Environment steps/s
+- Policy transitions/s
+- Seconds per PPO iteration
+- Physics / observation / inference / update breakdown
+- 초기와 후기 throughput
+- Reset/contact rate
+
+### **17.3 Learning**
+
+- `num_envs`
+- `num_steps_per_env`
+- Batch와 mini-batch
+- PPO epochs
+- KL와 adaptive learning rate
+- Critic loss
+- Timeout bootstrap 적용 여부
+- Terrain level distribution
+
+### **17.4 Sim2Real**
+
+- Friction와 mass randomization
+- Observation noise 단위
+- Push mechanism과 interval
+- Actuator model input/output
+- Control dt와 latency
+- Height map source와 update rate
+- Real command limit
+
+학습 시간만 재현하고 real deployment interface가 다르면 이 논문의 전체 claim을 재현한 것이 아닙니다.
+
+---
+
+## **18. 많이 하는 오해**
+
+### **오해 1: 4096개를 쓰면 언제나 4096배 빠르다**
+
+아닙니다.
+
+약 4000개 이후 throughput scaling이 둔화되고, 고정 batch에서는 horizon이 너무 짧아져 policy quality가 떨어집니다.
+
+### **오해 2: 20분밖에 data를 안 썼다**
+
+Wall-clock이 20분 미만인 것이고 simulation transition은 약 147 million개입니다.
+
+### **오해 3: 24 step episode다**
+
+24 step은 PPO rollout horizon입니다. Episode는 최대 20초이며 여러 update를 가로지릅니다.
+
+### **오해 4: Timeout도 done이므로 value를 0으로 둔다**
+
+Time-limit truncation은 task terminal이 아닙니다. Bootstrap을 하지 않으면 critic target이 왜곡됩니다.
+
+### **오해 5: Terrain curriculum은 새 mesh를 계속 생성한다**
+
+하나의 tiled mesh에서 robot reset 위치를 다른 level tile로 옮깁니다.
+
+### **오해 6: 같은 policy가 ANYmal, A1, Cassie에 transfer됐다**
+
+각 morphology별로 다시 학습했고 A1과 Cassie에는 설정 변경도 필요했습니다.
+
+### **오해 7: 빠르게 학습했으니 Sim2Real gap도 작다**
+
+실제 height map error 때문에 command velocity를 0.6 m/s로 낮췄습니다. Simulator 속도와 model fidelity는 별개의 축입니다.
+
+---
+
+## **19. 이 논문의 한계**
+
+### **19.1 Sample efficiency보다 compute throughput**
+
+147 million transition을 사용하는 방식은 simulation이 매우 빠를 때 강합니다.
+
+Expensive rendering, deformable physics, fluid simulation이나 real-world data collection처럼 sample 하나가 비싼 task에서는 같은 전략이 그대로 적용되지 않습니다.
+
+### **19.2 On-policy scaling의 한계**
+
+PPO는 rollout policy와 update policy가 가까워야 합니다.
+
+Robot 수를 늘려도 batch를 무한히 키우면 stale data와 update 비용이 늘고, batch를 고정하면 horizon이 줄어듭니다.
+
+### **19.3 Perception gap**
+
+Ground-truth simulation heights와 LiDAR elevation map은 품질이 다릅니다.
+
+Uniform height noise만으로:
+
+- Occlusion
+- Map hole
+- Moving-object artifact
+- Pose drift
+- Temporal delay
+
+를 모두 모델링할 수 없습니다.
+
+### **19.4 Real experiment의 정량성**
+
+Simulation에는 terrain difficulty별 curve가 있지만 real deployment는 주로 qualitative figure와 video입니다.
+
+“20분 policy가 실제로 동작한다”는 증거는 강하지만, 최고 robustness 비교나 failure probability를 정밀하게 판단하기에는 부족합니다.
+
+### **19.5 Safety**
+
+논문은 실제 배포에서 additional filtering과 constraint satisfaction을 사용하지 않았다고 설명합니다.
+
+새 robot에서 이를 그대로 따르는 것은 안전한 재현 절차가 아닙니다.
+
+필요한 항목은:
+
+- Joint target clamp
+- Torque/velocity limit
+- Action-rate limit
+- Tilt/base-contact termination
+- Watchdog
+- Low-speed command envelope
+- Manual emergency stop
+
+입니다.
+
+### **19.6 빠른 iteration은 overfitting도 빠르게 만든다**
+
+Reward와 terrain을 자주 바꿀 수 있다는 것은 좋지만, 같은 simulation benchmark에 반복 최적화하면 simulator artifact에 더 빨리 overfit할 수도 있습니다.
+
+Holdout terrain, 다른 physics setting과 real test를 분리해야 합니다.
+
+---
+
+## **20. 앞선 Sim2Real 논문과 연결하기**
+
+| Paper 흐름 | 이 논문에서의 역할 |
+|---|---|
+| Noise and Reality Gap | Observation noise와 perception mismatch |
+| Domain Randomization | Friction, mass와 disturbance variation |
+| Dynamics Randomization | 여러 physical context에서 policy robustness |
+| Agile Locomotion | Actuator dynamics와 latency-aware transfer |
+| Agile Motor Skills | Learned actuator model과 high-performance control |
+| Challenging Terrain | Terrain curriculum과 proprioceptive/perceptive locomotion |
+| RMA | Runtime environment adaptation |
+| Learning in Minutes | 이 구성들을 빠르게 반복하는 GPU training infrastructure |
+
+마지막 논문은 앞선 방법을 대체하지 않습니다.
+
+오히려:
+
+```text
+reward
+observation
+randomization
+actuator model
+terrain curriculum
+policy architecture
+```
+
+를 여러 번 바꿔 학습해야 하는 Sim2Real 연구에서 iteration cost를 줄입니다.
+
+---
+
+## **21. 실전에서 가져갈 설계 원칙**
+
+### **원칙 1: `num_envs`보다 `num_envs × horizon`을 본다**
+
+Environment 수만 보고 scaling을 판단하지 않습니다.
+
+### **원칙 2: Episode boundary와 rollout boundary를 분리한다**
+
+PPO update마다 environment를 reset할 필요가 없습니다.
+
+### **원칙 3: `terminated`와 `truncated`를 분리한다**
+
+Timeout은 value bootstrapping이 필요합니다.
+
+### **원칙 4: Physics throughput을 profile한다**
+
+Policy inference보다 contact, terrain과 reset이 병목일 수 있습니다.
+
+### **원칙 5: Curriculum state를 distribution으로 본다**
+
+수천 robot의 terrain level 분포 자체가 policy capability의 online summary입니다.
+
+### **원칙 6: 빠른 training과 real robustness를 혼동하지 않는다**
+
+분 단위 학습은 빠른 검증 loop를 만들 뿐, hardware validation을 없애지 않습니다.
+
+### **원칙 7: Paper와 code의 버전을 함께 기록한다**
+
+Observation shape와 push interval부터 다를 수 있습니다.
+
+---
+
+## **22. 재현 Checklist**
+
+### **GPU Pipeline**
+
+- [ ] Physics state tensor가 GPU에 유지되는가?
+- [ ] Reward와 observation이 vectorized GPU operation인가?
+- [ ] Action/observation의 CPU round trip이 없는가?
+- [ ] Rendering을 끈 throughput도 별도로 측정했는가?
+
+### **PPO**
+
+- [ ] $B=N_{\text{env}}\times T_{\text{rollout}}$를 확인했는가?
+- [ ] Robot당 horizon이 약 0.5초를 유지하는가?
+- [ ] Batch 98,304와 mini-batch 24,576의 shape가 맞는가?
+- [ ] 5 epochs, clip 0.2, entropy 0.01인가?
+- [ ] KL target 0.01 기반 adaptive learning rate인가?
+
+### **Reset**
+
+- [ ] Crash와 timeout signal이 분리되어 있는가?
+- [ ] Timeout transition에서 value bootstrap을 하는가?
+- [ ] PPO update가 끝났다고 environment를 reset하지 않는가?
+
+### **Terrain**
+
+- [ ] 8 m tile과 terrain type/level mapping이 맞는가?
+- [ ] Level-up/down 거리 기준이 맞는가?
+- [ ] 최고 level에서 random level로 loop하는가?
+- [ ] Triangle mesh의 vertical surface가 올바른가?
+
+### **Control**
+
+- [ ] Simulation 0.005 s, decimation 4, policy 50 Hz인가?
+- [ ] Action이 desired joint position인가?
+- [ ] Actuator network state가 reset 때 함께 reset되는가?
+- [ ] Robot별 PD gain과 torque limit이 맞는가?
+
+### **Sim2Real**
+
+- [ ] Noise의 단위와 normalization 순서를 확인했는가?
+- [ ] Friction와 mass randomization 범위가 기록됐는가?
+- [ ] Push가 force인지 velocity overwrite인지 구분했는가?
+- [ ] Height map latency와 missing data를 검증했는가?
+- [ ] Real command envelope를 simulation과 별도로 기록했는가?
+
+---
+
+## **23. 정리: 빠른 Simulator가 아니라 빠른 연구 Loop**
+
+이 논문의 핵심 equation은 단순합니다.
+
+$$
+B
+=
+N_{\text{robots}}
+\times
+T_{\text{rollout}}
+$$
+
+하지만 이 식을 실제 4096-environment locomotion에 적용하려면 다음이 모두 필요했습니다.
+
+- Physics, reward, observation, inference와 PPO를 GPU에 유지
+- 약 0.5초의 per-robot horizon 보존
+- 98,304 sample batch와 큰 mini-batch
+- Timeout value bootstrapping
+- 하나의 tiled terrain mesh
+- Robot별 game-inspired curriculum
+- Contact body와 terrain representation 최적화
+- Friction/noise/push randomization
+- LSTM actuator network
+- LiDAR elevation-map 기반 real interface
+
+대표 rough-terrain policy는:
+
+$$
+4096
+\times
+24
+\times
+1500
+=
+147,456,000
+$$
+
+transition을 RTX A6000 한 장에서 20분 이내에 처리했습니다.
+
+Simulation에서는 20 cm stairs를 거의 완벽하게 통과했고, 실제 ANYmal C에서도 stairs와 obstacle traversal을 보였습니다.
+
+그러나 real elevation map 오차 때문에 maximum command를 0.6 m/s로 낮췄고, 실기 정량 benchmark는 제한적이었습니다.
+
+따라서 가장 정확한 결론은 다음입니다.
+
+> Massively parallel RL은 학습에 필요한 simulation experience를 없애는 방법이 아니라, 충분한 trajectory horizon과 올바른 RL semantics를 유지하면서 그 경험을 매우 짧은 wall-clock time에 수집·최적화하는 시스템 설계다.
+
+그리고 Sim2Real 관점에서 더 중요한 메시지는:
+
+> 빠른 학습의 진짜 가치는 한 번에 정답 policy를 얻는 것이 아니라, reward·observation·randomization·perception interface를 실제 robot 결과와 대조하며 더 자주 수정할 수 있게 만드는 데 있다.
+
+이 글로 8편의 Sim2Real paper 흐름은:
+
+```text
+reality gap
+-> randomization
+-> actuator/dynamics modeling
+-> rough-terrain perception
+-> online adaptation
+-> massively parallel iteration
+```
+
+으로 연결됩니다.
+
+---
+
+## **참고 자료**
+
+- [Rudin et al., Learning to Walk in Minutes Using Massively Parallel Deep Reinforcement Learning](https://proceedings.mlr.press/v164/rudin22a.html)
+- [PMLR paper PDF](https://proceedings.mlr.press/v164/rudin22a/rudin22a.pdf)
+- [arXiv:2109.11978](https://arxiv.org/abs/2109.11978)
+- [Official project and video](https://leggedrobotics.github.io/legged_gym/)
+- [Official legged_gym repository](https://github.com/leggedrobotics/legged_gym)
+- [Initial public code commit ae614c0](https://github.com/leggedrobotics/legged_gym/tree/ae614c029977157123225f538ecdd3f873e54bd4)
+- [Isaac Lab locomotion migration guide](https://isaac-sim.github.io/IsaacLab/main/source/migration/migrating_from_isaacgymenvs.html)
