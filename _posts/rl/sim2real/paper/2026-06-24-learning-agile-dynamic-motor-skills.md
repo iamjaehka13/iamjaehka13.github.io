@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 5] Agile and Dynamic Motor Skills"
 date: 2026-06-24 17:33:00 +0900
-last_modified_at: 2026-07-27 20:42:00 +0900
+last_modified_at: 2026-07-27 21:20:57 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, legged-robots, anymal, actuator-network, hybrid-simulator, trpo, system-identification, dynamics-randomization]
 description: Hwangbo et al.의 ANYmal Sim2Real을 hybrid simulator, actuator network, stochastic rigid-body model, TRPO policy, 정량 실기체 결과와 ablation까지 원문 기준으로 정리한다.
@@ -13,23 +13,21 @@ image:
 
 ## **0. 전체 그림: Actuator를 대충 모델링하면 왜 걷지도 못할까**
 
+이전 글: [Learning Agile Locomotion: Minitaur의 actuator model과 dynamics randomization](/posts/learning-agile-locomotion-quadruped-robots/)
+
 앞선 Tan et al.의 Minitaur 논문은 actuator response와 control latency를 simulator에 넣고, 남은 차이를 dynamics randomization으로 덮었습니다.
 
 Hwangbo et al.의 **Learning agile and dynamic motor skills for legged robots**는 이 문제를 32 kg급 quadruped인 ANYmal에서 더 깊게 파고듭니다.
 
 ANYmal의 12개 joint는 **Series Elastic Actuator, SEA**로 구동됩니다. Policy가 joint position target 하나를 내도 실제 joint torque가 만들어지기까지 다음 과정이 이어집니다.
 
-```text
-position target
-    ↓ joint-level PD
-desired torque
-    ↓ current PID
-desired motor current
-    ↓ field-oriented control
-phase voltage
-    ↓ motor + transmission + elastic element
-measured joint torque
-```
+| 단계 | 입력에서 출력으로 | Reality gap의 원인 |
+|---|---|---|
+| Policy | Observation $\rightarrow$ position target | Observation noise, policy extrapolation |
+| Joint-level PD | Position error $\rightarrow$ desired torque | Gain, sampling, delay |
+| Current controller | Desired torque $\rightarrow$ desired motor current | Internal controller state, bandwidth |
+| Field-oriented control | Current command $\rightarrow$ phase voltage | Electrical dynamics |
+| Physical actuator | Voltage $\rightarrow$ measured joint torque | Motor, transmission, friction, elastic element |
 
 여기에 communication delay, sensor filtering, controller 내부 상태, nonlinear friction과 actuator bandwidth까지 들어갑니다. 이 전체를 손으로 정확히 식별하기는 어렵습니다.
 
@@ -48,6 +46,13 @@ _CAD 기반 stochastic rigid-body model을 만들고, 실제 actuator data로 ac
 즉 이 논문의 주장은 **neural network가 physics를 대체한다**가 아닙니다.
 
 > 잘 아는 dynamics는 physics로 남기고, 현실적으로 식별하기 어려운 subsystem만 data-driven model로 바꾸면 빠르면서도 충분히 현실적인 simulator를 만들 수 있다.
+
+이 글을 읽을 때 먼저 구분할 네 가지는 다음과 같습니다.
+
+1. **전체 physics를 학습한 것이 아니다.** Rigid body와 contact는 analytical simulator가, command-to-torque subsystem만 actuator net이 담당합니다.
+2. **Real data를 쓰지 않은 것이 아니다.** 4분 미만의 actuator data가 simulator identification에 들어가고, policy trial-and-error만 simulation에서 수행됩니다.
+3. **Torque prediction graph만 좋아진 것이 아니다.** Actuator model만 교체한 real-robot ablation에서 transfer 성공 여부가 갈렸습니다.
+4. **하나의 universal controller가 아니다.** Locomotion, high speed, recovery는 pipeline을 공유하지만 각각 별도 policy입니다.
 
 ---
 
@@ -69,13 +74,10 @@ _CAD 기반 stochastic rigid-body model을 만들고, 실제 actuator data로 ac
 
 이 논문은 세 가지 서로 다른 task를 보여주지만, 하나의 policy가 세 가지를 모두 수행하는 것은 아닙니다.
 
-```text
-공통:
-hybrid simulator + observation/action 설계 + TRPO training pipeline
-
-서로 다름:
-reward + command distribution + initial-state distribution + trained policy weights
-```
+| 구분 | 세 task의 구성 |
+|---|---|
+| 공통 | Hybrid simulator, observation/action 설계, TRPO training pipeline |
+| task별로 다름 | Reward, command distribution, initial-state distribution, trained policy weights |
 
 따라서 이 논문의 기여는 universal controller보다 **여러 동적 skill을 실제 robot으로 옮길 수 있는 reusable training pipeline**에 가깝습니다.
 
@@ -121,15 +123,12 @@ _Policy net은 observation과 joint-state history에서 position target을 만�
 
 그림의 한 cycle을 순서대로 읽으면 다음과 같습니다.
 
-```text
-1. rigid-body simulator가 q, u를 계산
-2. joint velocity와 position error를 history buffer에 저장
-3. policy가 body state, history, 이전 action, command를 읽음
-4. policy가 12개 joint position target을 출력
-5. actuator net이 각 joint torque를 예측
-6. 예측 torque를 rigid-body simulator에 적용
-7. 다음 state로 진행
-```
+1. Rigid-body simulator가 generalized coordinate $q$와 velocity $u$를 계산합니다.
+2. Joint velocity와 position error를 history buffer에 저장합니다.
+3. Policy가 body state, history, previous action과 command를 읽습니다.
+4. Policy가 12개 joint position target을 출력합니다.
+5. Actuator net이 각 joint torque를 예측합니다.
+6. 예측 torque를 rigid-body simulator에 적용해 다음 state를 만듭니다.
 
 Actuator net은 deploy되는 policy 내부 module이 아닙니다. **Policy를 학습할 때만 simulator 내부에서 real actuator response를 흉내 내는 model**입니다.
 
@@ -152,16 +151,11 @@ Hybrid simulator 실행 시간의 약 절반은 actuator nets 평가에 사용�
 
 여기서 중요한 trade-off는 다음입니다.
 
-```text
-너무 단순한 simulator
--> 빠르지만 transfer 실패
-
-너무 복잡한 simulator
--> 현실적일 수 있지만 RL sample 생성이 느림
-
-hybrid simulator
--> tractable physics + small learned subsystem model
-```
+| Simulator 설계 | 장점 | 실패 지점 |
+|---|---|---|
+| 지나치게 단순한 model | 빠른 sample 생성 | Actuator delay와 bandwidth mismatch로 transfer 실패 가능 |
+| 지나치게 복잡한 model | 높은 nominal fidelity 가능 | RL에 필요한 수억 transition 생성이 느림 |
+| Hybrid simulator | Tractable physics와 작은 learned subsystem 결합 | Real actuator 계측과 model coverage가 필요 |
 
 ---
 
@@ -307,13 +301,11 @@ Data collection controller는 sine-wave foot trajectory를 만들고 inverse kin
 
 각 actuator network는 다음 구조입니다.
 
-```text
-input: velocity history + position-error history
-hidden: 32 softsign
-hidden: 32 softsign
-hidden: 32 softsign
-output: predicted joint torque
-```
+| Layer | 구성 |
+|---|---|
+| Input | Current, 10 ms, 20 ms 전 velocity와 position-error history |
+| Hidden 1-3 | 각 32 units, softsign |
+| Output | Predicted joint torque |
 
 12개 joint를 모두 평가하는 데 걸린 시간은 activation에 따라 다음과 같았습니다.
 
@@ -502,12 +494,12 @@ $$
 
 Policy는 두 hidden layer MLP입니다.
 
-```text
-observation
--> 256 tanh
--> 128 tanh
--> 12 joint position targets
-```
+| Layer | 구성 |
+|---|---|
+| Input | Current observation, joint-state history, previous action, command |
+| Hidden 1 | 256 units, tanh |
+| Hidden 2 | 128 units, tanh |
+| Output | 12 joint position targets |
 
 Simulation 성능이 비슷해도 ReLU policy와 tanh policy의 real 성능은 크게 달랐습니다.
 
@@ -544,13 +536,10 @@ $k_c$는 점차 1에 가까워집니다.
 - Velocity objective, recovery orientation objective: curriculum scaling을 적용하지 않음
 - Torque, joint-speed, slip, smoothness 등 constraint cost: $k_c$를 곱함
 
-```text
-초기:
-일단 command를 따라 움직이거나 몸을 뒤집는 방법을 찾음
-
-후기:
-같은 objective를 유지하면서 torque, slip, impact, joint speed를 줄임
-```
+| 학습 단계 | Objective와 constraint의 관계 |
+|---|---|
+| 초기 | Command를 따라 움직이거나 몸을 뒤집는 task objective를 먼저 찾음 |
+| 후기 | 같은 objective를 유지하면서 torque, slip, impact와 joint speed cost를 강화 |
 
 이 curriculum은 sample difficulty를 바꾸는 방식이 아니라 **cost landscape를 바꾸는 curriculum**입니다.
 
@@ -586,12 +575,10 @@ Fall recovery는 upright locomotion과 초기 state가 완전히 다릅니다.
 
 Naive하게 random pose를 만들면 link가 서로 관통하거나 물리적으로 불가능한 contact가 생길 수 있습니다. 저자들은 다음 절차로 valid fallen state를 만들었습니다.
 
-```text
-1. ANYmal을 1.0 m 높이에 둠
-2. Base orientation과 joint position을 randomize
-3. 1.2 s 동안 떨어뜨리고 충돌시킴
-4. 안정된 resulting state를 recovery episode 초기값으로 사용
-```
+1. ANYmal을 1.0 m 높이에 둡니다.
+2. Base orientation과 joint position을 randomize합니다.
+3. 1.2초 동안 떨어뜨려 contact dynamics를 실제로 진행합니다.
+4. 충돌 후 얻은 valid state를 recovery episode의 초기값으로 사용합니다.
 
 ![Recovery policy를 위한 sampled initial states](/assets/img/posts/rl/sim2real/agile-motor-skills/09-recovery-initial-states.png){: width="1100" .d-block .mx-auto }
 _Robot을 random pose로 떨어뜨려 얻은 recovery training initial states. 단순 pose sampling보다 실제 contact dynamics를 거친 state를 사용한다. 출처: [Hwangbo et al., Figure S3](https://arxiv.org/pdf/1901.08652)._
@@ -781,14 +768,13 @@ Recovery network는 100 Hz에서도 single CPU core 계산량의 약 0.25%만 �
 
 정확한 data flow는 다음과 같습니다.
 
-```text
-real robot actuator excitation
--> actuator-model supervised data
--> learned actuator net
--> hybrid simulator
--> policy RL training in simulation
--> policy direct deployment
-```
+| 단계 | 사용되는 data 또는 model |
+|---|---|
+| 1. Real actuator excitation | Command, joint state, measured torque를 수집 |
+| 2. Supervised actuator modeling | History에서 torque를 예측하는 actuator net 학습 |
+| 3. Hybrid simulation | Learned actuator net과 stochastic rigid-body model 결합 |
+| 4. Policy optimization | Hybrid simulator 안에서만 TRPO rollout 수행 |
+| 5. Direct deployment | Actuator net 없이 policy만 real ANYmal에 배포 |
 
 Policy optimization에는 real rollout reward가 들어가지 않았지만, simulator calibration에는 real actuator data가 들어갔습니다.
 
@@ -834,16 +820,11 @@ ANYmal SEA에서는 actuator/software stack이 더 복잡했습니다. 그래서
 
 세 논문은 서로 대체 관계가 아닙니다.
 
-```text
-system identification
--> nominal model의 중심을 현실에 맞춤
-
-learned actuator model
--> 손으로 쓰기 어려운 systematic subsystem gap을 줄임
-
-domain randomization
--> 남은 uncertainty를 견디게 함
-```
+| 도구 | 서로 다른 역할 |
+|---|---|
+| System identification | Nominal model의 중심을 현실에 맞춤 |
+| Learned actuator model | 손으로 쓰기 어려운 systematic subsystem gap을 줄임 |
+| Domain randomization | Identification 뒤에 남은 uncertainty를 견디게 함 |
 
 실제 Sim2Real pipeline에서는 세 가지를 함께 쓰는 경우가 많습니다.
 
@@ -924,15 +905,12 @@ Recovery policy가 simulation에서 body-impact cost를 줄였다고 해서 real
 
 ### **Step 1. Action-to-torque chain을 계측한다**
 
-```text
-timestamp
-desired position / torque
-measured joint position
-measured joint velocity
-measured torque or current
-battery voltage
-actuator temperature
-```
+- Timestamp
+- Desired position 또는 torque
+- Measured joint position과 velocity
+- Measured torque 또는 current
+- Battery voltage
+- Actuator temperature
 
 Timestamp alignment과 unit부터 검증합니다.
 
@@ -957,12 +935,12 @@ RMS 하나만 보지 말고 다음을 확인합니다.
 
 ### **Step 5. Simulator ablation을 먼저 통과한다**
 
-```text
-ideal actuator
-analytical actuator
-learned actuator
-learned actuator + randomization
-```
+| Ablation | 확인하려는 질문 |
+|---|---|
+| Ideal actuator | Delay와 bandwidth를 무시해도 transfer되는가 |
+| Analytical actuator | 식별한 compact model로 충분한가 |
+| Learned actuator | Data-driven command-to-torque model이 추가 이득을 주는가 |
+| Learned actuator + randomization | Nominal fidelity와 residual robustness를 함께 쓰면 어떤가 |
 
 각 조건에서 simulation robustness와 real low-risk behavior를 단계적으로 비교합니다.
 
@@ -974,24 +952,21 @@ Joint-position bound, torque limit, velocity limit, emergency stop과 fall-prote
 
 ## **15. 정리: Actuator Model은 Simulator의 부품이다**
 
-Hwangbo et al.의 핵심을 다시 압축하면 다음과 같습니다.
+Hwangbo et al.의 핵심은 다섯 가지로 압축할 수 있습니다.
 
-1. ANYmal의 rigid-body와 contact는 빠른 physics simulator로 계산했습니다.
-2. 손으로 정확히 쓰기 어려운 SEA와 software dynamics는 real data로 학습한 actuator network가 모델링했습니다.
-3. Actuator net은 current, 10 ms, 20 ms 전 position error와 velocity로 torque를 예측했습니다.
-4. 4분 미만의 400 Hz data로 100만 개 이상의 sample을 수집했습니다.
-5. Learned model의 torque RMS는 validation 0.740 Nm, policy test 0.966 Nm였고 ideal model보다 훨씬 작았습니다.
-6. Ideal·analytical actuator policy는 real robot에서 한 걸음도 못 갔지만 learned model policy는 transfer되었습니다.
-7. TRPO policy는 real-observable state history에서 low-impedance position target을 출력했습니다.
-8. Stochastic rigid-body model, observation noise, curriculum과 bounded network가 함께 transfer를 도왔습니다.
-9. 실제 ANYmal에서 command tracking, 1.5 m/s running과 3초 이내 fall recovery를 보였습니다.
-10. 이 방법은 real data를 없앤 것이 아니라, **real data를 simulator fidelity에 집중해 사용하고 policy trial-and-error는 simulation으로 옮긴 것**입니다.
+1. **Hybrid modeling:** Rigid body와 contact는 physics로 계산하고, 식별하기 어려운 SEA command-to-torque mapping만 history-conditioned actuator net으로 학습했습니다.
+2. **Targeted real data:** 4분 미만의 400 Hz actuator data로 100만 개 이상의 sample을 얻었으며, policy trial-and-error는 hybrid simulator 안에서 수행했습니다.
+3. **Transfer evidence:** Learned model의 torque RMS는 validation 0.740 Nm, policy test 0.966 Nm였고, actuator-model ablation에서는 ideal·analytical model policy와 달리 real locomotion이 transfer되었습니다.
+4. **Pipeline, not one component:** Stochastic rigid-body model, observation noise, bounded policy, state history와 cost curriculum이 actuator net과 함께 작동했습니다.
+5. **Task-specific real results:** 별도 TRPO policy들이 command tracking, 1.5 m/s running과 3초 이내 fall recovery를 실제 ANYmal에서 수행했습니다.
 
 5편의 결론은 다음 한 문장으로 남길 수 있습니다.
 
 > Legged Sim2Real에서 actuator는 action 뒤에 붙는 세부 구현이 아니라, policy가 학습하는 environment dynamics의 핵심 구성요소다.
 
-다음 글에서는 이 actuator-aware Sim2Real 흐름이 uneven terrain locomotion으로 확장될 때, terrain curriculum과 observation 설계가 어떤 역할을 하는지 살펴봅니다.
+다음 글: [Learning Quadrupedal Locomotion over Challenging Terrain](/posts/learning-quadrupedal-locomotion-challenging-terrain/)
+
+다음 편에서는 이 actuator-aware Sim2Real 흐름이 uneven terrain locomotion으로 확장될 때, terrain curriculum과 observation 설계가 어떤 역할을 하는지 살펴봅니다.
 
 ---
 
