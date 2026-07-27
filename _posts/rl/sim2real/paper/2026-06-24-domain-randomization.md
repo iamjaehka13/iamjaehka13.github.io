@@ -1,10 +1,14 @@
 ---
 title: "[Sim2Real Paper 2] Domain Randomization"
 date: 2026-06-24 17:30:00 +0900
+last_modified_at: 2026-07-27 19:46:00 +0900
 categories: [RL, Sim2Real, Paper]
-tags: [sim2real, domain-randomization, visual-domain-randomization, robot-vision, object-localization]
-description: Tobin et al.의 Domain Randomization 논문을 통해 real world를 simulation variation 중 하나로 보이게 만드는 Sim2Real 아이디어를 정리한다.
+tags: [sim2real, domain-randomization, visual-domain-randomization, robot-vision, object-localization, fetch-robot, synthetic-data]
+description: Tobin et al.의 visual domain randomization을 random texture, camera·lighting variation, VGG detector, real-image localization ablation과 Fetch grasping 결과까지 원문 기준으로 정리한다.
 math: true
+image:
+  path: /assets/img/posts/rl/sim2real/domain-randomization/00-preview.png
+  alt: 비현실적으로 randomize한 simulation training image와 실제 tabletop test image
 ---
 
 ## **0. 전체 그림: 현실을 하나의 variation으로 만들기**
@@ -25,6 +29,11 @@ Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks fro
 
 이 논문은 특히 **visual domain randomization**의 대표적인 초기 논문입니다. 여기서 randomization의 대상은 주로 texture, lighting, camera pose, distractor object, image noise 같은 시각 요소입니다.
 
+![Randomized simulation training image와 실제 test image](/assets/img/posts/rl/sim2real/domain-randomization/01-training-vs-real.png){: width="1150" .d-block .mx-auto }
+_왼쪽의 비현실적인 simulation image만으로 detector를 학습한 뒤, 오른쪽 실제 webcam image에 추가 학습 없이 적용한다. 출처: [Tobin et al., Figure 1](https://arxiv.org/pdf/1703.06907)._
+
+이 그림에서 주목할 것은 simulation 한 장이 현실과 닮았는지가 아닙니다. Training image끼리도 색, 조명, camera, object 구성이 크게 달라서 **공통으로 남는 shape와 spatial cue**를 학습하게 만드는 것이 핵심입니다.
+
 ## **1. 논문 정보**
 
 | 항목 | 내용 |
@@ -36,8 +45,8 @@ Tobin et al.의 **Domain Randomization for Transferring Deep Neural Networks fro
 | Task | object localization from RGB image |
 | Simulator | MuJoCo built-in renderer |
 | Model | modified VGG-style convolutional network |
-| Transfer setting | target-domain real images 없이 simulated RGB labels로 transfer |
-| Source | [arXiv](https://arxiv.org/abs/1703.06907), [PDF](https://arxiv.org/pdf/1703.06907) |
+| Transfer setting | target-domain real image를 training에 사용하지 않는 zero-shot sim-to-real |
+| Source | [arXiv](https://arxiv.org/abs/1703.06907), [PDF](https://arxiv.org/pdf/1703.06907), [IEEE DOI](https://doi.org/10.1109/IROS.2017.8202133) |
 
 이 논문은 quadruped locomotion 논문은 아닙니다. Dynamics randomization 논문도 아닙니다.
 
@@ -81,9 +90,26 @@ Tobin et al.의 답은 domain randomization입니다.
 | distractor object | 관심 없는 물체를 scene에 추가함 |
 | image noise | image에 noise를 추가함 |
 
+![Domain randomization으로 생성한 여러 training scene](/assets/img/posts/rl/sim2real/domain-randomization/02-randomized-scenes.png){: width="900" .d-block .mx-auto }
+_같은 task label을 유지하면서 texture, lighting, camera, target 위치와 distractor 구성을 바꾼 training scene 일부. 출처: [Tobin et al., supplementary figure source](https://arxiv.org/abs/1703.06907)._
+
 중요한 점은 texture가 realistic할 필요가 없다는 것입니다.
 
 논문에서는 random RGB color, random gradient, checker pattern 같은 단순하고 비현실적인 texture도 사용합니다. 목적은 예쁜 simulation image를 만드는 것이 아닙니다. 목적은 model이 texture나 lighting 같은 우연한 visual cue에 기대지 못하게 만드는 것입니다.
+
+여기서 "randomize했다"는 말을 실제 범위로 풀어 쓰면 다음과 같습니다.
+
+| 요소 | 논문의 구체적인 설정 |
+|---|---|
+| Distractor | table 위에 0-10개, 개수와 shape를 sample마다 변경 |
+| Texture | random RGB, 두 RGB 사이 gradient, 두 RGB checker pattern 중 선택 |
+| Camera position | 대략 맞춘 nominal 위치 주변 $10\times5\times10$ cm box |
+| Camera direction | table의 고정점을 향하게 한 뒤 각 방향으로 최대 0.1 rad offset |
+| Field of view | nominal 값에서 최대 5% scale 변화 |
+| Lighting | light 개수, 위치, 방향, specular property 변경 |
+| Image corruption | noise type과 양 변경 |
+
+따라서 "camera calibration이 필요 없다"는 표현도 조심해야 합니다. 저자들은 실제 camera와 **대략 비슷한 viewpoint와 FOV를 simulation에 먼저 배치**한 뒤 그 주변을 randomize했습니다. 정밀한 extrinsic calibration은 피했지만, camera가 전혀 다른 위치에 있어도 된다는 뜻은 아닙니다.
 
 실험은 object localization입니다. Model은 single RGB image를 입력으로 받고, table 위에 있는 geometric object의 Cartesian coordinate를 예측합니다. 이후 이 object detector를 실제 robot grasping pipeline에 연결합니다.
 
@@ -99,6 +125,38 @@ Training data는 simulation에서 만듭니다. Simulator는 MuJoCo built-in ren
 
 Test는 real world image에서 합니다. 중요한 점은 target-domain real robot image로 model을 다시 학습하지 않는다는 것입니다.
 
+### **2.1 Detector는 무엇을 입력받고 무엇을 출력하는가?**
+
+![Domain-randomized object detector architecture](/assets/img/posts/rl/sim2real/domain-randomization/03-model-architecture.png){: width="1200" .d-block .mx-auto }
+_224×224 monocular RGB image를 modified VGG-16에 넣고 object center의 $(x,y,z)$를 회귀한다. 출처: [Tobin et al., Figure 2](https://arxiv.org/pdf/1703.06907)._
+
+Network는 VGG-16의 convolutional stack을 사용하되 fully connected layer를 256, 64 units로 줄이고 dropout을 제거했습니다. ReLU와 max pooling을 거친 뒤 object별 Cartesian center coordinate를 출력합니다.
+
+여기서 `sim-only`의 의미를 정확히 구분해야 합니다. 대부분의 주 실험은 ImageNet-pretrained convolution weight로 초기화했으므로 모든 weight가 synthetic data만 본 것은 아닙니다. 다만 target tabletop image와 position label은 training에 쓰지 않았고, scratch ablation에서도 synthetic data가 충분하면 비슷한 real 성능을 얻었습니다. 따라서 핵심 주장은 **target-domain supervision 없이 transfer했다**는 데 있습니다.
+
+$$
+d_\theta(I)
+=
+\left\{(\hat x_i,\hat y_i,\hat z_i)\right\}_{i=1}^{N_{\mathrm{target}}}
+$$
+
+Training label은 simulator가 알고 있는 object center of mass의 world coordinate이며, loss는 L2 regression입니다.
+
+$$
+\mathcal{L}(\theta)
+=
+\sum_i
+\left\|
+d_\theta(I)_i-y_i
+\right\|_2^2
+$$
+
+Optimizer는 Adam, learning rate 후보는 $10^{-4}$와 $2\times10^{-4}$, batch size 후보는 25·50·100이었습니다. 저자들은 기본 Adam learning rate $10^{-3}$보다 작은 값이 모든 object를 table 중앙으로 예측하는 local optimum을 피하는 데 도움이 됐다고 보고합니다.
+
+Monocular camera인데도 $(x,y,z)$를 출력할 수 있었던 중요한 조건이 있습니다. **Table height를 고정**했기 때문에 실제 문제는 tabletop 평면 위의 2D localization에 가깝습니다. 임의의 3D 공간에서 full 6-DoF pose를 추정한 것이 아닙니다.
+
+### **2.2 Real test set은 training data가 아니다**
+
 즉, 이 논문의 실험은 다음 질문을 직접 확인합니다.
 
 > Simulation variation을 충분히 크게 만들면, real image도 그 variation 안에 들어온 것처럼 처리될 수 있는가?
@@ -113,6 +171,10 @@ Test는 real world image에서 합니다. 중요한 점은 target-domain real ro
 | Distractors | 목표 object 외에 다른 object도 있음 |
 | Occlusions | 목표 object가 부분적으로 가려짐 |
 
+각 object의 60장은 object-only 20장, distractor 20장, partial-occlusion 20장으로 구성됩니다. Object는 camera에서 70-105 cm 떨어져 있었고 camera position은 real test image 전체에서 고정했습니다. Real label은 tabletop grid에 object를 맞춰 얻었습니다.
+
+이 480장은 **최종 evaluation용**입니다. Model weight를 update하거나 fine-tuning하는 데 사용하지 않았습니다. 다만 연구자가 real test 결과를 보며 method와 hyperparameter를 연구한 이상, 엄밀한 의미의 완전히 보이지 않은 future deployment까지 보장하는 것은 아닙니다.
+
 Full method의 평균 detection error는 다음과 같이 보고됩니다.
 
 | Evaluation type | Average detection error |
@@ -123,6 +185,8 @@ Full method의 평균 detection error는 다음과 같이 보고됩니다.
 
 논문은 전체적으로 object detector가 real world에서 평균적으로 약 1.5 cm 수준의 정확도를 얻었다고 정리합니다.
 
+Simulation holdout error는 약 0.3-0.5 cm였으므로 real error 1.5 cm와 여전히 차이가 있습니다. 즉 domain randomization이 reality gap을 제거한 것이 아니라 **robot grasping에 사용할 만큼 줄인 것**입니다.
+
 이 결과가 중요한 이유는 두 가지입니다.
 
 첫째, model은 target-domain real robot image로 fine-tuning하지 않았습니다.
@@ -130,6 +194,32 @@ Full method의 평균 detection error는 다음과 같이 보고됩니다.
 둘째, simulation texture는 realistic하지 않았습니다.
 
 즉, 현실을 정밀하게 복사한 simulator가 아니라, 충분히 다양하게 randomized된 simulator에서 학습한 model이 real image로 넘어간 것입니다.
+
+### **2.3 Detector에서 실제 grasping까지**
+
+![Fetch robot의 geometric-object와 Spam grasping](/assets/img/posts/rl/sim2real/domain-randomization/06-fetch-grasping.png){: width="1200" .d-block .mx-auto }
+_위는 geometric object, 아래는 YCB Spam can을 clutter 속에서 찾고 집는 과정이다. 출처: [Tobin et al., Figure 6](https://arxiv.org/pdf/1703.06907)._
+
+Detector가 실제 control에 충분한지 확인하기 위해 Fetch robot과 off-the-shelf motion planner를 연결했습니다.
+
+| Grasping setting | 결과 |
+|---|---:|
+| 정확도가 안정적이었던 geometric-object detector 2개, 각 20회 | **38/40 성공** |
+| YCB Spam can, unseen food-item distractor | **9/10 성공** |
+
+몇몇 geometric distractor는 training에서 보지 못한 orientation으로 놓였고, target과 같은 색의 object가 가까이 있어도 detector가 동작했습니다. Spam 실험에서는 training distractor가 geometric shape였지만 real test distractor는 다른 food item이었습니다.
+
+그러나 이것은 simulation에서 학습한 **end-to-end grasping policy transfer**가 아닙니다.
+
+```text
+sim-only visual detector
+        ↓ target Cartesian position
+기존 motion planner
+        ↓
+미리 정한 방식으로 grasp
+```
+
+논문이 증명한 것은 randomized RGB로 학습한 localization network가 real manipulation pipeline에 쓸 만큼 정확했다는 것입니다. Contact-rich manipulation dynamics까지 simulation에서 real로 이전한 것은 아닙니다.
 
 ## **3. 핵심 아이디어의 이론적 원리**
 
@@ -186,6 +276,8 @@ $$
 > $p_{\mathrm{DR}}$가 충분히 넓으면, real image distribution $p_{\mathrm{real}}$이 그 안의 하나의 domain처럼 들어올 수 있다.
 
 즉 photorealism으로 $p_{\mathrm{sim}} \approx p_{\mathrm{real}}$을 만들려는 것이 아니라, randomized simulation distribution $p_{\mathrm{DR}}$가 real domain을 덮도록 만드는 접근입니다.
+
+이것은 논문의 작동 직관이지, finite sample과 finite network에서 성립하는 정리나 coverage 보장은 아닙니다. 어떤 nuisance axis를 빠뜨렸는지 real data 없이 완전히 확인하기도 어렵습니다.
 
 ### **3.2 Photorealism과 Domain Randomization의 차이**
 
@@ -264,6 +356,21 @@ Training distribution에 들어간 variation에 대해서만 robustness가 생�
 
 논문의 ablation이 이 점을 잘 보여줍니다.
 
+![Training sample 수와 real-image error](/assets/img/posts/rl/sim2real/domain-randomization/04-training-samples-ablation.png){: width="1100" .d-block .mx-auto }
+_ImageNet-pretrained model은 적은 data에서 유리하지만, synthetic sample이 충분해지면 scratch model도 비슷한 real error에 도달한다. 성능은 약 50,000 samples까지 개선됐다. 출처: [Tobin et al., Figure 4](https://arxiv.org/pdf/1703.06907)._
+
+이 결과는 두 가지를 분리해서 읽어야 합니다.
+
+- Pretraining은 적은 synthetic data에서 sample efficiency를 높였습니다.
+- 충분한 randomized data에서는 random initialization도 비슷한 transfer 성능을 냈으며, object에 따라 scratch model이 가장 좋기도 했습니다.
+
+즉 ImageNet feature가 transfer의 필수조건은 아니었지만, data가 적을 때는 분명한 이점이 있었습니다.
+
+![Unique texture 수와 real-image error](/assets/img/posts/rl/sim2real/domain-randomization/05-texture-ablation.png){: width="1100" .d-block .mx-auto }
+_10,000 training images를 고정하고 unique texturization 수만 바꾼 결과. 1,000개 미만에서 real error가 크게 증가했다. 출처: [Tobin et al., Figure 5](https://arxiv.org/pdf/1703.06907)._
+
+특히 low-data regime에서는 object position 조합을 늘리는 것보다 texture diversity를 확보하는 편이 더 중요했습니다. 이는 단순히 image 수만 세면 synthetic dataset의 실제 다양성을 과대평가할 수 있음을 보여줍니다.
+
 | Method | Object only | Distractors | Occlusions |
 |---|---:|---:|---:|
 | Full method | 1.3 ± 0.6 | 1.8 ± 1.7 | 2.4 ± 3.0 |
@@ -274,6 +381,19 @@ Training distribution에 들어간 variation에 대해서만 robustness가 생�
 여기서 가장 눈에 띄는 것은 distractor입니다.
 
 Training 때 distractor를 넣지 않으면, real test에서 distractor나 occlusion이 있을 때 error가 크게 증가합니다. 즉 model은 training 중에 본 variation에 대해서만 robust해집니다.
+
+반면 image noise를 제거한 결과는 full method와 거의 같았습니다. 이 실험에서는 모든 randomization axis가 똑같이 중요하지 않았습니다.
+
+```text
+No image noise
+-> 거의 변화 없음
+
+No camera randomization
+-> 일관된 소폭 악화
+
+No distractors during training
+-> clutter/occlusion error가 약 4배 증가
+```
 
 이것은 domain randomization의 coverage 문제입니다.
 
@@ -364,17 +484,25 @@ Model이 object의 색이나 배경 texture 같은 쉬운 shortcut을 쓰면 rea
 
 실험 대상은 비교적 단순한 geometric object입니다. Real-world object category가 복잡해지거나, deformable object, transparent object, cluttered scene으로 가면 추가적인 문제가 생길 수 있습니다.
 
-셋째, grasping은 end-to-end policy transfer가 아닙니다.
+셋째, full pose estimation이 아닙니다.
+
+Table height가 고정된 monocular image에서 object center translation을 예측합니다. Arbitrary 3D 위치, orientation을 포함한 6-DoF pose, moving camera를 다루지 않습니다. Real evaluation에서도 camera는 고정돼 있었습니다.
+
+넷째, grasping은 end-to-end policy transfer가 아닙니다.
 
 논문에서는 detector를 실제 robot grasping pipeline에 연결합니다. 하지만 simulation에서 학습한 end-to-end manipulation policy를 그대로 real robot에 올리는 문제와는 다릅니다.
 
-넷째, dynamics gap은 다루지 않습니다.
+다섯째, dynamics gap은 다루지 않습니다.
 
 이 논문의 randomization은 visual appearance 중심입니다. Robot control에서 중요한 mass, friction, actuator delay, contact, controller gain 같은 dynamics parameter는 다음 글에서 볼 dynamics randomization 쪽에 더 가깝습니다.
 
-다섯째, randomization distribution은 사람이 설계합니다.
+여섯째, randomization distribution은 사람이 설계합니다.
 
 어떤 parameter를 얼마나 흔들어야 real domain을 잘 덮는지 자동으로 알려주지는 않습니다. 결국 domain randomization은 여전히 task와 deployment condition을 이해하고 설계해야 하는 부분이 큽니다.
+
+일곱째, 평균 1.5 cm가 모든 case에 동일한 것은 아닙니다.
+
+Object와 조건에 따라 variance가 컸고, tetrahedron의 occlusion처럼 outlier가 큰 경우도 있었습니다. Simulation error 0.3-0.5 cm보다 real error가 높았기 때문에 visual gap도 남아 있었습니다.
 
 그래도 이 논문은 Sim2Real에서 domain randomization이 왜 작동할 수 있는지 직관을 잘 줍니다.
 
@@ -389,7 +517,9 @@ Photorealistic simulator를 완벽하게 만들지 못해도, model이 simulatio
 - 핵심 아이디어는 real world를 simulation variation 중 하나처럼 보이게 만드는 것입니다.
 - 이론적으로는 randomized simulation domains의 mixture distribution을 만들고, 그 안에서 domain-invariant feature를 학습하는 것으로 볼 수 있습니다.
 - Photorealistic rendering이 없어도, 충분히 다양한 simulated image로 real image transfer가 가능함을 보였습니다.
+- Detector는 real test image로 fine-tuning하지 않았고, Fetch grasping에서 geometric object 38/40, Spam can 9/10을 성공했습니다.
 - 하지만 randomization은 넣은 variation에 대해서만 robustness를 줍니다.
+- 이 결과는 tabletop center localization과 기존 motion planner의 조합이지 end-to-end contact policy transfer는 아닙니다.
 - Randomization range는 real domain을 덮을 만큼 넓어야 하지만, task-relevant signal을 망가뜨릴 만큼 넓어서는 안 됩니다.
 
 1편의 질문이 이것이었다면,
@@ -401,3 +531,9 @@ Photorealistic simulator를 완벽하게 만들지 못해도, model이 simulatio
 > 하나의 simulation을 믿지 말고, 가능한 simulation들의 distribution을 학습에 사용하자.
 
 다음 글에서는 이 domain randomization 아이디어가 vision이 아니라 robot control dynamics 쪽으로 어떻게 확장되는지 살펴보겠습니다.
+
+## **참고 자료**
+
+- [Tobin et al., arXiv paper and source](https://arxiv.org/abs/1703.06907)
+- [IEEE IROS 2017 publication](https://doi.org/10.1109/IROS.2017.8202133)
+- [DBLP bibliographic record](https://dblp.org/rec/conf/iros/TobinFRSZA17)
