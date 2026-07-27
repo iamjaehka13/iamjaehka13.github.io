@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 6] Challenging Terrain Locomotion"
 date: 2026-06-24 17:34:00 +0900
-last_modified_at: 2026-07-27 21:08:00 +0900
+last_modified_at: 2026-07-27 21:22:15 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, quadruped-locomotion, rough-terrain, proprioception, privileged-learning, teacher-student, tcn, terrain-curriculum, anymal]
 description: Lee et al.의 blind rough-terrain locomotion을 privileged teacher, TCN student, PMTG, adaptive terrain curriculum, 자연환경 실험과 ablation까지 원문 기준으로 정리한다.
@@ -12,6 +12,8 @@ image:
 ---
 
 ## **0. 전체 그림: 지형을 보지 않고도 왜 버틸 수 있었을까**
+
+이전 글: [Agile and Dynamic Motor Skills: hybrid simulator와 actuator network](/posts/learning-agile-dynamic-motor-skills/)
 
 앞선 Hwangbo et al.의 논문은 learned actuator network와 stochastic rigid-body model을 결합해 flat ground locomotion, high-speed running과 fall recovery를 실제 ANYmal로 옮겼습니다.
 
@@ -36,24 +38,26 @@ Lee et al.의 **Learning Quadrupedal Locomotion over Challenging Terrain**은 �
 ![다양한 자연환경에 배포된 ANYmal](/assets/img/posts/rl/sim2real/challenging-terrain/00-preview.png){: width="1100" .d-block .mx-auto }
 _동일 세대의 ANYmal에는 환경별 재조정 없이 같은 proprioceptive controller가 사용되었다. Training에는 rigid procedural terrain만 있었지만, deployment에서는 mountain trail, creek, vegetation, rubble, snow, mud와 forest를 통과했다. 출처: [Lee et al., Figure 1](https://arxiv.org/pdf/2010.11251)._
 
-이 논문의 해법은 세 단계입니다.
+이 논문의 해법은 세 축으로 정리할 수 있습니다.
 
-```text
-1. privileged teacher
-   terrain/contact ground truth를 보며 RL로 rough-terrain skill 학습
-
-2. proprioceptive student
-   teacher의 action과 latent를 2초 history에서 모방
-
-3. adaptive terrain curriculum
-   현재 policy가 간신히 통과할 난이도를 자동으로 샘플링
-```
+| 축 | Training에서 하는 일 | Deployment에 남는가 |
+|---|---|---|
+| Privileged teacher | Terrain·contact ground truth를 보며 rough-terrain skill 학습 | 아니요 |
+| Proprioceptive student | Teacher action과 latent를 2초 body-response history에서 모방 | 예 |
+| Adaptive terrain curriculum | 현재 policy가 간신히 통과할 난이도를 자동으로 샘플링 | Training에만 사용 |
 
 Deploy되는 student는 camera, LiDAR, foot-contact sensor와 terrain height map을 사용하지 않습니다. Joint encoder, IMU와 state estimator가 주는 proprioceptive stream만 사용합니다.
 
 다만 이것을 “눈 없이 terrain을 정확히 안다”고 표현하면 과합니다.
 
 > Student는 terrain map을 명시적으로 복원해 planning하는 것이 아니라, 과거 body response에서 control에 필요한 hidden condition의 흔적을 암묵적으로 인코딩한다.
+
+먼저 네 가지 claim boundary를 잡고 읽는 편이 좋습니다.
+
+1. **Blind는 무센서가 아니다.** Joint encoder, IMU와 state estimator를 사용하되 camera·LiDAR terrain map을 쓰지 않습니다.
+2. **History는 미래 terrain을 보지 못한다.** 이미 일어난 slip, collision과 tracking mismatch를 통해 hidden condition을 추론합니다.
+3. **Natural terrain을 simulation에 그대로 만들지 않았다.** Rigid hills·steps·stairs와 friction variation에서 response strategy를 학습했습니다.
+4. **TCN 하나의 성과가 아니다.** Privileged learning, DAgger, curriculum, PMTG, actuator model과 randomization이 함께 작동했습니다.
 
 ---
 
@@ -125,13 +129,10 @@ History $H_t$가 필요한 이유는 hidden condition이 시간에 걸친 respon
 
 현재 joint angle과 body orientation이 같아도 다음 두 경우는 다릅니다.
 
-```text
-case A:
-foot target을 정상적으로 따라와 현재 자세에 도달
-
-case B:
-발끝이 obstacle에 걸리고 target을 못 따라오다가 현재 자세에 도달
-```
+| 현재 pose는 같아도 | 직전 history가 말해 주는 것 |
+|---|---|
+| 정상 tracking으로 pose에 도달 | Position error와 impact가 작음 |
+| Obstacle에 걸린 뒤 pose에 도달 | Target mismatch, collision과 velocity 변화가 남음 |
 
 단일 frame만 보면 구분이 어려울 수 있지만 history에는 다음 신호가 남습니다.
 
@@ -164,51 +165,25 @@ _A는 privileged teacher와 proprioceptive student의 두 단계 학습, B는 pa
 
 ### **Training Stage 1: Teacher**
 
-```text
-deployable robot state o_t
-+ privileged terrain/contact state x_t
--> teacher MLP
--> latent l_bar_t
--> action a_bar_t
--> TRPO update
-```
+Teacher는 deployable state $o_t$와 privileged terrain/contact state $x_t$를 받습니다. Terrain encoder가 $\bar l_t$를 만들고, teacher MLP가 action $\bar a_t$를 출력하며 TRPO로 업데이트됩니다.
 
 ### **Training Stage 2: Student**
 
-```text
-current deployable state o_t
-+ proprioceptive history H_t
--> TCN encoder
--> inferred latent l_t
--> copied policy MLP
--> student action a_t
-
-supervision:
-a_t ≈ a_bar_t
-l_t ≈ l_bar_t
-```
+Student는 current deployable state $o_t$와 history $H_t$만 받습니다. TCN이 inferred latent $l_t$를 만들고, teacher에서 복사한 policy head가 action $a_t$를 출력합니다. Supervision은 action imitation $a_t\approx\bar a_t$와 latent imitation $l_t\approx\bar l_t$를 함께 사용합니다.
 
 ### **Runtime Control**
 
-```text
-direction command
--> student policy
--> leg frequencies + foot residuals
--> foot trajectory generators
--> analytic inverse kinematics
--> joint position PD controller
--> real robot
-```
+| Runtime 단계 | 출력 |
+|---|---|
+| Direction command + proprioceptive history | Student latent와 action |
+| Student policy | Leg frequencies + foot residuals |
+| Foot trajectory generator | 각 leg의 3D foot target |
+| Analytic inverse kinematics | Joint position target |
+| Joint PD controller | Real actuator command |
 
 ### **Curriculum**
 
-```text
-terrain parameter particles
--> procedural terrain rollout
--> traversability estimate
--> medium-difficulty particles get high weight
--> resample and perturb
-```
+Terrain parameter particle마다 procedural rollout을 수행해 traversability를 추정합니다. Medium-difficulty particle에 높은 weight를 주고, 이를 resample·perturb해 다음 학습 난이도를 만듭니다.
 
 이 네 component 중 하나만으로 결과가 나온 것이 아닙니다. 원문 ablation은 memory, privileged learning과 adaptive curriculum 각각이 필요했음을 보여줍니다.
 
@@ -504,13 +479,11 @@ Ordinary behavior cloning은 teacher trajectory만 학습합니다. Student가 �
 
 이 논문은 DAgger-style dataset aggregation을 사용합니다.
 
-```text
-student가 rollout
--> student가 실제 방문한 state 수집
--> 같은 state에서 teacher action/latent query
--> supervised dataset에 추가
--> student update
-```
+1. Student policy로 rollout합니다.
+2. Student가 실제 방문한 state를 수집합니다.
+3. 같은 state에서 teacher action과 latent를 query합니다.
+4. Labelled sample을 supervised dataset에 추가합니다.
+5. 확장된 dataset으로 student를 업데이트합니다.
 
 즉 training distribution을 teacher가 잘 가는 state가 아니라 **현재 student가 실제로 가는 state** 쪽으로 맞춥니다.
 
@@ -573,16 +546,11 @@ $$
 0.9
 $$
 
-```text
-Tr ≈ 1.0
--> 이미 거의 항상 통과, 새 학습 신호가 적음
-
-Tr ≈ 0.0
--> 너무 자주 조기 종료, 유용한 trajectory가 적음
-
-Tr = 0.5~0.9
--> 성공도 하지만 자주 어려움을 겪는 learning frontier
-```
+| Traversability | 해석 | Curriculum에서의 가치 |
+|---|---|---|
+| $\operatorname{Tr}\approx1.0$ | 이미 거의 항상 통과 | 새 학습 신호가 적음 |
+| $\operatorname{Tr}\approx0.0$ | 조기 종료가 대부분 | 유용한 trajectory가 적음 |
+| $0.5\le\operatorname{Tr}\le0.9$ | 성공과 실패가 함께 존재 | Learning frontier로 우선 sampling |
 
 ### **8.3 Particle filter로 learning frontier를 따라간다**
 
@@ -629,15 +597,15 @@ Training에서는 foot-ground friction을 randomize하고, external disturbance�
 
 따라서 natural-terrain generalization을 TCN 하나의 효과로만 돌리면 안 됩니다.
 
-```text
-realistic actuator model
-+ dynamics/friction variation
-+ disturbances and sensor noise
-+ terrain curriculum
-+ privileged teacher
-+ long-history student
-+ PMTG motion prior
-```
+| Transfer stack | 담당하는 문제 |
+|---|---|
+| Realistic actuator model | Command-to-torque gap |
+| Dynamics/friction variation | Physical-parameter uncertainty |
+| Disturbance와 sensor noise | Perturbation·observation robustness |
+| Terrain curriculum | 유효한 난이도 분포 |
+| Privileged teacher | Sparse rough-terrain learning signal |
+| Long-history student | Hidden terrain/contact condition |
+| PMTG motion prior | 실행 가능한 periodic foot motion |
 
 전체 조합이 transfer stack입니다.
 
@@ -951,19 +919,12 @@ Policy는 natural deployment terrain에서 reward를 받아 fine-tuning하지 �
 
 논문 결과만으로 mechanism을 단 하나로 확정할 수는 없지만, evidence가 지지하는 설명은 다음과 같습니다.
 
-```text
-procedural steps / hills / friction / disturbances
--> collision, slip, imbalance에 대한 다양한 body response 생성
-
-privileged teacher
--> informative terrain/contact state에서 좋은 response 발견
-
-TCN distillation
--> real에서 관측 가능한 body-response history로 condition 추론
-
-PMTG + actuator model
--> 물리적으로 실행 가능한 motion prior와 realistic actuation
-```
+| 학습 요소 | Natural-terrain transfer에 기여한 연결 고리 |
+|---|---|
+| Procedural terrain·friction·disturbance | Collision, slip, imbalance에 대한 다양한 body response 생성 |
+| Privileged teacher | 정확한 terrain/contact state에서 좋은 response 발견 |
+| TCN distillation | Real에서 관측 가능한 response history로 hidden condition 추론 |
+| PMTG + actuator model | 실행 가능한 motion prior와 realistic actuation 제공 |
 
 Natural terrain의 픽셀이나 geometry가 training과 같아서가 아니라, **controller가 처리해야 하는 proprioceptive event class가 겹쳤기 때문**이라고 보는 편이 타당합니다.
 
@@ -1046,14 +1007,11 @@ Actuator model, estimator, PMTG, IK와 400 Hz control loop가 flat ground에서 
 
 Terrain height와 normal의 frame, contact state, force와 friction unit을 하나씩 확인합니다.
 
-```text
-height sample frame
-foot ordering
-terrain normal direction
-contact-force sign
-friction per foot
-external-force frame
-```
+- Height-sample frame과 foot ordering
+- Terrain-normal direction
+- Contact-force sign
+- Foot별 friction
+- External-force frame
 
 Frame mismatch는 teacher가 simulation exploit을 배우게 만들 수 있습니다.
 
@@ -1071,13 +1029,11 @@ Pass criterion은 terrain parameter가 무작정 max difficulty로 몰리는 것
 
 다음 loss를 따로 기록합니다.
 
-```text
-action imitation loss
-latent imitation loss
-teacher-student rollout disagreement
-episode return
-step success by history length
-```
+- Action imitation loss
+- Latent imitation loss
+- Teacher-student rollout disagreement
+- Episode return
+- History length별 step success
 
 Offline validation만으로 끝내지 말고 student rollout에서 DAgger query가 실제로 늘어나는지 확인합니다.
 
@@ -1087,14 +1043,12 @@ TCN-1, TCN-20, TCN-100을 slope, step, 50 N disturbance에 비교합니다. Natu
 
 ### **Step 7. Low-risk real test**
 
-```text
-flat floor
--> low friction mat
--> 3-5 cm fixed step
--> loose but bounded board
--> small payload
--> outdoor terrain
-```
+1. Flat floor
+2. Low-friction mat
+3. 3-5 cm fixed step
+4. Loose but bounded board
+5. Small payload
+6. Outdoor terrain
 
 Torque·joint-speed limit, emergency stop, fall harness와 operator clearance를 먼저 둡니다.
 
@@ -1118,16 +1072,11 @@ Lee et al.은 2초 proprioceptive history로 terrain, contact와 disturbance의 
 
 다음 RMA는 environment dynamics를 privileged encoder가 explicit latent $z_t$로 만들고, adaptation module이 recent history에서 그 latent를 빠르게 예측하도록 구조화합니다.
 
-```text
-Hwangbo 2019:
-history -> actuator torque model
-
-Lee 2020:
-history -> implicit terrain/contact latent -> action
-
-RMA 2021:
-history -> explicit environment latent -> base policy
-```
+| Paper | History가 담당하는 hidden state |
+|---|---|
+| Hwangbo 2019 | Short joint history $\rightarrow$ actuator torque model |
+| Lee 2020 | 2초 proprioception $\rightarrow$ implicit terrain/contact latent $\rightarrow$ action |
+| RMA 2021 | Recent history $\rightarrow$ explicit environment latent $\rightarrow$ base policy |
 
 6편은 **history가 online adaptation mechanism이 될 수 있다**는 흐름을 real natural terrain에서 강하게 보여준 연결점입니다.
 
@@ -1135,26 +1084,22 @@ history -> explicit environment latent -> base policy
 
 ## **20. 정리: Terrain Map보다 먼저 Body Response를 읽는다**
 
-이 논문의 핵심을 압축하면 다음과 같습니다.
+이 논문의 핵심은 여섯 가지로 압축할 수 있습니다.
 
-1. Training은 RaiSim의 rigid hills, slippery hills, steps와 stairs에서 이루어졌습니다.
-2. Teacher는 terrain profile, contact, friction과 disturbance를 privileged input으로 받아 TRPO로 학습됐습니다.
-3. Student는 deployable observation과 2초 proprioceptive history만 사용했습니다.
-4. TCN student는 teacher action뿐 아니라 terrain/contact latent도 모방했습니다.
-5. DAgger가 student 방문 state에서 teacher supervision을 계속 추가했습니다.
-6. Policy는 PMTG의 leg frequency와 foot residual을 출력하고, IK와 joint PD가 tracking했습니다.
-7. Particle-filter curriculum은 traversability 0.5-0.9의 learning frontier를 유지했습니다.
-8. Long memory, privileged training과 adaptive curriculum은 각각 ablation에서 이득을 보였습니다.
-9. Real ANYmal은 mud, snow, vegetation, rubble, running water와 DARPA underground environment에서 동작했습니다.
-10. 16.8 cm foot trapping, 10 kg payload, wet surface와 50 N disturbance를 controlled test로 분리해 확인했습니다.
-11. Decoder와 saliency는 TCN representation에 hidden condition 정보가 있다는 근거를 제공하지만 explicit terrain reconstruction의 증명은 아닙니다.
-12. Blind control은 강력한 fallback이지만 cliff와 gap을 contact 전에 피할 수 없으므로 exteroception을 대체하지 않습니다.
+1. **Teacher:** Rigid hills, slippery hills, steps와 stairs에서 terrain profile·contact·friction·disturbance를 privileged input으로 받아 TRPO로 학습했습니다.
+2. **Student:** Deployable observation과 2초 proprioceptive history로 teacher action과 latent를 함께 모방했고, DAgger로 student 방문 분포를 따라갔습니다.
+3. **Structured action:** Policy는 PMTG의 leg frequency와 foot residual을 출력하며, IK와 joint PD가 이를 real actuator command로 바꿨습니다.
+4. **Adaptive difficulty:** Particle-filter curriculum은 traversability 0.5-0.9의 learning frontier를 추적했고, long memory·privileged training·adaptive curriculum은 각각 ablation에서 이득을 보였습니다.
+5. **Real evidence:** ANYmal은 mud, snow, vegetation, rubble와 running water에서 동작했고, controlled test에서는 16.8 cm trapping, 10 kg payload와 wet surface를 따로 평가했습니다.
+6. **Boundary:** Decoder와 saliency는 hidden-condition information의 근거이지 explicit terrain reconstruction의 증명은 아니며, blind control은 contact 전 cliff·gap avoidance를 해결하지 못합니다.
 
 6편의 결론은 다음과 같습니다.
 
 > Simulation이 자연환경을 그대로 복제하지 못하더라도, robot이 자신의 response history에서 contact와 mismatch를 읽도록 학습하면 simple training domain을 넘어서는 robustness가 나타날 수 있다.
 
-다음 글에서는 이 hidden-condition inference를 더 명시적인 environment latent와 adaptation module로 분리한 **Rapid Motor Adaptation, RMA**를 살펴봅니다.
+다음 글: [Rapid Motor Adaptation, RMA](/posts/rma-rapid-motor-adaptation/)
+
+다음 편에서는 이 hidden-condition inference를 더 명시적인 environment latent와 adaptation module로 분리한 **Rapid Motor Adaptation, RMA**를 살펴봅니다.
 
 ---
 
