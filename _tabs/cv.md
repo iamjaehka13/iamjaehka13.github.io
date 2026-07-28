@@ -347,6 +347,19 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </figcaption>
       </figure>
 
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide portfolio-sheet-figure-letterbox">
+        <img
+          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_policy_comparison.gif"
+          alt="Animated top-down comparison showing colored foot trajectories for the baseline, thermal feedback, and thermal-torque feedback policies"
+          loading="lazy"
+          width="720"
+          height="180"
+        >
+        <figcaption>
+          Colored foot trajectories show how each policy distributes contact while tracking the command.
+        </figcaption>
+      </figure>
+
       <div class="portfolio-sheet-results" aria-label="MuJoCo comparison results">
         <div>
           <span>Proxy thermal dose</span>
