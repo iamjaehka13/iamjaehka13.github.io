@@ -336,14 +336,14 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
       <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide portfolio-sheet-figure-letterbox">
         <img
-          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_policy_comparison_preview.jpg"
-          alt="Top-down comparison of baseline, thermal feedback, and thermal-torque feedback locomotion policies"
+          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_follow_gait_comparison.gif"
+          alt="Animated side-by-side gait comparison of baseline, thermal feedback, and thermal-torque feedback locomotion policies"
           loading="lazy"
-          width="1920"
-          height="480"
+          width="720"
+          height="180"
         >
         <figcaption>
-          Policy comparison at vx = 1.5 m/s: tracking behavior remains comparable.
+          Animated gait comparison at vx = 1.5 m/s: locomotion remains comparable.
         </figcaption>
       </figure>
 
