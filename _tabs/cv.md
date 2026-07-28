@@ -214,9 +214,9 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
   </article>
 
   <section class="resume-portfolio" aria-label="Detailed project portfolio">
-    <article class="portfolio-sheet" aria-labelledby="go2-sim2real-title">
+    <article class="portfolio-sheet portfolio-sheet-sim2real" aria-labelledby="go2-sim2real-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 01</p>
+        <p class="portfolio-sheet-index">Selected Work · 02</p>
         <h2 id="go2-sim2real-title">Unitree Go2 Sim-to-Real Locomotion</h2>
         <p>Independent Project · 2026—Present</p>
       </header>
@@ -294,9 +294,9 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       </div>
     </article>
 
-    <article class="portfolio-sheet" aria-labelledby="go2-thermal-title">
+    <article class="portfolio-sheet portfolio-sheet-thermal" aria-labelledby="go2-thermal-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 02</p>
+        <p class="portfolio-sheet-index">Selected Work · 03</p>
         <h2 id="go2-thermal-title">Thermal-Aware Locomotion for Unitree Go2</h2>
         <p>Individual Capstone Design Project · 2026—Present</p>
       </header>
@@ -419,9 +419,9 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       </footer>
     </article>
 
-    <article class="portfolio-sheet" aria-labelledby="oibc-2024-title">
+    <article class="portfolio-sheet portfolio-sheet-oibc" aria-labelledby="oibc-2024-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 03</p>
+        <p class="portfolio-sheet-index">Selected Work · 01</p>
         <h2 id="oibc-2024-title">Jeju Electricity Price Forecasting</h2>
         <p>2024 POSTECH × OIBC Challenge · Team 스운공</p>
       </header>

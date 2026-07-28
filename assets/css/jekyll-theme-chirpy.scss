@@ -741,6 +741,18 @@ body:has(.resume-page) article.px-1 {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.11);
 }
 
+.portfolio-sheet-oibc {
+  order: 1;
+}
+
+.portfolio-sheet-sim2real {
+  order: 2;
+}
+
+.portfolio-sheet-thermal {
+  order: 3;
+}
+
 .portfolio-sheet-header {
   display: grid;
   gap: 0.45rem;
