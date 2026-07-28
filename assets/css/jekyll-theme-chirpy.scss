@@ -857,6 +857,11 @@ body:has(.resume-page) article.px-1 {
   aspect-ratio: 9 / 13;
 }
 
+.portfolio-sheet-figure-poster img {
+  object-fit: contain;
+  background: #fff;
+}
+
 .portfolio-sheet-proof-copy {
   padding-left: 1.35rem;
   border-left: 3px solid var(--resume-rule);

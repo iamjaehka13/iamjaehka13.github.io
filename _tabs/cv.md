@@ -418,5 +418,88 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </a>
       </footer>
     </article>
+
+    <article class="portfolio-sheet" aria-labelledby="oibc-2024-title">
+      <header class="portfolio-sheet-header">
+        <p class="portfolio-sheet-index">Selected Work · 03</p>
+        <h2 id="oibc-2024-title">Jeju Electricity Price Forecasting</h2>
+        <p>2024 POSTECH × OIBC Challenge · Team 스운공</p>
+      </header>
+
+      <div class="portfolio-sheet-rule" aria-hidden="true"></div>
+
+      <section class="portfolio-sheet-row" aria-labelledby="oibc-objective-heading">
+        <h3 id="oibc-objective-heading">Challenge</h3>
+        <div>
+          <p>
+            Forecast the next day’s hourly system marginal price (SMP) for the
+            Jeju electricity market and submit the predictions through the
+            competition API.
+          </p>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="oibc-method-heading">
+        <h3 id="oibc-method-heading">Approach</h3>
+        <div>
+          <ul>
+            <li>
+              Built separate <strong>XGBoost</strong> models for weekdays and
+              weekends to reflect different demand patterns.
+            </li>
+            <li>
+              Used historical SMP together with solar- and wind-generation
+              variables from the provided Jeju power-market data.
+            </li>
+            <li>
+              Produced the hourly day-ahead forecast required for the
+              competition submission format.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="portfolio-sheet-results" aria-label="2024 OIBC Challenge result">
+        <div>
+          <span>Final rank</span>
+          <strong>12th</strong>
+        </div>
+        <div>
+          <span>Recognition</span>
+          <strong>Award</strong>
+        </div>
+        <p>
+          Participation Award · Team 스운공 · Konkuk University
+        </p>
+      </div>
+
+      <div class="portfolio-sheet-proof">
+        <figure class="portfolio-sheet-figure portfolio-sheet-figure-portrait portfolio-sheet-figure-poster">
+          <img
+            src="/assets/img/cv/2024-oibc-challenge-poster.png"
+            alt="Official poster for the 2024 POSTECH OIBC Big Data Challenge"
+            loading="lazy"
+            width="1830"
+            height="2588"
+          >
+          <figcaption>
+            Official 2024 OIBC Challenge poster · POSTECH OIBC / H Energy
+          </figcaption>
+        </figure>
+
+        <div class="portfolio-sheet-proof-copy">
+          <p>Competition Record</p>
+          <strong>12th Place · Participation Award</strong>
+          <p>
+            Participated as a member of Team 스운공 in the sixth OIBC Big Data
+            Challenge, an electricity-price forecasting competition for
+            university students and graduate students.
+          </p>
+          <a href="https://dataen.ai/challenge/history/2024">
+            View the official 2024 challenge page ↗
+          </a>
+        </div>
+      </div>
+    </article>
   </section>
 </div>
