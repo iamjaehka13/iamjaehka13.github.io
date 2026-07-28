@@ -256,7 +256,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
       <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
         <img
-          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg"
+          src="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif"
           alt="Unitree Go2 responding to a turning command during real-hardware deployment"
           loading="lazy"
           width="854"
@@ -270,7 +270,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       <div class="portfolio-sheet-proof">
         <figure class="portfolio-sheet-figure portfolio-sheet-figure-portrait">
           <img
-            src="/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk-preview.jpg"
+            src="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk.gif"
             alt="Unitree Go2 walking during an outdoor hardware test"
             loading="lazy"
             width="480"
