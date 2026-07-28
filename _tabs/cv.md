@@ -11,7 +11,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 <div class="resume-page" lang="en">
   <div class="resume-toolbar resume-screen-only">
     <a href="/" aria-label="Back to blog">← Back to blog</a>
-    <button type="button" onclick="window.print()">Print / Save PDF</button>
+    <button type="button" onclick="window.print()">Print CV + Portfolio</button>
   </div>
 
   <article class="resume-sheet" aria-labelledby="resume-name">
@@ -212,4 +212,198 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       </dl>
     </section>
   </article>
+
+  <section class="resume-portfolio" aria-label="Detailed project portfolio">
+    <article class="portfolio-sheet" aria-labelledby="go2-sim2real-title">
+      <header class="portfolio-sheet-header">
+        <p class="portfolio-sheet-index">Selected Work · 01</p>
+        <h2 id="go2-sim2real-title">Unitree Go2 Sim-to-Real Locomotion</h2>
+        <p>Independent Project · 2026—Present</p>
+      </header>
+
+      <div class="portfolio-sheet-rule" aria-hidden="true"></div>
+
+      <section class="portfolio-sheet-row" aria-labelledby="go2-objective-heading">
+        <h3 id="go2-objective-heading">Project Objective</h3>
+        <div>
+          <p>
+            Train a locomotion policy in Isaac Lab and transfer it to a physical
+            Unitree Go2. The goal was not simply to make the robot stand, but to
+            achieve <strong>command-responsive walking on real hardware</strong>.
+          </p>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="go2-method-heading">
+        <h3 id="go2-method-heading">Implementation</h3>
+        <div>
+          <ul>
+            <li>
+              Matched the simulation and hardware pipelines by auditing observation
+              order, action scaling, joint order, and control frequency.
+            </li>
+            <li>
+              Used domain randomization to improve robustness to contact, latency,
+              and model mismatch.
+            </li>
+            <li>
+              Connected the learned policy to the Go2 through ROS 2 and Unitree
+              SDK2, then validated forward and turning commands.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg"
+          alt="Unitree Go2 responding to a turning command during real-hardware deployment"
+          loading="lazy"
+          width="854"
+          height="480"
+        >
+        <figcaption>
+          Real-hardware deployment: the learned policy responds to a turning command.
+        </figcaption>
+      </figure>
+
+      <div class="portfolio-sheet-proof">
+        <figure class="portfolio-sheet-figure portfolio-sheet-figure-portrait">
+          <img
+            src="/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-walk-preview.jpg"
+            alt="Unitree Go2 walking during an outdoor hardware test"
+            loading="lazy"
+            width="480"
+            height="854"
+          >
+          <figcaption>Outdoor walking test with the deployed policy.</figcaption>
+        </figure>
+
+        <div class="portfolio-sheet-proof-copy">
+          <p>Hardware Result</p>
+          <strong>Simulation policy → real Go2 walking</strong>
+          <p>
+            After correcting the interface mismatches that caused unstable trials,
+            the same policy produced repeatable walking and command-following
+            behavior on the physical robot.
+          </p>
+          <a href="/posts/unitree-go2-part-5-sim2real-success/">
+            Read the full project notes ↗
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <article class="portfolio-sheet" aria-labelledby="go2-thermal-title">
+      <header class="portfolio-sheet-header">
+        <p class="portfolio-sheet-index">Selected Work · 02</p>
+        <h2 id="go2-thermal-title">Thermal-Aware Locomotion for Unitree Go2</h2>
+        <p>Individual Capstone Design Project · 2026—Present</p>
+      </header>
+
+      <div class="portfolio-sheet-rule" aria-hidden="true"></div>
+
+      <section class="portfolio-sheet-row" aria-labelledby="thermal-objective-heading">
+        <h3 id="thermal-objective-heading">Project Objective</h3>
+        <div>
+          <p>
+            Reduce thermal concentration during fast locomotion without solving the
+            problem by merely slowing the robot down. The controller should retain
+            command tracking while distributing actuator load more evenly.
+          </p>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="thermal-method-heading">
+        <h3 id="thermal-method-heading">Implementation</h3>
+        <div>
+          <ul>
+            <li>
+              Collected current and motor-temperature telemetry from the real Go2
+              and fitted a <strong>temperature-rate proxy</strong>.
+            </li>
+            <li>
+              Added thermal, torque, and positive-power feedback to the locomotion
+              objective.
+            </li>
+            <li>
+              Compared baseline, thermal-feedback, and thermal–torque-feedback
+              policies in MuJoCo at a commanded speed of 1.5 m/s.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide portfolio-sheet-figure-letterbox">
+        <img
+          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx1p5_policy_comparison_preview.jpg"
+          alt="Top-down comparison of baseline, thermal feedback, and thermal-torque feedback locomotion policies"
+          loading="lazy"
+          width="1920"
+          height="480"
+        >
+        <figcaption>
+          Policy comparison at vx = 1.5 m/s: tracking behavior remains comparable.
+        </figcaption>
+      </figure>
+
+      <div class="portfolio-sheet-results" aria-label="MuJoCo comparison results">
+        <div>
+          <span>Proxy thermal dose</span>
+          <strong>−22.5%</strong>
+        </div>
+        <div>
+          <span>Hotspot dose</span>
+          <strong>−27.0%</strong>
+        </div>
+        <p>
+          Thermal–torque feedback versus the baseline in MuJoCo. Learned-policy
+          hardware validation is planned.
+        </p>
+      </div>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_paper_thermal_metrics.png"
+          alt="Bar charts comparing thermal dose, maximum temperature rise, and hotspot dose"
+          loading="lazy"
+          width="1760"
+          height="638"
+        >
+        <figcaption>
+          Absolute thermal metrics from the controlled MuJoCo comparison.
+        </figcaption>
+      </figure>
+
+      <div class="portfolio-sheet-gallery">
+        <figure class="portfolio-sheet-figure">
+          <img
+            src="/assets/img/posts/unitree/sim2real/unitree-go2-part-7-thermal-reward-model/vx15_real_telemetry_compact.png"
+            alt="Real Go2 current and motor-temperature telemetry collected during active walking"
+            loading="lazy"
+            width="1600"
+            height="1320"
+          >
+          <figcaption>Held-out real Go2 walking telemetry used to ground the proxy.</figcaption>
+        </figure>
+
+        <figure class="portfolio-sheet-figure">
+          <img
+            src="/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_capstone_temperature_trace.png"
+            alt="Thermal trajectories for the three locomotion policies"
+            loading="lazy"
+            width="1870"
+            height="1050"
+          >
+          <figcaption>Corrected simulated thermal trajectories at vx = 1.5 m/s.</figcaption>
+        </figure>
+      </div>
+
+      <footer class="portfolio-sheet-footer">
+        <a href="/posts/unitree-go2-part-8-thermal-policy-comparison/">
+          Read the full project notes ↗
+        </a>
+      </footer>
+    </article>
+  </section>
 </div>

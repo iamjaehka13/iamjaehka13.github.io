@@ -726,6 +726,233 @@ body:has(.resume-page) article.px-1 {
   margin: 0;
 }
 
+.resume-portfolio {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.portfolio-sheet {
+  min-height: 297mm;
+  padding: 3rem 3.25rem;
+  border: 1px solid #d5d5d5;
+  color: var(--resume-ink);
+  background: var(--resume-paper);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.11);
+}
+
+.portfolio-sheet-header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.portfolio-sheet-header p {
+  margin: 0;
+  color: var(--resume-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.portfolio-sheet-header .portfolio-sheet-index {
+  color: var(--resume-ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portfolio-sheet-header h2 {
+  max-width: 42rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--resume-ink);
+  font-size: clamp(2.25rem, 5vw, 3.45rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.portfolio-sheet-rule {
+  margin: 1.35rem 0 2.4rem;
+  border-top: 2px solid var(--resume-rule);
+}
+
+.portfolio-sheet-row {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 2rem;
+  margin: 0 0 2.2rem;
+}
+
+.portfolio-sheet-row h3 {
+  margin: 0;
+  color: var(--resume-ink);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.portfolio-sheet-row p,
+.portfolio-sheet-row ul {
+  margin: 0;
+  color: #292929;
+  font-size: 0.98rem;
+  line-height: 1.68;
+}
+
+.portfolio-sheet-row ul {
+  padding-left: 1.15rem;
+}
+
+.portfolio-sheet-row li + li {
+  margin-top: 0.45rem;
+}
+
+.portfolio-sheet-figure {
+  margin: 0;
+}
+
+.portfolio-sheet-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border: 1px solid #dadada;
+  border-radius: 0;
+  background: #f5f5f5;
+  object-fit: cover;
+}
+
+.portfolio-sheet-figure figcaption {
+  margin: 0.55rem 0 0;
+  color: #4e4e4e;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.portfolio-sheet-figure-wide {
+  margin-top: 2.75rem;
+}
+
+.portfolio-sheet-figure-letterbox img {
+  aspect-ratio: 4 / 1;
+}
+
+.portfolio-sheet-proof {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.82fr) minmax(0, 1.18fr);
+  gap: 2.75rem;
+  align-items: center;
+  margin-top: 2.8rem;
+}
+
+.portfolio-sheet-figure-portrait {
+  max-width: 18rem;
+  justify-self: center;
+}
+
+.portfolio-sheet-figure-portrait img {
+  aspect-ratio: 9 / 13;
+}
+
+.portfolio-sheet-proof-copy {
+  padding-left: 1.35rem;
+  border-left: 3px solid var(--resume-rule);
+}
+
+.portfolio-sheet-proof-copy > p:first-child {
+  margin: 0 0 0.45rem;
+  color: var(--resume-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portfolio-sheet-proof-copy strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--resume-ink);
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.portfolio-sheet-proof-copy > p:not(:first-child) {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.portfolio-sheet-proof-copy a,
+.portfolio-sheet-footer a {
+  display: inline-block;
+  margin-top: 1.15rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.portfolio-sheet-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 0.5fr)) minmax(15rem, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+  margin: 2.75rem 0 0;
+  padding: 1.15rem 0;
+  border-top: 1px solid var(--resume-rule);
+  border-bottom: 1px solid var(--resume-rule);
+}
+
+.portfolio-sheet-results div {
+  display: grid;
+  gap: 0.3rem;
+  padding-right: 1rem;
+  border-right: 1px solid #c8c8c8;
+}
+
+.portfolio-sheet-results span {
+  color: var(--resume-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.portfolio-sheet-results strong {
+  color: var(--resume-ink);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.portfolio-sheet-results > p {
+  align-self: center;
+  margin: 0;
+  color: #444;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.portfolio-sheet-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem;
+  align-items: start;
+  margin-top: 2.6rem;
+}
+
+.portfolio-sheet-gallery img {
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+}
+
+.portfolio-sheet-footer {
+  margin-top: 1.35rem;
+  text-align: right;
+}
+
 @media screen and (max-width: 840px) {
   .resume-page {
     max-width: none;
@@ -742,6 +969,50 @@ body:has(.resume-page) article.px-1 {
     padding: 1.55rem 1.15rem 2.25rem;
     border: 0;
     box-shadow: none;
+  }
+
+  .resume-portfolio {
+    gap: 0;
+    margin-top: 0;
+  }
+
+  .portfolio-sheet {
+    min-height: 0;
+    padding: 2.5rem 1.15rem 3.25rem;
+    border-width: 1px 0 0;
+    box-shadow: none;
+  }
+
+  .portfolio-sheet-header h2 {
+    font-size: clamp(2.05rem, 9vw, 3rem);
+  }
+
+  .portfolio-sheet-rule {
+    margin-bottom: 1.8rem;
+  }
+
+  .portfolio-sheet-row {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .portfolio-sheet-row p,
+  .portfolio-sheet-row ul {
+    font-size: 0.91rem;
+  }
+
+  .portfolio-sheet-proof {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    gap: 1.25rem;
+  }
+
+  .portfolio-sheet-results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .portfolio-sheet-results > p {
+    grid-column: 1 / -1;
   }
 
   .resume-header {
@@ -837,6 +1108,38 @@ body:has(.resume-page) article.px-1 {
     padding-left: 1rem;
   }
 
+  .portfolio-sheet {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .portfolio-sheet-header h2 {
+    font-size: 2rem;
+  }
+
+  .portfolio-sheet-proof,
+  .portfolio-sheet-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-sheet-proof {
+    gap: 1.5rem;
+  }
+
+  .portfolio-sheet-figure-portrait {
+    width: min(100%, 16rem);
+  }
+
+  .portfolio-sheet-proof-copy {
+    padding: 1rem 0 0;
+    border-top: 3px solid var(--resume-rule);
+    border-left: 0;
+  }
+
+  .portfolio-sheet-results strong {
+    font-size: 1.45rem;
+  }
+
   .resume-name {
     font-size: 2.45rem;
   }
@@ -898,6 +1201,72 @@ body:has(.resume-page) article.px-1 {
     padding: 0;
     border: 0;
     box-shadow: none;
+  }
+
+  .resume-portfolio {
+    gap: 0;
+    margin: 0;
+  }
+
+  .portfolio-sheet {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .portfolio-sheet-header h2 {
+    font-size: 28pt;
+  }
+
+  .portfolio-sheet-header p {
+    font-size: 8pt;
+  }
+
+  .portfolio-sheet-rule {
+    margin: 4mm 0 7mm;
+  }
+
+  .portfolio-sheet-row {
+    grid-template-columns: 32mm minmax(0, 1fr);
+    gap: 7mm;
+    margin-bottom: 6mm;
+    break-inside: avoid;
+  }
+
+  .portfolio-sheet-row h3 {
+    font-size: 11pt;
+  }
+
+  .portfolio-sheet-row p,
+  .portfolio-sheet-row ul {
+    font-size: 9.2pt;
+    line-height: 1.45;
+  }
+
+  .portfolio-sheet-figure,
+  .portfolio-sheet-proof,
+  .portfolio-sheet-results,
+  .portfolio-sheet-gallery {
+    break-inside: avoid;
+  }
+
+  .portfolio-sheet-figure-wide,
+  .portfolio-sheet-proof,
+  .portfolio-sheet-results,
+  .portfolio-sheet-gallery {
+    margin-top: 7mm;
+  }
+
+  .portfolio-sheet-proof-copy strong {
+    font-size: 14pt;
+  }
+
+  .portfolio-sheet-proof-copy > p:not(:first-child),
+  .portfolio-sheet-results > p {
+    font-size: 8pt;
   }
 
   .resume-header {
