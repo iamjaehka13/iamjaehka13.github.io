@@ -455,9 +455,76 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
               Produced the hourly day-ahead forecast required for the
               competition submission format.
             </li>
+            <li>
+              Evaluated actual-versus-predicted traces by time band; the
+              off-peak window from 22:00 to 08:00 recorded an RMSE of 34.58.
+            </li>
           </ul>
         </div>
       </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="oibc-analysis-heading">
+        <h3 id="oibc-analysis-heading">Technical Analysis</h3>
+        <div>
+          <p>
+            Explored nonlinear price regimes, including negative-price periods,
+            and compared daytime SMP against electricity demand and solar
+            generation before comparing the forecast against observed price
+            traces.
+          </p>
+        </div>
+      </section>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/cv/oibc-2024/negative-price-regime.png"
+          alt="Timeline visualization of negative Jeju electricity prices with demand encoded by color"
+          loading="lazy"
+          width="1099"
+          height="360"
+        >
+        <figcaption>
+          Exploratory view of negative-price periods across the 2024 data.
+        </figcaption>
+      </figure>
+
+      <div class="portfolio-sheet-gallery">
+        <figure class="portfolio-sheet-figure">
+          <img
+            src="/assets/img/cv/oibc-2024/demand-vs-smp.png"
+            alt="Scatter plot comparing daytime electricity demand and SMP"
+            loading="lazy"
+            width="1714"
+            height="1101"
+          >
+          <figcaption>Daytime electricity demand versus SMP.</figcaption>
+        </figure>
+
+        <figure class="portfolio-sheet-figure">
+          <img
+            src="/assets/img/cv/oibc-2024/solar-vs-smp.png"
+            alt="Scatter plot comparing daytime solar generation and SMP"
+            loading="lazy"
+            width="1714"
+            height="1101"
+          >
+          <figcaption>Daytime solar generation versus SMP.</figcaption>
+        </figure>
+      </div>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/cv/oibc-2024/off-peak-validation.png"
+          alt="Actual and predicted SMP traces for the off-peak period with an RMSE of 34.58"
+          loading="lazy"
+          width="2270"
+          height="758"
+        >
+        <figcaption>
+          Off-peak validation from 22:00 to 08:00: actual versus predicted SMP,
+          RMSE 34.58.
+        </figcaption>
+      </figure>
 
       <div class="portfolio-sheet-results" aria-label="2024 OIBC Challenge result">
         <div>
