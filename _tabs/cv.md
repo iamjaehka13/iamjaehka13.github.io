@@ -473,6 +473,19 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </p>
       </div>
 
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/cv/2024-oibc-participation-record.png"
+          alt="DataEn competition participation record showing Jaeha Kang's team 스운공 placed 12th in the 2024 OIBC Challenge"
+          loading="lazy"
+          width="2022"
+          height="778"
+        >
+        <figcaption>
+          DataEn competition record · Team 스운공 · Konkuk University · 12th place
+        </figcaption>
+      </figure>
+
       <div class="portfolio-sheet-proof">
         <figure class="portfolio-sheet-figure portfolio-sheet-figure-portrait portfolio-sheet-figure-poster">
           <img
