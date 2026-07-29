@@ -544,9 +544,9 @@ body:has(.resume-page) article.px-1 {
 .resume-name {
   margin: 0;
   color: var(--resume-ink);
-  font-size: 3.15rem;
+  font-size: 2.75rem;
   font-weight: 800;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.045em;
   line-height: 0.95;
   white-space: nowrap;
 }
@@ -779,7 +779,7 @@ body:has(.resume-page) article.px-1 {
   padding: 0;
   border: 0;
   color: var(--resume-ink);
-  font-size: clamp(2.25rem, 5vw, 3.45rem);
+  font-size: clamp(2.1rem, 4.5vw, 3rem);
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 1.02;
@@ -1001,7 +1001,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .portfolio-sheet-header h2 {
-    font-size: clamp(2.05rem, 9vw, 3rem);
+    font-size: clamp(1.9rem, 7.5vw, 2.6rem);
   }
 
   .portfolio-sheet-rule {
@@ -1039,7 +1039,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .resume-name {
-    font-size: 2.75rem;
+    font-size: 2.55rem;
   }
 
   .resume-contact {
@@ -1131,7 +1131,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .portfolio-sheet-header h2 {
-    font-size: 2rem;
+    font-size: 1.65rem;
   }
 
   .portfolio-sheet-proof,
@@ -1158,7 +1158,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .resume-name {
-    font-size: 2.45rem;
+    font-size: 2.25rem;
   }
 
   .resume-place {
@@ -1235,7 +1235,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .portfolio-sheet-header h2 {
-    font-size: 28pt;
+    font-size: 24pt;
   }
 
   .portfolio-sheet-header p {
@@ -1293,7 +1293,7 @@ body:has(.resume-page) article.px-1 {
   }
 
   .resume-name {
-    font-size: 32pt;
+    font-size: 28pt;
   }
 
   .resume-contact {

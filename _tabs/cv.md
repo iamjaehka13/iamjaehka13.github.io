@@ -203,9 +203,9 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
           </h3>
           <ul>
             <li>
-              Team placed 12th using separate weekday/weekend XGBoost models with
-              historical SMP, solar, and wind-generation variables for Jeju
-              electricity-price forecasting.
+              Team placed 12th in the Jeju Electricity Market Price Forecasting
+              Competition using separate weekday/weekend XGBoost models with
+              historical SMP, solar, and wind-generation variables.
             </li>
           </ul>
         </div>
@@ -445,8 +445,8 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
     <article class="portfolio-sheet portfolio-sheet-oibc" aria-labelledby="oibc-2024-title">
       <header class="portfolio-sheet-header">
         <p class="portfolio-sheet-index">Selected Work · 01</p>
-        <h2 id="oibc-2024-title">Jeju Electricity Price Forecasting</h2>
-        <p>2024 POSTECH × OIBC Challenge · Team 스운공</p>
+        <h2 id="oibc-2024-title">6th POSTECH OIBC Challenge</h2>
+        <p>Jeju Electricity Market Price Forecasting Competition · Team 스운공</p>
       </header>
 
       <div class="portfolio-sheet-rule" aria-hidden="true"></div>
@@ -579,24 +579,23 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       <div class="portfolio-sheet-proof">
         <figure class="portfolio-sheet-figure portfolio-sheet-figure-portrait portfolio-sheet-figure-poster">
           <img
-            src="/assets/img/cv/2024-oibc-challenge-poster.png"
-            alt="Official poster for the 2024 POSTECH OIBC Big Data Challenge"
+            src="/assets/img/cv/2024-oibc-participation-award.png"
+            alt="Participation Award certificate issued to Jaeha Kang for the 6th POSTECH OIBC Challenge"
             loading="lazy"
-            width="1830"
-            height="2588"
+            width="1086"
+            height="1448"
           >
           <figcaption>
-            Official 2024 OIBC Challenge poster · POSTECH OIBC / H Energy
+            Participation Award certificate · Jaeha Kang · Nov. 29, 2024
           </figcaption>
         </figure>
 
         <div class="portfolio-sheet-proof-copy">
-          <p>Competition Record</p>
+          <p>Award Certificate</p>
           <strong>12th Place · Participation Award</strong>
           <p>
-            Participated as a member of Team 스운공 in the sixth OIBC Big Data
-            Challenge, an electricity-price forecasting competition for
-            university students and graduate students.
+            Participated as a member of Team 스운공 in the 6th POSTECH OIBC
+            Challenge — Jeju Electricity Market Price Forecasting Competition.
           </p>
           <a href="https://dataen.ai/challenge/history/2024">
             View the official 2024 challenge page ↗
