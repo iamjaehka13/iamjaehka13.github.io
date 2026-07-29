@@ -1,7 +1,7 @@
 ---
 title: "Autoware 기반 K-City Planning System"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 17:06:00 +0900
+last_modified_at: 2026-07-29 17:18:00 +0900
 categories: [Robotics, Autonomous Driving]
 tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
 description: "K-City 지도와 미션 planning, CARLA 통합, 학교 콘 시험, 실제 대회 LiDAR 콘 인식 주행, Autoware–ERP42 인터페이스를 정리한다."
@@ -556,7 +556,7 @@ trajectory
 프로젝트 참여 기록에 따르면 아래 영상은 **실제 대회에서 LiDAR로 청·황 콘을 인식해 주행한 전체 현장 기록**이다. 기존의 simulator 결과가 아니라 차량 플랫폼을 대회 코스에서 운용한 실차 단계다.
 
 <figure>
-  <video controls playsinline preload="metadata"
+  <video controls autoplay muted loop playsinline preload="auto"
          poster="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/08-closed-course-platform.png"
          aria-describedby="competition-lidar-cone-caption"
          style="width: 100%; border-radius: 6px;">
@@ -596,7 +596,7 @@ LiDAR PointCloud
 아래 영상은 대회 영상과 다른 **학교 내 콘 코스 시험**이다. 차량 위 모니터에서 vehicle marker, 경계, 곡선형 path가 시간에 따라 갱신되는 모습을 확인할 수 있다.
 
 <figure>
-  <video controls playsinline preload="metadata"
+  <video controls autoplay muted loop playsinline preload="auto"
          poster="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/11-school-cone-test-poster.jpg"
          aria-describedby="school-cone-test-caption"
          style="width: min(100%, 620px); display: block; margin: 0 auto; border-radius: 6px;">
