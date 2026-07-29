@@ -1,10 +1,10 @@
 ---
 title: "Autoware 기반 K-City Planning System"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 15:54:00 +0900
+last_modified_at: 2026-07-29 16:23:00 +0900
 categories: [Robotics, Autonomous Driving]
-tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city]
-description: "K-City PCD·Lanelet2 지도, 미션 FSM, 라바콘 trajectory planner, 신호·주차·장애물 회피, Autoware–ERP42 인터페이스를 연결한 Planning 시스템의 사양과 검증 범위를 정리한다."
+tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city, carla, vehicle-interface]
+description: "K-City PCD·Lanelet2 지도, 미션 FSM, 라바콘·신호·주차·회피 planning, CARLA 사전 통합, 차량 플랫폼 검증 근거와 Autoware–ERP42 인터페이스를 정리한다."
 image:
   path: /assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png
   alt: K-City Autoware Planning 시스템의 지도, 미션, 경로계획, 제어 계층
@@ -450,7 +450,148 @@ control command는 있지만 차량 command가 제한됨
 
 누락된 localization initialization state를 공급한 뒤 `/autoware/state`가 `DRIVING`으로 전환된 기록이 있다. Planner node만 띄우는 것과 차량을 Autonomous 상태로 만드는 것은 다른 문제다.
 
-## **10. Autoware–ERP42 Vehicle Interface**
+## **10. CARLA에서 실차 플랫폼까지의 검증 단계**
+
+추가로 남아 있는 CARLA 화면과 현장 영상을 이용해 simulator에서 실제 플랫폼으로 넘어간 단계를 다시 구분했다. 자료가 보여주는 것은 하나의 완성된 end-to-end 시험이 아니라, 서로 다른 시점에 확인한 네 종류의 통합 상태다.
+
+| 단계 | 확인한 것 | 아직 확인하지 못한 것 |
+|---|---|---|
+| CARLA + RViz | CARLA 도시 장면, recognition image, pointcloud map, ego vehicle marker/footprint, route/path의 동시 표시 | sensor timestamp 정렬, perception 정확도, 제어 추종 오차 |
+| Autoware system state | routing, localization, motion, operation mode, failsafe panel의 서로 다른 상태 화면 | 모든 panel이 같은 timestamp를 사용한다는 보장 |
+| 차량 플랫폼 | chassis, steering/suspension, onboard compute/display, path 형태의 시각화 | 표시 화면의 실제 topic source, actuator command 적용 여부 |
+| 제한 콘 코스 | 청·황 콘으로 구성한 코스에서 플랫폼 위치가 시간에 따라 바뀌는 보존 영상 | 수동·원격·자율 제어 구분, 무개입 완주, 반복 성공률 |
+
+### CARLA–Autoware 동시 실행
+
+![CARLA와 Autoware RViz 동시 실행 화면](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/06-carla-autoware-integration.png)
+_CARLA 도시 장면과 RViz의 recognition image, pointcloud map, ego vehicle, route/path를 같은 실행 화면에서 확인했다. 이 화면만으로 sensor synchronization이나 tracking 성능까지 검증된 것은 아니다._
+
+화면에서 직접 확인할 수 있는 범위는 다음과 같다.
+
+```text
+CARLA scene
+├── camera-like road image
+├── simulated vehicle pose
+└── road environment
+
+Autoware RViz
+├── RecognitionResultOnImage
+├── pointcloud map
+├── ego vehicle footprint
+└── route / path / drivable corridor
+```
+
+CARLA와 RViz가 동시에 떠 있다는 사실로 확인되는 것은 동시 실행 화면 구성까지다. 동일 data stream이 실제로 교환됐는지 검증하려면 화면이 아니라 timestamp가 포함된 message와 TF를 봐야 한다.
+
+아래 표는 CARLA 동시 실행 화면과 별도의 system-state 화면 전체에서 보인 UI를 합쳐 정리한 것이다.
+
+| 계약 | 보존 화면에서 확인한 것 | 추가로 필요한 기록 |
+|---|---|---|
+| Camera/recognition | 도로 영상이 recognition window에 표시됨 | image timestamp, inference output, processing latency |
+| Localization | pointcloud map 위 ego marker가 표시됨 | pose covariance, TF age, localization convergence |
+| Routing/planning | route와 색상 path/corridor가 표시됨 | route state, trajectory timestamp, path validity |
+| Control | vehicle과 steering/velocity 계기 UI가 표시됨 | `control_cmd`, steering/velocity report, tracking error |
+| System state | operation mode와 initialization panel이 표시됨 | 각 state transition의 원인과 동일 시간축 log |
+
+즉, CARLA 단계의 목적은 전체 시스템을 성공으로 판정하는 것이 아니라, 다음 interface를 검증하기 전에 입출력 UI와 상태 준비 여부를 점검하는 것.
+
+```text
+simulated scene
+→ localization / perception input
+→ route and planning
+→ trajectory and control
+→ simulated vehicle state feedback
+```
+
+### System state panel을 읽는 방법
+
+![Autoware routing·localization·operation mode 상태 확인](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/07-autoware-state-validation.png)
+_RViz에서 `AUTONOMOUS`, `Routing SET`, `Localization INITIALIZED`, `Motion STOPPED`, `FailSafe NONE`과 route/path를 함께 확인한 시점. AutowareControl 영역에는 `Disable`이 표시돼 operation mode와 control enable이 별도 조건임을 보여준다. 정지 상태이므로 자율주행 성공 장면이 아니라 상태 준비 여부를 점검한 화면이다._
+
+다른 보존 화면에는 `STOP`, `Routing INIT`, `Localization INITIALIZING`, `Motion MOVING`, `0.00 km/h`가 한 프레임에 같이 보인다. 이 조합만으로는 panel label과 계기 값의 의미·갱신 시점을 동일하다고 볼 수 없다. 서로 다른 갱신 주기나 state-machine 의미가 섞인 전이 구간일 수 있다. 따라서 녹색 label 하나만 보고 "자율주행이 된다"고 판단하면 안 된다.
+
+또한 상태 화면의 ROS Time은 1970년, Wall Time은 2025년으로 표시된다. 이 화면은 clock synchronization 성공 근거가 아니며, 실제 검증에서는 simulator time 사용 여부와 `/clock`, sensor stamp, TF stamp를 함께 확인해야 한다.
+
+실제 주행 준비 여부는 아래 순서로 확인해야 한다.
+
+1. route가 유효하게 설정됐는가
+2. localization이 수렴하고 `map`–`base_link` TF가 최신인가
+3. operation mode가 의도한 mode인가
+4. Autoware control이 활성화됐는가
+5. non-empty trajectory가 지속해서 갱신되는가
+6. `control_cmd`가 생성되는가
+7. steering·velocity·gear report가 command를 따라오는가
+8. failsafe와 emergency stop이 실제로 작동하는가
+
+이 순서에서 1–5는 planning/system 준비, 6–7은 closed-loop control, 8은 안전 계층이다. 화면 한 장은 특정 순간의 준비 상태만 보여주며, 6–8을 대체하지 못한다.
+
+### 차량 탑재 구성
+
+![경로 시각화 화면을 탑재한 차량 플랫폼](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/09-on-vehicle-visualization.png){: width="620" .d-block .mx-auto }
+_차량 chassis와 onboard compute/display를 함께 촬영한 현장 기록. 화면에는 vehicle marker와 곡선형 path가 보이지만, 해당 path의 topic source와 actuator 적용 여부는 영상만으로 식별할 수 없다._
+
+차량 플랫폼 자료에서 직접 확인되는 하드웨어 범위는 다음과 같다.
+
+- 조향 구조가 보이는 전륜과 차체
+- 현가장치와 구동용 wheel
+- 차량 위 compute/display 구성
+- vehicle marker, 도로 경계, 곡선형 path 형태의 시각화
+
+여기서 "차량에 화면이 올라갔다"와 "Autoware command가 drive-by-wire actuator에 적용됐다"는 다른 주장이다. 후자를 확인하려면 command와 feedback이 같은 시간축에 기록돼야 한다.
+
+```text
+trajectory
+→ control command
+→ vehicle interface
+→ actuator command
+→ steering / velocity / gear feedback
+→ tracking error
+```
+
+이 chain 가운데 현장 이미지가 직접 보여주는 것은 플랫폼과 시각화까지다. ERP42 interface source, ECU feedback, controller tracking은 별도 log가 필요하다.
+
+### 제한 콘 코스 현장 기록
+
+![청·황 콘 제한 코스의 차량 플랫폼](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/08-closed-course-platform.png)
+_청·황 콘으로 경계를 만든 제한 코스에서 차량 플랫폼을 운용한 장면. 이 정지 이미지를 추출한 약 3분 보존 원본 영상에서 플랫폼 위치 변화는 확인되지만, 수동·원격·자율 제어 여부와 무개입 완주는 판정할 수 없다._
+
+보존 원본 현장 자료는 세 종류다.
+
+| 기록 | 직접 확인되는 것 | 해석 제한 |
+|---|---|---|
+| 약 180.75초 주간 영상 | 청·황 콘 코스, 차량 플랫폼, 시간에 따른 플랫폼 위치 변화 | controller source, lap completion, intervention 여부가 없음 |
+| 약 17.34초 야간 영상 | 플랫폼 탑재 화면의 vehicle/path 형태 시각화 | 플랫폼 이동과 closed-loop control을 분리할 수 없음 |
+| 약 99.41초 주간 영상 | 차량 chassis와 onboard display를 여러 각도에서 확인 | walk-around 중심이며 주행 시험이 아님 |
+
+17.34초 야간 영상은 동일한 파일이 두 이름으로 보존돼 있었다. 두 개의 독립 시험으로 세지 않고 하나의 현장 관찰로 처리했다.
+
+추가 현장 기록으로 다음 claim은 가능하다.
+
+> 차량 탑재 화면이 기록됐고, 별도의 콘 제한 코스 영상에는 시간에 따른 플랫폼 위치 변화가 남아 있다.
+
+반대로 아래 claim은 아직 할 수 없다.
+
+- cone planner가 실제 LiDAR 입력만으로 경계를 인식했다
+- Autoware trajectory가 actuator command까지 전달됐다
+- 운전자·원격 조작 없이 코스를 완주했다
+- cone 접촉 없이 반복 주행에 성공했다
+- K-City 전체 mission FSM과 ERP42 interface가 연속 동작했다
+
+이 claim을 검증하려면 현장 영상과 함께 다음 topic을 같은 clock으로 기록해야 한다.
+
+| 검증 항목 | 필요한 데이터 |
+|---|---|
+| Planner provenance | detected cone PointCloud, planner debug marker, trajectory |
+| Control propagation | trajectory follower output, gated control command |
+| Vehicle response | steering, velocity, gear, control mode report |
+| Localization | odometry, acceleration, `map`–`base_link` TF와 covariance |
+| Safety | emergency stop, command timeout, manual intervention event |
+| Course result | start/finish time, cone contact, minimum clearance, stop/replan count |
+| Repeatability | 동일 설정 반복 횟수와 각 run의 성공·실패 기준 |
+
+현재 현장 자료는 **실차 플랫폼 준비와 제한 코스 운용 확인**으로 분류한다. 특정 planner의 자율 완주나 ERP42 closed-loop 검증으로 올려 잡지 않는다.
+
+## **11. Autoware–ERP42 Vehicle Interface**
 
 Vehicle interface는 Autoware와 ERP42 사이에서 command와 status의 의미를 맞춘다.
 
@@ -476,7 +617,7 @@ ERP42 feedback
 
 ERP42 raw bridge가 작동했다는 기록은 있다. 그러나 interface source는 독립 package보다 Markdown 안의 구현 초안에 가깝고, ECU feedback까지 포함한 full closed-loop 실차 주행은 확인하지 못했다.
 
-## **11. Crash와 통합 오류**
+## **12. Crash와 통합 오류**
 
 Algorithm tuning보다 interface와 상태 준비 문제가 더 많은 시간을 사용했다.
 
@@ -512,7 +653,7 @@ validateNonEmpty(): Points is empty
 
 수정 C++ artifact와 적용 후 문제없이 사용했다는 기록은 있다. 현재 Autoware checkout에서 다시 build한 결과는 아니다.
 
-## **12. 구현 산출물**
+## **13. 구현 산출물**
 
 | 산출물 | 내용 | 상태 |
 |---|---|---|
@@ -539,12 +680,15 @@ validateNonEmpty(): Points is empty
 
 이 검사는 파일이 깨지지 않았고 문법이 맞는다는 뜻이다. 현재 Autoware 배포판에서 모든 package가 clean build되고 runtime contract를 만족한다는 뜻은 아니다.
 
-## **13. 미션별 검증 상태**
+## **14. 미션별 검증 상태**
 
 | 기능 | 상태 | 확인 범위 | 확인하지 못한 것 |
 |---|---|---|---|
 | K-City PCD·Lanelet2 | 실행 확인 | map load, route/path 생성 | 전체 route reachability, 실차 완주 |
 | 라바콘 trajectory | 실행 확인 | simulator, Control 연결, 1/3 m/s 기록 | 실제 LiDAR·ERP42 코스 |
+| CARLA–Autoware 통합 | 실행 화면 확인 | CARLA, RViz, recognition image, route/path 동시 표시 | timestamp 정렬, perception·tracking 성능 |
+| 차량 플랫폼 탑재 구성 | 현장 기록 | chassis, onboard compute/display, path 형태 시각화 | 실제 topic source와 actuator 적용 |
+| 제한 콘 코스 운용 | 부분 확인 | 약 3분 보존 원본 영상의 플랫폼 위치 변화 | 수동·원격·자율 구분, 무개입 완주, 반복성 |
 | 신호등·dilemma zone | 실행 확인 | RViz/Simulator yellow 시험 | 실제 신호 인지·C-ITS |
 | 정적 장애물 회피 | 부분 확인 | simulator path와 parameter 시험 | 안전 margin과 실차 안정성 |
 | 주차 | 부분 확인 | Freespace path와 주차 동작 | 슬롯 인식부터 자동 출차 |
@@ -556,7 +700,7 @@ validateNonEmpty(): Points is empty
 | LiDAR Hybrid A* BPP | 설계 | 요구사항 | source, build, runtime |
 | K-City 전체 실차 주행 | 미확인 | 개별 subsystem 근거만 존재 | end-to-end 완주 |
 
-## **14. 실제 차량 검증 전에 필요한 것**
+## **15. 실제 차량 검증 전에 필요한 것**
 
 ### 1. Build 재현
 
@@ -597,7 +741,9 @@ vehicle interface 단독
 
 Simulator에서 path가 보인다는 이유로 바로 전체 미션을 실행하면 안 된다. 각 단계는 control command, vehicle feedback, stop fallback, operator emergency stop이 모두 확인된 뒤 다음 단계로 넘어가야 한다.
 
-## **15. 정리**
+추가 현장 영상은 차량 플랫폼과 제한 코스를 실제로 준비하고 운용했다는 근거다. 위 단계에서 `vehicle interface 단독`과 `fixed trajectory 저속 추종`이 완료됐다는 근거는 아니므로, 다음 시험에서는 synchronized rosbag과 intervention log부터 남겨야 한다.
+
+## **16. 정리**
 
 이 시스템의 핵심은 Autoware module을 각각 실행한 것이 아니다.
 
@@ -613,7 +759,9 @@ Simulator에서 path가 보인다는 이유로 바로 전체 미션을 실행하
 
 이 연결을 K-City 미션 단위로 구성하고, map semantics와 topic contract가 실제 planner 동작에 어떤 영향을 주는지 확인했다.
 
-라바콘, 신호·정지선, 주차, 장애물 회피는 simulator/RViz에서 개별 동작을 확인했다. `task_manager`, reset trigger, Start Planner patch도 source artifact로 남았다. 다음 단계는 실험용 safety margin을 복원하고, 실제 센서 지연과 vehicle feedback을 포함한 조건에서 전체 route/preset/FSM을 반복 검증하는 것.
+라바콘, 신호·정지선, 주차, 장애물 회피는 simulator/RViz에서 개별 동작을 확인했다. CARLA와 Autoware의 동시 실행 화면, 차량 탑재 구성, 제한 콘 코스의 현장 운용 기록도 남아 있다. `task_manager`, reset trigger, Start Planner patch는 source artifact로 확인했다.
+
+그러나 시각화 화면과 현장 영상만으로 planner에서 actuator까지의 closed loop를 증명할 수는 없다. 다음 단계는 실험용 safety margin을 복원하고, 실제 센서 지연·control command·vehicle feedback·operator intervention을 같은 시간축으로 기록하면서 전체 route/preset/FSM을 반복 검증하는 것.
 
 ## **참고 자료**
 
