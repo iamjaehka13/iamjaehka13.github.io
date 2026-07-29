@@ -749,12 +749,16 @@ body:has(.resume-page) article.px-1 {
   order: 2;
 }
 
-.portfolio-sheet-sim2real {
+.portfolio-sheet-isaac-ros2 {
   order: 3;
 }
 
-.portfolio-sheet-thermal {
+.portfolio-sheet-sim2real {
   order: 4;
+}
+
+.portfolio-sheet-thermal {
+  order: 5;
 }
 
 .portfolio-sheet-header {
@@ -824,6 +828,10 @@ body:has(.resume-page) article.px-1 {
 
 .portfolio-sheet-row li + li {
   margin-top: 0.45rem;
+}
+
+.portfolio-sheet-row-followup {
+  margin-top: 2.8rem;
 }
 
 .portfolio-sheet-figure {
@@ -933,6 +941,10 @@ body:has(.resume-page) article.px-1 {
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.portfolio-sheet-footer a + a {
+  margin-left: 1.25rem;
 }
 
 .portfolio-sheet-results {
@@ -1307,6 +1319,10 @@ body:has(.resume-page) article.px-1 {
     gap: 7mm;
     margin-bottom: 6mm;
     break-inside: avoid;
+  }
+
+  .portfolio-sheet-row-followup {
+    margin-top: 7mm;
   }
 
   .portfolio-sheet-row h3 {

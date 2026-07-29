@@ -139,6 +139,28 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
       <div class="resume-entry">
         <p class="resume-date">
+          <span>Dec. 2025 –</span>
+          <span>Jan. 2026</span>
+        </p>
+        <div class="resume-entry-body">
+          <h3>
+            <a href="/posts/isaacsim5-ros2-go2/">
+              Go2 Digital-Twin Locomotion in Isaac Sim
+            </a>
+          </h3>
+          <p class="resume-role">Collaborative Project · Digital-Twin Integration</p>
+          <ul>
+            <li>
+              Imported a campus digital-twin scene into Isaac Sim and demonstrated
+              a pretrained Unitree Go2 locomotion policy in the imported environment.
+            </li>
+          </ul>
+        </div>
+        <p class="resume-place">Seoul, Korea</p>
+      </div>
+
+      <div class="resume-entry">
+        <p class="resume-date">
           <span>Jul. 2025 –</span>
           <span>Nov. 2025</span>
         </p>
@@ -237,9 +259,96 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
   </article>
 
   <section class="resume-portfolio" aria-label="Detailed project portfolio">
-    <article class="portfolio-sheet portfolio-sheet-sim2real" aria-labelledby="go2-sim2real-title">
+    <article class="portfolio-sheet portfolio-sheet-isaac-ros2" aria-labelledby="isaac-ros2-go2-title">
       <header class="portfolio-sheet-header">
         <p class="portfolio-sheet-index">Selected Work · 03</p>
+        <h2 id="isaac-ros2-go2-title">Go2 Digital-Twin Locomotion in Isaac Sim</h2>
+        <p>Collaborative Project · Digital-Twin Integration · Dec. 2025—Jan. 2026</p>
+      </header>
+
+      <div class="portfolio-sheet-rule" aria-hidden="true"></div>
+
+      <section class="portfolio-sheet-row" aria-labelledby="isaac-ros2-objective-heading">
+        <h3 id="isaac-ros2-objective-heading">Project Objective</h3>
+        <div>
+          <p>
+            Run an existing Go2 PPO locomotion policy inside an imported campus
+            digital-twin scene within a shared Isaac Sim–ROS 2 simulation system.
+          </p>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="isaac-ros2-contribution-heading">
+        <h3 id="isaac-ros2-contribution-heading">My Contribution</h3>
+        <div>
+          <ul>
+            <li>
+              Imported a reconstructed campus environment into Isaac Sim and
+              placed the Go2 inside the scene.
+            </li>
+            <li>
+              Integrated the scene with an existing rough-terrain PPO checkpoint
+              and recorded policy-driven locomotion in the imported environment.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          class="portfolio-sheet-video-poster"
+          src="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg"
+          alt="Unitree Go2 running a locomotion policy inside an imported campus digital-twin scene in Isaac Sim"
+          loading="lazy"
+          width="1280"
+          height="836"
+        >
+        <video
+          controls
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg"
+          aria-describedby="isaac-ros2-digital-twin-caption"
+        >
+          <source
+            src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/03-go2-digital-twin.mp4"
+            type="video/mp4"
+          >
+          This browser does not support embedded video.
+        </video>
+        <figcaption id="isaac-ros2-digital-twin-caption">
+          My contribution: the imported campus digital twin with the pretrained
+          Go2 locomotion policy running in Isaac Sim.
+        </figcaption>
+      </figure>
+
+      <section class="portfolio-sheet-row portfolio-sheet-row-followup" aria-labelledby="isaac-ros2-system-heading">
+        <h3 id="isaac-ros2-system-heading">Shared System</h3>
+        <div>
+          <p>
+            The shared codebase routes per-robot ROS 2 velocity commands into
+            policy observations and publishes RGB, RTX LiDAR, odometry, clock,
+            and TF data for RViz2 and a Nav2 interface.
+          </p>
+        </div>
+      </section>
+
+      <footer class="portfolio-sheet-footer">
+        <a href="/posts/isaacsim5-ros2-go2/">
+          Read the project notes ↗
+        </a>
+        <a href="https://github.com/iamjaehka13/isaacsim_ros2_go2">
+          View the repository fork ↗
+        </a>
+      </footer>
+    </article>
+
+    <article class="portfolio-sheet portfolio-sheet-sim2real" aria-labelledby="go2-sim2real-title">
+      <header class="portfolio-sheet-header">
+        <p class="portfolio-sheet-index">Selected Work · 04</p>
         <h2 id="go2-sim2real-title">Unitree Go2 Sim-to-Real Locomotion</h2>
         <p>Independent Project · 2026—Present</p>
       </header>
@@ -319,7 +428,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
     <article class="portfolio-sheet portfolio-sheet-thermal" aria-labelledby="go2-thermal-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 04</p>
+        <p class="portfolio-sheet-index">Selected Work · 05</p>
         <h2 id="go2-thermal-title">Thermal-Aware Locomotion for Unitree Go2</h2>
         <p>Individual Capstone Design Project · 2026—Present</p>
       </header>
