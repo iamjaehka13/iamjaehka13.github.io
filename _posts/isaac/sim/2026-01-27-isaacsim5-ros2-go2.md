@@ -385,37 +385,3 @@ cmd_vel_gui.py               env별 Twist GUI
 envs/sim_env.py              warehouse·office scene import
 envs/usdz_import.py          experimental digital twin import
 ```
-
-## **11. 현재 코드에서 남은 부분**
-
-| 항목 | 현재 상태 | 필요한 수정 |
-|---|---|---|
-| Camera output | RGB만 연결 | depth·semantic publisher 추가 |
-| Sensor enable flag | YAML에는 있으나 생성 경로를 막지 않음 | `enable_camera`, `enable_lidar` 조건 반영 |
-| Odometry | simulator root state 사용 | noise·drift가 있는 estimator 또는 SLAM odometry 비교 |
-| Nav2 | 시연 영상과 interface만 보존 | launch, map, localization, remap config 포함 |
-| Digital twin | absolute path, 호출 비활성 | relative asset path와 import option 정리 |
-| Collision | scene variant마다 처리 차이 | 모든 scene의 collision audit |
-| Error handling | odometry update exception을 무시 | 초기화 오류와 runtime 오류를 구분해 log |
-| Command range | GUI 값이 policy 학습 범위를 넘을 수 있음 | training range 기준 clamp |
-| 실행 관리 | 세 script를 수동 실행 | ROS 2 launch 또는 단일 launcher |
-| 검증 | 시연 영상 중심 | topic rate, latency, RTF, navigation error log |
-
-이 결과는 Isaac Sim 안에서 ROS 2 interface와 보행 policy를 연결한 것. 실제 Go2 hardware 제어 결과나 sim-to-real 성능을 뜻하지 않는다. Nav2 화면도 localization 정확도와 path tracking error를 정량 검증한 자료는 아니다.
-
-확인된 범위는 다음과 같다.
-
-- PPO locomotion checkpoint의 40 Hz inference
-- ROS 2 `cmd_vel`을 env별 policy command로 전달
-- RGB, RTX LiDAR PointCloud2, odometry, simulation clock publish
-- robot별 odom·base·sensor TF 분리
-- RViz2 sensor visualization
-- built-in scene와 digital twin 시연
-- Nav2 연결 화면
-
-## **참고**
-
-- [isaacsim5.0_ros2_go2 repository](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)
-- [Isaac Sim 5.0 ROS 2 Installation](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/installation/install_ros.html)
-- [Isaac Sim 5.0 RTX Lidar Sensors](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_rtx_lidar.html)
-- [Isaac Sim 5.0 Transform Trees and Odometry](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_tf.html)
