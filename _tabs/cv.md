@@ -239,7 +239,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
   <section class="resume-portfolio" aria-label="Detailed project portfolio">
     <article class="portfolio-sheet portfolio-sheet-sim2real" aria-labelledby="go2-sim2real-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 02</p>
+        <p class="portfolio-sheet-index">Selected Work · 03</p>
         <h2 id="go2-sim2real-title">Unitree Go2 Sim-to-Real Locomotion</h2>
         <p>Independent Project · 2026—Present</p>
       </header>
@@ -319,7 +319,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
     <article class="portfolio-sheet portfolio-sheet-thermal" aria-labelledby="go2-thermal-title">
       <header class="portfolio-sheet-header">
-        <p class="portfolio-sheet-index">Selected Work · 03</p>
+        <p class="portfolio-sheet-index">Selected Work · 04</p>
         <h2 id="go2-thermal-title">Thermal-Aware Locomotion for Unitree Go2</h2>
         <p>Individual Capstone Design Project · 2026—Present</p>
       </header>
@@ -602,6 +602,118 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
           </a>
         </div>
       </div>
+    </article>
+
+    <article class="portfolio-sheet portfolio-sheet-mobility" aria-labelledby="mobility-2025-title">
+      <header class="portfolio-sheet-header">
+        <p class="portfolio-sheet-index">Selected Work · 02</p>
+        <h2 id="mobility-2025-title">2025 대학생 창작 모빌리티 경진대회</h2>
+        <p>Planning Team Member · Unmanned Mobility Division · Jul.—Nov. 2025</p>
+      </header>
+
+      <div class="portfolio-sheet-rule" aria-hidden="true"></div>
+
+      <section class="portfolio-sheet-row" aria-labelledby="mobility-scope-heading">
+        <h3 id="mobility-scope-heading">Competition</h3>
+        <div>
+          <p>
+            Prepared Autoware planning for the unmanned-mobility division held at
+            the Korea Transportation Safety Authority’s K-City. The field
+            competition ran from Oct. 31 to Nov. 1, 2025.
+          </p>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="mobility-contribution-heading">
+        <h3 id="mobility-contribution-heading">My Contribution</h3>
+        <div>
+          <ul>
+            <li>
+              Investigated the configuration and I/O of Autoware Scenario
+              Planning, Behavior Path Planner, and Behavior Velocity Planner.
+            </li>
+            <li>
+              Worked on traffic-light and stop-line planning and participated in
+              integration and field testing.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="portfolio-sheet-row" aria-labelledby="mobility-system-heading">
+        <h3 id="mobility-system-heading">Team System</h3>
+        <div>
+          <p>
+            The planning team connected K-City PCD and Lanelet2 routes, mission
+            switching, Autoware Behavior Planning, a custom LiDAR cone trajectory,
+            control, and the ERP-42 vehicle interface.
+          </p>
+        </div>
+      </section>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          src="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png"
+          alt="Architecture of the 2025 K-City mobility competition planning system"
+          loading="lazy"
+          width="1200"
+          height="630"
+        >
+        <figcaption>
+          Planning scope from K-City map and missions to Autoware control and ERP-42.
+        </figcaption>
+      </figure>
+
+      <div class="portfolio-sheet-results" aria-label="2025 mobility competition field result">
+        <div>
+          <span>Division</span>
+          <strong>Unmanned</strong>
+        </div>
+        <div>
+          <span>Venue</span>
+          <strong>K-City</strong>
+        </div>
+        <p>
+          Team field result: LiDAR-based blue/yellow cone recognition and
+          cone-course driving at the actual competition.
+        </p>
+      </div>
+
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+        <img
+          class="portfolio-sheet-video-poster"
+          src="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/08-closed-course-platform.png"
+          alt="ERP-42 driving through the blue and yellow cone course at K-City"
+          loading="lazy"
+          width="1400"
+          height="958"
+        >
+        <video
+          controls
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/08-closed-course-platform.png"
+          aria-describedby="mobility-field-video-caption"
+        >
+          <source
+            src="https://media.iamjaehka13.blog/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/10-competition-lidar-cone-drive.mp4"
+            type="video/mp4"
+          >
+          This browser does not support embedded video.
+        </video>
+        <figcaption id="mobility-field-video-caption">
+          K-City field run during the 2025 competition: LiDAR-based cone-course driving.
+        </figcaption>
+      </figure>
+
+      <footer class="portfolio-sheet-footer">
+        <a href="/posts/autoware-kcity-planning-system/">
+          Read the full competition notes ↗
+        </a>
+      </footer>
     </article>
   </section>
 </div>
