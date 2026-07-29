@@ -1,21 +1,22 @@
 ---
-title: "Autoware 기반 K-City Planning System"
+title: "2025 대학생 창작 모빌리티 경진대회: Autoware 기반 K-City Planning"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 18:23:00 +0900
+last_modified_at: 2026-07-29 18:34:00 +0900
 categories: [Robotics, Autonomous Driving]
-tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
-description: "K-City 지도와 미션 planning, CARLA 통합, 학교 콘 시험, 실제 대회 LiDAR 콘 인식 주행, Autoware–ERP42 인터페이스를 정리한다."
+tags: [creative-mobility-competition, unmanned-mobility, autoware-universe, ros2, autonomous-driving, lanelet2, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
+description: "한국교통안전공단 K-City에서 열린 2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문을 준비하며 구축한 Autoware Planning 시스템을 정리한다."
 image:
   path: /assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png
-  alt: K-City Autoware Planning 시스템의 지도, 미션, 경로계획, 제어 계층
+  alt: 2025 대학생 창작 모빌리티 경진대회를 위한 K-City Autoware Planning 시스템
 ---
 
-Autoware Universe 위에 K-City 주행 미션을 구성했다.
+2025년 10월 31일부터 11월 1일까지 한국교통안전공단 자동차안전연구원 K-City에서 열린 **2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문**을 준비했다.
 
-일반 도로에서는 Lanelet2 route와 Autoware Behavior Planner를 사용한다. 라바콘 구간에서는 LiDAR PointCloud로 좌·우 경계를 복원하고, 중앙선을 `Trajectory`로 발행하는 custom planner가 주행 경로를 맡는다. 주차·장애물·신호등은 각 planning module로 나누고, 상위 `task_manager`가 route와 operation mode를 전환하는 구조다.
+Planning 팀의 목표는 대회 미션을 Autoware가 실행할 수 있는 route, path, velocity, trajectory와 mission transition으로 바꾸는 것. 일반 도로는 Lanelet2 route와 Autoware Behavior Planner, 라바콘 구간은 LiDAR PointCloud에서 중앙선을 만드는 custom planner로 구성했다.
 
 ```text
-K-City PCD + Lanelet2
+대회 미션
+→ K-City PCD + Lanelet2
 → Route / Mission FSM
 → Behavior Planning 또는 Cone Planning
 → Trajectory Follower
@@ -23,9 +24,33 @@ K-City PCD + Lanelet2
 → Planning Simulator 또는 ERP42
 ```
 
-기반 환경은 ROS 2 Humble과 Autoware Universe 2024.01 계열. K-City PCD·Lanelet2·projector 설정을 하나의 map package로 묶었다. Planning Simulator에서 planning을 검증하고 CARLA 0.9.15·RViz 동시 실행 화면을 구성한 뒤 학교와 대회 현장 시험으로 이어갔다.
+기반 환경은 ROS 2 Humble과 Autoware Universe 2024.01 계열. K-City PCD·Lanelet2·projector 설정을 하나의 map package로 묶고, Planning Simulator와 학교 콘 코스 시험을 거쳐 실제 대회 LiDAR 콘 인식 주행까지 진행했다.
 
-## **1. 시스템 구성**
+## **1. 대회 개요와 Planning 범위**
+
+| 항목 | 내용 |
+|---|---|
+| 대회 | 2025 대학생 창작 모빌리티 경진대회 |
+| 참가 부문 | 무인 모빌리티 |
+| 일정 | 2025년 10월 31일~11월 1일 |
+| 장소 | 경기도 화성 한국교통안전공단 자동차안전연구원 K-City |
+| 주최 | 국토교통부 |
+| 공동 주관 | 한국교통안전공단, 한국자동차모빌리티안전학회 |
+
+Planning 팀은 대회 요구사항을 미션 단위로 나누고 각 구간에 사용할 map, route, planning module, trigger를 정했다.
+
+| 대회 구간 | Planning 구성 | 확인된 범위 |
+|---|---|---|
+| 예선 라바콘 트랙 | LiDAR cone detection, 좌·우 경계, centerline `Trajectory` | Simulator, 학교 시험, 실제 대회 주행 |
+| 예선 하이웨이·U-turn | Route/preset 전환, 정적 장애물 회피 | Simulator 부분 시험 |
+| 본선 교차로·정지 | Traffic Light module, stop line, dilemma zone | RViz·Simulator |
+| 본선 정적 장애물 | Behavior Path Avoidance, Obstacle Stop Planner | Simulator 부분 시험 |
+| 본선 주차 | Parking area, OccupancyGrid, Freespace Planner | Simulator 부분 시험 |
+| 배달 A/B | Route 교체, pull-over, 정차 조건, FSM | 설계 단계 |
+
+핵심 산출물은 K-City map, mission FSM, 라바콘 전용 planner, 신호·회피·주차 module 설정, trajectory–control 연결, ERP42 interface다.
+
+## **2. 시스템 구성**
 
 ![K-City Autoware Planning 시스템 아키텍처](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/01-system-architecture.svg)
 _K-City planning system의 계층 구조._
@@ -44,7 +69,7 @@ Autoware의 기존 module은 신호·회피·주차에 사용하고, 라바콘�
 
 Source와 message contract는 2024.01 계열 기준이다. 최신 Autoware로 옮길 때는 package, message type, topic remap을 다시 맞춰야 한다.
 
-## **2. 지도와 미션 구성**
+## **3. K-City 지도와 미션 구성**
 
 Map은 배경 이미지가 아니라 planner의 입력이다.
 
@@ -104,7 +129,7 @@ Scenario Selector를 강제로 바꾸지 않았다. Route가 주행 문맥을 �
 
 주차·복구 구간의 보조 node는 `map`–`base_link` TF를 0.2초마다 검사한다. 지정 좌표 반경 1.5 m 안에 들어오면 `/parking/reset_cone_finder`에 `std_msgs/Empty`를 발행한다. 소비 node가 edge trigger라면 latch나 debounce를 둔다.
 
-## **3. 일반 도로 Planning**
+## **4. 일반 도로 Planning**
 
 일반 도로는 Behavior Path Planner와 Behavior Velocity Planner의 역할을 나눴다.
 
@@ -151,7 +176,7 @@ parking goal
 → 일반 route goal
 ```
 
-## **4. LiDAR Cone Trajectory Planner**
+## **5. LiDAR Cone Trajectory Planner**
 
 라바콘 구간에서는 map 중심선보다 실시간으로 관측한 콘 경계가 직접적인 주행 기준이다. 입력 PointCloud에서 좌·우 경계를 만들고 두 경계의 중앙을 Autoware `Trajectory`로 변환했다.
 
@@ -213,7 +238,7 @@ _Cone trajectory를 추종하는 Planning Simulator._
 
 Circle, cone, no-color cone planner package의 이전 colcon 설치 기록도 남아 있다. 최신 loose source의 clean build와 regression 결과는 별도로 남아 있지 않다.
 
-## **5. Control과 ERP42 Interface**
+## **6. Control과 ERP42 Interface**
 
 제어에는 localization, perception, vehicle status, system state가 함께 필요하다.
 
@@ -246,14 +271,14 @@ Vehicle Command Gate는 mode와 vehicle status에 따라 command를 제한하고
 
 Raw bridge 동작 기록은 있으나 ECU feedback을 포함한 synchronized closed-loop log는 없다. ERP42 interface 구현도 완성된 독립 ROS 2 package보다 Markdown에 보존된 구현 초안에 가깝다.
 
-## **6. Simulator에서 실제 대회까지**
+## **7. Simulator에서 K-City 대회까지**
 
 시험 단계:
 
 ```text
 CARLA / Planning Simulator
 → 학교 콘 코스 시험
-→ 실제 대회 LiDAR 콘 인식 주행
+→ 2025 대학생 창작 모빌리티 경진대회
 ```
 
 ### CARLA–Autoware 통합
@@ -285,7 +310,7 @@ CARLA와 RViz에는 camera image, ego pose, pointcloud map, route, drivable corr
 
 ### 실제 대회 LiDAR 콘 인식 주행
 
-학교 시험 다음 단계는 실제 대회였다. 당시 LiDAR로 청·황 콘을 인식하고 그 사이의 경로를 따라 주행했다.
+학교 시험 다음 단계는 한국교통안전공단 자동차안전연구원 K-City에서 열린 실제 대회였다. 무인 모빌리티 부문에서 LiDAR로 청·황 콘을 인식하고 그 사이의 경로를 따라 주행했다.
 
 <figure>
   <video controls autoplay muted loop playsinline preload="auto"
@@ -297,7 +322,7 @@ CARLA와 RViz에는 camera image, ego pose, pointcloud map, route, drivable corr
     <a href="https://media.iamjaehka13.blog/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/10-competition-lidar-cone-drive.mp4">대회 주행 영상 직접 열기</a>
   </video>
   <figcaption id="competition-lidar-cone-caption" class="text-center">
-    실제 대회 LiDAR 콘 인식 주행.
+    2025 대학생 창작 모빌리티 경진대회 K-City LiDAR 콘 인식 주행.
   </figcaption>
 </figure>
 
@@ -314,7 +339,7 @@ LiDAR PointCloud
 
 동기화된 rosbag이 없어 detection 정확도와 lateral tracking error는 산출하지 못했다.
 
-## **7. 통합 과정에서 해결한 문제**
+## **8. 통합 과정에서 해결한 문제**
 
 문제의 다수는 algorithm보다 map relation과 interface 상태에서 생겼다.
 
@@ -330,7 +355,7 @@ LiDAR PointCloud
 
 Start Planner patch는 `planner_data`, odometry, route, dynamic object, current lane, path point를 먼저 검사한다. 미준비 입력에는 warning과 함께 `false`를 반환해 maneuver를 승인하지 않는다. 적용 기록은 있으나 현재 checkout에서 다시 build한 regression 결과는 없다.
 
-## **8. 결과와 남은 검증**
+## **9. 대회 준비 결과**
 
 | 기능 | 현재 결과 | 남은 검증 |
 |---|---|---|
