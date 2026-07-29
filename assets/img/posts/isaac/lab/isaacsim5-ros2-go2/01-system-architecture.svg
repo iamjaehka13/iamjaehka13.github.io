@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Isaac Sim 5.0 ROS 2 Go2 system architecture</title>
+  <desc id="desc">ROS 2 velocity commands enter a PPO locomotion policy in Isaac Lab. Isaac Sim publishes camera, lidar, odometry, clock, and TF data back to ROS 2 for RViz and Nav2.</desc>
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2778c4"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#20856d"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#bc7418"/>
+    </marker>
+    <style>
+      .title { font: 700 30px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #202632; }
+      .subtitle { font: 500 16px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #5f6877; }
+      .label { font: 700 18px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #202632; }
+      .body { font: 500 15px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #3f4856; }
+      .small { font: 600 14px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #4f5968; }
+      .section { font: 700 15px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #ffffff; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#f7f8fa"/>
+  <text class="title" x="60" y="58">Isaac Sim 5.0 + ROS 2 Go2</text>
+  <text class="subtitle" x="60" y="86">Command, policy inference, simulation, sensor publishing, and navigation interfaces</text>
+
+  <rect x="60" y="120" width="1080" height="38" rx="6" fill="#3d4654"/>
+  <text class="section" x="600" y="145" text-anchor="middle">Each robot uses its own env_i namespace and command row</text>
+
+  <rect x="60" y="200" width="190" height="112" rx="6" fill="#e8f2ff" stroke="#2778c4" stroke-width="2"/>
+  <text class="label" x="155" y="232" text-anchor="middle">External ROS 2</text>
+  <text class="body" x="155" y="262" text-anchor="middle">CmdVel GUI</text>
+  <text class="body" x="155" y="286" text-anchor="middle">Nav2 / teleoperation</text>
+
+  <rect x="310" y="200" width="190" height="112" rx="6" fill="#e7f7f1" stroke="#20856d" stroke-width="2"/>
+  <text class="label" x="405" y="232" text-anchor="middle">ROS 2 Bridge</text>
+  <text class="body" x="405" y="262" text-anchor="middle">Twist subscriber</text>
+  <text class="small" x="405" y="286" text-anchor="middle">base_vel_cmd[N, 3]</text>
+
+  <rect x="560" y="200" width="210" height="112" rx="6" fill="#fff2db" stroke="#bc7418" stroke-width="2"/>
+  <text class="label" x="665" y="232" text-anchor="middle">PPO Inference</text>
+  <text class="body" x="665" y="262" text-anchor="middle">observation + command</text>
+  <text class="small" x="665" y="286" text-anchor="middle">12 joint targets @ 40 Hz</text>
+
+  <rect x="830" y="200" width="310" height="112" rx="6" fill="#f0edff" stroke="#6757b8" stroke-width="2"/>
+  <text class="label" x="985" y="232" text-anchor="middle">Isaac Sim + Isaac Lab</text>
+  <text class="body" x="985" y="262" text-anchor="middle">Go2 articulation and scene</text>
+  <text class="small" x="985" y="286" text-anchor="middle">physics 200 Hz · decimation 5</text>
+
+  <line x1="250" y1="256" x2="300" y2="256" stroke="#2778c4" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <text class="small" x="275" y="242" text-anchor="middle">Twist</text>
+  <line x1="500" y1="256" x2="550" y2="256" stroke="#20856d" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <line x1="770" y1="256" x2="820" y2="256" stroke="#bc7418" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <rect x="60" y="382" width="240" height="118" rx="6" fill="#fff0ee" stroke="#b64b3e" stroke-width="2"/>
+  <text class="label" x="180" y="414" text-anchor="middle">Robot State</text>
+  <text class="body" x="180" y="444" text-anchor="middle">root pose and body velocity</text>
+  <text class="body" x="180" y="470" text-anchor="middle">simulation timestamp</text>
+
+  <rect x="350" y="382" width="210" height="118" rx="6" fill="#eef7fb" stroke="#347e9d" stroke-width="2"/>
+  <text class="label" x="455" y="414" text-anchor="middle">Front Camera</text>
+  <text class="body" x="455" y="444" text-anchor="middle">640 × 480 RGB</text>
+  <text class="small" x="455" y="470" text-anchor="middle">front_cam_link_i</text>
+
+  <rect x="610" y="382" width="210" height="118" rx="6" fill="#eef7fb" stroke="#347e9d" stroke-width="2"/>
+  <text class="label" x="715" y="414" text-anchor="middle">RTX LiDAR</text>
+  <text class="body" x="715" y="444" text-anchor="middle">rotary point cloud</text>
+  <text class="small" x="715" y="470" text-anchor="middle">go2_lidar{i}</text>
+
+  <rect x="870" y="382" width="270" height="118" rx="6" fill="#e8f2ff" stroke="#2778c4" stroke-width="2"/>
+  <text class="label" x="1005" y="414" text-anchor="middle">OmniGraph Publishers</text>
+  <text class="body" x="1005" y="444" text-anchor="middle">RGB · PointCloud2 · Odometry</text>
+  <text class="body" x="1005" y="470" text-anchor="middle">Clock</text>
+
+  <path d="M 985 312 L 985 350 L 180 350 L 180 372" fill="none" stroke="#6757b8" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <path d="M 985 350 L 455 350 L 455 372" fill="none" stroke="#6757b8" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <path d="M 985 350 L 715 350 L 715 372" fill="none" stroke="#6757b8" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <line x1="300" y1="441" x2="340" y2="441" stroke="#347e9d" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="560" y1="441" x2="600" y2="441" stroke="#347e9d" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <line x1="820" y1="441" x2="860" y2="441" stroke="#347e9d" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="60" y="570" width="500" height="120" rx="6" fill="#fff8e9" stroke="#c08a2e" stroke-width="2"/>
+  <text class="label" x="310" y="604" text-anchor="middle">Per-robot TF tree</text>
+  <text class="small" x="310" y="636" text-anchor="middle">world → odom_i → base_link_i</text>
+  <text class="small" x="310" y="664" text-anchor="middle">↳ front_cam_link_i · go2_lidar{i}</text>
+
+  <rect x="640" y="570" width="500" height="120" rx="6" fill="#e8f2ff" stroke="#2778c4" stroke-width="2"/>
+  <text class="label" x="890" y="604" text-anchor="middle">ROS 2 consumers</text>
+  <text class="body" x="890" y="636" text-anchor="middle">RViz2 visualization · Nav2 integration</text>
+  <text class="small" x="890" y="664" text-anchor="middle">/env_i/unitree_go2/...</text>
+
+  <path d="M 1005 500 L 1005 540 L 890 540 L 890 560" fill="none" stroke="#2778c4" stroke-width="3" marker-end="url(#arrow-blue)"/>
+  <path d="M 180 500 L 180 540 L 310 540 L 310 560" fill="none" stroke="#b64b3e" stroke-width="3" marker-end="url(#arrow-orange)"/>
+  <line x1="560" y1="630" x2="630" y2="630" stroke="#2778c4" stroke-width="3" marker-end="url(#arrow-blue)"/>
+</svg>
