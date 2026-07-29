@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520" role="img" aria-labelledby="title desc">
+  <title id="title">PointCloud 기반 Cone Planner Pipeline</title>
+  <desc id="desc">콘 PointCloud 입력에서 좌우 경계와 중앙 trajectory를 생성하고 실패하면 정지 trajectory를 발행하는 흐름</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 24px Pretendard, "Noto Sans KR", sans-serif; fill: #10213a; }
+      .head { font: 700 16px Pretendard, "Noto Sans KR", sans-serif; fill: #10213a; }
+      .body { font: 400 13px Pretendard, "Noto Sans KR", sans-serif; fill: #475569; }
+      .box { rx: 6; stroke-width: 2; }
+      .arr { fill: none; stroke: #475569; stroke-width: 2.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="520" fill="#f8fafc"/>
+  <text x="44" y="52" class="title">Cone Planner: PointCloud2 → Autoware Trajectory</text>
+  <text x="44" y="78" class="body">색상 topic 또는 무색상 DBSCAN 입력을 동일한 boundary/centerline pipeline으로 처리한다.</text>
+
+  <g>
+    <rect x="44" y="132" width="140" height="122" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="114" y="166" class="head" text-anchor="middle">PointCloud2</text>
+    <text x="114" y="194" class="body" text-anchor="middle">/perception/cones</text>
+    <text x="114" y="216" class="body" text-anchor="middle">yellow / blue</text>
+    <text x="114" y="238" class="body" text-anchor="middle">sensor frame</text>
+
+    <rect x="218" y="132" width="140" height="122" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="288" y="166" class="head" text-anchor="middle">TF Transform</text>
+    <text x="288" y="194" class="body" text-anchor="middle">timestamp lookup</text>
+    <text x="288" y="216" class="body" text-anchor="middle">latest fallback</text>
+    <text x="288" y="238" class="body" text-anchor="middle">→ map frame</text>
+
+    <rect x="392" y="132" width="150" height="122" class="box" fill="#ede9fe" stroke="#a78bfa"/>
+    <text x="467" y="166" class="head" text-anchor="middle">Stabilize</text>
+    <text x="467" y="194" class="body" text-anchor="middle">ROI · time window</text>
+    <text x="467" y="216" class="body" text-anchor="middle">TTL · dedup</text>
+    <text x="467" y="238" class="body" text-anchor="middle">EMA buffer</text>
+
+    <rect x="576" y="132" width="150" height="122" class="box" fill="#ede9fe" stroke="#a78bfa"/>
+    <text x="651" y="166" class="head" text-anchor="middle">Split L/R</text>
+    <text x="651" y="194" class="body" text-anchor="middle">color topics</text>
+    <text x="651" y="216" class="body" text-anchor="middle">or DBSCAN</text>
+    <text x="651" y="238" class="body" text-anchor="middle">geometry check</text>
+
+    <rect x="760" y="132" width="156" height="122" class="box" fill="#dcfce7" stroke="#22c55e"/>
+    <text x="838" y="166" class="head" text-anchor="middle">Boundary</text>
+    <text x="838" y="194" class="body" text-anchor="middle">distance/direction</text>
+    <text x="838" y="216" class="body" text-anchor="middle">angle-constrained chain</text>
+    <text x="838" y="238" class="body" text-anchor="middle">B-spline fitting</text>
+
+    <rect x="950" y="132" width="160" height="122" class="box" fill="#dcfce7" stroke="#22c55e"/>
+    <text x="1030" y="166" class="head" text-anchor="middle">Centerline</text>
+    <text x="1030" y="194" class="body" text-anchor="middle">arc-length resample</text>
+    <text x="1030" y="216" class="body" text-anchor="middle">midpoint</text>
+    <text x="1030" y="238" class="body" text-anchor="middle">single-side fallback</text>
+
+    <rect x="1144" y="132" width="212" height="122" class="box" fill="#fef3c7" stroke="#f59e0b"/>
+    <text x="1250" y="166" class="head" text-anchor="middle">Trajectory</text>
+    <text x="1250" y="194" class="body" text-anchor="middle">ego alignment · yaw EMA</text>
+    <text x="1250" y="216" class="body" text-anchor="middle">curvature speed limit</text>
+    <text x="1250" y="238" class="body" text-anchor="middle">Trajectory · Path · Marker</text>
+
+    <path d="M184 193 H218" class="arr"/>
+    <path d="M358 193 H392" class="arr"/>
+    <path d="M542 193 H576" class="arr"/>
+    <path d="M726 193 H760" class="arr"/>
+    <path d="M916 193 H950" class="arr"/>
+    <path d="M1110 193 H1144" class="arr"/>
+  </g>
+
+  <rect x="392" y="336" width="718" height="104" rx="6" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+  <text x="428" y="371" class="head">Failure path</text>
+  <text x="428" y="399" class="body">관측 부족 · boundary 생성 실패 · centerline 없음</text>
+  <text x="806" y="399" class="head">→</text>
+  <text x="850" y="399" class="head">2-point, 0 m/s stop trajectory</text>
+  <path d="M1030 254 V316 H751 V336" class="arr"/>
+
+  <rect x="1144" y="336" width="212" height="104" rx="6" fill="#ecfeff" stroke="#14b8a6" stroke-width="2"/>
+  <text x="1250" y="371" class="head" text-anchor="middle">Runtime contract</text>
+  <text x="1250" y="399" class="body" text-anchor="middle">publish_hz: 10 Hz</text>
+  <text x="1250" y="421" class="body" text-anchor="middle">output frame: map</text>
+</svg>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">K-City Autoware Planning 시스템 아키텍처</title>
+  <desc id="desc">지도, localization, perception, task manager, Autoware planning, custom cone planner, control, ERP42 interface 데이터 흐름</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#526174"/>
+    </marker>
+    <style>
+      .h { font: 700 24px Pretendard, "Noto Sans KR", sans-serif; fill: #14213d; }
+      .sh { font: 700 15px Pretendard, "Noto Sans KR", sans-serif; letter-spacing: 1px; }
+      .t { font: 700 17px Pretendard, "Noto Sans KR", sans-serif; fill: #172033; }
+      .s { font: 400 14px Pretendard, "Noto Sans KR", sans-serif; fill: #4b5563; }
+      .box { rx: 6; stroke-width: 2; }
+      .arr { fill: none; stroke: #526174; stroke-width: 2.5; marker-end: url(#a); }
+    </style>
+  </defs>
+  <rect width="1400" height="820" fill="#f7f9fc"/>
+  <text x="56" y="58" class="h">K-City Autoware Planning System</text>
+  <text x="56" y="88" class="s">Map frame 기준의 입력, mission orchestration, planning, control, vehicle feedback contract</text>
+
+  <text x="56" y="138" class="sh" fill="#0369a1">MAP · STATE · PERCEPTION</text>
+  <rect x="56" y="158" width="236" height="92" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text x="174" y="190" class="t" text-anchor="middle">K-City Map</text>
+  <text x="174" y="217" class="s" text-anchor="middle">PCD · Lanelet2 · Projector</text>
+  <text x="174" y="238" class="s" text-anchor="middle">traffic light · stop line · parking</text>
+
+  <rect x="56" y="276" width="236" height="92" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text x="174" y="309" class="t" text-anchor="middle">Localization</text>
+  <text x="174" y="337" class="s" text-anchor="middle">kinematic state · acceleration</text>
+  <text x="174" y="358" class="s" text-anchor="middle">map → base_link TF</text>
+
+  <rect x="56" y="394" width="236" height="108" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text x="174" y="427" class="t" text-anchor="middle">Perception</text>
+  <text x="174" y="455" class="s" text-anchor="middle">objects · PointCloud</text>
+  <text x="174" y="476" class="s" text-anchor="middle">OccupancyGrid · traffic signal</text>
+  <text x="174" y="492" class="s" text-anchor="middle">cone PointCloud2</text>
+
+  <text x="358" y="138" class="sh" fill="#6d28d9">MISSION ORCHESTRATION</text>
+  <rect x="358" y="158" width="254" height="128" class="box" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="485" y="192" class="t" text-anchor="middle">task_manager</text>
+  <text x="485" y="220" class="s" text-anchor="middle">YAML mission sequence</text>
+  <text x="485" y="242" class="s" text-anchor="middle">timer · topic · route state · pose</text>
+  <text x="485" y="264" class="s" text-anchor="middle">operation mode retry</text>
+
+  <rect x="358" y="316" width="254" height="92" class="box" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="485" y="350" class="t" text-anchor="middle">Routing API</text>
+  <text x="485" y="378" class="s" text-anchor="middle">set_route_points · clear_route</text>
+  <text x="485" y="399" class="s" text-anchor="middle">/api/routing/state</text>
+
+  <rect x="358" y="438" width="254" height="92" class="box" fill="#ede9fe" stroke="#a78bfa"/>
+  <text x="485" y="472" class="t" text-anchor="middle">Planning Preset</text>
+  <text x="485" y="500" class="s" text-anchor="middle">module enable · parameter</text>
+  <text x="485" y="521" class="s" text-anchor="middle">route와 behavior 분리</text>
+
+  <text x="676" y="138" class="sh" fill="#15803d">AUTOWARE PLANNING</text>
+  <rect x="676" y="158" width="286" height="92" class="box" fill="#dcfce7" stroke="#22c55e"/>
+  <text x="819" y="191" class="t" text-anchor="middle">Mission Planner</text>
+  <text x="819" y="219" class="s" text-anchor="middle">Lanelet2 route · goal · waypoint</text>
+  <text x="819" y="240" class="s" text-anchor="middle">/planning/mission_planning/route</text>
+
+  <rect x="676" y="276" width="286" height="118" class="box" fill="#dcfce7" stroke="#22c55e"/>
+  <text x="819" y="309" class="t" text-anchor="middle">Behavior Path Planner</text>
+  <text x="819" y="337" class="s" text-anchor="middle">avoidance · lane change</text>
+  <text x="819" y="359" class="s" text-anchor="middle">start · goal · drivable area</text>
+  <text x="819" y="381" class="s" text-anchor="middle">parking scene modules</text>
+
+  <rect x="676" y="420" width="286" height="104" class="box" fill="#dcfce7" stroke="#22c55e"/>
+  <text x="819" y="454" class="t" text-anchor="middle">Behavior Velocity Planner</text>
+  <text x="819" y="482" class="s" text-anchor="middle">traffic light · stop line</text>
+  <text x="819" y="504" class="s" text-anchor="middle">intersection · dilemma zone</text>
+
+  <rect x="676" y="558" width="286" height="112" class="box" fill="#ccfbf1" stroke="#14b8a6"/>
+  <text x="819" y="592" class="t" text-anchor="middle">Custom Cone Planner</text>
+  <text x="819" y="620" class="s" text-anchor="middle">PointCloud2 → boundary → centerline</text>
+  <text x="819" y="642" class="s" text-anchor="middle">Autoware Trajectory · stop fallback</text>
+
+  <text x="1026" y="138" class="sh" fill="#b45309">CONTROL · VEHICLE</text>
+  <rect x="1026" y="188" width="302" height="92" class="box" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1177" y="222" class="t" text-anchor="middle">Trajectory Follower</text>
+  <text x="1177" y="250" class="s" text-anchor="middle">trajectory + vehicle state → control_cmd</text>
+  <text x="1177" y="271" class="s" text-anchor="middle">steering · velocity</text>
+
+  <rect x="1026" y="310" width="302" height="92" class="box" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1177" y="344" class="t" text-anchor="middle">Vehicle Command Gate</text>
+  <text x="1177" y="372" class="s" text-anchor="middle">operation mode · engage · gear</text>
+  <text x="1177" y="393" class="s" text-anchor="middle">command selection and gating</text>
+
+  <rect x="1026" y="432" width="302" height="104" class="box" fill="#ffe4e6" stroke="#f43f5e"/>
+  <text x="1177" y="466" class="t" text-anchor="middle">ERP42 Interface</text>
+  <text x="1177" y="494" class="s" text-anchor="middle">Autoware command ↔ ERP42 command</text>
+  <text x="1177" y="516" class="s" text-anchor="middle">velocity · steering · gear · mode</text>
+
+  <rect x="1026" y="566" width="302" height="92" class="box" fill="#e2e8f0" stroke="#64748b"/>
+  <text x="1177" y="600" class="t" text-anchor="middle">Planning Simulator</text>
+  <text x="1177" y="628" class="s" text-anchor="middle">dummy localization · perception · vehicle</text>
+  <text x="1177" y="649" class="s" text-anchor="middle">integration verification</text>
+
+  <path d="M292 204 H320 V112 H648 V204 H676" class="arr"/>
+  <path d="M292 322 H640 V244 H650 V204 H676" class="arr"/>
+  <path d="M292 448 H320 V548 H640 V335 H676" class="arr"/>
+  <path d="M292 470 H320 V614 H676" class="arr"/>
+  <path d="M485 286 V316" class="arr"/>
+  <path d="M612 362 H646 V204 H676" class="arr"/>
+  <path d="M612 484 H648 V335 H676" class="arr"/>
+  <path d="M819 250 V276" class="arr"/>
+  <path d="M819 394 V420" class="arr"/>
+  <path d="M962 472 H990 V234 H1026" class="arr"/>
+  <path d="M962 614 H990 V234 H1026" class="arr"/>
+  <path d="M1177 280 V310" class="arr"/>
+  <path d="M1177 402 V432" class="arr"/>
+  <path d="M1328 356 H1360 V612 H1328" class="arr"/>
+
+  <path d="M1026 492 H990 V730 H300 V342 H292" class="arr"/>
+  <text x="684" y="754" class="s" text-anchor="middle">vehicle status feedback: velocity · steering · gear · control mode</text>
+
+  <rect x="56" y="704" width="232" height="58" rx="6" fill="#fff" stroke="#cbd5e1"/>
+  <text x="172" y="728" class="s" text-anchor="middle">Coordinate contract</text>
+  <text x="172" y="749" class="t" text-anchor="middle">map → base_link</text>
+</svg>
