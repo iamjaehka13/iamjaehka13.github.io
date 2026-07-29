@@ -20,7 +20,7 @@ math: true
 - 여러 Go2의 topic과 command 분리
 - RViz2 visualization과 Nav2 interface 연결
 
-[프로젝트 저장소](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)는 command 입력, policy inference, physics step, sensor publish를 하나의 Isaac Sim loop로 묶었다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
+[프로젝트 저장소](https://github.com/iamjaehka13/isaacsim_ros2_go2)는 command 입력, policy inference, physics step, sensor publish를 하나의 Isaac Sim loop로 묶었다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
