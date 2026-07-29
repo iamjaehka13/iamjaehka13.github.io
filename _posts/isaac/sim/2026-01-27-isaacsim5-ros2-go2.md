@@ -1,31 +1,33 @@
 ---
-title: "[IsaacLab Part 5] Go2와 ROS 2 연결"
+title: "Isaac Sim 5.0에서 ROS 2로 Unitree Go2 제어하기"
 date: 2026-01-27 10:00:00 +0900
 last_modified_at: 2026-01-27 10:00:00 +0900
 preserve_last_modified_at: true
-categories: [Isaac, Lab]
-tags: [unitree-go2, isaac-sim, isaac-lab, ros2, ros2-humble, rsl-rl, ppo, rviz2, nav2, multi-robot, digital-twin, rtx-lidar]
-description: "Isaac Sim 5.0과 Isaac Lab 2.2.0에서 Go2 PPO policy, ROS 2 명령, RGB·LiDAR·odometry·TF, multi-robot teleoperation과 Nav2를 연결한 구현 기록."
+categories: [Isaac, Sim]
+tags: [unitree-go2, isaac-sim, ros2, ros2-humble, rsl-rl, ppo, rviz2, nav2, multi-robot, digital-twin, rtx-lidar]
+description: "Isaac Sim 5.0에서 Unitree Go2 PPO policy와 ROS 2 명령, RGB·LiDAR·odometry·TF, multi-robot teleoperation, Nav2를 연결한 구현 기록."
 image:
-  path: /assets/img/posts/isaac/lab/isaacsim5-ros2-go2/00-preview.jpg
+  path: /assets/img/posts/isaac/sim/isaacsim5-ros2-go2/00-preview.jpg
   alt: 실내 digital twin 환경에서 움직이는 Unitree Go2
 math: true
 ---
 
-[Part 4](/posts/isaaclab-part-4-rl-policy-isaac-sim/)를 끝냈을 때 남아 있던 건 세 가지였다.
+목표는 Isaac Sim 5.0 안의 Unitree Go2를 ROS 2 Humble에서 제어하고, robot state와 sensor data를 RViz2와 Nav2까지 연결하는 것.
 
-- 키보드나 ROS 2에서 목표 속도 입력
-- camera·LiDAR·odometry를 ROS 2 topic으로 publish
-- Nav2가 쓸 수 있는 command·odometry·TF 연결
+- ROS 2 `Twist`로 목표 속도 입력
+- PPO 보행 policy로 12개 관절 target 생성
+- RGB camera·RTX LiDAR·odometry·TF publish
+- 여러 Go2의 topic과 command 분리
+- RViz2 visualization과 Nav2 interface 연결
 
-[`isaacsim5.0_ros2_go2`](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)는 이 세 항목을 하나의 simulation loop로 묶은 저장소다. 학습된 Go2 보행 policy는 Isaac Lab에서 실행하고, 외부 명령과 센서 데이터는 ROS 2 Humble을 통과한다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
+[`isaacsim5.0_ros2_go2`](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)는 command 입력, policy inference, physics step, sensor publish를 하나의 Isaac Sim loop로 묶은 저장소다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
-         poster="/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg"
+         poster="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg"
          aria-describedby="digital-twin-caption"
          style="width: 100%; border-radius: 6px;">
-    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/03-go2-digital-twin.mp4" type="video/mp4">
+    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/03-go2-digital-twin.mp4" type="video/mp4">
     이 브라우저는 동영상 재생을 지원하지 않는다.
   </video>
   <figcaption id="digital-twin-caption" class="text-center">
@@ -40,7 +42,7 @@ math: true
 | 항목 | 설정 또는 구현 |
 |---|---|
 | Simulator | Isaac Sim 5.0 |
-| RL framework | Isaac Lab 2.2.0, RSL-RL |
+| Policy runtime | RSL-RL PPO checkpoint inference |
 | Policy | rough-terrain PPO checkpoint inference |
 | Physics / policy 주기 | 200 Hz / 40 Hz |
 | ROS 2 | Humble, Isaac Sim ROS 2 Bridge |
@@ -50,7 +52,7 @@ math: true
 | Multi-robot | `env_i`별 command, topic, frame 분리 |
 | Scene | warehouse 계열, office, experimental digital twin |
 
-![Isaac Sim 5.0 ROS 2 Go2 시스템 구성](/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/01-system-architecture.svg)
+![Isaac Sim 5.0 ROS 2 Go2 시스템 구성](/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/01-system-architecture.svg)
 _ROS 2 command가 PPO policy를 거쳐 관절 명령이 되고, simulation state와 sensor output이 다시 ROS 2로 나오는 구조._
 
 ROS 2가 관절을 직접 움직이는 구조는 아니다.
@@ -129,6 +131,8 @@ policy frequency: 40 Hz
 
 `agent.yaml`에는 PPO training parameter가 남아 있지만 이 저장소의 실행 loop에는 `learn()` 호출이 없다. 실제 동작은 `rough_model_9000.pt`를 load한 뒤 inference policy를 얻는 과정.
 
+코드에 포함된 environment wrapper와 RSL-RL loader는 기존 PPO checkpoint를 실행하기 위한 부분이다. 이 프로젝트의 중심은 학습 환경을 새로 만드는 작업이 아니라 Isaac Sim의 Go2와 ROS 2 입출력을 연결하는 데 있다.
+
 ```python
 ppo_runner = OnPolicyRunner(
     env,
@@ -189,7 +193,7 @@ base_vel_cmd_input[idx, 1] = msg.linear.y
 base_vel_cmd_input[idx, 2] = msg.angular.z
 ```
 
-`num_envs == 1`이면 Isaac Lab의 `Se2Keyboard`를 사용하고, 둘 이상이면 robot별 `cmd_vel` subscriber를 만든다.
+`num_envs == 1`이면 코드에 포함된 `Se2Keyboard` 입력을 사용하고, 둘 이상이면 robot별 `cmd_vel` subscriber를 만든다.
 
 ```text
 /env_0/unitree_go2/cmd_vel → base_vel_cmd_input[0]
@@ -201,10 +205,10 @@ base_vel_cmd_input[idx, 2] = msg.angular.z
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
-         poster="/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/02-multi-robot-teleoperation-poster.jpg"
+         poster="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/02-multi-robot-teleoperation-poster.jpg"
          aria-describedby="multi-robot-caption"
          style="width: 100%; border-radius: 6px;">
-    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/01-multi-robot-teleoperation.mp4" type="video/mp4">
+    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/01-multi-robot-teleoperation.mp4" type="video/mp4">
     이 브라우저는 동영상 재생을 지원하지 않는다.
   </video>
   <figcaption id="multi-robot-caption" class="text-center">
@@ -228,12 +232,12 @@ omni.kit.commands.execute(
 )
 ```
 
-Camera와 LiDAR마다 별도의 OmniGraph를 만들고 `ROS2CameraHelper`, `ROS2RtxLidarHelper`에 render product를 연결했다. Odometry는 sensor integration 결과가 아니라 Isaac Lab의 root state를 읽어 만든 simulation-state odometry다.
+Camera와 LiDAR마다 별도의 OmniGraph를 만들고 `ROS2CameraHelper`, `ROS2RtxLidarHelper`에 render product를 연결했다. Odometry는 sensor integration 결과가 아니라 simulator의 root state를 읽어 만든 simulation-state odometry다.
 
 Quaternion convention도 한 번 변환한다.
 
 ```python
-# Isaac Lab: WXYZ
+# Simulator tensor: WXYZ
 quat_wxyz = robot_data.root_state_w[i, 3:7]
 
 # ROS 2: XYZW
@@ -258,10 +262,10 @@ quat_xyzw = [
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
-         poster="/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/03-rviz-sensor-bridge-poster.jpg"
+         poster="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/03-rviz-sensor-bridge-poster.jpg"
          aria-describedby="rviz-sensor-caption"
          style="width: 100%; border-radius: 6px;">
-    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/02-rviz-sensor-bridge.mp4" type="video/mp4">
+    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/02-rviz-sensor-bridge.mp4" type="video/mp4">
     이 브라우저는 동영상 재생을 지원하지 않는다.
   </video>
   <figcaption id="rviz-sensor-caption" class="text-center">
@@ -328,10 +332,10 @@ LiDAR + odometry + TF + clock
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
-         poster="/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/05-nav2-integration-poster.jpg"
+         poster="/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/05-nav2-integration-poster.jpg"
          aria-describedby="nav2-caption"
          style="width: 100%; border-radius: 6px;">
-    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/lab/isaacsim5-ros2-go2/04-nav2-integration.mp4" type="video/mp4">
+    <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-nav2-integration.mp4" type="video/mp4">
     이 브라우저는 동영상 재생을 지원하지 않는다.
   </video>
   <figcaption id="nav2-caption" class="text-center">
@@ -415,4 +419,3 @@ envs/usdz_import.py          experimental digital twin import
 - [Isaac Sim 5.0 ROS 2 Installation](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/installation/install_ros.html)
 - [Isaac Sim 5.0 RTX Lidar Sensors](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_rtx_lidar.html)
 - [Isaac Sim 5.0 Transform Trees and Odometry](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/ros2_tutorials/tutorial_ros2_tf.html)
-- [Isaac Lab 2.2.0 Local Installation](https://isaac-sim.github.io/IsaacLab/v2.2.0/source/setup/installation/index.html)
