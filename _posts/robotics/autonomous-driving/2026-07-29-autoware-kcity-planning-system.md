@@ -1,7 +1,7 @@
 ---
 title: "Autoware 기반 K-City Planning System"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 18:00:00 +0900
+last_modified_at: 2026-07-29 18:23:00 +0900
 categories: [Robotics, Autonomous Driving]
 tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
 description: "K-City 지도와 미션 planning, CARLA 통합, 학교 콘 시험, 실제 대회 LiDAR 콘 인식 주행, Autoware–ERP42 인터페이스를 정리한다."
@@ -342,28 +342,3 @@ Start Planner patch는 `planner_data`, odometry, route, dynamic object, current 
 | CARLA 통합 | Scene, camera, map, route/path 동시 실행 | Sensor timestamp와 tracking error |
 | ERP42 interface | Command/status 변환과 raw bridge 기록 | ECU feedback 포함 closed-loop 반복 주행 |
 | K-City 전체 시스템 | 개별 subsystem의 구현·시험 기록 | Mission FSM과 ERP42를 포함한 end-to-end 자동 완주 |
-
-남은 검증:
-
-1. Autoware 버전과 message package를 고정한 clean build
-2. 동일 입력을 이용한 simulator regression
-3. 음수 safety buffer 제거와 vehicle footprint·sensor error 반영
-4. PointCloud부터 vehicle feedback까지 synchronized rosbag 기록
-5. 저속 fixed trajectory, 개별 미션, mission FSM, 전체 코스 순서의 단계적 확대
-
-## **9. 정리**
-
-핵심 산출물은 K-City map semantic, route 기반 mission 전환, LiDAR cone trajectory, Autoware control, ERP42 interface의 구성과 개별 시험 기록이다.
-
-라바콘 planning은 simulator에서 시작해 학교 콘 코스 시험을 거쳤고, 실제 대회 LiDAR 콘 인식 주행까지 이어졌다. 다음 단계는 perception–planning–control–vehicle 전 구간을 같은 시간축으로 기록하고 반복 가능한 수치로 만드는 일이다.
-
-## **참고 자료**
-
-- [Autoware Planning Components](https://autowarefoundation.github.io/autoware_universe/latest/planning/)
-- [Autoware Map Component Design](https://autowarefoundation.github.io/autoware-documentation/main/design/autoware-architecture-v1/components/map/)
-- [Autoware Routing API](https://autowarefoundation.github.io/autoware-documentation/main/design/autoware-architecture-v1/interfaces/ad-api/features/routing/)
-- [Autoware Behavior Path Planner](https://autowarefoundation.github.io/autoware_universe/main/planning/behavior_path_planner/autoware_behavior_path_planner/)
-- [Autoware Traffic Light Module](https://autowarefoundation.github.io/autoware_universe/latest/planning/behavior_velocity_planner/autoware_behavior_velocity_traffic_light_module/)
-- [Autoware Freespace Planner](https://autowarefoundation.github.io/autoware_universe/main/planning/autoware_freespace_planner/)
-- [Autoware Operation Mode API](https://autowarefoundation.github.io/autoware-documentation/main/design/autoware-architecture-v1/interfaces/ad-api/features/operation_mode/)
-- [Integrating Autoware with a Vehicle](https://autowarefoundation.github.io/autoware-documentation/latest/how-to-guides/integrating-autoware/overview/)
