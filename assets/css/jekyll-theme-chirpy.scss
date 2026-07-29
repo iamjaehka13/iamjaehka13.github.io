@@ -890,6 +890,7 @@ body:has(.resume-page) article.px-1 {
 }
 
 .portfolio-sheet-figure-poster img {
+  aspect-ratio: 3 / 4;
   object-fit: contain;
   background: #fff;
 }
