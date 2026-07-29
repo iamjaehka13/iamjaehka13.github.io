@@ -136,6 +136,29 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </div>
         <p class="resume-place">Seoul, Korea</p>
       </div>
+
+      <div class="resume-entry">
+        <p class="resume-date">
+          <span>Jul. 2025 –</span>
+          <span>Nov. 2025</span>
+        </p>
+        <div class="resume-entry-body">
+          <h3>
+            <a href="/posts/autoware-kcity-planning-system/">
+              Autoware Planning for the 2025 Creative Mobility Competition
+            </a>
+          </h3>
+          <p class="resume-role">Planning Team Member · Unmanned Mobility Division</p>
+          <ul>
+            <li>
+              Worked on traffic-light and stop-line planning in Autoware and
+              participated in K-City field testing of the team's LiDAR-based
+              cone-course driving on an ERP-42.
+            </li>
+          </ul>
+        </div>
+        <p class="resume-place">Hwaseong, Korea</p>
+      </div>
     </section>
 
     <section class="resume-section" aria-labelledby="experience-heading">
@@ -175,7 +198,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         <div class="resume-entry-body">
           <h3>
             <a href="https://dataen.ai/challenge/history/2024">
-              2024 POSTECH × OIBC Challenge, Participation Award
+              6th POSTECH OIBC Challenge, Participation Award
             </a>
           </h3>
           <ul>
