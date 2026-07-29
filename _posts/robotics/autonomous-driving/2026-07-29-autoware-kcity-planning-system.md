@@ -1,7 +1,7 @@
 ---
 title: "Autoware 기반 K-City Planning System"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 15:30:00 +0900
+last_modified_at: 2026-07-29 15:54:00 +0900
 categories: [Robotics, Autonomous Driving]
 tags: [autoware-universe, ros2, autonomous-driving, lanelet2, behavior-path-planner, behavior-velocity-planner, cone-planner, freespace-planner, erp42, k-city]
 description: "K-City PCD·Lanelet2 지도, 미션 FSM, 라바콘 trajectory planner, 신호·주차·장애물 회피, Autoware–ERP42 인터페이스를 연결한 Planning 시스템의 사양과 검증 범위를 정리한다."
@@ -23,9 +23,6 @@ K-City PCD + Lanelet2
 → Vehicle Command Gate
 → Planning Simulator / ERP42 Interface
 ```
-
-![Autoware 기반 K-City Planning 시스템 개요](/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png)
-_Lanelet2 지도, mission FSM, behavior planning, custom cone planner, control, vehicle interface를 한 경로로 연결한 구조._
 
 ## **1. 시스템 목표와 검증 범위**
 
