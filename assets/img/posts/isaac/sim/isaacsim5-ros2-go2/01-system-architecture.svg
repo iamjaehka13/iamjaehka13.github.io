@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
-  <title id="title">Isaac Sim 5.0 ROS 2 Go2 system architecture</title>
+  <title id="title">Isaac Sim ROS 2 Go2 system architecture</title>
   <desc id="desc">ROS 2 velocity commands enter a PPO locomotion policy in the Isaac Sim runtime. Isaac Sim publishes camera, lidar, odometry, clock, and TF data back to ROS 2 for RViz and Nav2.</desc>
   <defs>
     <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -22,7 +22,7 @@
   </defs>
 
   <rect width="1200" height="760" fill="#f7f8fa"/>
-  <text class="title" x="60" y="58">Isaac Sim 5.0 + ROS 2 Go2</text>
+  <text class="title" x="60" y="58">Isaac Sim + ROS 2 Go2</text>
   <text class="subtitle" x="60" y="86">Command, policy inference, simulation, sensor publishing, and navigation interfaces</text>
 
   <rect x="60" y="120" width="1080" height="38" rx="6" fill="#3d4654"/>
@@ -44,7 +44,7 @@
   <text class="small" x="665" y="286" text-anchor="middle">12 joint targets @ 40 Hz</text>
 
   <rect x="830" y="200" width="310" height="112" rx="6" fill="#f0edff" stroke="#6757b8" stroke-width="2"/>
-  <text class="label" x="985" y="232" text-anchor="middle">Isaac Sim 5.0</text>
+  <text class="label" x="985" y="232" text-anchor="middle">Isaac Sim</text>
   <text class="body" x="985" y="262" text-anchor="middle">Go2 articulation and scene</text>
   <text class="small" x="985" y="286" text-anchor="middle">physics 200 Hz · decimation 5</text>
 

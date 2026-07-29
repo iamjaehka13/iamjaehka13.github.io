@@ -1,18 +1,18 @@
 ---
-title: "Isaac Sim 5.0에서 ROS 2로 Unitree Go2 제어하기"
+title: "Isaac Sim에서 ROS 2로 Unitree Go2 제어하기"
 date: 2026-01-27 10:00:00 +0900
 last_modified_at: 2026-01-27 10:00:00 +0900
 preserve_last_modified_at: true
 categories: [Isaac, Sim]
 tags: [unitree-go2, isaac-sim, ros2, ros2-humble, rsl-rl, ppo, rviz2, nav2, multi-robot, digital-twin, rtx-lidar]
-description: "Isaac Sim 5.0에서 Unitree Go2 PPO policy와 ROS 2 명령, RGB·LiDAR·odometry·TF, multi-robot teleoperation, Nav2를 연결한 구현 기록."
+description: "Isaac Sim에서 Unitree Go2 PPO policy와 ROS 2 명령, RGB·LiDAR·odometry·TF, multi-robot teleoperation, Nav2를 연결한 구현 기록."
 image:
   path: /assets/img/posts/isaac/sim/isaacsim5-ros2-go2/00-preview.jpg
   alt: 실내 digital twin 환경에서 움직이는 Unitree Go2
 math: true
 ---
 
-목표는 Isaac Sim 5.0 안의 Unitree Go2를 ROS 2 Humble에서 제어하고, robot state와 sensor data를 RViz2와 Nav2까지 연결하는 것.
+목표는 Isaac Sim 안의 Unitree Go2를 ROS 2 Humble에서 제어하고, robot state와 sensor data를 RViz2와 Nav2까지 연결하는 것.
 
 - ROS 2 `Twist`로 목표 속도 입력
 - PPO 보행 policy로 12개 관절 target 생성
@@ -20,7 +20,7 @@ math: true
 - 여러 Go2의 topic과 command 분리
 - RViz2 visualization과 Nav2 interface 연결
 
-[`isaacsim5.0_ros2_go2`](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)는 command 입력, policy inference, physics step, sensor publish를 하나의 Isaac Sim loop로 묶은 저장소다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
+[프로젝트 저장소](https://github.com/tosemfdk/isaacsim5.0_ros2_go2)는 command 입력, policy inference, physics step, sensor publish를 하나의 Isaac Sim loop로 묶었다. `num_envs`를 늘리면 robot마다 독립된 topic과 command row를 사용한다.
 
 <figure>
   <video controls autoplay muted loop playsinline preload="metadata"
@@ -41,7 +41,7 @@ math: true
 
 | 항목 | 설정 또는 구현 |
 |---|---|
-| Simulator | Isaac Sim 5.0 |
+| Simulator | Isaac Sim |
 | Policy runtime | RSL-RL PPO checkpoint inference |
 | Policy | rough-terrain PPO checkpoint inference |
 | Physics / policy 주기 | 200 Hz / 40 Hz |
@@ -52,7 +52,7 @@ math: true
 | Multi-robot | `env_i`별 command, topic, frame 분리 |
 | Scene | warehouse 계열, office, experimental digital twin |
 
-![Isaac Sim 5.0 ROS 2 Go2 시스템 구성](/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/01-system-architecture.svg)
+![Isaac Sim ROS 2 Go2 시스템 구성](/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/01-system-architecture.svg)
 _ROS 2 command가 PPO policy를 거쳐 관절 명령이 되고, simulation state와 sensor output이 다시 ROS 2로 나오는 구조._
 
 ROS 2가 관절을 직접 움직이는 구조는 아니다.
@@ -76,7 +76,7 @@ Isaac Sim camera / RTX LiDAR / root state
 
 ## **2. Isaac Sim과 ROS 2의 Python 환경 분리**
 
-Isaac Sim 5.0은 Python 3.11을 사용한다. Ubuntu 22.04의 system ROS 2 Humble은 Python 3.10 기반이라, Isaac Sim을 실행하는 터미널에서 `/opt/ros/humble/setup.bash`를 바로 source하면 `rclpy`와 message package가 충돌할 수 있다.
+이 프로젝트의 Isaac Sim 실행 환경은 Python 3.11을 사용한다. Ubuntu 22.04의 system ROS 2 Humble은 Python 3.10 기반이라, Isaac Sim을 실행하는 터미널에서 `/opt/ros/humble/setup.bash`를 바로 source하면 `rclpy`와 message package가 충돌할 수 있다.
 
 Isaac Sim terminal:
 
@@ -89,7 +89,7 @@ source ~/IsaacSim-ros_workspaces/build_ws/humble/humble_ws/install/local_setup.b
 
 이 terminal에는 Python 3.11로 build한 Isaac Sim ROS workspace만 올렸다. RViz2, Nav2, 별도 ROS 2 node는 system Humble을 source한 다른 terminal에서 실행할 수 있다. 두 process 사이의 message 전달은 DDS가 맡는다.
 
-Isaac Sim 5.0의 [ROS 2 설치 문서](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/installation/install_ros.html)에도 Isaac Sim process에서는 internal library 또는 Python 3.11로 build한 ROS workspace를 사용하도록 안내되어 있다.
+Isaac Sim의 [ROS 2 설치 문서](https://docs.isaacsim.omniverse.nvidia.com/5.0.0/installation/install_ros.html)에도 Isaac Sim process에서는 internal library 또는 Python 3.11로 build한 ROS workspace를 사용하도록 안내되어 있다.
 
 ## **3. Main simulation loop**
 
@@ -352,21 +352,18 @@ LiDAR + odometry + TF + clock
 Isaac Sim terminal:
 
 ```bash
-cd ~/isaacsim5.0_ros2_go2
 python run_simul.py
 ```
 
 TF publisher:
 
 ```bash
-cd ~/isaacsim5.0_ros2_go2
 python tf_publisher.py
 ```
 
 Multi-robot command GUI:
 
 ```bash
-cd ~/isaacsim5.0_ros2_go2
 python cmd_vel_gui.py
 ```
 
