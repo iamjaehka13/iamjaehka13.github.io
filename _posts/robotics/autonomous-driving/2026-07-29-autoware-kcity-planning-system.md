@@ -1,13 +1,13 @@
 ---
-title: "2025 대학생 창작 모빌리티 경진대회: Autoware 기반 K-City Planning"
+title: "2025 대학생 창작 모빌리티 경진대회"
 date: 2026-07-29 15:30:00 +0900
-last_modified_at: 2026-07-29 18:34:00 +0900
+last_modified_at: 2026-07-29 18:47:00 +0900
 categories: [Robotics, Autonomous Driving]
 tags: [creative-mobility-competition, unmanned-mobility, autoware-universe, ros2, autonomous-driving, lanelet2, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
-description: "한국교통안전공단 K-City에서 열린 2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문을 준비하며 구축한 Autoware Planning 시스템을 정리한다."
+description: "한국교통안전공단 K-City에서 열린 2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문의 Planning 팀 기록."
 image:
   path: /assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png
-  alt: 2025 대학생 창작 모빌리티 경진대회를 위한 K-City Autoware Planning 시스템
+  alt: 2025 대학생 창작 모빌리티 경진대회 Planning 팀 기록
 ---
 
 2025년 10월 31일부터 11월 1일까지 한국교통안전공단 자동차안전연구원 K-City에서 열린 **2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문**을 준비했다.
