@@ -972,6 +972,36 @@ body:has(.resume-page) article.px-1 {
   line-height: 1.45;
 }
 
+.portfolio-sheet-outcome {
+  margin: 2.75rem 0 0;
+  padding: 0.15rem 0 0.15rem 1.25rem;
+  border-left: 3px solid var(--resume-rule);
+}
+
+.portfolio-sheet-outcome span {
+  display: block;
+  color: var(--resume-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portfolio-sheet-outcome strong {
+  display: block;
+  margin: 0.35rem 0 0.45rem;
+  color: var(--resume-ink);
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.portfolio-sheet-outcome p {
+  margin: 0;
+  color: #444;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
 .portfolio-sheet-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1291,6 +1321,7 @@ body:has(.resume-page) article.px-1 {
   .portfolio-sheet-figure,
   .portfolio-sheet-proof,
   .portfolio-sheet-results,
+  .portfolio-sheet-outcome,
   .portfolio-sheet-gallery {
     break-inside: avoid;
   }
@@ -1307,6 +1338,7 @@ body:has(.resume-page) article.px-1 {
   .portfolio-sheet-figure-wide,
   .portfolio-sheet-proof,
   .portfolio-sheet-results,
+  .portfolio-sheet-outcome,
   .portfolio-sheet-gallery {
     margin-top: 7mm;
   }
@@ -1316,7 +1348,8 @@ body:has(.resume-page) article.px-1 {
   }
 
   .portfolio-sheet-proof-copy > p:not(:first-child),
-  .portfolio-sheet-results > p {
+  .portfolio-sheet-results > p,
+  .portfolio-sheet-outcome p {
     font-size: 8pt;
   }
 

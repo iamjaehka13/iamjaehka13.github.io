@@ -664,18 +664,12 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </figcaption>
       </figure>
 
-      <div class="portfolio-sheet-results" aria-label="2025 mobility competition field demonstration">
-        <div>
-          <span>Competition Division</span>
-          <strong>Unmanned</strong>
-        </div>
-        <div>
-          <span>Field Site</span>
-          <strong>K-City</strong>
-        </div>
+      <div class="portfolio-sheet-outcome" aria-label="2025 mobility competition field demonstration">
+        <span>Field Demonstration · K-City</span>
+        <strong>LiDAR Cone-Course Driving</strong>
         <p>
-          Team field demonstration: The team’s ERP-42 used LiDAR to detect blue
-          and yellow cones and drove through the competition cone course at K-City.
+          The team’s ERP-42 detected blue and yellow cones with LiDAR and drove
+          through the competition course.
         </p>
       </div>
 
