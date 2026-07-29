@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 3] Dynamics Randomization"
-date: 2026-01-15 17:31:00 +0900
-last_modified_at: 2026-01-15 17:31:00 +0900
+date: 2026-02-01 17:31:00 +0900
+last_modified_at: 2026-02-01 17:31:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, dynamics-randomization, recurrent-policy, implicit-system-identification, fetch-robot, object-pushing, rdpg, her]
 description: Peng et al.의 dynamics randomization을 Fetch puck pushing 실험, RDPG와 HER, LSTM 기반 implicit system identification, omniscient critic, 실물 ablation 결과까지 원문 기준으로 정리한다.

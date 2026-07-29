@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 4] Learning Agile Locomotion"
-date: 2026-01-15 17:32:00 +0900
-last_modified_at: 2026-01-15 17:32:00 +0900
+date: 2026-02-01 17:32:00 +0900
+last_modified_at: 2026-02-01 17:32:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, quadruped-locomotion, minitaur, ppo, actuator-model, latency, dynamics-randomization, system-identification]
 description: Tan et al.의 Minitaur Sim2Real을 PPO, leg-space action, open-loop reference와 feedback, actuator model, latency, randomization, compact observation ablation까지 원문 기준으로 정리한다.

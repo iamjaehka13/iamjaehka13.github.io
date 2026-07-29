@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 6] Challenging Terrain Locomotion"
-date: 2026-01-16 17:34:00 +0900
-last_modified_at: 2026-01-16 17:34:00 +0900
+date: 2026-02-02 17:34:00 +0900
+last_modified_at: 2026-02-02 17:34:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, quadruped-locomotion, rough-terrain, proprioception, privileged-learning, teacher-student, tcn, terrain-curriculum, anymal]
 description: Lee et al.의 blind rough-terrain locomotion을 privileged teacher, TCN student, PMTG, adaptive terrain curriculum, 자연환경 실험과 ablation까지 원문 기준으로 정리한다.

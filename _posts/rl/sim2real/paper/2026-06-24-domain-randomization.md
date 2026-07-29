@@ -1,7 +1,7 @@
 ---
 title: "[Sim2Real Paper 2] Domain Randomization"
-date: 2026-01-14 17:30:00 +0900
-last_modified_at: 2026-01-14 17:30:00 +0900
+date: 2026-01-31 17:30:00 +0900
+last_modified_at: 2026-01-31 17:30:00 +0900
 categories: [RL, Sim2Real, Paper]
 tags: [sim2real, domain-randomization, visual-domain-randomization, robot-vision, object-localization, fetch-robot, synthetic-data]
 description: Tobin et al.의 visual domain randomization을 random texture, camera·lighting variation, VGG detector, real-image localization ablation과 Fetch grasping 결과까지 원문 기준으로 정리한다.
