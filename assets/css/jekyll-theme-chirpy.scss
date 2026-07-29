@@ -866,6 +866,12 @@ body:has(.resume-page) article.px-1 {
   aspect-ratio: 4 / 1;
 }
 
+.portfolio-sheet-figure-platform img {
+  width: min(100%, 24rem);
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .portfolio-sheet-proof {
   display: grid;
   grid-template-columns: minmax(13rem, 0.82fr) minmax(0, 1.18fr);

@@ -118,7 +118,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </p>
         <div class="resume-entry-body">
           <h3>
-            <a href="/posts/unitree-go2-part-8-thermal-policy-comparison/">
+            <a href="/posts/unitree-go2-part-9-capstone-retrospective/">
               Thermal-Aware Locomotion for Unitree Go2
             </a>
           </h3>
@@ -436,7 +436,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
       </div>
 
       <footer class="portfolio-sheet-footer">
-        <a href="/posts/unitree-go2-part-8-thermal-policy-comparison/">
+        <a href="/posts/unitree-go2-part-9-capstone-retrospective/">
           Read the full project notes ↗
         </a>
       </footer>
@@ -607,7 +607,7 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
     <article class="portfolio-sheet portfolio-sheet-mobility" aria-labelledby="mobility-2025-title">
       <header class="portfolio-sheet-header">
         <p class="portfolio-sheet-index">Selected Work · 02</p>
-        <h2 id="mobility-2025-title">2025 대학생 창작 모빌리티 경진대회</h2>
+        <h2 id="mobility-2025-title">2025 Creative Mobility Competition</h2>
         <p>Planning Team Member · Unmanned Mobility Division · Jul.—Nov. 2025</p>
       </header>
 
@@ -651,31 +651,31 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
         </div>
       </section>
 
-      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide">
+      <figure class="portfolio-sheet-figure portfolio-sheet-figure-wide portfolio-sheet-figure-platform">
         <img
-          src="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/00-preview.png"
-          alt="Architecture of the 2025 K-City mobility competition planning system"
+          src="/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/09-on-vehicle-visualization.png"
+          alt="Team unmanned-mobility platform with Autoware planning visualization on the onboard monitor"
           loading="lazy"
-          width="1200"
-          height="630"
+          width="900"
+          height="1180"
         >
         <figcaption>
-          Planning scope from K-City map and missions to Autoware control and ERP-42.
+          Autoware planning visualization on the team’s unmanned-mobility platform.
         </figcaption>
       </figure>
 
-      <div class="portfolio-sheet-results" aria-label="2025 mobility competition field result">
+      <div class="portfolio-sheet-results" aria-label="2025 mobility competition field demonstration">
         <div>
-          <span>Division</span>
+          <span>Competition Division</span>
           <strong>Unmanned</strong>
         </div>
         <div>
-          <span>Venue</span>
+          <span>Field Site</span>
           <strong>K-City</strong>
         </div>
         <p>
-          Team field result: LiDAR-based blue/yellow cone recognition and
-          cone-course driving at the actual competition.
+          Team field demonstration: The team’s ERP-42 used LiDAR to detect blue
+          and yellow cones and drove through the competition cone course at K-City.
         </p>
       </div>
 
