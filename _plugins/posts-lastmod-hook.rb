@@ -4,6 +4,9 @@
 
 Jekyll::Hooks.register :posts, :post_init do |post|
 
+  # Keep explicitly curated historical modification dates.
+  next if post.data['preserve_last_modified_at']
+
   # Matching timestamps intentionally mean the post is unchanged since publication.
   next if post.data['last_modified_at'] == post.data['date']
 
