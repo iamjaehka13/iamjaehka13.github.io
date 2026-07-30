@@ -194,3 +194,7 @@ layout: default
     {% include post-paginator.html %}
   </div>
 {% endif %}
+
+{% if paginator.page == 1 %}
+  <script defer src="{{ '/assets/js/liquid-home.js' | relative_url }}"></script>
+{% endif %}
