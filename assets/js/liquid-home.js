@@ -184,6 +184,7 @@
       targetX: 0,
       targetY: 0,
       active: false,
+      gripping: false,
       releasing: false,
       releaseLockUntil: 0,
       releaseHoldUntil: 0,
@@ -311,7 +312,7 @@
       if (settled) {
         state.frame = null;
 
-        if (state.active) {
+        if (state.active && state.gripping) {
           return;
         }
 
@@ -359,11 +360,33 @@
       const normalizedX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
       const normalizedY = ((event.clientY - bounds.top) / bounds.height) * 2 - 1;
       const distance = Math.hypot(normalizedX, normalizedY);
-      const edgeGrip =
-        0.28 + clamp((distance - 0.15) / 0.85, 0, 1) * 0.87;
+      const edgeInfluence = clamp((distance - 0.76) / 0.2, 0, 1);
 
-      state.targetX = clamp(normalizedX * edgeGrip, -1.25, 1.25);
-      state.targetY = clamp(normalizedY * edgeGrip, -1.25, 1.25);
+      if (edgeInfluence === 0) {
+        state.gripping = false;
+        state.targetX = 0;
+        state.targetY = 0;
+
+        if (
+          Math.abs(state.x) > 0.0015 ||
+          Math.abs(state.y) > 0.0015 ||
+          Math.abs(state.velocityX) > 0.0015 ||
+          Math.abs(state.velocityY) > 0.0015 ||
+          folder.style.borderRadius
+        ) {
+          ensureAnimation();
+        }
+
+        return;
+      }
+
+      if (!state.gripping) {
+        state.baseRadii = readComputedRadii();
+      }
+
+      state.gripping = true;
+      state.targetX = clamp(normalizedX * edgeInfluence * 1.15, -1.25, 1.25);
+      state.targetY = clamp(normalizedY * edgeInfluence * 1.15, -1.25, 1.25);
       ensureAnimation();
     };
 
@@ -423,6 +446,7 @@
       if (isOrbitMoving()) {
         window.clearTimeout(state.recoilTimer);
         state.active = false;
+        state.gripping = false;
         state.releasing = false;
         state.releaseHoldUntil = 0;
         state.targetX = 0;
@@ -443,7 +467,12 @@
       const directionX = rawX / magnitude;
       const directionY = rawY / magnitude;
 
+      if (!folder.style.borderRadius) {
+        state.baseRadii = readComputedRadii();
+      }
+
       state.active = false;
+      state.gripping = false;
       state.releasing = true;
       state.releaseLockUntil = window.performance.now() + 520;
       state.releaseHoldUntil = window.performance.now() + 115;
@@ -481,8 +510,8 @@
 
       window.clearTimeout(state.releaseTimer);
       window.clearTimeout(state.recoilTimer);
-      state.baseRadii = readComputedRadii();
       state.active = true;
+      state.gripping = false;
       state.releasing = false;
       state.releaseHoldUntil = 0;
       folder.classList.remove('is-liquid-releasing');
