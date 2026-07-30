@@ -47,18 +47,7 @@ layout: default
 {% endif %}
 
 {% if paginator.page == 1 %}
-  <section class="liquid-home" aria-labelledby="liquid-home-title">
-    <div class="liquid-home__glow liquid-home__glow--one" aria-hidden="true"></div>
-    <div class="liquid-home__glow liquid-home__glow--two" aria-hidden="true"></div>
-
-    <header class="liquid-home__header">
-      <p class="liquid-home__eyebrow">JAEHKA13 · KNOWLEDGE SPACE</p>
-      <h1 id="liquid-home-title">어떤 기록을 펼쳐볼까요?</h1>
-      <p class="liquid-home__intro">
-        물방울 폴더를 눌러 분야별 연구와 학습 기록을 엽니다.
-      </p>
-    </header>
-
+  <section class="liquid-home" aria-label="분야별 글 폴더">
     <div class="liquid-folder-grid" role="list" aria-label="분야별 글 폴더">
       {% for folder in site.data.home_folders %}
         {% assign folder_post_count = 0 %}
@@ -68,7 +57,7 @@ layout: default
           {% endif %}
         {% endfor %}
         <a
-          class="liquid-folder liquid-folder--{{ folder.accent }} liquid-folder--shape-{{ folder.shape }}"
+          class="liquid-folder liquid-folder--shape-{{ folder.shape }}"
           href="{{ folder.url | relative_url }}"
           role="listitem"
           aria-label="{{ folder.name }} 폴더, 글 {{ folder_post_count }}개"

@@ -2,7 +2,6 @@
   category: RL
   url: /categories/rl/
   description: Policy learning and skill discovery
-  accent: cyan
   shape: one
   icons:
     - "fas fa-brain"
@@ -14,7 +13,6 @@
   category: Sim2Real
   url: /categories/sim2real/
   description: Unitree Go2 and real-world transfer
-  accent: violet
   shape: two
   icons:
     - "fas fa-robot"
@@ -26,7 +24,6 @@
   category: Isaac
   url: /categories/isaac/
   description: Isaac Sim and Isaac Lab
-  accent: amber
   shape: three
   icons:
     - "fas fa-cube"
@@ -38,7 +35,6 @@
   category: Math
   url: /categories/math/
   description: Linear algebra and foundations
-  accent: blue
   shape: four
   icons:
     - "fas fa-infinity"
@@ -50,7 +46,6 @@
   category: AI
   url: /categories/ai/
   description: Deep learning foundations
-  accent: rose
   shape: five
   icons:
     - "fas fa-layer-group"
@@ -62,7 +57,6 @@
   category: Robotics
   url: /categories/robotics/
   description: Autonomous systems and projects
-  accent: green
   shape: six
   icons:
     - "fas fa-car"
