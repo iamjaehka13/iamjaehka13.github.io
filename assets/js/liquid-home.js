@@ -58,10 +58,31 @@
       folder.style.setProperty('--orbit-rotate-y', `${rotateY.toFixed(3)}deg`);
       folder.style.setProperty('--orbit-opacity', opacity.toFixed(4));
       folder.style.zIndex = `${Math.round(20 + depth * 80)}`;
-      folder.style.pointerEvents = depth > 0.16 ? 'auto' : 'none';
+      folder.style.pointerEvents = 'auto';
       folder.dataset.orbitDepth = depth.toFixed(4);
     });
   };
+
+  const projectedFolderAt = (clientX, clientY) =>
+    folders
+      .map((folder) => {
+        const bounds = folder.getBoundingClientRect();
+        const radiusX = bounds.width / 2;
+        const radiusY = bounds.height / 2;
+        const normalizedX = (clientX - (bounds.left + radiusX)) / radiusX;
+        const normalizedY = (clientY - (bounds.top + radiusY)) / radiusY;
+
+        return {
+          folder,
+          depth: Number.parseFloat(folder.dataset.orbitDepth) || 0,
+          distance: Math.hypot(normalizedX, normalizedY)
+        };
+      })
+      .filter(({ distance }) => distance <= 0.94)
+      .sort(
+        (left, right) =>
+          right.depth - left.depth || left.distance - right.distance
+      )[0]?.folder ?? null;
 
   const animateOrbit = () => {
     const difference = orbit.targetRotation - orbit.rotation;
@@ -114,6 +135,34 @@
   grid.setAttribute('aria-label', '마우스 휠 또는 방향키로 회전하는 분야별 글 폴더');
   grid.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown');
   renderOrbit();
+
+  let isForwardingProjectedClick = false;
+
+  home.addEventListener('click', (event) => {
+    if (isForwardingProjectedClick || event.button !== 0) {
+      return;
+    }
+
+    const projectedFolder = projectedFolderAt(event.clientX, event.clientY);
+    const directFolder =
+      event.target instanceof Element
+        ? event.target.closest('.liquid-folder')
+        : null;
+
+    if (!projectedFolder || directFolder === projectedFolder) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    isForwardingProjectedClick = true;
+
+    try {
+      projectedFolder.click();
+    } finally {
+      isForwardingProjectedClick = false;
+    }
+  });
 
   grid.addEventListener('wheel', (event) => {
     if (event.ctrlKey) {
