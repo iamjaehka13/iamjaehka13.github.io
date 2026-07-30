@@ -1,0 +1,52 @@
+{% assign post = include.post %}
+{% assign image_source = post.image.path | default: post.image %}
+{% assign image_alt = post.image.alt | default: post.title %}
+{% assign record_delay = include.index | default: 0 %}
+
+{% if record_delay > 10 %}
+  {% assign record_delay = 10 %}
+{% endif %}
+
+<article class="category-record" style="--record-delay: {{ record_delay }};">
+  <a
+    class="category-record-card"
+    href="{{ post.url | relative_url }}"
+    aria-label="{{ post.title | escape }}"
+  >
+    <div class="category-record-card__media{% unless image_source %} category-record-card__media--empty{% endunless %}">
+      {% if image_source %}
+        {% capture image_url %}
+          {% include media-url.html src=image_source subpath=post.media_subpath %}
+        {% endcapture %}
+        <img
+          src="{{ image_url | strip }}"
+          alt="{{ image_alt | escape }}"
+          loading="lazy"
+          decoding="async"
+        >
+      {% else %}
+        <i class="far fa-file-alt" aria-hidden="true"></i>
+      {% endif %}
+    </div>
+
+    <div class="category-record-card__body">
+      <div class="category-record-card__path">
+        {% for category in post.categories %}
+          <span>{{ category }}</span>
+          {% unless forloop.last %}<i aria-hidden="true"></i>{% endunless %}
+        {% endfor %}
+      </div>
+
+      <h3>{{ post.title }}</h3>
+
+      <p>{% include post-summary.html max_length=150 %}</p>
+
+      <div class="category-record-card__footer">
+        <time datetime="{{ post.date | date_to_xmlschema }}">
+          {{ post.date | date: '%Y.%m.%d' }}
+        </time>
+        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+      </div>
+    </div>
+  </a>
+</article>

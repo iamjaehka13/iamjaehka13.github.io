@@ -1,0 +1,148 @@
+---
+layout: page
+---
+
+{% include lang.html %}
+
+{% assign category_posts = page.posts %}
+{% assign category_count = category_posts | size %}
+{% assign sub_categories = '' | split: '' %}
+{% assign direct_post_count = 0 %}
+
+{% for post in category_posts %}
+  {% assign current_category_seen = false %}
+  {% assign immediate_child = '' %}
+
+  {% for category in post.categories %}
+    {% if current_category_seen %}
+      {% assign immediate_child = category %}
+      {% break %}
+    {% endif %}
+
+    {% if category == page.title %}
+      {% assign current_category_seen = true %}
+    {% endif %}
+  {% endfor %}
+
+  {% if immediate_child != '' %}
+    {% unless sub_categories contains immediate_child %}
+      {% assign sub_categories = sub_categories | push: immediate_child %}
+    {% endunless %}
+  {% else %}
+    {% assign direct_post_count = direct_post_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{% assign sub_categories = sub_categories | sort_natural %}
+
+<section class="category-library" aria-labelledby="category-library-title">
+  <header class="category-library__header">
+    <span class="category-library__folder-mark" aria-hidden="true">
+      <i class="far fa-folder-open"></i>
+    </span>
+
+    <div class="category-library__heading">
+      <h1 id="category-library-title">{{ page.title }}</h1>
+      <span>{{ category_count }} post{% unless category_count == 1 %}s{% endunless %}</span>
+    </div>
+  </header>
+
+  {% if sub_categories.size > 0 %}
+    <nav class="category-library__subcategories" aria-label="{{ page.title }} 하위 분야">
+      {% for sub_category in sub_categories %}
+        {% assign sub_category_count = 0 %}
+        {% for post in category_posts %}
+          {% if post.categories contains sub_category %}
+            {% assign sub_category_count = sub_category_count | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+
+        {% capture sub_category_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
+        <a href="{{ sub_category_url | relative_url }}">
+          <span>{{ sub_category }}</span>
+          <strong>{{ sub_category_count }}</strong>
+        </a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  {% if category_count == 0 %}
+    <div class="category-library__empty">
+      <i class="far fa-folder-open" aria-hidden="true"></i>
+      <span>아직 글이 없습니다.</span>
+    </div>
+  {% elsif sub_categories.size > 0 %}
+    {% if direct_post_count > 0 %}
+      <section class="category-record-section" aria-labelledby="direct-category-posts">
+        <header class="category-record-section__header">
+          <h2 id="direct-category-posts">{{ page.title }}</h2>
+          <span>{{ direct_post_count }}</span>
+        </header>
+
+        <div class="category-record-grid">
+          {% assign direct_card_index = 0 %}
+          {% for post in category_posts %}
+            {% assign current_category_seen = false %}
+            {% assign has_immediate_child = false %}
+
+            {% for category in post.categories %}
+              {% if current_category_seen %}
+                {% assign has_immediate_child = true %}
+                {% break %}
+              {% endif %}
+
+              {% if category == page.title %}
+                {% assign current_category_seen = true %}
+              {% endif %}
+            {% endfor %}
+
+            {% unless has_immediate_child %}
+              {% include category-record-card.html post=post index=direct_card_index %}
+              {% assign direct_card_index = direct_card_index | plus: 1 %}
+            {% endunless %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% for sub_category in sub_categories %}
+      {% assign sub_category_count = 0 %}
+      {% for post in category_posts %}
+        {% if post.categories contains sub_category %}
+          {% assign sub_category_count = sub_category_count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+
+      {% assign section_id = sub_category | slugify | prepend: 'category-section-' %}
+      {% capture sub_category_url %}/categories/{{ sub_category | slugify | url_encode }}/{% endcapture %}
+
+      <section class="category-record-section" aria-labelledby="{{ section_id }}">
+        <header class="category-record-section__header">
+          <h2 id="{{ section_id }}">
+            <a href="{{ sub_category_url | relative_url }}">
+              {{ sub_category }}
+              <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+          </h2>
+          <span>{{ sub_category_count }}</span>
+        </header>
+
+        <div class="category-record-grid">
+          {% assign sub_category_card_index = 0 %}
+          {% for post in category_posts %}
+            {% if post.categories contains sub_category %}
+              {% include category-record-card.html post=post index=sub_category_card_index %}
+              {% assign sub_category_card_index = sub_category_card_index | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  {% else %}
+    <div class="category-record-grid category-record-grid--ungrouped">
+      {% for post in category_posts %}
+        {% include category-record-card.html post=post index=forloop.index0 %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
