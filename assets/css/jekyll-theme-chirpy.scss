@@ -433,6 +433,30 @@ html[data-mode='dark'] {
 
 /* Liquid folder home */
 
+@property --liquid-morph-x-a {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --liquid-morph-x-b {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --liquid-morph-y-a {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --liquid-morph-y-b {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
 .liquid-home {
   --liquid-ink: #fff;
 
@@ -504,6 +528,19 @@ html[data-mode='dark'] {
   --orbit-scale: 1;
   --orbit-rotate-y: 0deg;
   --orbit-opacity: 1;
+  --liquid-radius-1: 56%;
+  --liquid-radius-2: 44%;
+  --liquid-radius-3: 58%;
+  --liquid-radius-4: 42%;
+  --liquid-radius-5: 48%;
+  --liquid-radius-6: 54%;
+  --liquid-radius-7: 46%;
+  --liquid-radius-8: 52%;
+  --liquid-morph-x-a: 0%;
+  --liquid-morph-x-b: 0%;
+  --liquid-morph-y-a: 0%;
+  --liquid-morph-y-b: 0%;
+  --liquid-morph-duration: 9s;
 
   position: relative;
   display: flex;
@@ -516,6 +553,15 @@ html[data-mode='dark'] {
   overflow: hidden;
   z-index: 1;
   border: 1px solid rgb(255 255 255 / 15%);
+  border-radius:
+    calc(var(--liquid-radius-1) + var(--liquid-morph-x-a))
+    calc(var(--liquid-radius-2) - var(--liquid-morph-x-a))
+    calc(var(--liquid-radius-3) + var(--liquid-morph-x-b))
+    calc(var(--liquid-radius-4) - var(--liquid-morph-x-b)) /
+    calc(var(--liquid-radius-5) + var(--liquid-morph-y-a))
+    calc(var(--liquid-radius-6) - var(--liquid-morph-y-b))
+    calc(var(--liquid-radius-7) + var(--liquid-morph-y-b))
+    calc(var(--liquid-radius-8) - var(--liquid-morph-y-a));
   color: var(--liquid-ink);
   background:
     radial-gradient(
@@ -573,7 +619,9 @@ html[data-mode='dark'] {
     box-shadow 220ms ease,
     color 220ms ease,
     filter 220ms ease;
-  animation: liquid-float 7s ease-in-out infinite;
+  animation:
+    liquid-float 7s ease-in-out infinite,
+    liquid-contour var(--liquid-morph-duration) ease-in-out infinite;
 }
 
 .liquid-folder:hover,
@@ -605,78 +653,145 @@ html[data-mode='dark'] {
 }
 
 .liquid-folder--shape-one {
+  --liquid-radius-1: 64%;
+  --liquid-radius-2: 36%;
+  --liquid-radius-3: 52%;
+  --liquid-radius-4: 48%;
+  --liquid-radius-5: 45%;
+  --liquid-radius-6: 58%;
+  --liquid-radius-7: 42%;
+  --liquid-radius-8: 55%;
+  --liquid-morph-duration: 8.2s;
+
   width: 100%;
   aspect-ratio: 1.36 / 1;
   justify-self: center;
-  border-radius: 64% 36% 52% 48% / 45% 58% 42% 55%;
+  animation-delay: 0s, -2.4s;
 }
 
 .liquid-folder--shape-two {
   --offset-y: -0.8rem;
+  --liquid-radius-1: 46%;
+  --liquid-radius-2: 54%;
+  --liquid-radius-3: 68%;
+  --liquid-radius-4: 32%;
+  --liquid-radius-5: 58%;
+  --liquid-radius-6: 38%;
+  --liquid-radius-7: 62%;
+  --liquid-radius-8: 42%;
+  --liquid-morph-duration: 9.7s;
 
   width: 85%;
   aspect-ratio: 0.82 / 1;
   justify-self: center;
-  border-radius: 46% 54% 68% 32% / 58% 38% 62% 42%;
-  animation-delay: -1.7s;
+  animation-delay: -1.7s, -6.1s;
 }
 
 .liquid-folder--shape-three {
   --offset-y: 0.45rem;
+  --liquid-radius-1: 38%;
+  --liquid-radius-2: 62%;
+  --liquid-radius-3: 44%;
+  --liquid-radius-4: 56%;
+  --liquid-radius-5: 57%;
+  --liquid-radius-6: 35%;
+  --liquid-radius-7: 65%;
+  --liquid-radius-8: 43%;
+  --liquid-morph-duration: 7.9s;
 
   width: 96%;
   aspect-ratio: 1.24 / 1;
   justify-self: center;
-  border-radius: 38% 62% 44% 56% / 57% 35% 65% 43%;
-  animation-delay: -3.8s;
+  animation-delay: -3.8s, -1.2s;
 }
 
 .liquid-folder--shape-four {
   --offset-y: -0.35rem;
+  --liquid-radius-1: 56%;
+  --liquid-radius-2: 44%;
+  --liquid-radius-3: 61%;
+  --liquid-radius-4: 39%;
+  --liquid-radius-5: 38%;
+  --liquid-radius-6: 66%;
+  --liquid-radius-7: 34%;
+  --liquid-radius-8: 62%;
+  --liquid-morph-duration: 10.6s;
 
   width: 78%;
   aspect-ratio: 1.08 / 1;
   justify-self: center;
-  border-radius: 56% 44% 61% 39% / 38% 66% 34% 62%;
-  animation-delay: -5.2s;
+  animation-delay: -5.2s, -7.4s;
 }
 
 .liquid-folder--shape-five {
   --offset-y: 0.75rem;
+  --liquid-radius-1: 37%;
+  --liquid-radius-2: 63%;
+  --liquid-radius-3: 48%;
+  --liquid-radius-4: 52%;
+  --liquid-radius-5: 66%;
+  --liquid-radius-6: 34%;
+  --liquid-radius-7: 58%;
+  --liquid-radius-8: 42%;
+  --liquid-morph-duration: 8.8s;
 
   width: 88%;
   aspect-ratio: 0.84 / 1;
   justify-self: center;
-  border-radius: 37% 63% 48% 52% / 66% 34% 58% 42%;
-  animation-delay: -2.9s;
+  animation-delay: -2.9s, -4.6s;
 }
 
 .liquid-folder--shape-six {
+  --liquid-radius-1: 68%;
+  --liquid-radius-2: 32%;
+  --liquid-radius-3: 47%;
+  --liquid-radius-4: 53%;
+  --liquid-radius-5: 42%;
+  --liquid-radius-6: 62%;
+  --liquid-radius-7: 38%;
+  --liquid-radius-8: 58%;
+  --liquid-morph-duration: 9.3s;
+
   width: 98%;
   aspect-ratio: 1.32 / 1;
   justify-self: center;
-  border-radius: 68% 32% 47% 53% / 42% 62% 38% 58%;
-  animation-delay: -6.3s;
+  animation-delay: -6.3s, -2.1s;
 }
 
 .liquid-folder--shape-seven {
   --offset-y: 0.35rem;
+  --liquid-radius-1: 43%;
+  --liquid-radius-2: 57%;
+  --liquid-radius-3: 65%;
+  --liquid-radius-4: 35%;
+  --liquid-radius-5: 55%;
+  --liquid-radius-6: 41%;
+  --liquid-radius-7: 59%;
+  --liquid-radius-8: 45%;
+  --liquid-morph-duration: 10.1s;
 
   width: 91%;
   aspect-ratio: 1.12 / 1;
   justify-self: center;
-  border-radius: 43% 57% 65% 35% / 55% 41% 59% 45%;
-  animation-delay: -4.4s;
+  animation-delay: -4.4s, -8.2s;
 }
 
 .liquid-folder--shape-eight {
   --offset-y: -0.5rem;
+  --liquid-radius-1: 61%;
+  --liquid-radius-2: 39%;
+  --liquid-radius-3: 35%;
+  --liquid-radius-4: 65%;
+  --liquid-radius-5: 44%;
+  --liquid-radius-6: 67%;
+  --liquid-radius-7: 33%;
+  --liquid-radius-8: 56%;
+  --liquid-morph-duration: 8.5s;
 
   width: 83%;
   aspect-ratio: 0.86 / 1;
   justify-self: center;
-  border-radius: 61% 39% 35% 65% / 44% 67% 33% 56%;
-  animation-delay: -0.9s;
+  animation-delay: -0.9s, -5.5s;
 }
 
 .liquid-folder__shine {
@@ -866,6 +981,37 @@ html[data-mode='dark'] {
 
   50% {
     translate: 0 -8px;
+  }
+}
+
+@keyframes liquid-contour {
+  0%,
+  100% {
+    --liquid-morph-x-a: -2.8%;
+    --liquid-morph-x-b: 1.8%;
+    --liquid-morph-y-a: 1.5%;
+    --liquid-morph-y-b: -2.2%;
+  }
+
+  28% {
+    --liquid-morph-x-a: 3.6%;
+    --liquid-morph-x-b: -2.2%;
+    --liquid-morph-y-a: -2.6%;
+    --liquid-morph-y-b: 2.8%;
+  }
+
+  61% {
+    --liquid-morph-x-a: -1.2%;
+    --liquid-morph-x-b: 3.1%;
+    --liquid-morph-y-a: 3.2%;
+    --liquid-morph-y-b: -1.4%;
+  }
+
+  82% {
+    --liquid-morph-x-a: 2.3%;
+    --liquid-morph-x-b: -1.1%;
+    --liquid-morph-y-a: -1.8%;
+    --liquid-morph-y-b: 3%;
   }
 }
 
