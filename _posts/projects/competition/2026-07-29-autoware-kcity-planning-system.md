@@ -3,7 +3,7 @@ title: "2025 대학생 창작 모빌리티 경진대회"
 date: 2025-11-02 15:30:00 +0900
 last_modified_at: 2025-11-03 18:47:00 +0900
 preserve_last_modified_at: true
-categories: [Robotics, Autonomous Driving]
+categories: [Projects, Competition]
 tags: [creative-mobility-competition, unmanned-mobility, autoware-universe, ros2, autonomous-driving, lanelet2, cone-planner, freespace-planner, erp42, k-city, carla, lidar, field-test, vehicle-interface]
 description: "한국교통안전공단 K-City에서 열린 2025 대학생 창작 모빌리티 경진대회 무인 모빌리티 부문의 Planning 팀 기록."
 image:
