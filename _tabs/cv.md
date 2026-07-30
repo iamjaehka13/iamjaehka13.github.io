@@ -91,6 +91,51 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
 
       <div class="resume-entry">
         <p class="resume-date">
+          <span>Jul. 2025 –</span>
+          <span>Nov. 2025</span>
+        </p>
+        <div class="resume-entry-body">
+          <h3>
+            <a href="/posts/autoware-kcity-planning-system/">
+              Autoware Planning for the 2025 Creative Mobility Competition
+            </a>
+          </h3>
+          <p class="resume-role">Planning Team Member · Unmanned Mobility Division</p>
+          <ul>
+            <li>
+              Worked on traffic-light and stop-line planning in Autoware and
+              participated in K-City field testing of the team's LiDAR-based
+              cone-course driving on an ERP-42.
+            </li>
+          </ul>
+        </div>
+        <p class="resume-place">Hwaseong, Korea</p>
+      </div>
+
+      <div class="resume-entry">
+        <p class="resume-date">
+          <span>Dec. 2025 –</span>
+          <span>Jan. 2026</span>
+        </p>
+        <div class="resume-entry-body">
+          <h3>
+            <a href="/posts/isaacsim5-ros2-go2/">
+              Go2 Digital-Twin Locomotion in Isaac Sim
+            </a>
+          </h3>
+          <p class="resume-role">Collaborative Project · Digital-Twin Integration</p>
+          <ul>
+            <li>
+              Imported a campus digital-twin scene into Isaac Sim and demonstrated
+              a pretrained Unitree Go2 locomotion policy in the imported environment.
+            </li>
+          </ul>
+        </div>
+        <p class="resume-place">Seoul, Korea</p>
+      </div>
+
+      <div class="resume-entry">
+        <p class="resume-date">
           <span>2026 –</span>
           <span>Present</span>
         </p>
@@ -135,51 +180,6 @@ description: Jaeha Kang — quadruped robot learning, reinforcement learning, an
           </ul>
         </div>
         <p class="resume-place">Seoul, Korea</p>
-      </div>
-
-      <div class="resume-entry">
-        <p class="resume-date">
-          <span>Dec. 2025 –</span>
-          <span>Jan. 2026</span>
-        </p>
-        <div class="resume-entry-body">
-          <h3>
-            <a href="/posts/isaacsim5-ros2-go2/">
-              Go2 Digital-Twin Locomotion in Isaac Sim
-            </a>
-          </h3>
-          <p class="resume-role">Collaborative Project · Digital-Twin Integration</p>
-          <ul>
-            <li>
-              Imported a campus digital-twin scene into Isaac Sim and demonstrated
-              a pretrained Unitree Go2 locomotion policy in the imported environment.
-            </li>
-          </ul>
-        </div>
-        <p class="resume-place">Seoul, Korea</p>
-      </div>
-
-      <div class="resume-entry">
-        <p class="resume-date">
-          <span>Jul. 2025 –</span>
-          <span>Nov. 2025</span>
-        </p>
-        <div class="resume-entry-body">
-          <h3>
-            <a href="/posts/autoware-kcity-planning-system/">
-              Autoware Planning for the 2025 Creative Mobility Competition
-            </a>
-          </h3>
-          <p class="resume-role">Planning Team Member · Unmanned Mobility Division</p>
-          <ul>
-            <li>
-              Worked on traffic-light and stop-line planning in Autoware and
-              participated in K-City field testing of the team's LiDAR-based
-              cone-course driving on an ERP-42.
-            </li>
-          </ul>
-        </div>
-        <p class="resume-place">Hwaseong, Korea</p>
       </div>
     </section>
 
