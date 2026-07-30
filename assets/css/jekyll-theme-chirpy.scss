@@ -439,8 +439,8 @@ html[data-mode='dark'] {
   position: relative;
   display: none;
   min-height: calc(100vh - 7rem);
-  margin: 1rem 0 2rem;
-  padding: clamp(2rem, 4vw, 4.5rem);
+  margin: 0.75rem 0 1.5rem;
+  padding: clamp(1.25rem, 2vw, 2.25rem);
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 2rem;
@@ -469,10 +469,13 @@ html[data-mode='dark'] {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(1rem, 2.2vw, 2rem);
+  grid-template-columns: repeat(4, minmax(10.5rem, 16rem));
+  column-gap: clamp(0.8rem, 2.5vw, 2.8rem);
+  row-gap: clamp(0.8rem, 1.8vw, 1.5rem);
   align-items: center;
-  max-width: 72rem;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 92rem;
   margin: 0 auto;
   perspective: 900px;
 }
@@ -499,7 +502,7 @@ html[data-mode='dark'] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 2.2vw, 1.7rem);
+  padding: clamp(0.8rem, 1.35vw, 1.2rem);
   overflow: hidden;
   z-index: 1;
   border: 1px solid rgb(255 255 255 / 20%);
@@ -569,13 +572,19 @@ html[data-mode='dark'] {
   filter: brightness(1.08);
 }
 
+.liquid-folder.is-liquid-releasing {
+  z-index: 4;
+  border-color: rgb(255 255 255 / 32%);
+  filter: brightness(1.06);
+}
+
 .liquid-folder:focus-visible {
   outline: 2px solid rgb(255 255 255 / 82%);
   outline-offset: 5px;
 }
 
 .liquid-folder--shape-one {
-  width: 108%;
+  width: 100%;
   aspect-ratio: 1.22 / 1;
   justify-self: center;
   border-radius: 52% 48% 45% 55% / 44% 48% 52% 56%;
@@ -584,7 +593,7 @@ html[data-mode='dark'] {
 .liquid-folder--shape-two {
   --offset-y: -0.8rem;
 
-  width: 92%;
+  width: 85%;
   aspect-ratio: 0.92 / 1;
   justify-self: center;
   border-radius: 58% 42% 52% 48% / 46% 59% 41% 54%;
@@ -594,7 +603,7 @@ html[data-mode='dark'] {
 .liquid-folder--shape-three {
   --offset-y: 0.45rem;
 
-  width: 101%;
+  width: 96%;
   aspect-ratio: 1.12 / 1;
   justify-self: center;
   border-radius: 44% 56% 48% 52% / 55% 43% 57% 45%;
@@ -604,7 +613,7 @@ html[data-mode='dark'] {
 .liquid-folder--shape-four {
   --offset-y: -0.35rem;
 
-  width: 84%;
+  width: 78%;
   aspect-ratio: 0.95 / 1;
   justify-self: center;
   border-radius: 51% 49% 58% 42% / 44% 57% 43% 56%;
@@ -614,7 +623,7 @@ html[data-mode='dark'] {
 .liquid-folder--shape-five {
   --offset-y: 0.75rem;
 
-  width: 94%;
+  width: 88%;
   aspect-ratio: 0.9 / 1;
   justify-self: center;
   border-radius: 47% 53% 42% 58% / 59% 43% 57% 41%;
@@ -622,11 +631,31 @@ html[data-mode='dark'] {
 }
 
 .liquid-folder--shape-six {
-  width: 106%;
+  width: 98%;
   aspect-ratio: 1.18 / 1;
   justify-self: center;
   border-radius: 56% 44% 49% 51% / 43% 52% 48% 57%;
   animation-delay: -6.3s;
+}
+
+.liquid-folder--shape-seven {
+  --offset-y: 0.35rem;
+
+  width: 91%;
+  aspect-ratio: 1.04 / 1;
+  justify-self: center;
+  border-radius: 43% 57% 53% 47% / 56% 47% 53% 44%;
+  animation-delay: -4.4s;
+}
+
+.liquid-folder--shape-eight {
+  --offset-y: -0.5rem;
+
+  width: 83%;
+  aspect-ratio: 0.94 / 1;
+  justify-self: center;
+  border-radius: 55% 45% 43% 57% / 48% 58% 42% 52%;
+  animation-delay: -0.9s;
 }
 
 .liquid-folder__shine {
@@ -677,12 +706,12 @@ html[data-mode='dark'] {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: clamp(0.32rem, 0.7vw, 0.55rem);
-  margin-bottom: clamp(0.85rem, 1.5vw, 1.2rem);
+  margin-bottom: clamp(0.6rem, 1vw, 0.85rem);
 }
 
 .liquid-folder__mini-grid > span {
   display: grid;
-  width: clamp(1.8rem, 3vw, 2.5rem);
+  width: clamp(1.55rem, 2vw, 2.05rem);
   aspect-ratio: 1;
   place-items: center;
   border: 1px solid rgb(255 255 255 / 18%);
@@ -695,7 +724,7 @@ html[data-mode='dark'] {
     inset 0 1px 2px rgb(255 255 255 / 30%),
     inset -2px -3px 5px rgb(255 255 255 / 10%),
     0 6px 16px rgb(0 0 0 / 34%);
-  font-size: clamp(0.72rem, 1.25vw, 0.95rem);
+  font-size: clamp(0.65rem, 0.85vw, 0.82rem);
 }
 
 .liquid-folder__copy {
@@ -706,7 +735,7 @@ html[data-mode='dark'] {
 
 .liquid-folder__copy strong {
   color: #fff;
-  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  font-size: clamp(1rem, 1.35vw, 1.28rem);
   font-weight: 720;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -715,7 +744,7 @@ html[data-mode='dark'] {
 .liquid-folder__copy > span {
   min-height: 2.5em;
   color: rgb(255 255 255 / 54%);
-  font-size: clamp(0.66rem, 1vw, 0.78rem);
+  font-size: clamp(0.62rem, 0.72vw, 0.72rem);
   line-height: 1.3;
 }
 
@@ -723,12 +752,43 @@ html[data-mode='dark'] {
   display: flex;
   gap: 0.45rem;
   align-items: center;
-  margin-top: clamp(0.7rem, 1.3vw, 1rem);
+  margin-top: clamp(0.55rem, 0.8vw, 0.75rem);
   color: rgb(255 255 255 / 64%);
   font-size: clamp(0.62rem, 0.9vw, 0.72rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.liquid-splash-particle {
+  --splash-dx: 0px;
+  --splash-dy: 0px;
+  --splash-mid-dx: 0px;
+  --splash-mid-dy: 0px;
+  --splash-spin: 0deg;
+  --splash-mid-spin: 0deg;
+  --splash-delay: 0ms;
+
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  width: var(--splash-size, 12px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  border: 1px solid rgb(255 255 255 / 32%);
+  border-radius: 58% 42% 54% 46% / 45% 58% 42% 55%;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 28% 20%, rgb(255 255 255 / 82%) 0 8%, transparent 28%),
+    linear-gradient(145deg, #383838 0%, #050505 48%, #171717 100%);
+  box-shadow:
+    inset 1px 1px 2px rgb(255 255 255 / 38%),
+    inset -2px -2px 4px rgb(255 255 255 / 17%),
+    0 5px 10px rgb(0 0 0 / 58%);
+  will-change: transform, opacity;
+  animation: liquid-splash 560ms var(--splash-delay) cubic-bezier(0.15, 0.72, 0.24, 1)
+    forwards;
 }
 
 .liquid-folder__count i {
@@ -747,7 +807,7 @@ html[data-mode='dark'] {
   width: max-content;
   max-width: 100%;
   gap: 0.35rem;
-  margin: clamp(3rem, 5vw, 4.5rem) auto 0;
+  margin: clamp(1.6rem, 2.6vw, 2.5rem) auto 0;
   padding: 0.45rem;
   border: 1px solid rgb(255 255 255 / 11%);
   border-radius: 999px;
@@ -791,6 +851,41 @@ html[data-mode='dark'] {
   }
 }
 
+@keyframes liquid-splash {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.38) rotate(0deg);
+  }
+
+  15% {
+    opacity: 0.94;
+  }
+
+  68% {
+    opacity: 0.82;
+    transform:
+      translate3d(
+        calc(-50% + var(--splash-mid-dx)),
+        calc(-50% + var(--splash-mid-dy)),
+        0
+      )
+      scale(1)
+      rotate(var(--splash-mid-spin));
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate3d(
+        calc(-50% + var(--splash-dx)),
+        calc(-50% + var(--splash-dy)),
+        0
+      )
+      scale(0.12)
+      rotate(var(--splash-spin));
+  }
+}
+
 @media (min-width: 850px) {
   .liquid-home {
     display: flex;
@@ -802,11 +897,24 @@ html[data-mode='dark'] {
     display: none !important;
   }
 
+  body:has(.liquid-home) #main-wrapper > .container {
+    width: 100%;
+    max-width: none !important;
+    padding-right: clamp(0.7rem, 1.25vw, 1.4rem) !important;
+    padding-left: clamp(0.7rem, 1.25vw, 1.4rem) !important;
+  }
+
   body:has(.liquid-home) #main-wrapper main,
   body:has(.liquid-home) #tail-wrapper {
     flex: 0 0 100%;
     width: 100%;
     max-width: 100%;
+  }
+
+  body:has(.liquid-home) #main-wrapper main,
+  body:has(.liquid-home) article.px-1 {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
   }
 
   body:has(.liquid-home) .mobile-home-feed,
@@ -815,14 +923,17 @@ html[data-mode='dark'] {
   }
 }
 
-@media (min-width: 850px) and (max-width: 1099.98px) {
+@media (min-width: 850px) and (max-width: 1249.98px) {
   .liquid-home {
     padding-right: 1.5rem;
     padding-left: 1.5rem;
   }
 
   .liquid-folder-grid {
+    grid-template-columns: repeat(3, minmax(0, 11.5rem));
     gap: 0.8rem;
+    justify-content: center;
+    max-width: 38rem;
   }
 
   .liquid-folder {
@@ -838,6 +949,10 @@ html[data-mode='dark'] {
   .liquid-folder {
     animation: none;
     transition: border-color 180ms ease;
+  }
+
+  .liquid-splash-particle {
+    display: none;
   }
 }
 

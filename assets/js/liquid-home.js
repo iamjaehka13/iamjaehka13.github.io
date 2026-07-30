@@ -12,7 +12,9 @@
     [44, 56, 48, 52, 55, 43, 57, 45],
     [51, 49, 58, 42, 44, 57, 43, 56],
     [47, 53, 42, 58, 59, 43, 57, 41],
-    [56, 44, 49, 51, 43, 52, 48, 57]
+    [56, 44, 49, 51, 43, 52, 48, 57],
+    [43, 57, 53, 47, 56, 47, 53, 44],
+    [55, 45, 43, 57, 48, 58, 42, 52]
   ];
 
   const clamp = (value, minimum, maximum) =>
@@ -30,6 +32,8 @@
       targetX: 0,
       targetY: 0,
       active: false,
+      releasing: false,
+      releaseTimer: null,
       frame: null
     };
 
@@ -53,8 +57,8 @@
     };
 
     const render = () => {
-      const spring = state.active ? 0.13 : 0.09;
-      const damping = state.active ? 0.72 : 0.78;
+      const spring = state.active ? 0.13 : state.releasing ? 0.105 : 0.09;
+      const damping = state.active ? 0.72 : state.releasing ? 0.81 : 0.78;
 
       state.velocityX =
         (state.velocityX + (state.targetX - state.x) * spring) * damping;
@@ -63,9 +67,10 @@
       state.x += state.velocityX;
       state.y += state.velocityY;
 
-      const motion = Math.abs(state.velocityX) + Math.abs(state.velocityY);
-      const horizontalStretch = 1 + Math.abs(state.x) * 0.025 + motion * 0.015;
-      const verticalStretch = 1 + Math.abs(state.y) * 0.025 + motion * 0.015;
+      const horizontalStretch =
+        1 + Math.abs(state.x) * 0.025 + Math.abs(state.velocityX) * 0.08 - Math.abs(state.y) * 0.008;
+      const verticalStretch =
+        1 + Math.abs(state.y) * 0.025 + Math.abs(state.velocityY) * 0.08 - Math.abs(state.x) * 0.008;
 
       folder.style.setProperty('--pull-x', `${state.x * 9}px`);
       folder.style.setProperty('--pull-y', `${state.y * 7}px`);
@@ -98,6 +103,8 @@
         state.y = 0;
         state.velocityX = 0;
         state.velocityY = 0;
+        state.releasing = false;
+        folder.classList.remove('is-liquid-releasing');
         folder.style.removeProperty('border-radius');
         folder.style.removeProperty('--pull-x');
         folder.style.removeProperty('--pull-y');
@@ -130,16 +137,94 @@
       ensureAnimation();
     };
 
-    const release = () => {
+    const createSplash = (event, directionX, directionY) => {
+      if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) {
+        return;
+      }
+
+      const particleCount = 2;
+
+      for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+        const particle = document.createElement('span');
+        const spread = particleIndex === 0 ? -0.24 : 0.22;
+        const distance = particleIndex === 0 ? 34 : 22;
+        const perpendicularX = -directionY * spread;
+        const perpendicularY = directionX * spread;
+
+        particle.className = 'liquid-splash-particle';
+        particle.setAttribute('aria-hidden', 'true');
+        particle.style.left = `${event.clientX}px`;
+        particle.style.top = `${event.clientY}px`;
+        particle.style.setProperty('--splash-size', `${particleIndex === 0 ? 12 : 8}px`);
+        particle.style.setProperty(
+          '--splash-dx',
+          `${(directionX + perpendicularX) * distance}px`
+        );
+        particle.style.setProperty(
+          '--splash-dy',
+          `${(directionY + perpendicularY) * distance + 7}px`
+        );
+        particle.style.setProperty(
+          '--splash-mid-dx',
+          `${(directionX + perpendicularX) * distance * 0.78}px`
+        );
+        particle.style.setProperty(
+          '--splash-mid-dy',
+          `${((directionY + perpendicularY) * distance + 7) * 0.78}px`
+        );
+        particle.style.setProperty('--splash-spin', `${particleIndex === 0 ? 115 : -90}deg`);
+        particle.style.setProperty(
+          '--splash-mid-spin',
+          `${particleIndex === 0 ? 90 : -70}deg`
+        );
+        particle.style.setProperty('--splash-delay', `${particleIndex * 35}ms`);
+        document.body.appendChild(particle);
+
+        particle.addEventListener('animationend', () => particle.remove(), { once: true });
+        window.setTimeout(() => particle.remove(), 750);
+      }
+    };
+
+    const release = (event) => {
+      if (!state.active && !state.releasing) {
+        return;
+      }
+
+      const bounds = folder.getBoundingClientRect();
+      const rawX = Number.isFinite(event.clientX)
+        ? ((event.clientX - bounds.left) / bounds.width) * 2 - 1
+        : state.targetX;
+      const rawY = Number.isFinite(event.clientY)
+        ? ((event.clientY - bounds.top) / bounds.height) * 2 - 1
+        : state.targetY;
+      const magnitude = Math.hypot(rawX, rawY) || 1;
+      const directionX = rawX / magnitude;
+      const directionY = rawY / magnitude;
+
       state.active = false;
+      state.releasing = true;
       state.targetX = 0;
       state.targetY = 0;
+      state.velocityX += directionX * 0.28;
+      state.velocityY += directionY * 0.28;
       folder.classList.remove('is-liquid-active');
+      folder.classList.add('is-liquid-releasing');
+      createSplash(event, directionX, directionY);
+
+      window.clearTimeout(state.releaseTimer);
+      state.releaseTimer = window.setTimeout(() => {
+        state.releasing = false;
+        folder.classList.remove('is-liquid-releasing');
+        ensureAnimation();
+      }, 620);
       ensureAnimation();
     };
 
     folder.addEventListener('pointerenter', (event) => {
+      window.clearTimeout(state.releaseTimer);
       state.active = true;
+      state.releasing = false;
+      folder.classList.remove('is-liquid-releasing');
       folder.classList.add('is-liquid-active');
       updateTarget(event);
     });

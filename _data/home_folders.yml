@@ -31,6 +31,17 @@
     - "fas fa-network-wired"
     - "fas fa-play"
 
+- name: Go2
+  category: Unitree Go2
+  url: /categories/unitree-go2/
+  description: Hardware and locomotion logs
+  shape: seven
+  icons:
+    - "fas fa-robot"
+    - "fas fa-microchip"
+    - "fas fa-wave-square"
+    - "fas fa-cogs"
+
 - name: Math
   category: Math
   url: /categories/math/
@@ -63,3 +74,14 @@
     - "fas fa-road"
     - "fas fa-map-marked-alt"
     - "fas fa-cogs"
+
+- name: Study
+  category: Study
+  url: /categories/study/
+  description: Concept notes and foundations
+  shape: eight
+  icons:
+    - "fas fa-book-open"
+    - "fas fa-pencil-alt"
+    - "fas fa-lightbulb"
+    - "fas fa-check"
