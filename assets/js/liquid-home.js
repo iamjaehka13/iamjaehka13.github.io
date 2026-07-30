@@ -74,7 +74,7 @@
 
   const animateOrbit = () => {
     const difference = orbit.targetRotation - orbit.rotation;
-    orbit.velocity = (orbit.velocity + difference * 0.075) * 0.82;
+    orbit.velocity = (orbit.velocity + difference * 0.11) * 0.8;
     orbit.rotation += orbit.velocity;
     renderOrbit();
 
@@ -141,11 +141,24 @@
     }
 
     delta = clamp(delta, -180, 180);
-    orbit.targetRotation += delta * 0.0024;
-    orbit.velocity += delta * 0.00012;
+
+    const direction = Math.sign(delta);
+    const isDiscreteWheel = event.deltaMode !== 0 || Math.abs(delta) >= 40;
+
+    if (isDiscreteWheel) {
+      window.clearTimeout(orbit.snapTimer);
+      orbit.targetRotation =
+        Math.round(orbit.targetRotation / orbitStep) * orbitStep +
+        direction * orbitStep;
+      orbit.velocity += direction * 0.032;
+    } else {
+      orbit.targetRotation += delta * 0.006;
+      orbit.velocity += delta * 0.00028;
+      queueOrbitSnap();
+    }
+
     orbit.movingUntil = window.performance.now() + 320;
     ensureOrbitAnimation();
-    queueOrbitSnap();
   }, { passive: false });
 
   grid.addEventListener('keydown', (event) => {
