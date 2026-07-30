@@ -33,22 +33,23 @@
       targetY: 0,
       active: false,
       releasing: false,
+      releaseLockUntil: 0,
       releaseTimer: null,
       frame: null
     };
 
     const setRadius = (x, y, velocityX, velocityY) => {
-      const waveX = x * 7 + velocityX * 5;
-      const waveY = y * 7 + velocityY * 5;
+      const waveX = x * 8.5 + velocityX * 11;
+      const waveY = y * 8.5 + velocityY * 11;
       const radii = [
-        clamp(base[0] + waveX - waveY * 0.35, 34, 66),
-        clamp(base[1] - waveX + waveY * 0.2, 34, 66),
-        clamp(base[2] - waveX * 0.45 + waveY, 34, 66),
-        clamp(base[3] + waveX * 0.55 - waveY, 34, 66),
-        clamp(base[4] - waveY + waveX * 0.3, 34, 66),
-        clamp(base[5] + waveY - waveX * 0.25, 34, 66),
-        clamp(base[6] + waveX + waveY * 0.35, 34, 66),
-        clamp(base[7] - waveX - waveY * 0.3, 34, 66)
+        clamp(base[0] + waveX - waveY * 0.35, 30, 70),
+        clamp(base[1] - waveX + waveY * 0.2, 30, 70),
+        clamp(base[2] - waveX * 0.45 + waveY, 30, 70),
+        clamp(base[3] + waveX * 0.55 - waveY, 30, 70),
+        clamp(base[4] - waveY + waveX * 0.3, 30, 70),
+        clamp(base[5] + waveY - waveX * 0.25, 30, 70),
+        clamp(base[6] + waveX + waveY * 0.35, 30, 70),
+        clamp(base[7] - waveX - waveY * 0.3, 30, 70)
       ];
 
       folder.style.borderRadius =
@@ -57,8 +58,8 @@
     };
 
     const render = () => {
-      const spring = state.active ? 0.13 : state.releasing ? 0.105 : 0.09;
-      const damping = state.active ? 0.72 : state.releasing ? 0.81 : 0.78;
+      const spring = state.active ? 0.105 : state.releasing ? 0.12 : 0.095;
+      const damping = state.active ? 0.79 : state.releasing ? 0.865 : 0.82;
 
       state.velocityX =
         (state.velocityX + (state.targetX - state.x) * spring) * damping;
@@ -68,29 +69,37 @@
       state.y += state.velocityY;
 
       const horizontalStretch =
-        1 + Math.abs(state.x) * 0.025 + Math.abs(state.velocityX) * 0.08 - Math.abs(state.y) * 0.008;
+        1 +
+        Math.abs(state.x) * 0.034 +
+        Math.abs(state.velocityX) * 0.2 -
+        Math.abs(state.y) * 0.012;
       const verticalStretch =
-        1 + Math.abs(state.y) * 0.025 + Math.abs(state.velocityY) * 0.08 - Math.abs(state.x) * 0.008;
+        1 +
+        Math.abs(state.y) * 0.034 +
+        Math.abs(state.velocityY) * 0.2 -
+        Math.abs(state.x) * 0.012;
 
-      folder.style.setProperty('--pull-x', `${state.x * 9}px`);
-      folder.style.setProperty('--pull-y', `${state.y * 7}px`);
-      folder.style.setProperty('--liquid-rotate', `${state.x * 2.6}deg`);
+      folder.style.setProperty('--pull-x', `${state.x * 11.5}px`);
+      folder.style.setProperty('--pull-y', `${state.y * 9.5}px`);
+      folder.style.setProperty('--liquid-rotate', `${state.x * 3.4}deg`);
       folder.style.setProperty('--liquid-scale-x', horizontalStretch.toFixed(4));
       folder.style.setProperty('--liquid-scale-y', verticalStretch.toFixed(4));
-      folder.style.setProperty('--shine-x', `${clamp(25 + state.x * 17, 11, 43)}%`);
-      folder.style.setProperty('--shine-y', `${clamp(16 + state.y * 13, 7, 34)}%`);
-      folder.style.setProperty('--rim-x', `${clamp(55 + state.x * 13, 39, 70)}%`);
-      folder.style.setProperty('--rim-y', `${clamp(69 + state.y * 9, 57, 80)}%`);
-      folder.style.setProperty('--shine-rotate', `${-18 + state.x * 9}deg`);
-      folder.style.setProperty('--content-x', `${state.x * -2.2}px`);
-      folder.style.setProperty('--content-y', `${state.y * -1.6}px`);
+      folder.style.setProperty('--shine-x', `${clamp(25 + state.x * 19, 9, 46)}%`);
+      folder.style.setProperty('--shine-y', `${clamp(16 + state.y * 15, 6, 37)}%`);
+      folder.style.setProperty('--rim-x', `${clamp(55 + state.x * 15, 36, 73)}%`);
+      folder.style.setProperty('--rim-y', `${clamp(69 + state.y * 11, 54, 82)}%`);
+      folder.style.setProperty('--shine-rotate', `${-18 + state.x * 12}deg`);
+      folder.style.setProperty('--content-x', `${state.x * -2.8}px`);
+      folder.style.setProperty('--content-y', `${state.y * -2.2}px`);
+      folder.style.setProperty('--lens-x', `${state.x * -3.6}px`);
+      folder.style.setProperty('--lens-y', `${state.y * -3}px`);
       setRadius(state.x, state.y, state.velocityX, state.velocityY);
 
       const settled =
-        Math.abs(state.targetX - state.x) < 0.002 &&
-        Math.abs(state.targetY - state.y) < 0.002 &&
-        Math.abs(state.velocityX) < 0.002 &&
-        Math.abs(state.velocityY) < 0.002;
+        Math.abs(state.targetX - state.x) < 0.0015 &&
+        Math.abs(state.targetY - state.y) < 0.0015 &&
+        Math.abs(state.velocityX) < 0.0015 &&
+        Math.abs(state.velocityY) < 0.0015;
 
       if (settled) {
         state.frame = null;
@@ -118,6 +127,8 @@
         folder.style.removeProperty('--shine-rotate');
         folder.style.removeProperty('--content-x');
         folder.style.removeProperty('--content-y');
+        folder.style.removeProperty('--lens-x');
+        folder.style.removeProperty('--lens-y');
         return;
       }
 
@@ -131,6 +142,10 @@
     };
 
     const updateTarget = (event) => {
+      if (!state.active) {
+        return;
+      }
+
       const bounds = folder.getBoundingClientRect();
       state.targetX = clamp(((event.clientX - bounds.left) / bounds.width) * 2 - 1, -1, 1);
       state.targetY = clamp(((event.clientY - bounds.top) / bounds.height) * 2 - 1, -1, 1);
@@ -147,7 +162,7 @@
       for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
         const particle = document.createElement('span');
         const spread = particleIndex === 0 ? -0.24 : 0.22;
-        const distance = particleIndex === 0 ? 34 : 22;
+        const distance = particleIndex === 0 ? 42 : 28;
         const perpendicularX = -directionY * spread;
         const perpendicularY = directionX * spread;
 
@@ -155,7 +170,7 @@
         particle.setAttribute('aria-hidden', 'true');
         particle.style.left = `${event.clientX}px`;
         particle.style.top = `${event.clientY}px`;
-        particle.style.setProperty('--splash-size', `${particleIndex === 0 ? 12 : 8}px`);
+        particle.style.setProperty('--splash-size', `${particleIndex === 0 ? 14 : 9}px`);
         particle.style.setProperty(
           '--splash-dx',
           `${(directionX + perpendicularX) * distance}px`
@@ -181,12 +196,12 @@
         document.body.appendChild(particle);
 
         particle.addEventListener('animationend', () => particle.remove(), { once: true });
-        window.setTimeout(() => particle.remove(), 750);
+        window.setTimeout(() => particle.remove(), 900);
       }
     };
 
     const release = (event) => {
-      if (!state.active && !state.releasing) {
+      if (!state.active) {
         return;
       }
 
@@ -203,10 +218,11 @@
 
       state.active = false;
       state.releasing = true;
+      state.releaseLockUntil = window.performance.now() + 360;
       state.targetX = 0;
       state.targetY = 0;
-      state.velocityX += directionX * 0.28;
-      state.velocityY += directionY * 0.28;
+      state.velocityX += directionX * 0.42;
+      state.velocityY += directionY * 0.42;
       folder.classList.remove('is-liquid-active');
       folder.classList.add('is-liquid-releasing');
       createSplash(event, directionX, directionY);
@@ -216,19 +232,32 @@
         state.releasing = false;
         folder.classList.remove('is-liquid-releasing');
         ensureAnimation();
-      }, 620);
+      }, 900);
       ensureAnimation();
     };
 
-    folder.addEventListener('pointerenter', (event) => {
+    const activate = (event) => {
+      if (window.performance.now() < state.releaseLockUntil) {
+        return;
+      }
+
       window.clearTimeout(state.releaseTimer);
       state.active = true;
       state.releasing = false;
       folder.classList.remove('is-liquid-releasing');
       folder.classList.add('is-liquid-active');
       updateTarget(event);
-    });
-    folder.addEventListener('pointermove', updateTarget, { passive: true });
+    };
+
+    folder.addEventListener('pointerenter', activate);
+    folder.addEventListener('pointermove', (event) => {
+      if (!state.active) {
+        activate(event);
+        return;
+      }
+
+      updateTarget(event);
+    }, { passive: true });
     folder.addEventListener('pointerleave', release);
     folder.addEventListener('pointercancel', release);
     folder.addEventListener('blur', release);
