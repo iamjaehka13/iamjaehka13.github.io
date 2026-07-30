@@ -20,7 +20,154 @@
   const clamp = (value, minimum, maximum) =>
     Math.min(Math.max(value, minimum), maximum);
 
-  const folders = document.querySelectorAll('.liquid-folder');
+  const home = document.querySelector('.liquid-home');
+  const grid = home?.querySelector('.liquid-folder-grid');
+  const folders = Array.from(home?.querySelectorAll('.liquid-folder') ?? []);
+
+  if (!home || !grid || folders.length < 2) {
+    return;
+  }
+
+  const fullTurn = Math.PI * 2;
+  const orbitStep = fullTurn / folders.length;
+  const initialOrbitOffset = Math.PI - orbitStep / 2;
+  const orbit = {
+    rotation: 0,
+    targetRotation: 0,
+    velocity: 0,
+    movingUntil: 0,
+    snapTimer: null,
+    frame: null
+  };
+
+  const isOrbitMoving = () =>
+    orbit.frame !== null || window.performance.now() < orbit.movingUntil;
+
+  const renderOrbit = () => {
+    const bounds = grid.getBoundingClientRect();
+    const radiusX = clamp(bounds.width * (bounds.width < 700 ? 0.43 : 0.39), 185, 560);
+    const radiusY = clamp(bounds.height * 0.25, 122, 172);
+
+    folders.forEach((folder, index) => {
+      const angle = initialOrbitOffset + index * orbitStep + orbit.rotation;
+      const depth = (1 - Math.cos(angle)) / 2;
+      const x = Math.sin(angle) * radiusX;
+      const y = -Math.cos(angle) * radiusY;
+      const z = -260 + depth * 380;
+      const scale = 0.62 + depth * 0.4;
+      const opacity = 0.36 + depth * 0.64;
+      const rotateY = -Math.sin(angle) * 30;
+
+      folder.style.setProperty('--orbit-x', `${x.toFixed(3)}px`);
+      folder.style.setProperty('--orbit-y', `${y.toFixed(3)}px`);
+      folder.style.setProperty('--orbit-z', `${z.toFixed(3)}px`);
+      folder.style.setProperty('--orbit-scale', scale.toFixed(4));
+      folder.style.setProperty('--orbit-rotate-y', `${rotateY.toFixed(3)}deg`);
+      folder.style.setProperty('--orbit-opacity', opacity.toFixed(4));
+      folder.style.zIndex = `${Math.round(20 + depth * 80)}`;
+      folder.style.pointerEvents = depth > 0.16 ? 'auto' : 'none';
+      folder.dataset.orbitDepth = depth.toFixed(4);
+    });
+  };
+
+  const animateOrbit = () => {
+    const difference = orbit.targetRotation - orbit.rotation;
+    orbit.velocity = (orbit.velocity + difference * 0.075) * 0.82;
+    orbit.rotation += orbit.velocity;
+    renderOrbit();
+
+    const settled = Math.abs(difference) < 0.0004 && Math.abs(orbit.velocity) < 0.0004;
+
+    if (settled) {
+      orbit.rotation = orbit.targetRotation;
+      orbit.velocity = 0;
+      orbit.frame = null;
+      orbit.movingUntil = window.performance.now() + 80;
+      renderOrbit();
+      return;
+    }
+
+    orbit.frame = window.requestAnimationFrame(animateOrbit);
+  };
+
+  const ensureOrbitAnimation = () => {
+    if (orbit.frame === null) {
+      orbit.frame = window.requestAnimationFrame(animateOrbit);
+    }
+  };
+
+  const queueOrbitSnap = () => {
+    window.clearTimeout(orbit.snapTimer);
+    orbit.snapTimer = window.setTimeout(() => {
+      orbit.targetRotation = Math.round(orbit.targetRotation / orbitStep) * orbitStep;
+      orbit.movingUntil = window.performance.now() + 280;
+      ensureOrbitAnimation();
+    }, 140);
+  };
+
+  const rotateFocusedFolderToFront = (index) => {
+    const baseAngle = initialOrbitOffset + index * orbitStep;
+    const frontRotation = Math.PI - baseAngle;
+    const nearestTurn =
+      frontRotation + Math.round((orbit.rotation - frontRotation) / fullTurn) * fullTurn;
+
+    orbit.targetRotation = nearestTurn;
+    orbit.movingUntil = window.performance.now() + 320;
+    ensureOrbitAnimation();
+  };
+
+  home.classList.add('is-orbit-ready');
+  grid.tabIndex = 0;
+  grid.setAttribute('aria-label', '마우스 휠 또는 방향키로 회전하는 분야별 글 폴더');
+  grid.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown');
+  renderOrbit();
+
+  grid.addEventListener('wheel', (event) => {
+    if (event.ctrlKey) {
+      return;
+    }
+
+    event.preventDefault();
+
+    let delta =
+      Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+
+    if (event.deltaMode === 1) {
+      delta *= 16;
+    } else if (event.deltaMode === 2) {
+      delta *= window.innerHeight;
+    }
+
+    delta = clamp(delta, -180, 180);
+    orbit.targetRotation += delta * 0.0024;
+    orbit.velocity += delta * 0.00012;
+    orbit.movingUntil = window.performance.now() + 320;
+    ensureOrbitAnimation();
+    queueOrbitSnap();
+  }, { passive: false });
+
+  grid.addEventListener('keydown', (event) => {
+    const direction =
+      event.key === 'ArrowRight' || event.key === 'ArrowDown'
+        ? 1
+        : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+          ? -1
+          : 0;
+
+    if (direction === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    orbit.targetRotation += direction * orbitStep;
+    orbit.movingUntil = window.performance.now() + 320;
+    ensureOrbitAnimation();
+  });
+
+  window.addEventListener('resize', () => {
+    orbit.movingUntil = window.performance.now() + 140;
+    renderOrbit();
+  }, { passive: true });
 
   folders.forEach((folder, index) => {
     const base = shapes[index % shapes.length];
@@ -205,6 +352,16 @@
         return;
       }
 
+      if (isOrbitMoving()) {
+        state.active = false;
+        state.releasing = false;
+        state.targetX = 0;
+        state.targetY = 0;
+        folder.classList.remove('is-liquid-active', 'is-liquid-releasing');
+        ensureAnimation();
+        return;
+      }
+
       const bounds = folder.getBoundingClientRect();
       const rawX = Number.isFinite(event.clientX)
         ? ((event.clientX - bounds.left) / bounds.width) * 2 - 1
@@ -237,7 +394,10 @@
     };
 
     const activate = (event) => {
-      if (window.performance.now() < state.releaseLockUntil) {
+      if (
+        isOrbitMoving() ||
+        window.performance.now() < state.releaseLockUntil
+      ) {
         return;
       }
 
@@ -261,5 +421,6 @@
     folder.addEventListener('pointerleave', release);
     folder.addEventListener('pointercancel', release);
     folder.addEventListener('blur', release);
+    folder.addEventListener('focus', () => rotateFocusedFolderToFront(index));
   });
 })();
