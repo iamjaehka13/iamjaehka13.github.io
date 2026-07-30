@@ -1,0 +1,71 @@
+- name: RL
+  category: RL
+  url: /categories/rl/
+  description: Policy learning and skill discovery
+  accent: cyan
+  shape: one
+  icons:
+    - "fas fa-brain"
+    - "fas fa-code"
+    - "fas fa-project-diagram"
+    - "fas fa-chart-line"
+
+- name: Sim2Real
+  category: Sim2Real
+  url: /categories/sim2real/
+  description: Unitree Go2 and real-world transfer
+  accent: violet
+  shape: two
+  icons:
+    - "fas fa-robot"
+    - "fas fa-random"
+    - "fas fa-wave-square"
+    - "fas fa-book-open"
+
+- name: Isaac
+  category: Isaac
+  url: /categories/isaac/
+  description: Isaac Sim and Isaac Lab
+  accent: amber
+  shape: three
+  icons:
+    - "fas fa-cube"
+    - "fas fa-microchip"
+    - "fas fa-network-wired"
+    - "fas fa-play"
+
+- name: Math
+  category: Math
+  url: /categories/math/
+  description: Linear algebra and foundations
+  accent: blue
+  shape: four
+  icons:
+    - "fas fa-infinity"
+    - "fas fa-divide"
+    - "fas fa-chart-area"
+    - "fas fa-calculator"
+
+- name: AI
+  category: AI
+  url: /categories/ai/
+  description: Deep learning foundations
+  accent: rose
+  shape: five
+  icons:
+    - "fas fa-layer-group"
+    - "fas fa-network-wired"
+    - "fas fa-bolt"
+    - "fas fa-code-branch"
+
+- name: Robotics
+  category: Robotics
+  url: /categories/robotics/
+  description: Autonomous systems and projects
+  accent: green
+  shape: six
+  icons:
+    - "fas fa-car"
+    - "fas fa-road"
+    - "fas fa-map-marked-alt"
+    - "fas fa-cogs"

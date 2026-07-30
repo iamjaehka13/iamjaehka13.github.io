@@ -46,7 +46,72 @@ layout: default
   {% endfor %}
 {% endif %}
 
-<div id="post-list" class="flex-grow-1 px-xl-1">
+{% if paginator.page == 1 %}
+  <section class="liquid-home" aria-labelledby="liquid-home-title">
+    <div class="liquid-home__glow liquid-home__glow--one" aria-hidden="true"></div>
+    <div class="liquid-home__glow liquid-home__glow--two" aria-hidden="true"></div>
+
+    <header class="liquid-home__header">
+      <p class="liquid-home__eyebrow">JAEHKA13 · KNOWLEDGE SPACE</p>
+      <h1 id="liquid-home-title">어떤 기록을 펼쳐볼까요?</h1>
+      <p class="liquid-home__intro">
+        물방울 폴더를 눌러 분야별 연구와 학습 기록을 엽니다.
+      </p>
+    </header>
+
+    <div class="liquid-folder-grid" role="list" aria-label="분야별 글 폴더">
+      {% for folder in site.data.home_folders %}
+        {% assign folder_post_count = 0 %}
+        {% for post in site.posts %}
+          {% if post.categories contains folder.category %}
+            {% assign folder_post_count = folder_post_count | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+        <a
+          class="liquid-folder liquid-folder--{{ folder.accent }} liquid-folder--shape-{{ folder.shape }}"
+          href="{{ folder.url | relative_url }}"
+          role="listitem"
+          aria-label="{{ folder.name }} 폴더, 글 {{ folder_post_count }}개"
+        >
+          <span class="liquid-folder__shine" aria-hidden="true"></span>
+
+          <span class="liquid-folder__mini-grid" aria-hidden="true">
+            {% for icon in folder.icons %}
+              <span><i class="{{ icon }}"></i></span>
+            {% endfor %}
+          </span>
+
+          <span class="liquid-folder__copy">
+            <strong>{{ folder.name }}</strong>
+            <span>{{ folder.description }}</span>
+          </span>
+
+          <span class="liquid-folder__count">
+            글 {{ folder_post_count }}개
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <nav class="liquid-home__dock" aria-label="빠른 이동">
+      <a href="{{ '/archives/' | relative_url }}">
+        <i class="fas fa-stream" aria-hidden="true"></i>
+        <span>전체 기록</span>
+      </a>
+      <a href="{{ '/categories/' | relative_url }}">
+        <i class="fas fa-folder-open" aria-hidden="true"></i>
+        <span>모든 폴더</span>
+      </a>
+      <a href="{{ '/cv/' | relative_url }}">
+        <i class="fas fa-id-card" aria-hidden="true"></i>
+        <span>CV</span>
+      </a>
+    </nav>
+  </section>
+{% endif %}
+
+<div id="post-list" class="mobile-home-feed flex-grow-1 px-xl-1">
   {% for post in posts %}
     <article class="card-wrapper card">
       <a href="{{ post.url | relative_url }}" class="post-preview row g-0 flex-md-row-reverse">
@@ -136,5 +201,7 @@ layout: default
 <!-- #post-list -->
 
 {% if paginator.total_pages > 1 %}
-  {% include post-paginator.html %}
+  <div class="mobile-home-pagination">
+    {% include post-paginator.html %}
+  </div>
 {% endif %}
