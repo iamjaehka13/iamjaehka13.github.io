@@ -196,5 +196,9 @@ layout: default
 {% endif %}
 
 {% if paginator.page == 1 %}
-  <script defer src="{{ '/assets/js/liquid-home.js' | relative_url }}"></script>
+  {% assign liquid_asset_version = site.time | date: '%s' %}
+  <script
+    defer
+    src="{{ '/assets/js/liquid-home.js' | relative_url }}?v={{ liquid_asset_version }}"
+  ></script>
 {% endif %}

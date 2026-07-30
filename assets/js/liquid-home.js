@@ -1,5 +1,7 @@
 (() => {
-  const interactionQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const interactionQuery = window.matchMedia(
+    '(min-width: 850px) and (any-hover: hover) and (any-pointer: fine)'
+  );
   const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   if (!interactionQuery.matches || reducedMotionQuery.matches) {
