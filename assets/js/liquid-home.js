@@ -8,16 +8,7 @@
     return;
   }
 
-  const shapes = [
-    [64, 36, 52, 48, 45, 58, 42, 55],
-    [46, 54, 68, 32, 58, 38, 62, 42],
-    [38, 62, 44, 56, 57, 35, 65, 43],
-    [56, 44, 61, 39, 38, 66, 34, 62],
-    [37, 63, 48, 52, 66, 34, 58, 42],
-    [68, 32, 47, 53, 42, 62, 38, 58],
-    [43, 57, 65, 35, 55, 41, 59, 45],
-    [61, 39, 35, 65, 44, 67, 33, 56]
-  ];
+  const circleRadii = [50, 50, 50, 50, 50, 50, 50, 50];
 
   const clamp = (value, minimum, maximum) =>
     Math.min(Math.max(value, minimum), maximum);
@@ -185,7 +176,6 @@
   }, { passive: true });
 
   folders.forEach((folder, index) => {
-    const base = shapes[index % shapes.length];
     const state = {
       x: 0,
       y: 0,
@@ -196,22 +186,40 @@
       active: false,
       releasing: false,
       releaseLockUntil: 0,
+      releaseHoldUntil: 0,
       releaseTimer: null,
+      recoilTimer: null,
+      baseRadii: [...circleRadii],
       frame: null
     };
 
+    const readComputedRadii = () => {
+      const values = getComputedStyle(folder).borderRadius.match(
+        /-?\d+(?:\.\d+)?%/g
+      );
+
+      if (!values || values.length < circleRadii.length) {
+        return [...circleRadii];
+      }
+
+      return values
+        .slice(0, circleRadii.length)
+        .map((value) => Number.parseFloat(value));
+    };
+
     const setRadius = (x, y, velocityX, velocityY) => {
-      const waveX = x * 8.5 + velocityX * 11;
-      const waveY = y * 8.5 + velocityY * 11;
+      const base = state.baseRadii;
+      const waveX = x * 11 + velocityX * 18;
+      const waveY = y * 11 + velocityY * 18;
       const radii = [
-        clamp(base[0] + waveX - waveY * 0.35, 30, 70),
-        clamp(base[1] - waveX + waveY * 0.2, 30, 70),
-        clamp(base[2] - waveX * 0.45 + waveY, 30, 70),
-        clamp(base[3] + waveX * 0.55 - waveY, 30, 70),
-        clamp(base[4] - waveY + waveX * 0.3, 30, 70),
-        clamp(base[5] + waveY - waveX * 0.25, 30, 70),
-        clamp(base[6] + waveX + waveY * 0.35, 30, 70),
-        clamp(base[7] - waveX - waveY * 0.3, 30, 70)
+        clamp(base[0] + waveX * 0.35 - waveY * 0.25, 34, 66),
+        clamp(base[1] - waveX * 0.85 - waveY * 0.25, 34, 66),
+        clamp(base[2] - waveX * 0.85 + waveY * 0.25, 34, 66),
+        clamp(base[3] + waveX * 0.35 + waveY * 0.25, 34, 66),
+        clamp(base[4] + waveY * 0.35 - waveX * 0.15, 34, 66),
+        clamp(base[5] + waveY * 0.35 + waveX * 0.15, 34, 66),
+        clamp(base[6] - waveY * 0.85 + waveX * 0.15, 34, 66),
+        clamp(base[7] - waveY * 0.85 - waveX * 0.15, 34, 66)
       ];
 
       folder.style.borderRadius =
@@ -220,8 +228,22 @@
     };
 
     const render = () => {
-      const spring = state.active ? 0.105 : state.releasing ? 0.12 : 0.095;
-      const damping = state.active ? 0.79 : state.releasing ? 0.865 : 0.82;
+      const holdingRelease =
+        state.releasing && window.performance.now() < state.releaseHoldUntil;
+      const spring = state.active
+        ? 0.135
+        : holdingRelease
+          ? 0.09
+          : state.releasing
+            ? 0.15
+            : 0.095;
+      const damping = state.active
+        ? 0.76
+        : holdingRelease
+          ? 0.88
+          : state.releasing
+            ? 0.84
+            : 0.82;
 
       state.velocityX =
         (state.velocityX + (state.targetX - state.x) * spring) * damping;
@@ -231,30 +253,53 @@
       state.y += state.velocityY;
 
       const horizontalStretch =
-        1 +
-        Math.abs(state.x) * 0.034 +
-        Math.abs(state.velocityX) * 0.2 -
-        Math.abs(state.y) * 0.012;
+        clamp(
+          1 +
+            Math.abs(state.x) * 0.095 +
+            Math.abs(state.velocityX) * 0.24 -
+            Math.abs(state.y) * 0.028,
+          0.91,
+          1.22
+        );
       const verticalStretch =
-        1 +
-        Math.abs(state.y) * 0.034 +
-        Math.abs(state.velocityY) * 0.2 -
-        Math.abs(state.x) * 0.012;
+        clamp(
+          1 +
+            Math.abs(state.y) * 0.095 +
+            Math.abs(state.velocityY) * 0.24 -
+            Math.abs(state.x) * 0.028,
+          0.91,
+          1.22
+        );
 
-      folder.style.setProperty('--pull-x', `${state.x * 11.5}px`);
-      folder.style.setProperty('--pull-y', `${state.y * 9.5}px`);
-      folder.style.setProperty('--liquid-rotate', `${state.x * 3.4}deg`);
+      folder.style.setProperty('--pull-x', `${state.x * 20}px`);
+      folder.style.setProperty('--pull-y', `${state.y * 18}px`);
+      folder.style.setProperty(
+        '--liquid-rotate',
+        `${state.x * 2.6 - state.x * state.y * 1.2}deg`
+      );
       folder.style.setProperty('--liquid-scale-x', horizontalStretch.toFixed(4));
       folder.style.setProperty('--liquid-scale-y', verticalStretch.toFixed(4));
-      folder.style.setProperty('--shine-x', `${clamp(25 + state.x * 19, 9, 46)}%`);
-      folder.style.setProperty('--shine-y', `${clamp(16 + state.y * 15, 6, 37)}%`);
-      folder.style.setProperty('--rim-x', `${clamp(55 + state.x * 15, 36, 73)}%`);
-      folder.style.setProperty('--rim-y', `${clamp(69 + state.y * 11, 54, 82)}%`);
-      folder.style.setProperty('--shine-rotate', `${-18 + state.x * 12}deg`);
-      folder.style.setProperty('--content-x', `${state.x * -2.8}px`);
-      folder.style.setProperty('--content-y', `${state.y * -2.2}px`);
-      folder.style.setProperty('--lens-x', `${state.x * -3.6}px`);
-      folder.style.setProperty('--lens-y', `${state.y * -3}px`);
+      folder.style.setProperty(
+        '--shine-x',
+        `${clamp(25 + state.x * 24, 6, 52)}%`
+      );
+      folder.style.setProperty(
+        '--shine-y',
+        `${clamp(16 + state.y * 21, 4, 43)}%`
+      );
+      folder.style.setProperty(
+        '--rim-x',
+        `${clamp(55 + state.x * 20, 30, 78)}%`
+      );
+      folder.style.setProperty(
+        '--rim-y',
+        `${clamp(69 + state.y * 17, 48, 86)}%`
+      );
+      folder.style.setProperty('--shine-rotate', `${-18 + state.x * 16}deg`);
+      folder.style.setProperty('--content-x', `${state.x * -5.5}px`);
+      folder.style.setProperty('--content-y', `${state.y * -4.5}px`);
+      folder.style.setProperty('--lens-x', `${state.x * -6.5}px`);
+      folder.style.setProperty('--lens-y', `${state.y * -5.5}px`);
       setRadius(state.x, state.y, state.velocityX, state.velocityY);
 
       const settled =
@@ -275,6 +320,8 @@
         state.velocityX = 0;
         state.velocityY = 0;
         state.releasing = false;
+        state.releaseHoldUntil = 0;
+        state.baseRadii = [...circleRadii];
         folder.classList.remove('is-liquid-releasing');
         folder.style.removeProperty('border-radius');
         folder.style.removeProperty('--pull-x');
@@ -309,8 +356,14 @@
       }
 
       const bounds = folder.getBoundingClientRect();
-      state.targetX = clamp(((event.clientX - bounds.left) / bounds.width) * 2 - 1, -1, 1);
-      state.targetY = clamp(((event.clientY - bounds.top) / bounds.height) * 2 - 1, -1, 1);
+      const normalizedX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+      const normalizedY = ((event.clientY - bounds.top) / bounds.height) * 2 - 1;
+      const distance = Math.hypot(normalizedX, normalizedY);
+      const edgeGrip =
+        0.28 + clamp((distance - 0.15) / 0.85, 0, 1) * 0.87;
+
+      state.targetX = clamp(normalizedX * edgeGrip, -1.25, 1.25);
+      state.targetY = clamp(normalizedY * edgeGrip, -1.25, 1.25);
       ensureAnimation();
     };
 
@@ -368,8 +421,10 @@
       }
 
       if (isOrbitMoving()) {
+        window.clearTimeout(state.recoilTimer);
         state.active = false;
         state.releasing = false;
+        state.releaseHoldUntil = 0;
         state.targetX = 0;
         state.targetY = 0;
         folder.classList.remove('is-liquid-active', 'is-liquid-releasing');
@@ -390,21 +445,29 @@
 
       state.active = false;
       state.releasing = true;
-      state.releaseLockUntil = window.performance.now() + 360;
-      state.targetX = 0;
-      state.targetY = 0;
-      state.velocityX += directionX * 0.42;
-      state.velocityY += directionY * 0.42;
+      state.releaseLockUntil = window.performance.now() + 520;
+      state.releaseHoldUntil = window.performance.now() + 115;
+      state.targetX = directionX * 1.18;
+      state.targetY = directionY * 1.18;
+      state.velocityX += directionX * 0.22;
+      state.velocityY += directionY * 0.22;
       folder.classList.remove('is-liquid-active');
       folder.classList.add('is-liquid-releasing');
       createSplash(event, directionX, directionY);
+
+      window.clearTimeout(state.recoilTimer);
+      state.recoilTimer = window.setTimeout(() => {
+        state.targetX = 0;
+        state.targetY = 0;
+        ensureAnimation();
+      }, 115);
 
       window.clearTimeout(state.releaseTimer);
       state.releaseTimer = window.setTimeout(() => {
         state.releasing = false;
         folder.classList.remove('is-liquid-releasing');
         ensureAnimation();
-      }, 900);
+      }, 1100);
       ensureAnimation();
     };
 
@@ -417,8 +480,11 @@
       }
 
       window.clearTimeout(state.releaseTimer);
+      window.clearTimeout(state.recoilTimer);
+      state.baseRadii = readComputedRadii();
       state.active = true;
       state.releasing = false;
+      state.releaseHoldUntil = 0;
       folder.classList.remove('is-liquid-releasing');
       folder.classList.add('is-liquid-active');
       updateTarget(event);

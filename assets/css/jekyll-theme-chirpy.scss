@@ -528,23 +528,25 @@ html[data-mode='dark'] {
   --orbit-scale: 1;
   --orbit-rotate-y: 0deg;
   --orbit-opacity: 1;
-  --liquid-radius-1: 56%;
-  --liquid-radius-2: 44%;
-  --liquid-radius-3: 58%;
-  --liquid-radius-4: 42%;
-  --liquid-radius-5: 48%;
-  --liquid-radius-6: 54%;
-  --liquid-radius-7: 46%;
-  --liquid-radius-8: 52%;
+  --liquid-radius-1: 50%;
+  --liquid-radius-2: 50%;
+  --liquid-radius-3: 50%;
+  --liquid-radius-4: 50%;
+  --liquid-radius-5: 50%;
+  --liquid-radius-6: 50%;
+  --liquid-radius-7: 50%;
+  --liquid-radius-8: 50%;
   --liquid-morph-x-a: 0%;
   --liquid-morph-x-b: 0%;
   --liquid-morph-y-a: 0%;
   --liquid-morph-y-b: 0%;
-  --liquid-morph-duration: 9s;
+  --liquid-morph-duration: 6.2s;
+  --liquid-float-delay: 0s;
+  --liquid-morph-delay: 0s;
 
   position: relative;
   display: flex;
-  aspect-ratio: 1.18 / 1;
+  aspect-ratio: 1 / 1;
   min-width: 0;
   flex-direction: column;
   align-items: center;
@@ -621,7 +623,9 @@ html[data-mode='dark'] {
     filter 220ms ease;
   animation:
     liquid-float 7s ease-in-out infinite,
-    liquid-contour var(--liquid-morph-duration) ease-in-out infinite;
+    liquid-contour var(--liquid-morph-duration) cubic-bezier(0.45, 0.05, 0.55, 0.95)
+      infinite;
+  animation-delay: var(--liquid-float-delay), var(--liquid-morph-delay);
 }
 
 .liquid-folder:hover,
@@ -653,145 +657,81 @@ html[data-mode='dark'] {
 }
 
 .liquid-folder--shape-one {
-  --liquid-radius-1: 64%;
-  --liquid-radius-2: 36%;
-  --liquid-radius-3: 52%;
-  --liquid-radius-4: 48%;
-  --liquid-radius-5: 45%;
-  --liquid-radius-6: 58%;
-  --liquid-radius-7: 42%;
-  --liquid-radius-8: 55%;
-  --liquid-morph-duration: 8.2s;
+  --liquid-morph-duration: 5.2s;
+  --liquid-float-delay: 0s;
+  --liquid-morph-delay: -2.4s;
 
   width: 100%;
-  aspect-ratio: 1.36 / 1;
   justify-self: center;
-  animation-delay: 0s, -2.4s;
 }
 
 .liquid-folder--shape-two {
   --offset-y: -0.8rem;
-  --liquid-radius-1: 46%;
-  --liquid-radius-2: 54%;
-  --liquid-radius-3: 68%;
-  --liquid-radius-4: 32%;
-  --liquid-radius-5: 58%;
-  --liquid-radius-6: 38%;
-  --liquid-radius-7: 62%;
-  --liquid-radius-8: 42%;
-  --liquid-morph-duration: 9.7s;
+  --liquid-morph-duration: 6.4s;
+  --liquid-float-delay: -1.7s;
+  --liquid-morph-delay: -5.1s;
 
   width: 85%;
-  aspect-ratio: 0.82 / 1;
   justify-self: center;
-  animation-delay: -1.7s, -6.1s;
 }
 
 .liquid-folder--shape-three {
   --offset-y: 0.45rem;
-  --liquid-radius-1: 38%;
-  --liquid-radius-2: 62%;
-  --liquid-radius-3: 44%;
-  --liquid-radius-4: 56%;
-  --liquid-radius-5: 57%;
-  --liquid-radius-6: 35%;
-  --liquid-radius-7: 65%;
-  --liquid-radius-8: 43%;
-  --liquid-morph-duration: 7.9s;
+  --liquid-morph-duration: 5.7s;
+  --liquid-float-delay: -3.8s;
+  --liquid-morph-delay: -1.2s;
 
   width: 96%;
-  aspect-ratio: 1.24 / 1;
   justify-self: center;
-  animation-delay: -3.8s, -1.2s;
 }
 
 .liquid-folder--shape-four {
   --offset-y: -0.35rem;
-  --liquid-radius-1: 56%;
-  --liquid-radius-2: 44%;
-  --liquid-radius-3: 61%;
-  --liquid-radius-4: 39%;
-  --liquid-radius-5: 38%;
-  --liquid-radius-6: 66%;
-  --liquid-radius-7: 34%;
-  --liquid-radius-8: 62%;
-  --liquid-morph-duration: 10.6s;
+  --liquid-morph-duration: 6.8s;
+  --liquid-float-delay: -5.2s;
+  --liquid-morph-delay: -6.4s;
 
   width: 78%;
-  aspect-ratio: 1.08 / 1;
   justify-self: center;
-  animation-delay: -5.2s, -7.4s;
 }
 
 .liquid-folder--shape-five {
   --offset-y: 0.75rem;
-  --liquid-radius-1: 37%;
-  --liquid-radius-2: 63%;
-  --liquid-radius-3: 48%;
-  --liquid-radius-4: 52%;
-  --liquid-radius-5: 66%;
-  --liquid-radius-6: 34%;
-  --liquid-radius-7: 58%;
-  --liquid-radius-8: 42%;
-  --liquid-morph-duration: 8.8s;
+  --liquid-morph-duration: 5.5s;
+  --liquid-float-delay: -2.9s;
+  --liquid-morph-delay: -3.6s;
 
   width: 88%;
-  aspect-ratio: 0.84 / 1;
   justify-self: center;
-  animation-delay: -2.9s, -4.6s;
 }
 
 .liquid-folder--shape-six {
-  --liquid-radius-1: 68%;
-  --liquid-radius-2: 32%;
-  --liquid-radius-3: 47%;
-  --liquid-radius-4: 53%;
-  --liquid-radius-5: 42%;
-  --liquid-radius-6: 62%;
-  --liquid-radius-7: 38%;
-  --liquid-radius-8: 58%;
-  --liquid-morph-duration: 9.3s;
+  --liquid-morph-duration: 6.1s;
+  --liquid-float-delay: -6.3s;
+  --liquid-morph-delay: -2.1s;
 
   width: 98%;
-  aspect-ratio: 1.32 / 1;
   justify-self: center;
-  animation-delay: -6.3s, -2.1s;
 }
 
 .liquid-folder--shape-seven {
   --offset-y: 0.35rem;
-  --liquid-radius-1: 43%;
-  --liquid-radius-2: 57%;
-  --liquid-radius-3: 65%;
-  --liquid-radius-4: 35%;
-  --liquid-radius-5: 55%;
-  --liquid-radius-6: 41%;
-  --liquid-radius-7: 59%;
-  --liquid-radius-8: 45%;
-  --liquid-morph-duration: 10.1s;
+  --liquid-morph-duration: 6.6s;
+  --liquid-float-delay: -4.4s;
+  --liquid-morph-delay: -5.2s;
 
   width: 91%;
-  aspect-ratio: 1.12 / 1;
   justify-self: center;
-  animation-delay: -4.4s, -8.2s;
 }
 
 .liquid-folder--shape-eight {
   --offset-y: -0.5rem;
-  --liquid-radius-1: 61%;
-  --liquid-radius-2: 39%;
-  --liquid-radius-3: 35%;
-  --liquid-radius-4: 65%;
-  --liquid-radius-5: 44%;
-  --liquid-radius-6: 67%;
-  --liquid-radius-7: 33%;
-  --liquid-radius-8: 56%;
-  --liquid-morph-duration: 8.5s;
+  --liquid-morph-duration: 5.9s;
+  --liquid-float-delay: -0.9s;
+  --liquid-morph-delay: -4.5s;
 
   width: 83%;
-  aspect-ratio: 0.86 / 1;
   justify-self: center;
-  animation-delay: -0.9s, -5.5s;
 }
 
 .liquid-folder__shine {
@@ -813,15 +753,17 @@ html[data-mode='dark'] {
   transform: rotate(var(--shine-rotate));
   pointer-events: none;
   transition: opacity 180ms ease;
+  animation: liquid-shine-flow var(--liquid-morph-duration) ease-in-out
+    var(--liquid-morph-delay) infinite;
 }
 
 .liquid-folder::before {
   content: '';
   position: absolute;
-  inset: 10% 9% 12%;
+  inset: 8.5%;
   z-index: 0;
-  border-radius: inherit;
-  opacity: 0.65;
+  border-radius: 50%;
+  opacity: 0.58;
   background:
     radial-gradient(
       ellipse at 32% 24%,
@@ -987,31 +929,56 @@ html[data-mode='dark'] {
 @keyframes liquid-contour {
   0%,
   100% {
-    --liquid-morph-x-a: -2.8%;
-    --liquid-morph-x-b: 1.8%;
-    --liquid-morph-y-a: 1.5%;
-    --liquid-morph-y-b: -2.2%;
+    --liquid-morph-x-a: -7%;
+    --liquid-morph-x-b: 4%;
+    --liquid-morph-y-a: 5%;
+    --liquid-morph-y-b: -6%;
   }
 
-  28% {
-    --liquid-morph-x-a: 3.6%;
-    --liquid-morph-x-b: -2.2%;
-    --liquid-morph-y-a: -2.6%;
-    --liquid-morph-y-b: 2.8%;
+  20% {
+    --liquid-morph-x-a: 8%;
+    --liquid-morph-x-b: -5%;
+    --liquid-morph-y-a: -7%;
+    --liquid-morph-y-b: 6%;
   }
 
-  61% {
-    --liquid-morph-x-a: -1.2%;
-    --liquid-morph-x-b: 3.1%;
-    --liquid-morph-y-a: 3.2%;
-    --liquid-morph-y-b: -1.4%;
+  43% {
+    --liquid-morph-x-a: -4%;
+    --liquid-morph-x-b: 8%;
+    --liquid-morph-y-a: 7%;
+    --liquid-morph-y-b: -3%;
   }
 
-  82% {
-    --liquid-morph-x-a: 2.3%;
-    --liquid-morph-x-b: -1.1%;
-    --liquid-morph-y-a: -1.8%;
-    --liquid-morph-y-b: 3%;
+  67% {
+    --liquid-morph-x-a: 6%;
+    --liquid-morph-x-b: -7%;
+    --liquid-morph-y-a: -4%;
+    --liquid-morph-y-b: 8%;
+  }
+
+  84% {
+    --liquid-morph-x-a: -8%;
+    --liquid-morph-x-b: 3%;
+    --liquid-morph-y-a: 6%;
+    --liquid-morph-y-b: -7%;
+  }
+}
+
+@keyframes liquid-shine-flow {
+  0%,
+  100% {
+    translate: -5% -3%;
+    scale: 0.92 1;
+  }
+
+  34% {
+    translate: 8% 12%;
+    scale: 1.08 0.88;
+  }
+
+  68% {
+    translate: -2% 19%;
+    scale: 0.96 1.1;
   }
 }
 
@@ -1205,8 +1172,12 @@ html[data-mode='dark'] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-folder {
+  .liquid-folder,
+  .liquid-folder__shine {
     animation: none;
+  }
+
+  .liquid-folder {
     transition: border-color 180ms ease;
   }
 
