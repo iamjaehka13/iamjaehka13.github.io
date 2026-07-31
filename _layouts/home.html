@@ -47,10 +47,11 @@ layout: default
 {% endif %}
 
 {% if paginator.page == 1 %}
-  <section class="liquid-home" aria-label="분야별 글 폴더">
-    <div class="liquid-folder-grid" role="list" aria-label="분야별 글 폴더">
+  <section class="liquid-home" aria-label="분야별 기록">
+    <div class="liquid-folder-grid" role="list" aria-label="분야별 기록">
       {% for folder in site.data.home_folders %}
         {% assign folder_post_count = 0 %}
+        {% assign lens_icon = folder.icons | first %}
         {% for post in site.posts %}
           {% if post.categories contains folder.category %}
             {% assign folder_post_count = folder_post_count | plus: 1 %}
@@ -60,14 +61,19 @@ layout: default
           class="liquid-folder liquid-folder--shape-{{ folder.shape }}"
           href="{{ folder.url | relative_url }}"
           role="listitem"
-          aria-label="{{ folder.name }} 폴더, 글 {{ folder_post_count }}개"
+          aria-label="{{ folder.name }} 카테고리, 글 {{ folder_post_count }}개"
         >
           <span class="liquid-folder__shine" aria-hidden="true"></span>
 
-          <span class="liquid-folder__mini-grid" aria-hidden="true">
-            {% for icon in folder.icons %}
-              <span><i class="{{ icon }}"></i></span>
-            {% endfor %}
+          <span class="liquid-folder__optic" aria-hidden="true">
+            <span class="liquid-folder__optic-ring liquid-folder__optic-ring--outer"></span>
+            <span class="liquid-folder__optic-ring liquid-folder__optic-ring--inner"></span>
+            <span class="liquid-folder__optic-scan"></span>
+            <span class="liquid-folder__optic-node liquid-folder__optic-node--one"></span>
+            <span class="liquid-folder__optic-node liquid-folder__optic-node--two"></span>
+            <span class="liquid-folder__optic-core">
+              <i class="{{ lens_icon }}"></i>
+            </span>
           </span>
 
           <span class="liquid-folder__copy">

@@ -132,7 +132,7 @@
 
   home.classList.add('is-orbit-ready');
   grid.tabIndex = 0;
-  grid.setAttribute('aria-label', '마우스 휠 또는 방향키로 회전하는 분야별 글 폴더');
+  grid.setAttribute('aria-label', '마우스 휠 또는 방향키로 회전하는 분야별 기록');
   grid.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown');
   renderOrbit();
 
@@ -455,6 +455,10 @@
 
         particle.className = 'liquid-splash-particle';
         particle.setAttribute('aria-hidden', 'true');
+        particle.style.setProperty(
+          '--lens-accent',
+          getComputedStyle(folder).getPropertyValue('--lens-accent').trim()
+        );
         particle.style.left = `${event.clientX}px`;
         particle.style.top = `${event.clientY}px`;
         particle.style.setProperty('--splash-size', `${particleIndex === 0 ? 14 : 9}px`);
