@@ -920,853 +920,725 @@ body:has(.category-library) article.px-1 {
   }
 }
 
-/* Liquid glass lens home */
+/* Solar system home */
 
-.liquid-home {
-  --liquid-ink: #fff;
+.solar-home {
+  --sun-shift-x: 0px;
+  --sun-shift-y: 0px;
 
   position: relative;
   display: none;
   min-height: calc(100vh - 7rem);
   margin: 0.75rem 0 1.5rem;
-  padding: clamp(1.25rem, 2vw, 2.25rem);
+  padding: clamp(1rem, 1.8vw, 2rem);
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 2rem;
-  color: var(--liquid-ink);
+  color: #fff;
   background:
-    radial-gradient(ellipse at 50% 44%, #191919 0%, #0d0d0d 44%, #050505 82%),
-    #050505;
+    radial-gradient(circle at 50% 50%, rgb(22 27 35 / 92%) 0%, rgb(8 11 16 / 96%) 38%, #020305 82%),
+    #020305;
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 5%),
-    0 30px 80px rgb(0 0 0 / 26%);
+    0 30px 80px rgb(0 0 0 / 28%);
   isolation: isolate;
 }
 
-.liquid-home::before {
+.solar-home::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at 18% 24%, rgb(255 255 255 / 4.5%), transparent 23%),
-    radial-gradient(ellipse at 79% 67%, rgb(255 255 255 / 3.5%), transparent 27%),
-    radial-gradient(ellipse at 48% 42%, rgb(255 255 255 / 2.8%), transparent 48%),
-    linear-gradient(180deg, rgb(255 255 255 / 1.8%), transparent 34%);
+    radial-gradient(circle at 50% 50%, transparent 0 34%, rgb(0 0 0 / 16%) 64%, rgb(0 0 0 / 56%) 100%),
+    linear-gradient(180deg, rgb(255 255 255 / 1.8%), transparent 25%);
 }
 
-.liquid-folder-grid {
+.solar-home__galaxy {
+  position: absolute;
+  left: -18%;
+  top: 35%;
+  width: 136%;
+  height: 30%;
+  z-index: 0;
+  border-radius: 50%;
+  opacity: 0.48;
+  background:
+    radial-gradient(ellipse at center, rgb(144 151 184 / 15%), rgb(94 104 145 / 7%) 34%, transparent 70%),
+    linear-gradient(90deg, transparent, rgb(189 194 214 / 5%) 30%, rgb(115 126 170 / 9%) 51%, transparent 78%);
+  filter: blur(24px);
+  transform: rotate(-11deg);
+  animation: cosmic-galaxy-drift 28s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.solar-home__stars {
+  position: absolute;
+  inset: -5%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.solar-home__stars--far {
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 6% 18%, rgb(255 255 255 / 72%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 13% 73%, rgb(199 213 255 / 65%) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle at 21% 39%, rgb(255 255 255 / 58%) 0 0.6px, transparent 1.3px),
+    radial-gradient(circle at 29% 9%, rgb(255 241 211 / 65%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 36% 67%, rgb(255 255 255 / 68%) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle at 43% 28%, rgb(204 218 255 / 62%) 0 0.6px, transparent 1.3px),
+    radial-gradient(circle at 51% 82%, rgb(255 255 255 / 55%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 58% 14%, rgb(255 236 206 / 62%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 64% 61%, rgb(255 255 255 / 66%) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle at 72% 32%, rgb(204 218 255 / 64%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 78% 88%, rgb(255 255 255 / 56%) 0 0.6px, transparent 1.3px),
+    radial-gradient(circle at 85% 12%, rgb(255 241 218 / 62%) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle at 92% 54%, rgb(219 227 255 / 68%) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle at 97% 79%, rgb(255 255 255 / 58%) 0 0.7px, transparent 1.4px);
+  animation: cosmic-stars-drift 36s linear infinite alternate;
+}
+
+.solar-home__stars--near {
+  opacity: 0.7;
+  background:
+    radial-gradient(circle at 9% 48%, rgb(255 255 255 / 86%) 0 1px, transparent 2px),
+    radial-gradient(circle at 18% 16%, rgb(184 207 255 / 78%) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 26% 84%, rgb(255 237 199 / 74%) 0 1px, transparent 2px),
+    radial-gradient(circle at 39% 45%, rgb(255 255 255 / 84%) 0 0.9px, transparent 1.9px),
+    radial-gradient(circle at 48% 6%, rgb(204 218 255 / 76%) 0 1px, transparent 2px),
+    radial-gradient(circle at 57% 72%, rgb(255 255 255 / 82%) 0 1px, transparent 2px),
+    radial-gradient(circle at 68% 21%, rgb(255 231 188 / 76%) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 76% 56%, rgb(203 216 255 / 78%) 0 1px, transparent 2px),
+    radial-gradient(circle at 89% 35%, rgb(255 255 255 / 84%) 0 0.9px, transparent 1.9px),
+    radial-gradient(circle at 95% 91%, rgb(194 210 255 / 74%) 0 1px, transparent 2px);
+  filter: drop-shadow(0 0 2px rgb(255 255 255 / 22%));
+  animation: cosmic-stars-twinkle 7s ease-in-out infinite alternate;
+}
+
+.solar-system {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
-  grid-template-columns: repeat(4, minmax(10.5rem, 16rem));
-  column-gap: clamp(0.8rem, 2.5vw, 2.8rem);
-  row-gap: clamp(0.8rem, 1.8vw, 1.5rem);
+  grid-template-columns: repeat(4, minmax(7.5rem, 1fr));
+  gap: 1.25rem;
   align-items: center;
-  justify-content: space-between;
+  justify-items: center;
   width: 100%;
+  min-height: clamp(31rem, 67vh, 41rem);
   max-width: 92rem;
   margin: 0 auto;
-  perspective: 900px;
+  outline: none;
+  perspective: 1000px;
+  transform-style: preserve-3d;
 }
 
-.liquid-folder {
-  --lens-accent: 137 156 168;
-  --offset-y: 0rem;
-  --pull-x: 0px;
-  --pull-y: 0px;
-  --liquid-rotate: 0deg;
-  --liquid-scale-x: 1;
-  --liquid-scale-y: 1;
-  --shine-x: 25%;
-  --shine-y: 16%;
-  --shine-rotate: -18deg;
-  --rim-x: 55%;
-  --rim-y: 69%;
-  --content-x: 0px;
-  --content-y: 0px;
-  --lens-x: 0px;
-  --lens-y: 0px;
-  --orbit-x: 0px;
-  --orbit-y: 0px;
-  --orbit-z: 0px;
-  --orbit-scale: 1;
-  --orbit-rotate-y: 0deg;
-  --orbit-opacity: 1;
-  --liquid-morph-duration: 6.2s;
-  --liquid-float-delay: 0s;
-  --liquid-morph-delay: 0s;
+.solar-system:focus-visible {
+  outline: 1px solid rgb(255 255 255 / 24%);
+  outline-offset: -0.45rem;
+  border-radius: 1.5rem;
+}
+
+.solar-system__orbits,
+.solar-sun {
+  display: none;
+}
+
+.solar-planet {
+  --planet-body-size: 4rem;
+  --planet-hitbox: 7rem;
+  --planet-glow: 170 180 192;
+  --planet-x: 0px;
+  --planet-y: 0px;
+  --planet-scale: 1;
+  --planet-opacity: 1;
+  --planet-tilt-x: 0deg;
+  --planet-tilt-y: 0deg;
+  --surface-shift-x: 0px;
+  --surface-shift-y: 0px;
 
   position: relative;
-  display: flex;
-  aspect-ratio: 1 / 1;
-  min-width: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(0.8rem, 1.35vw, 1.2rem);
-  overflow: hidden;
-  z-index: 1;
-  border: 1px solid rgb(255 255 255 / 22%);
-  border-radius: 50%;
-  color: var(--liquid-ink);
-  background:
-    radial-gradient(
-      ellipse at var(--shine-x) var(--shine-y),
-      rgb(255 255 255 / 46%) 0%,
-      rgb(255 255 255 / 11%) 7%,
-      transparent 19%
-    ),
-    radial-gradient(
-      ellipse at var(--rim-x) var(--rim-y),
-      rgb(var(--lens-accent) / 16%) 0%,
-      transparent 34%
-    ),
-    radial-gradient(
-      circle at 50% 52%,
-      rgb(255 255 255 / 4.5%) 0%,
-      rgb(5 7 9 / 50%) 52%,
-      rgb(0 0 0 / 74%) 100%
-    ),
-    linear-gradient(
-      145deg,
-      rgb(108 116 122 / 20%) 0%,
-      rgb(13 16 19 / 28%) 31%,
-      rgb(1 2 3 / 48%) 61%,
-      rgb(var(--lens-accent) / 8%) 100%
-    );
-  box-shadow:
-    inset 2px 2px 3px rgb(255 255 255 / 62%),
-    inset -3px -6px 12px rgb(255 255 255 / 13%),
-    inset 14px 11px 30px rgb(var(--lens-accent) / 5.5%),
-    inset -18px -16px 32px rgb(0 0 0 / 58%),
-    0 24px 52px rgb(0 0 0 / 48%),
-    0 0 0 1px rgb(255 255 255 / 3%);
-  backdrop-filter: blur(16px) brightness(0.72) saturate(0.9) contrast(1.12);
-  -webkit-backdrop-filter: blur(16px) brightness(0.72) saturate(0.9)
-    contrast(1.12);
+  display: grid;
+  width: var(--planet-hitbox);
+  aspect-ratio: 1;
+  place-items: center;
+  color: #fff;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  opacity: var(--orbit-opacity);
-  transform:
-    translate3d(
-      var(--pull-x),
-      calc(var(--offset-y) + var(--pull-y)),
-      0
-    )
-    rotate(var(--liquid-rotate))
-    scale(var(--orbit-scale))
-    scaleX(var(--liquid-scale-x))
-    scaleY(var(--liquid-scale-y));
-  transform-origin: center;
+  opacity: var(--planet-opacity);
   transform-style: preserve-3d;
-  will-change: transform, border-radius, background;
   transition:
-    border-color 180ms ease,
-    box-shadow 220ms ease,
-    color 220ms ease,
-    filter 220ms ease;
-  animation: liquid-float 7s ease-in-out infinite;
-  animation-delay: var(--liquid-float-delay);
+    opacity 240ms ease,
+    filter 240ms ease;
 }
 
-.liquid-folder:hover,
-.liquid-folder:focus-visible,
-.liquid-folder.is-liquid-active {
-  z-index: 4;
-  border-color: rgb(255 255 255 / 48%);
+.solar-planet:hover,
+.solar-planet:focus-visible,
+.solar-planet.is-planet-active {
+  z-index: 120 !important;
   color: #fff;
   text-decoration: none;
-  box-shadow:
-    inset 2px 2px 4px rgb(255 255 255 / 72%),
-    inset -4px -7px 14px rgb(255 255 255 / 18%),
-    inset 15px 12px 30px rgb(var(--lens-accent) / 9%),
-    inset -18px -16px 30px rgb(0 0 0 / 52%),
-    0 30px 58px rgb(0 0 0 / 58%),
-    0 0 34px rgb(var(--lens-accent) / 18%);
-  filter: brightness(1.14) saturate(1.08);
+  filter: brightness(1.12) saturate(1.08);
 }
 
-.liquid-folder.is-liquid-releasing {
-  z-index: 4;
-  border-color: rgb(255 255 255 / 38%);
-  box-shadow:
-    inset 2px 2px 4px rgb(255 255 255 / 65%),
-    inset -4px -7px 13px rgb(255 255 255 / 15%),
-    inset 14px 11px 28px rgb(var(--lens-accent) / 7%),
-    inset -18px -16px 30px rgb(0 0 0 / 54%),
-    0 28px 54px rgb(0 0 0 / 55%),
-    0 0 25px rgb(var(--lens-accent) / 13%);
-  filter: brightness(1.08);
+.solar-planet:focus-visible {
+  outline: none;
 }
 
-.liquid-folder:focus-visible {
+.solar-planet:focus-visible .solar-planet__body {
   outline: 2px solid rgb(255 255 255 / 82%);
   outline-offset: 5px;
 }
 
-.liquid-folder--shape-one {
-  --liquid-morph-duration: 5.2s;
-  --liquid-float-delay: 0s;
-  --liquid-morph-delay: -2.4s;
-
-  width: 100%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-two {
-  --offset-y: -0.8rem;
-  --liquid-morph-duration: 6.4s;
-  --liquid-float-delay: -1.7s;
-  --liquid-morph-delay: -5.1s;
-
-  width: 85%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-three {
-  --offset-y: 0.45rem;
-  --liquid-morph-duration: 5.7s;
-  --liquid-float-delay: -3.8s;
-  --liquid-morph-delay: -1.2s;
-
-  width: 96%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-four {
-  --offset-y: -0.35rem;
-  --liquid-morph-duration: 6.8s;
-  --liquid-float-delay: -5.2s;
-  --liquid-morph-delay: -6.4s;
-
-  width: 78%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-five {
-  --offset-y: 0.75rem;
-  --liquid-morph-duration: 5.5s;
-  --liquid-float-delay: -2.9s;
-  --liquid-morph-delay: -3.6s;
-
-  width: 88%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-six {
-  --liquid-morph-duration: 6.1s;
-  --liquid-float-delay: -6.3s;
-  --liquid-morph-delay: -2.1s;
-
-  width: 98%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-seven {
-  --offset-y: 0.35rem;
-  --liquid-morph-duration: 6.6s;
-  --liquid-float-delay: -4.4s;
-  --liquid-morph-delay: -5.2s;
-
-  width: 91%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-eight {
-  --offset-y: -0.5rem;
-  --liquid-morph-duration: 5.9s;
-  --liquid-float-delay: -0.9s;
-  --liquid-morph-delay: -4.5s;
-
-  width: 83%;
-  justify-self: center;
-}
-
-.liquid-folder--shape-one,
-.liquid-folder--shape-two,
-.liquid-folder--shape-three,
-.liquid-folder--shape-four,
-.liquid-folder--shape-five,
-.liquid-folder--shape-six,
-.liquid-folder--shape-seven,
-.liquid-folder--shape-eight {
-  --offset-y: 0rem;
-
-  width: 88%;
-}
-
-.liquid-folder:nth-child(1) {
-  --lens-accent: 238 86 99;
-}
-
-.liquid-folder:nth-child(2) {
-  --lens-accent: 242 143 82;
-}
-
-.liquid-folder:nth-child(3) {
-  --lens-accent: 82 182 230;
-}
-
-.liquid-folder:nth-child(4) {
-  --lens-accent: 99 204 168;
-}
-
-.liquid-folder:nth-child(5) {
-  --lens-accent: 191 174 255;
-}
-
-.liquid-folder:nth-child(6) {
-  --lens-accent: 213 93 224;
-}
-
-.liquid-folder:nth-child(7) {
-  --lens-accent: 240 193 78;
-}
-
-.liquid-folder:nth-child(8) {
-  --lens-accent: 91 140 236;
-}
-
-.liquid-folder__shine {
-  position: absolute;
-  top: calc(var(--shine-y) - 3%);
-  left: calc(var(--shine-x) - 21%);
-  width: 50%;
-  height: 10%;
-  z-index: 2;
-  border-radius: 50%;
-  opacity: 0.84;
-  background: linear-gradient(
-    180deg,
-    rgb(255 255 255 / 82%),
-    rgb(255 255 255 / 21%) 42%,
-    transparent 86%
-  );
-  filter: blur(1.2px);
-  transform: rotate(var(--shine-rotate));
-  pointer-events: none;
-  transition: opacity 180ms ease;
-  animation: liquid-shine-flow var(--liquid-morph-duration) ease-in-out
-    var(--liquid-morph-delay) infinite;
-}
-
-.liquid-folder::before {
-  content: '';
-  position: absolute;
-  inset: 6.5%;
-  z-index: 0;
-  border-radius: 50%;
-  border: 1px solid rgb(255 255 255 / 7%);
-  opacity: 0.78;
-  background:
-    radial-gradient(
-      circle at calc(50% + var(--lens-x)) calc(50% + var(--lens-y)),
-      rgb(var(--lens-accent) / 10%),
-      transparent 36%
-    ),
-    linear-gradient(
-      145deg,
-      rgb(255 255 255 / 8%),
-      transparent 28%,
-      rgb(255 255 255 / 2%) 66%,
-      rgb(var(--lens-accent) / 5%)
-    );
-  box-shadow:
-    inset 7px 7px 18px rgb(255 255 255 / 5%),
-    inset -10px -12px 22px rgb(0 0 0 / 34%),
-    0 0 22px rgb(var(--lens-accent) / 4%);
-  transform: translate3d(var(--lens-x), var(--lens-y), 0);
-  pointer-events: none;
-}
-
-.liquid-folder::after {
-  content: '';
-  position: absolute;
-  top: calc(var(--rim-y) - 12%);
-  left: calc(var(--rim-x) - 28%);
-  width: 56%;
-  height: 23%;
-  z-index: 2;
-  border-bottom: 4px solid rgb(255 255 255 / 54%);
-  border-radius: 50%;
-  opacity: 0.74;
-  filter: blur(1.4px);
-  transform: rotate(-18deg);
-  pointer-events: none;
-}
-
-.liquid-folder > :not(.liquid-folder__shine) {
+.solar-planet__body {
   position: relative;
-  z-index: 1;
-  transform: translate3d(var(--content-x), var(--content-y), 0);
-  transition: transform 90ms linear;
-}
-
-.liquid-folder__optic {
-  position: relative;
-  display: grid;
-  width: clamp(3.8rem, 5.6vw, 5.15rem);
-  aspect-ratio: 1;
-  margin-bottom: clamp(0.55rem, 0.9vw, 0.75rem);
-  place-items: center;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgb(var(--lens-accent) / 13%), transparent 45%),
-    rgb(0 0 0 / 12%);
-  box-shadow:
-    inset 0 0 18px rgb(var(--lens-accent) / 8%),
-    0 0 18px rgb(var(--lens-accent) / 5%);
-  transform: translate3d(var(--lens-x), var(--lens-y), 18px);
-  transition:
-    border-color 180ms ease,
-    box-shadow 220ms ease;
-}
-
-.liquid-folder__optic::before,
-.liquid-folder__optic::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.liquid-folder__optic::before {
-  inset: 11%;
-  border-top: 1px solid rgb(255 255 255 / 18%);
-  border-right: 1px solid transparent;
-  border-bottom: 1px solid rgb(var(--lens-accent) / 23%);
-  border-left: 1px solid transparent;
-  animation: liquid-lens-spin 12s linear infinite;
-}
-
-.liquid-folder__optic::after {
-  inset: 26%;
-  background: radial-gradient(
-    circle,
-    rgb(var(--lens-accent) / 16%),
-    transparent 68%
-  );
-  filter: blur(3px);
-  animation: liquid-lens-pulse 3.8s ease-in-out infinite;
-}
-
-.liquid-folder__optic-ring {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.liquid-folder__optic-ring--outer {
-  inset: 5%;
-  border: 1px solid rgb(var(--lens-accent) / 32%);
-  border-right-color: rgb(255 255 255 / 22%);
-  border-bottom-color: transparent;
-  animation: liquid-lens-spin 9s linear infinite reverse;
-}
-
-.liquid-folder__optic-ring--inner {
-  inset: 24%;
-  border: 1px dashed rgb(255 255 255 / 18%);
-  animation: liquid-lens-spin 6.5s linear infinite;
-}
-
-.liquid-folder__optic-scan {
-  position: absolute;
-  top: 50%;
-  left: 18%;
-  width: 64%;
-  height: 1px;
-  opacity: 0.62;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgb(var(--lens-accent) / 74%),
-    transparent
-  );
-  box-shadow: 0 0 8px rgb(var(--lens-accent) / 32%);
-  animation: liquid-lens-scan 3.4s ease-in-out infinite;
-}
-
-.liquid-folder__optic-core {
-  position: relative;
-  display: grid;
-  width: 36%;
+  display: block;
+  width: var(--planet-body-size);
   aspect-ratio: 1;
   z-index: 2;
-  place-items: center;
   border: 1px solid rgb(255 255 255 / 19%);
   border-radius: 50%;
-  color: rgb(255 255 255 / 88%);
-  background:
-    radial-gradient(circle at 30% 24%, rgb(255 255 255 / 22%), transparent 31%),
-    rgb(var(--lens-accent) / 15%);
+  background: #11151c;
   box-shadow:
-    inset 0 1px 2px rgb(255 255 255 / 18%),
-    0 0 15px rgb(var(--lens-accent) / 18%);
-  font-size: clamp(0.7rem, 1vw, 0.92rem);
+    inset 3px 3px 7px rgb(255 255 255 / 22%),
+    inset -12px -9px 18px rgb(0 0 0 / 62%),
+    0 13px 24px rgb(0 0 0 / 54%),
+    0 0 18px rgb(var(--planet-glow) / 16%);
+  transform:
+    perspective(420px)
+    rotateX(var(--planet-tilt-x))
+    rotateY(var(--planet-tilt-y));
+  transform-style: preserve-3d;
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms ease;
+  isolation: isolate;
 }
 
-.liquid-folder__optic-node {
+.solar-planet:hover .solar-planet__body,
+.solar-planet:focus-visible .solar-planet__body,
+.solar-planet.is-planet-active .solar-planet__body {
+  box-shadow:
+    inset 3px 3px 8px rgb(255 255 255 / 30%),
+    inset -12px -9px 18px rgb(0 0 0 / 58%),
+    0 18px 32px rgb(0 0 0 / 60%),
+    0 0 27px rgb(var(--planet-glow) / 34%);
+  transform:
+    perspective(420px)
+    rotateX(var(--planet-tilt-x))
+    rotateY(var(--planet-tilt-y))
+    scale(1.1);
+}
+
+.solar-planet__surface,
+.solar-planet__atmosphere {
   position: absolute;
-  width: 5px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgb(var(--lens-accent) / 92%);
-  box-shadow: 0 0 8px rgb(var(--lens-accent) / 70%);
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
-.liquid-folder__optic-node--one {
-  top: 16%;
-  right: 21%;
+.solar-planet__surface {
+  z-index: 1;
+  overflow: hidden;
+  background: radial-gradient(circle at 32% 27%, #8b9198, #303640 58%, #0d1015);
+  transform: translate3d(var(--surface-shift-x), var(--surface-shift-y), 0) scale(1.04);
+  transition: transform 130ms linear;
+  animation: cosmic-surface-drift 24s ease-in-out infinite alternate;
 }
 
-.liquid-folder__optic-node--two {
-  bottom: 19%;
-  left: 15%;
-  width: 3px;
-  opacity: 0.7;
+.solar-planet__surface::after {
+  content: '';
+  position: absolute;
+  inset: -2%;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 27% 22%, rgb(255 255 255 / 38%), transparent 22%),
+    linear-gradient(90deg, transparent 38%, rgb(0 0 0 / 14%) 62%, rgb(0 0 0 / 58%) 100%);
+  mix-blend-mode: screen;
+  opacity: 0.62;
 }
 
-.liquid-folder:hover .liquid-folder__optic,
-.liquid-folder:focus-visible .liquid-folder__optic,
-.liquid-folder.is-liquid-active .liquid-folder__optic {
-  border-color: rgb(255 255 255 / 20%);
+.solar-planet__atmosphere {
+  z-index: 3;
+  border: 1px solid rgb(var(--planet-glow) / 18%);
   box-shadow:
-    inset 0 0 21px rgb(var(--lens-accent) / 12%),
-    0 0 24px rgb(var(--lens-accent) / 13%);
+    inset 0 0 12px rgb(var(--planet-glow) / 9%),
+    0 0 9px rgb(var(--planet-glow) / 13%);
 }
 
-.liquid-folder__copy {
+.solar-planet__ring {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 178%;
+  height: 48%;
+  z-index: 0;
+  border: 6px solid rgb(210 189 143 / 47%);
+  border-right-color: rgb(108 91 64 / 28%);
+  border-left-color: rgb(241 222 176 / 64%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgb(95 79 52 / 20%),
+    0 0 13px rgb(204 177 119 / 18%);
+  transform: translate(-50%, -50%) rotate(-13deg);
+  pointer-events: none;
+}
+
+.solar-planet__label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--planet-body-size) / 2 + 0.5rem);
   display: grid;
-  gap: 0.35rem;
-  max-width: 13rem;
+  min-width: 6.5rem;
+  gap: 0.18rem;
+  z-index: 5;
+  color: rgb(255 255 255 / 76%);
+  text-shadow: 0 2px 8px rgb(0 0 0 / 92%);
+  transform: translate3d(-50%, 0, 20px);
+  transition:
+    color 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-.liquid-folder__copy strong {
-  color: #fff;
-  font-size: clamp(1rem, 1.35vw, 1.28rem);
+.solar-planet__label strong {
+  color: inherit;
+  font-size: clamp(0.72rem, 0.92vw, 0.86rem);
   font-weight: 720;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   line-height: 1;
 }
 
-.liquid-folder__copy > span {
-  min-height: 2.5em;
-  color: rgb(255 255 255 / 54%);
-  font-size: clamp(0.62rem, 0.72vw, 0.72rem);
-  line-height: 1.3;
-}
-
-.liquid-folder__count {
-  display: flex;
-  gap: 0.45rem;
-  align-items: center;
-  margin-top: clamp(0.55rem, 0.8vw, 0.75rem);
-  color: rgb(255 255 255 / 64%);
-  font-size: clamp(0.62rem, 0.9vw, 0.72rem);
-  font-weight: 700;
-  letter-spacing: 0.06em;
+.solar-planet__label span {
+  color: rgb(255 255 255 / 44%);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-.liquid-splash-particle {
-  --lens-accent: 137 156 168;
-  --splash-dx: 0px;
-  --splash-dy: 0px;
-  --splash-mid-dx: 0px;
-  --splash-mid-dy: 0px;
-  --splash-spin: 0deg;
-  --splash-mid-spin: 0deg;
-  --splash-delay: 0ms;
+.solar-planet:hover .solar-planet__label,
+.solar-planet:focus-visible .solar-planet__label,
+.solar-planet.is-planet-active .solar-planet__label {
+  color: #fff;
+  transform: translate3d(-50%, -0.2rem, 20px);
+}
 
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1000;
-  width: var(--splash-size, 12px);
-  aspect-ratio: 1;
-  pointer-events: none;
-  border: 1px solid rgb(255 255 255 / 38%);
+.solar-planet--mercury {
+  --planet-body-size: 2.55rem;
+  --planet-hitbox: 4.6rem;
+  --planet-glow: 173 169 162;
+}
+
+.solar-planet--mercury .solar-planet__surface {
+  background:
+    radial-gradient(circle at 27% 32%, rgb(41 39 37 / 80%) 0 6%, transparent 7%),
+    radial-gradient(circle at 67% 61%, rgb(38 36 34 / 70%) 0 9%, transparent 10%),
+    radial-gradient(circle at 57% 20%, rgb(199 194 184 / 18%) 0 5%, transparent 6%),
+    radial-gradient(circle at 34% 28%, #aaa59c, #57544f 52%, #262522 78%, #11110f);
+}
+
+.solar-planet--venus {
+  --planet-body-size: 3.35rem;
+  --planet-hitbox: 5.6rem;
+  --planet-glow: 216 166 94;
+}
+
+.solar-planet--venus .solar-planet__surface {
+  background:
+    repeating-linear-gradient(165deg, transparent 0 8%, rgb(255 229 173 / 9%) 9% 12%, transparent 13% 20%),
+    radial-gradient(circle at 32% 28%, #c8a465, #856640 52%, #392a1d 78%, #15100d);
+}
+
+.solar-planet--earth {
+  --planet-body-size: 3.6rem;
+  --planet-hitbox: 5.9rem;
+  --planet-glow: 84 164 231;
+}
+
+.solar-planet--earth .solar-planet__surface {
+  background:
+    radial-gradient(ellipse at 34% 38%, #5f8f64 0 12%, transparent 13%),
+    radial-gradient(ellipse at 61% 58%, #477756 0 16%, transparent 17%),
+    radial-gradient(ellipse at 54% 24%, rgb(224 235 226 / 50%) 0 5%, transparent 7%),
+    radial-gradient(circle at 31% 26%, #6eb6d5, #27688f 48%, #153b5d 75%, #071725);
+}
+
+.solar-planet--earth .solar-planet__atmosphere {
+  border-color: rgb(116 193 255 / 38%);
+  box-shadow:
+    inset 0 0 10px rgb(111 197 255 / 14%),
+    0 0 12px rgb(87 174 244 / 26%);
+}
+
+.solar-planet--mars {
+  --planet-body-size: 3rem;
+  --planet-hitbox: 5.2rem;
+  --planet-glow: 213 91 64;
+}
+
+.solar-planet--mars .solar-planet__surface {
+  background:
+    radial-gradient(circle at 67% 34%, rgb(71 28 21 / 72%) 0 7%, transparent 8%),
+    radial-gradient(circle at 32% 63%, rgb(79 31 22 / 62%) 0 10%, transparent 11%),
+    radial-gradient(circle at 31% 25%, #c36e4d, #843f2d 52%, #3d1e19 78%, #160b0a);
+}
+
+.solar-planet--jupiter {
+  --planet-body-size: 6.3rem;
+  --planet-hitbox: 8.5rem;
+  --planet-glow: 211 164 116;
+}
+
+.solar-planet--jupiter .solar-planet__surface {
+  background:
+    radial-gradient(ellipse at 66% 67%, #9e4936 0 8%, #c77857 9% 12%, transparent 13%),
+    repeating-linear-gradient(
+      180deg,
+      #bd9a77 0 8%,
+      #80624e 9% 13%,
+      #d4b58f 14% 22%,
+      #6e5041 23% 28%,
+      #c99c72 29% 39%
+    );
+}
+
+.solar-planet--saturn {
+  --planet-body-size: 5.2rem;
+  --planet-hitbox: 9.2rem;
+  --planet-glow: 218 190 132;
+}
+
+.solar-planet--saturn .solar-planet__surface {
+  background:
+    repeating-linear-gradient(180deg, #c4a875 0 9%, #8f744f 10% 15%, #d4bc8b 16% 27%, #725c42 28% 33%);
+}
+
+.solar-planet--saturn .solar-planet__ring {
+  display: block;
+}
+
+.solar-planet--uranus {
+  --planet-body-size: 4.15rem;
+  --planet-hitbox: 6.5rem;
+  --planet-glow: 119 206 219;
+}
+
+.solar-planet--uranus .solar-planet__surface {
+  background:
+    linear-gradient(165deg, transparent 42%, rgb(255 255 255 / 10%) 47%, transparent 53%),
+    radial-gradient(circle at 31% 25%, #92cbd0, #4b969e 54%, #234f59 79%, #0a1d22);
+}
+
+.solar-planet--neptune {
+  --planet-body-size: 4.3rem;
+  --planet-hitbox: 6.6rem;
+  --planet-glow: 77 123 232;
+}
+
+.solar-planet--neptune .solar-planet__surface {
+  background:
+    radial-gradient(ellipse at 64% 62%, rgb(19 34 97 / 68%) 0 10%, transparent 11%),
+    repeating-linear-gradient(175deg, transparent 0 15%, rgb(122 155 255 / 8%) 16% 19%, transparent 20% 31%),
+    radial-gradient(circle at 30% 25%, #527dde, #244ba2 53%, #14265e 78%, #070d23);
+}
+
+.solar-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--orbit-width, 12rem);
+  height: var(--orbit-height, 7rem);
+  border: 1px solid rgb(209 219 239 / 13%);
   border-radius: 50%;
   opacity: 0;
-  background:
-    radial-gradient(circle at 28% 20%, rgb(255 255 255 / 82%) 0 8%, transparent 27%),
-    radial-gradient(circle, rgb(var(--lens-accent) / 24%), transparent 68%),
-    linear-gradient(
-      145deg,
-      rgb(74 82 88 / 68%) 0%,
-      rgb(4 6 8 / 82%) 48%,
-      rgb(var(--lens-accent) / 34%) 100%
-    );
   box-shadow:
-    inset 1px 1px 2px rgb(255 255 255 / 38%),
-    inset -2px -2px 4px rgb(255 255 255 / 13%),
-    0 0 9px rgb(var(--lens-accent) / 28%),
-    0 5px 10px rgb(0 0 0 / 58%);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+    inset 0 0 9px rgb(144 162 196 / 2%),
+    0 0 8px rgb(144 162 196 / 2%);
+  transform: translate(-50%, -50%);
+  transition:
+    width 160ms ease,
+    height 160ms ease,
+    opacity 350ms ease;
+  pointer-events: none;
+}
+
+.solar-orbit:nth-child(2n) {
+  border-color: rgb(209 219 239 / 9%);
+}
+
+.solar-sun {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(5.4rem, 8.5vw, 7rem);
+  aspect-ratio: 1;
+  z-index: 50;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.solar-sun__corona,
+.solar-sun__core,
+.solar-sun__flare {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.solar-sun__corona {
+  inset: -48%;
+  opacity: 0.72;
+  background: radial-gradient(circle, rgb(255 223 157 / 22%), rgb(232 159 72 / 8%) 36%, transparent 70%);
+  filter: blur(7px);
+  animation: cosmic-corona-pulse 5.2s ease-in-out infinite;
+}
+
+.solar-sun__core {
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 244 211 / 74%);
+  background:
+    radial-gradient(circle at 34% 28%, #fffdf1 0 8%, #ffe7a5 22%, #efa54c 51%, #a74d16 76%, #421505 100%);
+  box-shadow:
+    inset 5px 5px 11px rgb(255 255 255 / 36%),
+    inset -12px -10px 18px rgb(113 35 5 / 48%),
+    0 0 18px rgb(255 222 153 / 78%),
+    0 0 42px rgb(239 154 62 / 38%),
+    0 0 82px rgb(220 121 35 / 18%);
+  animation: cosmic-sun-breathe 4.6s ease-in-out infinite;
+}
+
+.solar-sun__core::before {
+  content: '';
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 26% 31%, rgb(255 255 255 / 72%) 0 3%, transparent 4%),
+    radial-gradient(circle at 62% 28%, rgb(165 68 17 / 42%) 0 5%, transparent 6%),
+    radial-gradient(circle at 48% 67%, rgb(255 244 188 / 54%) 0 4%, transparent 5%),
+    radial-gradient(circle at 74% 61%, rgb(128 43 10 / 38%) 0 5%, transparent 6%);
+  transform: translate3d(var(--sun-shift-x), var(--sun-shift-y), 0);
+  transition: transform 160ms ease-out;
+  animation: cosmic-sun-rotate 18s linear infinite;
+}
+
+.solar-sun__flare {
+  border: 2px solid transparent;
+  border-top-color: rgb(255 196 104 / 62%);
+  filter: drop-shadow(0 0 5px rgb(247 148 48 / 58%));
+}
+
+.solar-sun__flare--one {
+  inset: -12%;
+  transform: rotate(38deg);
+  animation: cosmic-sun-rotate 12s linear infinite;
+}
+
+.solar-sun__flare--two {
+  inset: -22%;
+  border-width: 1px;
+  border-top-color: rgb(255 226 162 / 38%);
+  transform: rotate(-52deg);
+  animation: cosmic-sun-rotate 19s linear infinite reverse;
+}
+
+.solar-home.is-solar-ready .solar-system {
+  display: block;
+  transform-style: preserve-3d;
+}
+
+.solar-home.is-solar-ready .solar-system__orbits,
+.solar-home.is-solar-ready .solar-sun {
+  display: block;
+}
+
+.solar-home.is-solar-ready .solar-system__orbits {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.solar-home.is-solar-ready .solar-orbit {
+  opacity: 1;
+}
+
+.solar-home.is-solar-ready .solar-planet {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  transform:
+    translate3d(
+      calc(-50% + var(--planet-x)),
+      calc(-50% + var(--planet-y)),
+      0
+    )
+    scale(var(--planet-scale));
   will-change: transform, opacity;
-  animation: liquid-splash 650ms var(--splash-delay) cubic-bezier(0.12, 0.72, 0.2, 1)
-    forwards;
 }
 
-.liquid-folder__count i {
-  font-size: 0.62rem;
-  transition: transform 220ms ease;
+@keyframes cosmic-galaxy-drift {
+  from {
+    translate: -1.5% -2%;
+    scale: 0.98 0.92;
+  }
+
+  to {
+    translate: 1.5% 2%;
+    scale: 1.03 1.08;
+  }
 }
 
-.liquid-folder:hover .liquid-folder__count i {
-  transform: translateX(3px);
+@keyframes cosmic-stars-drift {
+  from {
+    transform: translate3d(-0.7%, -0.3%, 0);
+  }
+
+  to {
+    transform: translate3d(0.7%, 0.3%, 0);
+  }
 }
 
-@keyframes liquid-float {
+@keyframes cosmic-stars-twinkle {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0.82;
+  }
+}
+
+@keyframes cosmic-surface-drift {
+  from {
+    background-position: 0% 0%;
+  }
+
+  to {
+    background-position: 8% 2%;
+  }
+}
+
+@keyframes cosmic-corona-pulse {
   0%,
   100% {
-    translate: 0 0;
+    opacity: 0.58;
+    transform: scale(0.94);
   }
 
   50% {
-    translate: 0 -8px;
+    opacity: 0.82;
+    transform: scale(1.06);
   }
 }
 
-@keyframes liquid-lens-spin {
+@keyframes cosmic-sun-breathe {
+  0%,
+  100% {
+    filter: brightness(0.94);
+  }
+
+  50% {
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes cosmic-sun-rotate {
   to {
     transform: rotate(1turn);
   }
 }
 
-@keyframes liquid-lens-pulse {
-  0%,
-  100% {
-    opacity: 0.48;
-    transform: scale(0.88);
-  }
-
-  50% {
-    opacity: 0.9;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes liquid-lens-scan {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: translateY(-1.25rem) scaleX(0.72);
-  }
-
-  50% {
-    opacity: 0.78;
-    transform: translateY(1.25rem) scaleX(1);
-  }
-}
-
-@keyframes liquid-shine-flow {
-  0%,
-  100% {
-    translate: -5% -3%;
-    scale: 0.92 1;
-  }
-
-  34% {
-    translate: 8% 12%;
-    scale: 1.08 0.88;
-  }
-
-  68% {
-    translate: -2% 19%;
-    scale: 0.96 1.1;
-  }
-}
-
-@keyframes liquid-splash {
-  0% {
-    opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale(0.38) rotate(0deg);
-  }
-
-  15% {
-    opacity: 0.94;
-  }
-
-  68% {
-    opacity: 0.82;
-    transform:
-      translate3d(
-        calc(-50% + var(--splash-mid-dx)),
-        calc(-50% + var(--splash-mid-dy)),
-        0
-      )
-      scale(1)
-      rotate(var(--splash-mid-spin));
-  }
-
-  100% {
-    opacity: 0;
-    transform:
-      translate3d(
-        calc(-50% + var(--splash-dx)),
-        calc(-50% + var(--splash-dy)),
-        0
-      )
-      scale(0.12)
-      rotate(var(--splash-spin));
-  }
-}
-
 @media (min-width: 850px) {
-  .liquid-home {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  .solar-home {
+    display: grid;
+    place-items: center;
   }
 
-  body:has(.liquid-home) #panel-wrapper {
+  body:has(.solar-home) #panel-wrapper {
     display: none !important;
   }
 
-  body:has(.liquid-home) #main-wrapper > .container {
+  body:has(.solar-home) #main-wrapper > .container {
     width: 100%;
     max-width: none !important;
     padding-right: clamp(0.7rem, 1.25vw, 1.4rem) !important;
     padding-left: clamp(0.7rem, 1.25vw, 1.4rem) !important;
   }
 
-  body:has(.liquid-home) #main-wrapper main,
-  body:has(.liquid-home) #tail-wrapper {
+  body:has(.solar-home) #main-wrapper main,
+  body:has(.solar-home) #tail-wrapper {
     flex: 0 0 100%;
     width: 100%;
     max-width: 100%;
   }
 
-  body:has(.liquid-home) #main-wrapper main,
-  body:has(.liquid-home) article.px-1 {
+  body:has(.solar-home) #main-wrapper main,
+  body:has(.solar-home) article.px-1 {
     padding-right: 0 !important;
     padding-left: 0 !important;
   }
 
-  body:has(.liquid-home) .mobile-home-feed,
-  body:has(.liquid-home) .mobile-home-pagination {
+  body:has(.solar-home) .mobile-home-feed,
+  body:has(.solar-home) .mobile-home-pagination {
     display: none !important;
   }
 }
 
-@media (min-width: 850px) and (max-width: 1249.98px) {
-  .liquid-home {
-    padding-right: 1.5rem;
-    padding-left: 1.5rem;
-  }
-
-  .liquid-folder-grid {
-    grid-template-columns: repeat(3, minmax(0, 11.5rem));
-    gap: 0.8rem;
-    justify-content: center;
-    max-width: 38rem;
-  }
-
-  .liquid-folder {
-    padding: 0.8rem;
-  }
-
-  .liquid-folder__copy > span {
-    display: none;
-  }
-}
-
-@media (min-width: 850px) {
-  .liquid-home.is-orbit-ready {
-    justify-content: center;
-  }
-
-  .liquid-home.is-orbit-ready .liquid-folder-grid {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: clamp(28rem, 64vh, 37rem);
-    max-width: none;
-    margin: 0;
-    perspective: 1100px;
-    perspective-origin: 50% 48%;
-    transform-style: preserve-3d;
-  }
-
-  .liquid-home.is-orbit-ready .liquid-folder-grid::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 56%;
-    width: min(46rem, 68%);
-    height: 18%;
-    border-radius: 50%;
-    opacity: 0.7;
-    background: radial-gradient(
-      ellipse,
-      rgb(255 255 255 / 3.8%),
-      rgb(255 255 255 / 1.2%) 34%,
-      transparent 72%
-    );
-    filter: blur(18px);
-    transform: translate3d(-50%, -50%, -260px) rotateX(68deg);
-    pointer-events: none;
-  }
-
-  .liquid-home.is-orbit-ready .liquid-folder {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: clamp(9.75rem, 13.3vw, 12rem);
-    margin: 0;
-    justify-self: auto;
-    transform:
-      translate3d(
-        calc(-50% + var(--orbit-x) + var(--pull-x)),
-        calc(-50% + var(--orbit-y) + var(--offset-y) + var(--pull-y)),
-        var(--orbit-z)
-      )
-      rotateY(var(--orbit-rotate-y))
-      rotate(var(--liquid-rotate))
-      scale(var(--orbit-scale))
-      scaleX(var(--liquid-scale-x))
-      scaleY(var(--liquid-scale-y));
-  }
-
-  .liquid-home.is-orbit-ready .liquid-folder-grid:focus-visible {
-    outline: 1px solid rgb(255 255 255 / 32%);
-    outline-offset: 0.4rem;
-    border-radius: 1.5rem;
-  }
-}
-
 @media (min-width: 850px) and (max-width: 1099.98px) {
-  .liquid-home.is-orbit-ready .liquid-folder {
-    width: clamp(8.5rem, 15vw, 9.75rem);
+  .solar-home {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+
+  .solar-system {
+    min-height: clamp(29rem, 65vh, 35rem);
+  }
+
+  .solar-planet--jupiter {
+    --planet-body-size: 5.5rem;
+    --planet-hitbox: 7.4rem;
+  }
+
+  .solar-planet--saturn {
+    --planet-body-size: 4.7rem;
+    --planet-hitbox: 8.1rem;
+  }
+
+  .solar-planet__label strong {
+    font-size: 0.72rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-folder,
-  .liquid-folder__shine,
-  .liquid-folder__optic::before,
-  .liquid-folder__optic::after,
-  .liquid-folder__optic-ring,
-  .liquid-folder__optic-scan {
+  .solar-home__galaxy,
+  .solar-home__stars,
+  .solar-planet__surface,
+  .solar-sun__corona,
+  .solar-sun__core,
+  .solar-sun__core::before,
+  .solar-sun__flare {
     animation: none;
   }
 
-  .liquid-folder {
-    transition: border-color 180ms ease;
-  }
-
-  .liquid-splash-particle {
-    display: none;
+  .solar-planet,
+  .solar-planet__body,
+  .solar-planet__surface,
+  .solar-planet__label,
+  .solar-orbit {
+    transition: none;
   }
 }
-
 /* Academic CV */
 
 body:has(.resume-page) #sidebar,

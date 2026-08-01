@@ -47,43 +47,52 @@ layout: default
 {% endif %}
 
 {% if paginator.page == 1 %}
-  <section class="liquid-home" aria-label="분야별 기록">
-    <div class="liquid-folder-grid" role="list" aria-label="분야별 기록">
+  <section class="solar-home" aria-label="태양계로 탐색하는 분야별 기록">
+    <span class="solar-home__galaxy" aria-hidden="true"></span>
+    <span class="solar-home__stars solar-home__stars--far" aria-hidden="true"></span>
+    <span class="solar-home__stars solar-home__stars--near" aria-hidden="true"></span>
+
+    <div class="solar-system" role="navigation" aria-label="분야별 기록">
+      <div class="solar-system__orbits" aria-hidden="true">
+        {% for folder in site.data.home_folders %}
+          <span
+            class="solar-orbit solar-orbit--{{ folder.planet }}"
+            data-orbit-index="{{ folder.orbit }}"
+          ></span>
+        {% endfor %}
+      </div>
+
+      <span class="solar-sun" aria-hidden="true">
+        <span class="solar-sun__corona"></span>
+        <span class="solar-sun__core"></span>
+        <span class="solar-sun__flare solar-sun__flare--one"></span>
+        <span class="solar-sun__flare solar-sun__flare--two"></span>
+      </span>
+
       {% for folder in site.data.home_folders %}
         {% assign folder_post_count = 0 %}
-        {% assign lens_icon = folder.icons | first %}
         {% for post in site.posts %}
           {% if post.categories contains folder.category %}
             {% assign folder_post_count = folder_post_count | plus: 1 %}
           {% endif %}
         {% endfor %}
         <a
-          class="liquid-folder liquid-folder--shape-{{ folder.shape }}"
+          class="solar-planet solar-planet--{{ folder.planet }}"
           href="{{ folder.url | relative_url }}"
-          role="listitem"
           aria-label="{{ folder.name }} 카테고리, 글 {{ folder_post_count }}개"
+          data-orbit-index="{{ folder.orbit }}"
+          data-start-angle="{{ folder.start_angle }}"
+          data-orbit-speed="{{ folder.orbit_speed }}"
         >
-          <span class="liquid-folder__shine" aria-hidden="true"></span>
-
-          <span class="liquid-folder__optic" aria-hidden="true">
-            <span class="liquid-folder__optic-ring liquid-folder__optic-ring--outer"></span>
-            <span class="liquid-folder__optic-ring liquid-folder__optic-ring--inner"></span>
-            <span class="liquid-folder__optic-scan"></span>
-            <span class="liquid-folder__optic-node liquid-folder__optic-node--one"></span>
-            <span class="liquid-folder__optic-node liquid-folder__optic-node--two"></span>
-            <span class="liquid-folder__optic-core">
-              <i class="{{ lens_icon }}"></i>
-            </span>
+          <span class="solar-planet__body" aria-hidden="true">
+            <span class="solar-planet__surface"></span>
+            <span class="solar-planet__atmosphere"></span>
+            <span class="solar-planet__ring"></span>
           </span>
 
-          <span class="liquid-folder__copy">
+          <span class="solar-planet__label">
             <strong>{{ folder.name }}</strong>
-            <span>{{ folder.description }}</span>
-          </span>
-
-          <span class="liquid-folder__count">
-            글 {{ folder_post_count }}개
-            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            <span>{{ folder_post_count }} post{% unless folder_post_count == 1 %}s{% endunless %}</span>
           </span>
         </a>
       {% endfor %}
@@ -187,9 +196,9 @@ layout: default
 {% endif %}
 
 {% if paginator.page == 1 %}
-  {% assign liquid_asset_version = site.time | date: '%s' %}
+  {% assign solar_asset_version = site.time | date: '%s' %}
   <script
     defer
-    src="{{ '/assets/js/liquid-home.js' | relative_url }}?v={{ liquid_asset_version }}"
+    src="{{ '/assets/js/solar-home.js' | relative_url }}?v={{ solar_asset_version }}"
   ></script>
 {% endif %}

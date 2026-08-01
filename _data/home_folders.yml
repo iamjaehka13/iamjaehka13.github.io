@@ -1,87 +1,71 @@
-- name: RL
-  category: RL
-  url: /categories/rl/
-  description: Policy learning and skill discovery
-  shape: one
-  icons:
-    - "fas fa-brain"
-    - "fas fa-code"
-    - "fas fa-project-diagram"
-    - "fas fa-chart-line"
-
-- name: Sim2Real
-  category: Sim2Real
-  url: /categories/sim2real/
-  description: Unitree Go2 and real-world transfer
-  shape: two
-  icons:
-    - "fas fa-robot"
-    - "fas fa-random"
-    - "fas fa-wave-square"
-    - "fas fa-book-open"
-
-- name: Isaac
-  category: Isaac
-  url: /categories/isaac/
-  description: Isaac Sim and Isaac Lab
-  shape: three
-  icons:
-    - "fas fa-cube"
-    - "fas fa-microchip"
-    - "fas fa-network-wired"
-    - "fas fa-play"
-
-- name: Go2
-  category: Unitree Go2
-  url: /categories/unitree-go2/
-  description: Hardware and locomotion logs
-  shape: seven
-  icons:
-    - "fas fa-robot"
-    - "fas fa-microchip"
-    - "fas fa-wave-square"
-    - "fas fa-cogs"
-
 - name: Math
   category: Math
   url: /categories/math/
   description: Linear algebra and foundations
-  shape: four
-  icons:
-    - "fas fa-infinity"
-    - "fas fa-divide"
-    - "fas fa-chart-area"
-    - "fas fa-calculator"
+  planet: mercury
+  orbit: 1
+  start_angle: -25
+  orbit_speed: 3.4
 
 - name: AI
   category: AI
   url: /categories/ai/
   description: Deep learning foundations
-  shape: five
-  icons:
-    - "fas fa-layer-group"
-    - "fas fa-network-wired"
-    - "fas fa-bolt"
-    - "fas fa-code-branch"
-
-- name: Projects
-  category: Projects
-  url: /categories/projects/
-  description: Competitions and team builds
-  shape: six
-  icons:
-    - "fas fa-car"
-    - "fas fa-road"
-    - "fas fa-map-marked-alt"
-    - "fas fa-cogs"
+  planet: venus
+  orbit: 2
+  start_angle: 145
+  orbit_speed: 2.7
 
 - name: Study
   category: Study
   url: /categories/study/
   description: Concept notes and foundations
-  shape: eight
-  icons:
-    - "fas fa-book-open"
-    - "fas fa-pencil-alt"
-    - "fas fa-lightbulb"
-    - "fas fa-check"
+  planet: earth
+  orbit: 3
+  start_angle: 30
+  orbit_speed: 2.25
+
+- name: Projects
+  category: Projects
+  url: /categories/projects/
+  description: Competitions and team builds
+  planet: mars
+  orbit: 4
+  start_angle: 220
+  orbit_speed: 1.85
+
+- name: RL
+  category: RL
+  url: /categories/rl/
+  description: Policy learning and skill discovery
+  planet: jupiter
+  orbit: 5
+  start_angle: 165
+  orbit_speed: 1.15
+
+- name: Sim2Real
+  category: Sim2Real
+  url: /categories/sim2real/
+  description: Unitree Go2 and real-world transfer
+  planet: saturn
+  orbit: 6
+  start_angle: -15
+  orbit_speed: 0.92
+
+- name: Isaac
+  category: Isaac
+  url: /categories/isaac/
+  description: Isaac Sim and Isaac Lab
+  planet: uranus
+  orbit: 7
+  start_angle: 78
+  orbit_speed: 0.72
+
+- name: Go2
+  category: Unitree Go2
+  url: /categories/unitree-go2/
+  description: Hardware and locomotion logs
+  planet: neptune
+  orbit: 8
+  start_angle: 270
+  orbit_speed: 0.58
