@@ -621,4 +621,3 @@ Default intrinsic reward는 `state_net(next_obs)`의 k-NN distance에서 계산�
 - [rll-research/cic official repository](https://github.com/rll-research/cic)
 - [분석에 사용한 commit `b523c38`](https://github.com/rll-research/cic/tree/b523c3884256346cb585bf06e52a7aadc127dcfc)
 - [CIC 논문 정리](/posts/cic-contrastive-intrinsic-control/)
-- [DIAYN 코드 읽기](/posts/diayn-pytorch-code-walkthrough/)

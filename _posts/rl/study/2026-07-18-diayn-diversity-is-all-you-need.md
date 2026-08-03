@@ -658,8 +658,6 @@ PPO 기반 DIAYN
 
 > **DIAYN이 SAC를 선택한 이유는 SAC가 PPO보다 항상 우수해서가 아니다. DIAYN의 $H(A\mid S,Z)$ 항과 maximum-entropy SAC가 자연스럽게 맞고, 여러 skill의 연속 제어 경험을 off-policy replay로 재사용할 수 있기 때문.**
 
-실제 초기 SAC의 Value, Q, Policy update가 DIAYN reward와 연결되는 코드는 [DIAYN PyTorch 구현 흐름](/posts/diayn-pytorch-code-walkthrough/)에서 이어서 확인할 수 있다.
-
 ## **9. Actor, Critic, Discriminator는 무엇이 다른가?**
 
 세 network가 모두 무언가를 "평가"하는 것처럼 보여 헷갈리기 쉽다.
