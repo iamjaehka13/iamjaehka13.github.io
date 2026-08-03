@@ -778,49 +778,7 @@ $d_{\pi_z}(s)$는 skill $z$의 state visitation distribution. Replay buffer에�
 
 Uniform prior는 이 mixture의 label balance를 유지한다. 동시에 skill 수 $K$가 커질수록 skill 하나가 받는 데이터는 대략 $1/K$로 줄어든다. 따라서 $K$는 data budget, network capacity, discriminator difficulty와 함께 결정해야 한다.
 
-## **11. VIC와 DIAYN의 차이**
-
-DIAYN과 가장 가까운 선행 연구 중 하나가 **Variational Intrinsic Control, VIC**이다.
-
-VIC는 시작 상태 $s_0$에서 option $\Omega$를 선택하고, option 실행 뒤의 final state $s_f$를 보고 어떤 option이었는지 맞히도록 학습한다.
-
-$$
-I(\Omega;S_f\mid S_0)
-$$
-
-VIC의 대표적인 intrinsic reward는
-
-$$
-r_I
-=
-\log q(\Omega\mid s_0,s_f)
--\log p_C(\Omega\mid s_0)
-$$
-
-DIAYN 논문이 강조한 차이는 세 가지.
-
-| 구분 | VIC 계열 | DIAYN |
-|---|---|---|
-| Skill prior | 학습 | uniform으로 고정 |
-| Discriminator 입력 | 주로 final state | 매 step의 state |
-| Policy entropy | 낮거나 별도 핵심이 아님 | maximum-entropy policy를 목적에 포함 |
-
-![Effective number of skills when learning the prior](/assets/img/posts/rl/diayn/diayn-fixed-prior-vic.png)
-_학습되는 prior는 일부 skill에 sampling mass가 몰리며 effective skill 수를 줄였다. 출처: [Eysenbach et al., Figure 4](https://arxiv.org/abs/1802.06070)._
-
-논문은 effective number of skills를 다음처럼 측정한다.
-
-$$
-N_{\mathrm{eff}}
-=
-e^{H(Z)}
-$$
-
-Appendix의 HalfCheetah, Inverted Pendulum, Mountain Car 비교에서는 $p(z)$를 학습할 때 effective skill 수가 약 10배까지 줄어드는 결과를 보고한다.
-
-다만 정확한 독해가 필요하다. DIAYN 논문의 VIC 비교 구현은 DIAYN에서 $p(z)$를 학습하도록 바꾼 형태를 중심으로 분석한다. VIC 원 논문의 모든 구조와 현대적인 재구현을 포괄적으로 비교한 결과라고 일반화하면 안 된다.
-
-## **12. 논문에서 실제로 발견한 skill**
+## **11. 논문에서 실제로 발견한 skill**
 
 ![Locomotion skills discovered without task reward](/assets/img/posts/rl/diayn/diayn-locomotion-skills.png)
 _외부 task reward 없이 발견한 HalfCheetah, Ant, Hopper의 움직임. 출처: [Eysenbach et al., Figure 3](https://arxiv.org/abs/1802.06070)._
@@ -846,9 +804,9 @@ _외부 task reward 없이 발견한 HalfCheetah, Ant, Hopper의 움직임. 출�
 
 > Reward가 없는데도 물리적으로 다양한 behavior mode가 생겼다는 증거이면서, 동시에 diversity만으로 quality를 보장할 수 없다는 증거.
 
-## **13. Downstream task에는 어떻게 사용하는가?**
+## **12. Downstream task에는 어떻게 사용하는가?**
 
-### **13.1 Policy initialization**
+### **12.1 Policy initialization**
 
 Unsupervised pretraining 후 각 benchmark의 true reward를 평가해 가장 좋은 skill을 고르고, actor와 critic weight를 task-specific reward로 fine-tuning한다.
 
@@ -861,7 +819,7 @@ HalfCheetah, Hopper, Ant 모두 DIAYN initialization이 초기 학습을 빠르�
 
 따라서 이 그림은 **전체 계산량이 항상 줄었다**는 증거가 아니라, pretraining 이후의 task-specific adaptation이 빨라졌다는 증거다.
 
-### **13.2 Hierarchical RL**
+### **12.2 Hierarchical RL**
 
 Low-level skill을 고정하고, meta-controller가 몇 step 동안 실행할 $z$를 선택한다.
 
@@ -880,7 +838,7 @@ Cheetah hurdle에서는 DIAYN skill 조합이 강한 결과를 보인다. Ant na
 
 > 어떤 state feature로 skill을 구별하게 할지가 downstream usefulness를 크게 결정한다.
 
-### **13.3 Imitation without expert actions**
+### **12.3 Imitation without expert actions**
 
 Expert state trajectory $\tau^*=\{s_i\}$만 주어졌을 때 discriminator로 가장 그럴듯한 skill을 찾는다.
 
@@ -896,27 +854,27 @@ $$
 
 즉 새로운 행동을 생성하는 범용 imitation이라기보다, **이미 발견한 skill 중 expert trajectory를 가장 잘 설명하는 것을 검색하는 방식**.
 
-## **14. 이 논문의 강점**
+## **13. 이 논문의 강점**
 
-### **14.1 Behavior distance를 직접 설계하지 않는다**
+### **13.1 Behavior distance를 직접 설계하지 않는다**
 
 Novelty search처럼 행동 간 거리를 사람이 정의하는 대신, state에서 skill을 분류하는 문제로 바꾼다. 고차원 연속제어에도 적용하기 쉬운 형태다.
 
-### **14.2 하나의 간단한 목적함수로 여러 용도를 연결한다**
+### **13.2 하나의 간단한 목적함수로 여러 용도를 연결한다**
 
 같은 skill repertoire와 discriminator를 pretraining, hierarchical control, imitation에 재사용한다. Skill discovery를 단순한 시각화 실험이 아니라 downstream task의 구성 요소로 연결한 점이 크다.
 
-### **14.3 Adversarial game이 아니라 cooperative game이다**
+### **13.3 Adversarial game이 아니라 cooperative game이다**
 
 Discriminator는 skill을 더 잘 맞히려 하고, policy도 discriminator가 더 잘 맞힐 상태를 만든다. 서로 반대 목적을 갖는 GAN식 saddle-point game보다 목표 방향이 일치한다.
 
-### **14.4 Fixed prior라는 단순한 선택이 collapse를 줄인다**
+### **13.4 Fixed prior라는 단순한 선택이 collapse를 줄인다**
 
 학습 가능한 prior가 이론적으로 더 유연해 보이지만, 실전에서는 초기 우연이 sampling imbalance로 증폭될 수 있다. Uniform prior는 모든 skill에 지속적인 학습 기회를 보장한다.
 
-## **15. 한계와 비판적으로 읽을 지점**
+## **14. 한계와 비판적으로 읽을 지점**
 
-### **15.1 Diversity는 quality가 아니다**
+### **14.1 Diversity는 quality가 아니다**
 
 DIAYN critic이 높게 평가하는 것은 안정성이나 효율이 아니다.
 
@@ -924,7 +882,7 @@ DIAYN critic이 높게 평가하는 것은 안정성이나 효율이 아니다.
 
 넘어지기, 뒤집기, 센서 포화 상태처럼 구별하기 쉬운 결과도 높은 intrinsic return을 만들 수 있다.
 
-### **15.2 Discriminator feature가 사실상 behavior specification이다**
+### **14.2 Discriminator feature가 사실상 behavior specification이다**
 
 $q_\phi(z\mid f(s))$에서 $f(s)$를 어떻게 선택하는지가 중요하다.
 
@@ -935,23 +893,23 @@ $q_\phi(z\mid f(s))$에서 $f(s)$를 어떻게 선택하는지가 중요하다.
 
 따라서 "reward engineering이 사라졌다"기보다, 일부 설계 부담이 **discriminator observation engineering**으로 이동했다고 보는 편이 정확하다.
 
-### **15.3 Skill 수 $K$를 늘리는 데 비용이 따른다**
+### **14.3 Skill 수 $K$를 늘리는 데 비용이 따른다**
 
 Uniform prior에서는 skill당 데이터 비율이 대략 $1/K$. $K$를 늘리면 이론적 mutual information 상한 $\log K$는 커지지만, 각 skill이 받는 sample은 줄고 network capacity 요구는 커진다.
 
 Skill 수가 많다고 자동으로 더 많은 의미 있는 behavior가 생기는 것은 아니다. 서로 거의 같은 skill이 여러 label로 나뉠 수도 있다.
 
-### **15.4 Reward와 critic target이 함께 움직인다**
+### **14.4 Reward와 critic target이 함께 움직인다**
 
 Policy, state distribution, discriminator, reward, critic이 강하게 결합되어 있다. Discriminator가 너무 약하면 reward가 거의 0이고, 너무 강하면 사소한 nuisance feature를 암기할 수 있다.
 
 Learning rate, update ratio, normalization, capacity가 결과에 직접 영향을 준다. 원 논문의 "cooperative game"이라는 설명이 function approximation에서 자동 안정성을 보장하는 것은 아니다.
 
-### **15.5 실험은 simulated benchmark 중심이다**
+### **14.5 실험은 simulated benchmark 중심이다**
 
 논문은 당시의 MuJoCo/Gym benchmark에서 실험했으며 real robot 결과는 없다. Contact uncertainty, actuator limit, latency, sensor noise, perception error, hardware safety가 포함된 실제 로봇 검증으로 읽으면 안 된다.
 
-### **15.6 Downstream 결과의 비용과 supervision을 구분해야 한다**
+### **14.6 Downstream 결과의 비용과 supervision을 구분해야 한다**
 
 - Policy initialization 그래프는 unsupervised pretraining 비용을 제외한다.
 - 가장 좋은 skill 선택에는 downstream reward 평가가 필요하다.
@@ -959,7 +917,7 @@ Learning rate, update ratio, normalization, capacity가 결과에 직접 영향�
 
 "완전한 무감독 학습만으로 모든 downstream task를 해결했다"고 읽기 어려운 이유.
 
-## **16. 로봇에 적용한다면 무엇이 달라져야 하는가?**
+## **15. 로봇에 적용한다면 무엇이 달라져야 하는가?**
 
 DIAYN의 수학적 구조는 특정 로봇 형태에 묶여 있지 않는다.
 
@@ -975,7 +933,7 @@ $$
 
 > **DIAYN 자체는 embodiment-agnostic이지만, 발견되는 skill의 의미와 안전성은 embodiment와 observation 설계에 강하게 의존한다.**
 
-### **16.1 공통으로 유지되는 학습 구조**
+### **15.1 공통으로 유지되는 학습 구조**
 
 원 논문은 maximum-entropy off-policy 알고리즘인 SAC를 사용했다. 그러나 핵심 구조는 다른 Actor-Critic 알고리즘에도 옮길 수 있다.
 
@@ -1007,7 +965,7 @@ SAC라면 replay buffer에서 과거 transition을 재사용하고, PPO라면 �
 
 원 논문은 episode 시작에 $z$를 뽑아 종료까지 유지한다. 실제 로봇에서는 episode가 매우 길거나 명확한 reset이 없을 수 있으므로, 일정한 **skill horizon**을 정의해 구간마다 $z$를 바꾸는 설계도 가능하다. 다만 매 control step마다 $z$를 바꾸면 하나의 skill이 일관된 상태분포를 만드는 원래 목적과 달라진다.
 
-### **16.2 로봇 종류에 따라 달라지는 $s$, $a$, $f(s)$**
+### **15.2 로봇 종류에 따라 달라지는 $s$, $a$, $f(s)$**
 
 같은 DIAYN이라도 로봇의 상태와 행동 공간이 다르면 발견되는 skill도 달라진다.
 
@@ -1044,7 +1002,7 @@ SAC라면 replay buffer에서 과거 transition을 재사용하고, PPO라면 �
 
 따라서 로봇 종류만 바꾸고 같은 $f(s)$를 기계적으로 재사용하면 안 된다. 원하는 skill이 task-space behavior인지, 자세 diversity인지, 탐색 coverage인지 먼저 정해야 한다.
 
-### **16.3 실제 로봇에서는 pure DIAYN이 위험할 수 있다**
+### **15.3 실제 로봇에서는 pure DIAYN이 위험할 수 있다**
 
 DIAYN은 유용성이나 안전성이 아니라 구별 가능성을 보상한다. 로봇 종류에 따라 다음과 같은 행동도 쉽게 구별되는 skill이 될 수 있다.
 
@@ -1070,7 +1028,7 @@ DIAYN은 유용성이나 안전성이 아니라 구별 가능성을 보상한다
 
 후자를 추가하면 논문 그대로의 pure reward-free DIAYN은 아니지만, 여전히 **task reward 없이 skill을 발견한다**는 목적은 유지할 수 있다. 실제 로봇에서는 방법의 순수성보다 안전하고 재사용 가능한 repertoire를 얻는 것이 더 중요하다.
 
-### **16.4 Discriminator feature는 로봇 간 범용성을 결정한다**
+### **15.4 Discriminator feature는 로봇 간 범용성을 결정한다**
 
 Simulator의 privileged state를 그대로 사용하면 real robot에서 관측할 수 없는 feature에 skill이 의존할 수 있다. 반대로 raw sensor 전체를 넣으면 배경, 조명, sensor drift처럼 행동과 무관한 정보로 분류할 수 있다.
 
@@ -1084,7 +1042,7 @@ Simulator의 privileged state를 그대로 사용하면 real robot에서 관측�
 
 예를 들어 object manipulation skill을 원한다면 joint angle만 분류하는 것보다 object-relative end-effector pose와 contact state를 사용하는 편이 목적에 가깝다. 장소에 무관한 이동 skill을 원한다면 절대 world position보다 body-frame velocity와 local trajectory feature가 더 적합할 수 있다.
 
-### **16.5 Real-world data 비용과 reset 문제**
+### **15.5 Real-world data 비용과 reset 문제**
 
 Simulation에서는 수백만 transition과 실패 reset이 비교적 저렴하지만 실제 로봇에서는 그렇지 않다.
 
@@ -1105,7 +1063,7 @@ Simulation 또는 offline data에서 skill pretraining
 
 이 과정에서 simulation에서만 분리되던 skill이 실제 sensor에서는 겹칠 수 있고, 반대로 hardware의 미세 편차가 새로운 shortcut을 만들 수도 있다. 그래서 real-world adaptation에서는 diversity 점수뿐 아니라 안전성, 재현성, 에너지, task usefulness를 함께 측정해야 한다.
 
-### **16.6 가장 먼저 확인할 구현 오류**
+### **15.6 가장 먼저 확인할 구현 오류**
 
 로봇 형태와 관계없이 Actor input에는 $z$가 들어가지만 Discriminator input에는 절대 들어가면 안 된다.
 
@@ -1120,7 +1078,7 @@ disc_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
 
 Label leakage가 생기면 Discriminator accuracy와 intrinsic reward는 매우 높아지지만 Policy는 서로 다른 행동을 만들 필요가 없다. Vectorized environment나 여러 로봇에서 병렬 수집할 때는 각 environment의 reset 시점과 `z` 갱신도 따로 관리해야 한다.
 
-## **17. 수식과 구현을 한 흐름으로 연결하기**
+## **16. 수식과 구현을 한 흐름으로 연결하기**
 
 DIAYN의 각 구성은 아래 순서로 연결된다.
 
@@ -1156,7 +1114,6 @@ Learned skill repertoire
 - [ICLR 2019 OpenReview](https://openreview.net/forum?id=SJx63jRqFm)
 - [Official DIAYN project videos](https://sites.google.com/view/diayn/)
 - [Official DIAYN implementation note](https://github.com/ben-eysenbach/sac/blob/master/DIAYN.md)
-- [Variational Intrinsic Control](https://arxiv.org/abs/1611.07507)
 - [Soft Actor-Critic](https://arxiv.org/abs/1801.01290)
 - [Soft Actor-Critic Algorithms and Applications](https://arxiv.org/abs/1812.05905)
 - [Proximal Policy Optimization Algorithms](https://arxiv.org/abs/1707.06347)
