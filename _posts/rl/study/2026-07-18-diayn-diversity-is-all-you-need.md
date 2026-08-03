@@ -1120,24 +1120,7 @@ disc_obs = torch.cat([robot_obs, one_hot_z], dim=-1)
 
 Label leakage가 생기면 Discriminator accuracy와 intrinsic reward는 매우 높아지지만 Policy는 서로 다른 행동을 만들 필요가 없다. Vectorized environment나 여러 로봇에서 병렬 수집할 때는 각 environment의 reset 시점과 `z` 갱신도 따로 관리해야 한다.
 
-## **17. 구현 체크리스트**
-
-| 점검 항목 | 확인할 내용 |
-|---|---|
-| Skill sampling | environment reset 때 uniform sampling되는가? |
-| Skill persistence | episode 중 같은 $z$가 유지되는가? |
-| Actor condition | actor observation에 $z$가 들어가는가? |
-| Critic condition | value/critic도 $z$를 알고 있는가? |
-| Label leakage | discriminator observation에서 $z$가 완전히 제외되는가? |
-| Reward state | $s_t$와 $s_{t+1}$ 중 무엇을 쓰는지 일관적인가? |
-| Numerical stability | `log_softmax`와 `gather`를 사용하는가? |
-| Gradient boundary | RL loss가 discriminator를 의도치 않게 업데이트하지 않는가? |
-| Update balance | discriminator accuracy가 chance나 100%에 즉시 고정되지 않는가? |
-| Per-skill coverage | 각 skill sample 수와 state coverage를 따로 기록하는가? |
-| Safety | fall, limit, contact, actuator constraint가 있는가? |
-| Evaluation | diversity뿐 아니라 stability, energy, usefulness도 따로 측정하는가? |
-
-## **18. 수식과 구현을 한 흐름으로 연결하기**
+## **17. 수식과 구현을 한 흐름으로 연결하기**
 
 DIAYN의 각 구성은 아래 순서로 연결된다.
 
