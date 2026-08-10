@@ -325,8 +325,8 @@ $$
 | State $s_t$ | 유지 |
 | Action $a_t$ | 유지 |
 | Next state $s_{t+1}$ | 유지 |
-| Goal $g$ | $g'$로 변경 |
-| Reward $r_t$ | $g'$ 기준으로 재계산 |
+| Goal $g$ | $g^{\prime}$로 변경 |
+| Reward $r_t$ | $g^{\prime}$ 기준으로 재계산 |
 
 > HER는 transition을 조작하지 않는다. 이미 일어난 물리 경험은 그대로 두고, **그 경험을 평가하는 목표와 reward만 바꾼다.**
 
@@ -340,7 +340,7 @@ $$
 a_t\sim\pi_b(a\mid s_t,g)
 $$
 
-그런데 relabeled transition에서는 목표가 $g'$. 마치 $g'$를 보고 그 action을 낸 것처럼 보인다.
+그런데 relabeled transition에서는 목표가 $g^{\prime}$. 마치 $g^{\prime}$를 보고 그 action을 낸 것처럼 보인다.
 
 HER는 **그렇게 주장하지 않는다.** 이 데이터는 target policy가 직접 생성한 on-policy sample이 아니라, 다른 behavior policy가 만든 off-policy sample로 취급된다.
 
@@ -370,7 +370,7 @@ $$
 \right]
 $$
 
-Action $a_t$를 실제로 실행했다는 사실과 그 결과 $s_{t+1}$는 변하지 않는다. Goal이 환경 dynamics가 아니라 reward와 policy condition만 바꾼다는 가정 아래, 이 transition은 $g'$에 대해서도 유효하다.
+Action $a_t$를 실제로 실행했다는 사실과 그 결과 $s_{t+1}$는 변하지 않는다. Goal이 환경 dynamics가 아니라 reward와 policy condition만 바꾼다는 가정 아래, 이 transition은 $g^{\prime}$에 대해서도 유효하다.
 
 ## 9. HER는 update rule이 아니다
 
@@ -514,7 +514,7 @@ SAC  -> 그 sample로 entropy-regularized actor/critic update
 Goal-conditioned PPO 자체는 가능하다.
 
 $$
-\pi_\theta(a\mid s,g),qquad V_\psi(s,g)
+\pi_\theta(a\mid s,g),\qquad V_\psi(s,g)
 $$
 
 문제는 hindsight relabeling이다. PPO의 clipped objective에는 rollout을 생성한 old policy의 probability ratio가 들어간다.
@@ -529,7 +529,7 @@ $$
 }
 $$
 
-Goal을 $g'$로 바꾸면 분모에 필요한 값은 사실:
+Goal을 $g^{\prime}$로 바꾸면 분모에 필요한 값은 사실:
 
 $$
 \pi_{\theta_{old}}(a_t\mid s_t,g')
@@ -748,7 +748,7 @@ HER source = achieved_goal(next_state)
 
 ### Q2. HER는 실패를 성공이라고 거짓말하는가?
 
-원래 목표에 성공했다고 말하지 않는다. **실제로 달성한 다른 목표 $g'$에 대해서는 성공이었다**고 재평가한다. Original goal data도 남긴다.
+원래 목표에 성공했다고 말하지 않는다. **실제로 달성한 다른 목표 $g^{\prime}$에 대해서는 성공이었다**고 재평가한다. Original goal data도 남긴다.
 
 ### Q3. Action은 원래 goal을 보고 냈는데 왜 쓸 수 있나?
 

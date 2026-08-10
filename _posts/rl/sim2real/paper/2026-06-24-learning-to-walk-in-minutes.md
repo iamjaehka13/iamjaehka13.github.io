@@ -678,7 +678,7 @@ Rule은 간단하다.
 | 기대 이동 거리의 절반도 못 감 | Level - 1 |
 | 최고 level을 해결 | Random level로 loop |
 
-수식으로 쓰면 episode 동안 실제 이동 거리를 $d$, command 기준 기대 거리를 $d^*$라고 할 때:
+수식으로 쓰면 episode 동안 실제 이동 거리를 $d$, command 기준 기대 거리를 $d^{\ast}$라고 할 때:
 
 $$
 d
@@ -814,13 +814,13 @@ Supplementary에는 아래 아홉 reward term이 공개돼 있다.
 
 | Reward term | Definition | Weight |
 |---|---|---:|
-| Linear velocity tracking | $\phi(\mathbf v^*_{b,xy}-\mathbf v_{b,xy})$ | $1\,dt$ |
-| Angular velocity tracking | $\phi(\omega^*_{b,z}-\omega_{b,z})$ | $0.5\,dt$ |
+| Linear velocity tracking | $\phi(\mathbf{v}^{\ast}\_{b,xy}-\mathbf{v}\_{b,xy})$ | $1\,dt$ |
+| Angular velocity tracking | $\phi(\omega^{\ast}\_{b,z}-\omega\_{b,z})$ | $0.5\,dt$ |
 | Vertical velocity | $-v_{b,z}^2$ | $4\,dt$ |
 | Roll/pitch angular velocity | $-\lVert\boldsymbol\omega_{b,xy}\rVert^2$ | $0.05\,dt$ |
 | Joint motion | $-\lVert\ddot{\mathbf q}\rVert^2-\lVert\dot{\mathbf q}\rVert^2$ | $0.001\,dt$ |
 | Joint torque | $-\lVert\boldsymbol\tau\rVert^2$ | $0.00002\,dt$ |
-| Action rate | $-\lVert\dot{\mathbf q}^*\rVert^2$ | $0.25\,dt$ |
+| Action rate | $-\lVert\dot{\mathbf q}^{\ast}\rVert^2$ | $0.25\,dt$ |
 | Collision | $-n_{\text{collision}}$ | $0.001\,dt$ |
 | Feet air time | $\sum_f(t_{\text{air},f}-0.5)$ | $2\,dt$ |
 

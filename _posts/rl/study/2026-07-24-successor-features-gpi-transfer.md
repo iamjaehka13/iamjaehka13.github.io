@@ -69,7 +69,7 @@ Dynamics와 policy가 그대로이고 reward preference만 바뀐다면 $\psi^\p
 | Authors | André Barreto, Will Dabney, Rémi Munos, Jonathan J. Hunt, Tom Schaul, Hado van Hasselt, David Silver |
 | Venue | NeurIPS 2017 |
 | Transfer setting | Dynamics는 같고 reward function만 달라지는 task family |
-| Reward model | $r(s,a,s')=\phi(s,a,s')^\top w$ |
+| Reward model | $r(s,a,s^{\prime})=\phi(s,a,s^{\prime})^\top w$ |
 | Predictive representation | $\psi^\pi(s,a)$ |
 | Value decomposition | $Q_w^\pi(s,a)=\psi^\pi(s,a)^\top w$ |
 | Policy reuse | Generalized Policy Improvement |
@@ -102,7 +102,7 @@ r_w(s,a,s')
 \phi(s,a,s')^\top w
 $$
 
-$\phi(s,a,s')\in\mathbb R^d$는 한 transition에서 발생한 feature이고, $w\in\mathbb R^d$는 task preference다.
+$\phi(s,a,s^{\prime})\in\mathbb R^d$는 한 transition에서 발생한 feature이고, $w\in\mathbb R^d$는 task preference다.
 
 예를 들어 robot transition feature를 다음처럼 잡을 수 있다.
 

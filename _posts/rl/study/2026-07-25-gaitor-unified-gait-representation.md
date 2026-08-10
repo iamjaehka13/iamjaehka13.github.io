@@ -545,7 +545,7 @@ Expert pace는 실제 robot에서 불안정했기 때문에 real-robot deploymen
 
 ### 10.2 Planner learning
 
-학습된 VAE로 expert trajectory를 encode해 $z_0^*,z_1^*$를 얻는다. 이를 polar coordinate로 변환한다.
+학습된 VAE로 expert trajectory를 encode해 $z_0^{\ast},z_1^{\ast}$를 얻는다. 이를 polar coordinate로 변환한다.
 
 $$
 \phi^*(k)
@@ -564,7 +564,7 @@ z_0^*(k)^2+z_1^*(k)^2
 }
 $$
 
-Planner는 $(\phi,z_g)$에서 expert radius $R^*$를 예측하도록 behavioural cloning으로 학습한다. 논문은 radius를 여러 discrete bin에 대한 확률로 예측한 뒤 weighted sum으로 연속 $R$을 계산한다.
+Planner는 $(\phi,z_g)$에서 expert radius $R^{\ast}$를 예측하도록 behavioural cloning으로 학습한다. 논문은 radius를 여러 discrete bin에 대한 확률로 예측한 뒤 weighted sum으로 연속 $R$을 계산한다.
 
 핵심은:
 

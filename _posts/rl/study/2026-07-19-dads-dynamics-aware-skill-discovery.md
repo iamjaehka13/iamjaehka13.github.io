@@ -21,7 +21,7 @@ $$
 
 DADS, **Dynamics-Aware Discovery of Skills**는 이 지점에서 질문을 바꾼다.
 
-> 현재 상태 $s$에서 skill $z$를 실행했을 때, 다음 상태 $s'$를 얼마나 잘 예측할 수 있는가?
+> 현재 상태 $s$에서 skill $z$를 실행했을 때, 다음 상태 $s^{\prime}$를 얼마나 잘 예측할 수 있는가?
 
 DIAYN이 skill별 **state visitation**을 구별한다면, DADS는 skill별 **state transition**을 구별하고 예측한다. 그리고 학습 과정에서 얻은 skill dynamics를 downstream planning에 그대로 재사용한다.
 
@@ -34,7 +34,7 @@ DADS에는 두 개의 학습 대상이 있다.
 | 구성 요소 | 역할 |
 |---|---|
 | Skill policy $\pi_\theta(a\mid s,z)$ | 현재 상태와 skill을 받아 실제 action을 만든다. |
-| Skill dynamics $q_\phi(s'\mid s,z)$ | 현재 상태에서 해당 skill이 만들 다음 상태를 예측한다. |
+| Skill dynamics $q_\phi(s^{\prime}\mid s,z)$ | 현재 상태에서 해당 skill이 만들 다음 상태를 예측한다. |
 
 전체 과정은 두 단계로 나뉜다.
 
@@ -59,8 +59,8 @@ skill dynamics로 z sequence를 평가하고 실행
 | Venue | ICLR 2020 |
 | 문제 | 외부 task reward 없이 예측 가능하고 다양한 skill 발견 |
 | Policy | $\pi_\theta(a\mid s,z)$ |
-| Skill model | $q_\phi(s'\mid s,z)$ |
-| 핵심 목적 | $I(S';Z\mid S)$ 최대화 |
+| Skill model | $q_\phi(s^{\prime}\mid s,z)$ |
+| 핵심 목적 | $I(S^{\prime};Z\mid S)$ 최대화 |
 | Policy optimizer | EC-SAC |
 | Downstream control | Skill-space MPC, 논문에서는 MPPI 사용 |
 | Skill space | Discrete와 continuous latent 모두 실험 |
@@ -77,8 +77,8 @@ DIAYN과 DADS를 가장 짧게 비교하면:
 | 질문 | DIAYN | DADS |
 |---|---|---|
 | 무엇을 구별하는가? | skill별 상태 분포 | skill별 상태 전이 |
-| 학습 모델 | $q(z\mid s)$ | $q(s'\mid s,z)$ |
-| Mutual information | $I(S;Z)$ | $I(S';Z\mid S)$ |
+| 학습 모델 | $q(z\mid s)$ | $q(s^{\prime}\mid s,z)$ |
+| Mutual information | $I(S;Z)$ | $I(S^{\prime};Z\mid S)$ |
 | 높은 보상의 의미 | 이 상태를 보면 $z$를 맞힐 수 있음 | 이 transition은 현재 $z$로 잘 예측되고 다른 $z$와 구별됨 |
 | Downstream 사용 | skill 선택, fine-tuning, meta-controller | learned skill dynamics를 이용한 planning |
 
@@ -148,7 +148,7 @@ $$
 
 중요한 것은 관절 action이 매번 동일한지가 아니라, **closed-loop policy가 거시적으로 일관된 상태 변화를 만드는가**.
 
-## 4. 핵심 목적함수: $I(S';Z\mid S)$
+## 4. 핵심 목적함수: $I(S^{\prime};Z\mid S)$
 
 DADS는 다음 conditional mutual information을 최대화한다.
 
@@ -178,8 +178,8 @@ $$
 
 | 항 | 최적화 방향 | 의미 |
 |---|---:|---|
-| $H(S'\mid S)$ | 크게 | 같은 현재 상태에서도 서로 다른 skill은 다양한 다음 상태를 만든다. |
-| $H(S'\mid S,Z)$ | 작게 | 현재 상태와 skill이 정해지면 다음 상태는 예측 가능해야 한다. |
+| $H(S^{\prime}\mid S)$ | 크게 | 같은 현재 상태에서도 서로 다른 skill은 다양한 다음 상태를 만든다. |
+| $H(S^{\prime}\mid S,Z)$ | 작게 | 현재 상태와 skill이 정해지면 다음 상태는 예측 가능해야 한다. |
 
 ### 4.1 Diversity와 predictability를 함께 요구한다
 
@@ -213,7 +213,7 @@ p(s'\mid s,z)
 \int p(s'\mid s,a)\pi_\theta(a\mid s,z)\,da
 $$
 
-하지만 환경 dynamics $p(s'\mid s,a)$를 알 수 없으므로 이 분포를 직접 계산할 수 없다. DADS는 이를 학습 가능한 skill dynamics로 근사한다.
+하지만 환경 dynamics $p(s^{\prime}\mid s,a)$를 알 수 없으므로 이 분포를 직접 계산할 수 없다. DADS는 이를 학습 가능한 skill dynamics로 근사한다.
 
 $$
 q_\phi(s'\mid s,z)
@@ -234,9 +234,9 @@ Policy와 skill dynamics의 역할은 다르다.
 | Network | 학습 질문 |
 |---|---|
 | Policy $\pi_\theta$ | 어떤 action을 해야 현재 $z$다운 transition이 만들어지는가? |
-| Skill dynamics $q_\phi$ | 현재 $s,z$에서 실제로 어떤 $s'$가 나오는가? |
+| Skill dynamics $q_\phi$ | 현재 $s,z$에서 실제로 어떤 $s^{\prime}$가 나오는가? |
 
-논문 구현에서는 전체 $s'$보다 state delta를 예측한다.
+논문 구현에서는 전체 $s^{\prime}$보다 state delta를 예측한다.
 
 $$
 q_\phi(s'-s\mid s,z)
@@ -277,7 +277,7 @@ $$
 
 | 항 | 질문 |
 |---|---|
-| $\log q_\phi(s'\mid s,z)$ | 실제 transition이 현재 선택한 $z$로 얼마나 잘 설명되는가? |
+| $\log q_\phi(s^{\prime}\mid s,z)$ | 실제 transition이 현재 선택한 $z$로 얼마나 잘 설명되는가? |
 | 다른 $z_i$에 대한 평균 likelihood | 이 transition을 다른 skill들도 비슷하게 설명할 수 있는가? |
 
 따라서 높은 reward를 받으려면 두 조건이 필요하다.
@@ -315,7 +315,7 @@ SAC
 
 1. Prior $p(z)$에서 skill을 뽑는다.
 2. $\pi_\theta(a\mid s,z)$로 새로운 transition batch를 수집한다.
-3. 수집한 $(s,z,s')$로 $q_\phi$를 학습한다.
+3. 수집한 $(s,z,s^{\prime})$로 $q_\phi$를 학습한다.
 4. 현재 $q_\phi$로 각 transition의 intrinsic reward를 계산한다.
 5. 그 reward를 사용해 SAC policy와 critic을 업데이트한다.
 
@@ -476,7 +476,7 @@ MPC는 현재 repertoire에서 좋은 sequence를 고른다. 낭떠러미를 뛰
 
 ### 12.3 One-step model error가 누적된다
 
-$q_\phi(s'\mid s,z)$를 여러 번 적용해 긴 미래를 예측하면 작은 오차가 쌓인다. Model mismatch가 큰 영역에서 planner가 실제로는 불가능한 trajectory를 선택할 수도 있다. Receding-horizon replanning이 오차를 줄여주지만 제거하지는 않는다.
+$q_\phi(s^{\prime}\mid s,z)$를 여러 번 적용해 긴 미래를 예측하면 작은 오차가 쌓인다. Model mismatch가 큰 영역에서 planner가 실제로는 불가능한 trajectory를 선택할 수도 있다. Receding-horizon replanning이 오차를 줄여주지만 제거하지는 않는다.
 
 ### 12.4 발견되는 skill은 state representation에 의존한다
 
@@ -502,7 +502,7 @@ DADS planning transfer
 
 ## 13. DADS에서 남는 연결
 
-Policy $\pi(a\mid s,z)$의 $z$는 처음부터 의미를 갖지 않는다. DIAYN이 $q(z\mid s)$로 skill-conditioned state distribution을 구별했다면, DADS는 $q(s'\mid s,z)$로 skill-conditioned transition을 예측한다. 그 결과 $I(S';Z\mid S)$는 서로 다른 $z$의 diversity와 같은 $z$의 predictability를 함께 요구한다. 학습된 skill dynamics는 intrinsic reward를 만드는 데서 끝나지 않고 downstream MPC에도 재사용된다.
+Policy $\pi(a\mid s,z)$의 $z$는 처음부터 의미를 갖지 않는다. DIAYN이 $q(z\mid s)$로 skill-conditioned state distribution을 구별했다면, DADS는 $q(s^{\prime}\mid s,z)$로 skill-conditioned transition을 예측한다. 그 결과 $I(S^{\prime};Z\mid S)$는 서로 다른 $z$의 diversity와 같은 $z$의 predictability를 함께 요구한다. 학습된 skill dynamics는 intrinsic reward를 만드는 데서 끝나지 않고 downstream MPC에도 재사용된다.
 
 Mixture-of-Experts의 expert 수, prior sample 수와 MPPI update 식은 구현할 때 다시 확인하면 된다. 논문의 연결은 아래 문장에 더 잘 남는다.
 

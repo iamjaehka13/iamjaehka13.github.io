@@ -840,7 +840,7 @@ Cheetah hurdle에서는 DIAYN skill 조합이 강한 결과를 보인다. Ant na
 
 ### **12.3 Imitation without expert actions**
 
-Expert state trajectory $\tau^*=\{s_i\}$만 주어졌을 때 discriminator로 가장 그럴듯한 skill을 찾는다.
+Expert state trajectory $\tau^{\ast}=\lbrace s_i\rbrace$만 주어졌을 때 discriminator로 가장 그럴듯한 skill을 찾는다.
 
 $$
 \hat z

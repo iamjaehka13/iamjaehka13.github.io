@@ -43,7 +43,7 @@ image: /assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png
 
 ![IMU publish용 Simulation Gate graph](/assets/img/posts/isaac-sim-publish-rate-qos/02-imu-gate-graph.png)
 
-이번 예제에서 바꿀 값은 두 개.
+이번 예제에서 바꿀 값은 세 개.
 
 - `Isaac Simulation Gate`의 `step`을 `2`로 설정한다.
 - `Isaac Read IMU` 노드의 target에는 추가한 IMU sensor prim을 넣는다.

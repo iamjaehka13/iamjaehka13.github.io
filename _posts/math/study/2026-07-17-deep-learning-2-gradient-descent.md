@@ -197,7 +197,7 @@ $$
 C(\theta)
 $$
 
-즉 전체 training data에 대한 cost가 작아지는 parameter $\theta^*$를 찾는 문제다.
+즉 전체 training data에 대한 cost가 작아지는 parameter $\theta^{\ast}$를 찾는 문제다.
 
 ## **5. cost function의 입력은 parameter다**
 

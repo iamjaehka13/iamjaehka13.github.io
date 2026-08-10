@@ -137,8 +137,8 @@ Real puck은 약 0.2 kg, 반지름은 0.065 m. Puck 위치는 PhaseSpace motion-
 그래서 **Hindsight Experience Replay, HER**를 사용한다.
 
 1. 원래 목표 $g$에는 실패한 trajectory를 replay buffer에서 꺼낸다.
-2. 실제로 도달한 최종 위치 $g'$를 새로운 목표로 해석한다.
-3. 같은 transition의 reward를 $g'$ 기준으로 다시 계산해 성공 example로 재사용한다.
+2. 실제로 도달한 최종 위치 $g^{\prime}$를 새로운 목표로 해석한다.
+3. 같은 transition의 reward를 $g^{\prime}$ 기준으로 다시 계산해 성공 example로 재사용한다.
 
 논문에서는 replay한 episode의 goal을 HER로 바꿀 확률을 $k=0.8$로 둔다.
 

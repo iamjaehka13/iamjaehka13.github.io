@@ -10,7 +10,7 @@ math: true
 ---
 ## Isaac Lab 설치
 
-<https://isaac-sim.github.io/IsaacLab/release/2.2.0/source/setup/installation/binaries_installation.html>
+<https://isaac-sim.github.io/IsaacLab/v2.2.0/source/setup/installation/binaries_installation.html>
 
 Isaac Lab을 설치한 뒤 `isaaclab_assets`에 포함된 Unitree Go2 configuration을 이용해 로봇을 Isaac Sim에 불러왔다.
 

@@ -328,7 +328,7 @@ $$
 이 식은 두 단계를 담고 있다.
 
 1. $\left(W^{(l+1)}\right)^T\boldsymbol{\delta}^{(l+1)}$로 다음 layer의 error를 현재 layer 방향으로 모은다.
-2. $\sigma'(\mathbf{z}^{(l)})$를 곱해 현재 activation function의 local sensitivity를 반영한다.
+2. $\sigma^{\prime}(\mathbf{z}^{(l)})$를 곱해 현재 activation function의 local sensitivity를 반영한다.
 
 <figure class="my-3">
   <img src="/assets/img/posts/ai/deep-learning-3-backpropagation/10-full-network-backprop.gif" alt="여러 neuron이 있는 network에서 chain rule을 이용해 error와 gradient를 역방향 계산하는 과정" class="d-block mx-auto" loading="lazy" style="width: 100%; border-radius: 6px;">

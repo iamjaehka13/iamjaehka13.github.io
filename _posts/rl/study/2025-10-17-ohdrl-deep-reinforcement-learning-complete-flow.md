@@ -99,7 +99,7 @@ Grid world에서는 MDP의 구성요소를 한 화면에서 볼 수 있다.
 
 *직접 작성한 `OhDRL.pdf`, p.6. 상태, 행동, 보상, 목표가 한 화면에 들어간 Grid world.*
 
-결정론적 환경에서는 같은 $(s,a)$가 항상 같은 $s'$를 만든다. 반면 확률적 환경에는 의도한 방향으로 갈 가능성과 옆으로 미끄러질 가능성이 공존한다. Policy가 고르는 것은 행동이지 결과 그 자체가 아니다.
+결정론적 환경에서는 같은 $(s,a)$가 항상 같은 $s^{\prime}$를 만든다. 반면 확률적 환경에는 의도한 방향으로 갈 가능성과 옆으로 미끄러질 가능성이 공존한다. Policy가 고르는 것은 행동이지 결과 그 자체가 아니다.
 
 ![결정론적 전이와 확률론적 전이](/assets/img/posts/rl/ohdrl-complete-flow/detail-p007-actions-deterministic-stochastic.jpg)
 
@@ -190,8 +190,8 @@ $$
 
 - $\mathcal{S}$: state space
 - $\mathcal{A}$: action space
-- $p(s'\mid s,a)$: 상태 $s$에서 행동 $a$를 했을 때 다음 상태 $s'$로 갈 전이확률
-- $r(s,a,s')$: 해당 transition에서 받을 immediate reward의 기대값
+- $p(s^{\prime}\mid s,a)$: 상태 $s$에서 행동 $a$를 했을 때 다음 상태 $s^{\prime}$로 갈 전이확률
+- $r(s,a,s^{\prime})$: 해당 transition에서 받을 immediate reward의 기대값
 - $\gamma\in[0,1]$: discount factor
 
 보상 자체도 확률변수라면 전이와 보상을 joint distribution 하나로 묶을 수도 있다.
@@ -216,9 +216,9 @@ $$
 
 - $r(s)$: 현재 state만으로 reward가 결정
 - $r(s,a)$: 현재 state와 action까지 반영
-- $r(s,a,s')$: 실제 도착한 next state까지 반영
+- $r(s,a,s^{\prime})$: 실제 도착한 next state까지 반영
 
-가장 일반적인 joint dynamics $p(s',r\mid s,a)$를 알고 있다면 expected reward는:
+가장 일반적인 joint dynamics $p(s^{\prime},r\mid s,a)$를 알고 있다면 expected reward는:
 
 $$
 r(s,a)
@@ -476,7 +476,7 @@ $$
 합에 들어가는 두 확률분포:
 
 1. $\pi(a\mid s)$: agent가 어떤 action을 선택하는가
-2. $p(s',r\mid s,a)$: environment가 어떤 next state와 reward를 만드는가
+2. $p(s^{\prime},r\mid s,a)$: environment가 어떤 next state와 reward를 만드는가
 
 Policy evaluation은 $\pi$를 고정하고 이 식의 fixed point를 구한다.
 
@@ -629,7 +629,7 @@ Transition model의 유무에 따라 계산 방식이 달라진다.
 
 *직접 작성한 `OhDRL.pdf`, p.28. 모델을 이용하는 planning과 경험을 이용하는 learning.*
 
-DP는 가능한 다음 상태를 모두 합산하는 **full backup**을 사용한다. 이를 위해 $p(s',r\mid s,a)$를 알아야 한다.
+DP는 가능한 다음 상태를 모두 합산하는 **full backup**을 사용한다. 이를 위해 $p(s^{\prime},r\mid s,a)$를 알아야 한다.
 
 DP를 가능하게 하는 두 구조:
 
@@ -1413,7 +1413,7 @@ $$
 
 한 minibatch update의 실제 순서:
 
-1. Replay buffer에서 $(s_i,a_i,r_i,s'_i,d_i)$ sampling
+1. Replay buffer에서 $(s_i,a_i,r_i,s_i^{\prime},d_i)$ sampling
 2. Online network의 selected Q 계산
 
    $$
@@ -2459,7 +2459,7 @@ R_{t+1}
 Z^\pi(S',A')
 $$
 
-$S'\sim P(\cdot\mid s,a)$, $A'\sim\pi(\cdot\mid S')$. $\overset{D}{=}$는 두 sample이 항상 같은 숫자라는 뜻이 아니라 양변이 같은 확률법칙을 따른다는 표시다.
+$S^{\prime}\sim P(\cdot\mid s,a)$, $A^{\prime}\sim\pi(\cdot\mid S^{\prime})$. $\overset{D}{=}$는 두 sample이 항상 같은 숫자라는 뜻이 아니라 양변이 같은 확률법칙을 따른다는 표시다.
 
 Distributional Bellman operator:
 
@@ -2651,7 +2651,7 @@ $$
 
 #### **C51 target과 categorical projection**
 
-Transition $(s,a,r,s',d)$에서 다음 greedy action:
+Transition $(s,a,r,s^{\prime},d)$에서 다음 greedy action:
 
 $$
 a^*
@@ -2686,7 +2686,7 @@ l_j=\lfloor b_j\rfloor,
 u_j=\lceil b_j\rceil
 $$
 
-Target atom $j$의 질량 $p_j(s',a^*)$를 아래·위 support로 선형 분배.
+Target atom $j$의 질량 $p_j(s^{\prime},a^{\ast})$를 아래·위 support로 선형 분배.
 
 $$
 m_{l_j}
@@ -2917,7 +2917,7 @@ joint_features  : [B, N, D]
 quantile_values : [B, N, A]
 ```
 
-Action selection용 $\tilde\tau_k$, current loss용 $\tau_i$, target용 $\tau'_j$의 sample 수를 서로 다르게 둘 수 있다. 코드에서 `num_quantiles`, `num_target_quantiles`, `num_greedy_quantiles`가 따로 등장하는 이유.
+Action selection용 $\tilde\tau_k$, current loss용 $\tau_i$, target용 $\tau_j^{\prime}$의 sample 수를 서로 다르게 둘 수 있다. 코드에서 `num_quantiles`, `num_target_quantiles`, `num_greedy_quantiles`가 따로 등장하는 이유.
 
 #### **분포를 배운 뒤 어떻게 위험을 반영할까**
 
@@ -4086,7 +4086,7 @@ Data reuse가 높다고 무조건 우월한 것은 아니다. Policy-distributio
 
 **1. Environment model**
 
-작은 $P(s'\mid s,a)$와 $R(s,a)$를 정확히 알고 있다면 baseline은 DP. Model 없이 interaction만 가능하다면 sample-based RL.
+작은 $P(s^{\prime}\mid s,a)$와 $R(s,a)$를 정확히 알고 있다면 baseline은 DP. Model 없이 interaction만 가능하다면 sample-based RL.
 
 **2. Action space**
 
@@ -4208,10 +4208,10 @@ target = reward + discount * bootstrap_mask * next_value
 
 **Next value**
 
-- $V(s')$
-- $Q(s',a')$, $a'\sim\pi$
-- $\max_{a'}Q(s',a')$
-- Target actor가 낸 $Q(s',\mu^-(s'))$
+- $V(s^{\prime})$
+- $Q(s^{\prime},a^{\prime})$, $a^{\prime}\sim\pi$
+- $\max_{a^{\prime}}Q(s^{\prime},a^{\prime})$
+- Target actor가 낸 $Q(s^{\prime},\mu^-(s^{\prime}))$
 - Distributional atom/quantile target
 
 **Target source**

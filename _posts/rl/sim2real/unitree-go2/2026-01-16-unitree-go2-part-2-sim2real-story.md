@@ -103,7 +103,7 @@ def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = Scen
   - $C_i$: 발이 지면에 닿아 있는지를 판단하는 이진 플래그 (Boolean)
   - $I$: 접촉 판단 임계값 (코드에서는 `1.0` Newton)
 - reward
-  - $R_{slide} = \sum_{i \in \text{feet}} \|v_{i, xy}\| \cdot C_i$
+  - $R_{slide} = \sum_{i \in \text{feet}} \lVert v_{i, xy}\rVert \cdot C_i$
   - 발이 지면에 닿아 있는 상태에서 foot velocity가 발생하면 negative reward를 주는 구조.
 
 

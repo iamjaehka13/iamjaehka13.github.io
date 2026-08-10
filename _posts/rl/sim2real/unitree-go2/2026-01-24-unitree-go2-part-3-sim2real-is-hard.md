@@ -106,6 +106,7 @@ math: true
 
 
    </details>
+
 ## **2. Simulation에서 확인한 문제**
 
 reward를 추가하면서 simulation에서는 분명히 개선이 있었다. 하지만 reward를 강하게 줄수록 policy가 의도하지 않은 방식으로 보상을 최적화하는 모습도 보였다.
@@ -137,7 +138,7 @@ reward를 추가하면서 simulation에서는 분명히 개선이 있었다. 하
 
 다양한 모델을 학습한 뒤 실제 로봇에 deploy했지만, 결과는 아직 충분하지 않았다. 이전과 마찬가지로 앞뒤좌우 command에 따라 몸을 기울이기만 할 뿐, 발을 제대로 드는 동작은 거의 보이지 않았다.
 
-   [![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
+   [![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif){: .d-block .mx-auto style="max-width: 420px;"}](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-3-sim2real-is-hard/img-1541.gif)
    {: .text-center}
 
 

@@ -116,7 +116,7 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 아래는 현재 baseline policy를 실제 Go2에 올려 야외 노면에서 굴린 모습.
 
-[![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif)](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif){: .popup .img-link .shimmer}
+[![](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif)](https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/baseline-rollout.gif)
 
 아직 논문에 넣을 최종 결과라기보다는, 데이터 수집용 baseline에 가깝다. 중요한 것은 "걷는다"가 아니라, 이 rollout에서 어떤 joint trajectory, torque pattern, reported actuator temperature trend가 나오는지.
 
@@ -126,7 +126,7 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 데이터를 모을 때는 policy가 출력한 action뿐 아니라, 실제 robot state가 함께 저장되는지 확인해야 한다.
 
-[![](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/teleop-data-check.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/teleop-data-check.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
+[![](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/teleop-data-check.gif){: .d-block .mx-auto style="max-width: 420px;"}](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/teleop-data-check.gif)
 
 특히 조심해야 하는 부분은 timestamp와 control frequency이다. Policy는 일정한 주기로 action을 내보내고, robot은 `/lowstate`를 통해 현재 상태를 보내준다. 이 둘이 어긋나면 나중에 torque나 reported actuator temperature를 action과 연결해서 해석하기 어려워진다.
 
@@ -144,7 +144,7 @@ conda run -n unitree-rl --no-capture-output python sim_to_real.py enp6s0 \
 
 아래는 실제로 command를 주며 짧게 걸린 구간.
 
-[![](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/outdoor-walk.gif)](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/outdoor-walk.gif){: .popup .img-link .shimmer .d-block .mx-auto style="max-width: 420px;"}
+[![](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/outdoor-walk.gif){: .d-block .mx-auto style="max-width: 420px;"}](/assets/img/posts/unitree/sim2real/unitree-go2-part-6-data-collection/outdoor-walk.gif)
 
 이런 짧은 rollout은 baseline distribution을 만들기 위한 첫 단계이자, logger format과 deploy 안정성을 확인하는 용도.
 

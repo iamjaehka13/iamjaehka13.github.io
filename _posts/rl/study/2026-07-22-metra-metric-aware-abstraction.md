@@ -75,8 +75,8 @@ _같은 pixel-based Quadruped benchmark에서 그린 global $x$-$y$ trajectory. 
 | Representation | $\phi:\mathcal{S}\rightarrow\mathcal{Z}$ |
 | 출발점 | Wasserstein dependency measure |
 | Metric | Temporal distance |
-| Intrinsic reward | $(\phi(s')-\phi(s))^\top z$ |
-| Constraint | Adjacent state에서 $\|\phi(s)-\phi(s')\|_2\le1$ |
+| Intrinsic reward | $(\phi(s^{\prime})-\phi(s))^\top z$ |
+| Constraint | Adjacent state에서 $\lVert\phi(s)-\phi(s^{\prime})\rVert_2\le1$ |
 | Policy optimizer | SAC |
 | Constraint optimizer | Dual gradient descent |
 | Source | [arXiv](https://arxiv.org/abs/2310.08887), [Official project](https://seohong.me/projects/metra/), [Official code](https://github.com/seohongpark/METRA) |
@@ -442,9 +442,9 @@ $$
 \right]
 $$
 
-여기서 $\Delta\phi=\phi(s')-\phi(s)$다.
+여기서 $\Delta\phi=\phi(s^{\prime})-\phi(s)$다.
 
-- $\|\Delta\phi\|_2^2>1$이면 constraint term이 음수가 되어 representation update에 불리하다.
+- $\lVert\Delta\phi\rVert_2^2>1$이면 constraint term이 음수가 되어 representation update에 불리하다.
 - $\lambda$는 dual update를 통해 위반 압력을 조절한다.
 - $\varepsilon>0$은 constraint에 작은 relaxation을 둔다.
 - Policy는 constraint penalty가 아니라 $r=\Delta\phi^\top z$를 reward로 받는다.

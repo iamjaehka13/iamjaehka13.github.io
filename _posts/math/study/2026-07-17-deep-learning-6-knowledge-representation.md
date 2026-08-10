@@ -98,7 +98,7 @@ $$
 | $W_{up}$ | $d_{model}\times d_{ff}$ | feature detection space로 확장 |
 | $Z,A$ | $T\times d_{ff}$ | pre-activation과 neuron activation |
 | $W_{down}$ | $d_{ff}\times d_{model}$ | hidden space에 쓸 update 생성 |
-| $U,X'$ | $T\times d_{model}$ | update와 residual output |
+| $U,X^{\prime}$ | $T\times d_{model}$ | update와 residual output |
 
 일반적으로 $d_{ff}$는 $d_{model}$보다 크다. 영상의 GPT-3 예에서는 약 4배의 expansion을 사용한다.
 

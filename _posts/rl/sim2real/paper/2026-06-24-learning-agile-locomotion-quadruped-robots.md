@@ -194,8 +194,8 @@ $$
 
 | Term | 의미 |
 |---|---|
-| $(\mathbf{p}_n-\mathbf{p}_{n-1})\cdot\mathbf{d}$ | 원하는 방향으로 이동한 거리 |
-| $\Delta t|\boldsymbol{\tau}\cdot\dot{\mathbf{q}}|$ | 한 step의 mechanical-energy proxy |
+| $(\mathbf{p}\_{n}-\mathbf{p}\_{n-1})\cdot\mathbf{d}$ | 원하는 방향으로 이동한 거리 |
+| $\Delta t\lvert\boldsymbol{\tau}\cdot\dot{\mathbf{q}}\rvert$ | 한 step의 mechanical-energy proxy |
 | $w=0.008$ | 두 항의 trade-off |
 
 Episode는 1,000 steps 후 끝나거나, base tilt가 0.5 rad를 넘으면 넘어졌다고 보고 종료한다.

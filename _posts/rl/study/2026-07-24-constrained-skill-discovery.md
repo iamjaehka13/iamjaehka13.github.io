@@ -226,7 +226,7 @@ $$
 
 > $\lVert z\rVert=1$이면 로봇이 정확히 1 m 이동한다.
 
-State vector에는 base position뿐 아니라 joint position, velocity, body orientation 등이 함께 들어간다. 따라서 $\lVert s'-s\rVert$은 물리적 미터 거리와 동일하지 않다. 논문도 latent distance와 실제 traveled distance가 같은 크기라고 보장하지는 않는다고 명시한다.
+State vector에는 base position뿐 아니라 joint position, velocity, body orientation 등이 함께 들어간다. 따라서 $\lVert s^{\prime}-s\rVert$은 물리적 미터 거리와 동일하지 않다. 논문도 latent distance와 실제 traveled distance가 같은 크기라고 보장하지는 않는다고 명시한다.
 
 정확한 해석은:
 

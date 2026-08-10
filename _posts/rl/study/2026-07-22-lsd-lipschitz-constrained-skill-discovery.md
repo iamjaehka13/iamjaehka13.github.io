@@ -147,7 +147,7 @@ $$
 \right)
 $$
 
-$p(z)$가 고정돼 있으므로 기대값에서 $\|z\|^2$ 항은 상수로 볼 수 있다. 그러면 두 항이 남는다.
+$p(z)$가 고정돼 있으므로 기대값에서 $\lVert z\rVert^2$ 항은 상수로 볼 수 있다. 그러면 두 항이 남는다.
 
 $$
 z^\top\Delta\phi
@@ -158,7 +158,7 @@ $$
 | 항 | 역할 |
 |---|---|
 | $z^\top\Delta\phi$ | 표현 변화 방향을 skill $z$와 정렬한다. |
-| $-\frac{1}{2}\|\Delta\phi\|^2$ | 표현 변화의 크기가 무한히 커지지 않게 제한한다. |
+| $-\frac{1}{2}\lVert\Delta\phi\rVert^2$ | 표현 변화의 크기가 무한히 커지지 않게 제한한다. |
 
 미분해 보면 더 명확하다.
 
@@ -569,12 +569,12 @@ _왼쪽 3x4: $\phi$에 1-Lipschitz 제약이 없는 조합. 각 점과 궤적이
 _오른쪽 3x4: 같은 reward와 state 표현 조합에 1-Lipschitz 제약을 적용했다. 제약만 추가한 위쪽 DIAYN 계열은 여전히 원점 부근에 머물고, 오른쪽 아래 LSD 조합에서만 여러 방향으로 긴 궤적이 펼쳐진다._
 
 ![Figure 7의 LSD 핵심 조합 확대](/assets/img/posts/rl/lsd/08-ablation-lsd-detail.png){: width="520" .d-block .mx-auto }
-_핵심 셀 확대: inner product reward + representation difference $\phi(s')-\phi(s)$ + 1-Lipschitz constraint. 색마다 서로 다른 skill trajectory이며, skill 방향별로 넓은 coverage가 형성된다._
+_핵심 셀 확대: inner product reward + representation difference $\phi(s^{\prime})-\phi(s)$ + 1-Lipschitz constraint. 색마다 서로 다른 skill trajectory이며, skill 방향별로 넓은 coverage가 형성된다._
 
 Figure 7의 축을 읽는 방법은:
 
 - **행**: Normal distribution, vMF distribution, inner product 순서로 reward 형태를 바꾼다.
-- **열**: $\phi(s)$, $\phi(s')$, $\phi(s'-s)$, $\phi(s')-\phi(s)$ 순서로 현재·다음 state의 표현 방식을 바꾼다.
+- **열**: $\phi(s)$, $\phi(s^{\prime})$, $\phi(s^{\prime}-s)$, $\phi(s^{\prime})-\phi(s)$ 순서로 현재·다음 state의 표현 방식을 바꾼다.
 - **좌우**: 왼쪽은 Lipschitz 제약이 없고, 오른쪽은 spectral normalization으로 1-Lipschitz를 적용한다.
 - **오른쪽 아래**: LSD가 채택한 세 요소가 함께 들어간 설정. 그림에서 유일하게 넓은 방사형 trajectory가 뚜렷하다.
 
@@ -600,7 +600,7 @@ LSD 전체 조합
 | DIAYN | 이 상태는 어떤 skill이 만들었는가? | $\log q(z\mid s)-\log p(z)$ | 구별되는 state visitation | 큰 이동, transition predictability |
 | DADS | 이 skill은 현재 상태에서 어떤 변화를 만드는가? | skill-conditioned dynamics likelihood ratio | 예측 가능한 transition과 skill-space planning | 표현 거리의 큰 변화 |
 | CIC | 어떤 skill-transition 표현이 구별되고 새로운가? | contrastive representation과 k-NN entropy | 고차원 continuous skill, URLB pretraining | 각 $z$의 사람 기준 의미와 고유성 |
-| LSD | $z$ 방향으로 얼마나 크게 이동했는가? | $z^\top(\phi(s')-\phi(s))$ | dynamic, far-reaching skill과 방향 기반 goal control | semantic usefulness, 정확한 행동 합성 |
+| LSD | $z$ 방향으로 얼마나 크게 이동했는가? | $z^\top(\phi(s^{\prime})-\phi(s))$ | dynamic, far-reaching skill과 방향 기반 goal control | semantic usefulness, 정확한 행동 합성 |
 
 이들을 상위호환 관계로 읽으면 안 된다.
 

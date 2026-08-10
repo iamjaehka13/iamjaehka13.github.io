@@ -58,7 +58,7 @@ embedding의 k-NN 거리로 particle entropy 계산
 | Authors | Michael Laskin, Hao Liu, Xue Bin Peng, Denis Yarats, Aravind Rajeswaran, Pieter Abbeel |
 | Venue | NeurIPS 2022 |
 | 문제 | 외부 reward 없이 다양한 행동을 고차원 continuous skill에 대응시키기 |
-| 핵심 목적 | $I(\tau;Z)$ 최대화, CIC에서는 $\tau=(S,S')$ |
+| 핵심 목적 | $I(\tau;Z)$ 최대화, CIC에서는 $\tau=(S,S^{\prime})$ |
 | Representation | transition encoder와 skill encoder의 noise contrastive learning |
 | Intrinsic reward | learned representation의 k-NN particle entropy |
 | RL backbone | DDPG |
@@ -75,7 +75,7 @@ CIC는 DIAYN이나 DADS를 반드시 대체하는 방법이 아니다. 세 방�
 | 방법 | 행동 다양성을 측정하는 기준 | 얻는 구조 | 남는 질문 |
 |---|---|---|---|
 | DIAYN | 상태에서 $z$를 분류하는 $q(z\mid s)$ | 구별되는 categorical skill | 좁은 영역의 작은 차이만 배울 수 있음 |
-| DADS | $q(s'\mid s,z)$의 조건부 likelihood | 예측 가능한 transition과 planning model | 고차원 conditional density model의 부담 |
+| DADS | $q(s^{\prime}\mid s,z)$의 조건부 likelihood | 예측 가능한 transition과 planning model | 고차원 conditional density model의 부담 |
 | APT | learned state representation의 k-NN 거리 | 넓은 탐색 | 행동을 특정 $z$로 다시 호출할 수 없음 |
 | APS | particle entropy와 successor feature | 탐색 가능한 continuous skill | 큰 skill space를 안정적으로 구별할 방법 |
 | CIC | $z$-transition contrastive representation의 거리 | 넓은 탐색과 64D continuous skill | task-to-skill mapping과 latent 해석은 별도 문제 |
@@ -446,7 +446,7 @@ z=(v,v,\ldots,v),
 v\in\{0,0.1,\ldots,1.0\}
 $$
 
-그중 extrinsic return이 가장 높은 $z^*$를 선택하고, 남은 96,000 step 동안 $z^*$를 고정한 채 DDPG actor-critic을 task reward로 fine-tuning한다.
+그중 extrinsic return이 가장 높은 $z^{\ast}$를 선택하고, 남은 96,000 step 동안 $z^{\ast}$를 고정한 채 DDPG actor-critic을 task reward로 fine-tuning한다.
 
 ```text
 pretrained skill repertoire
@@ -486,7 +486,7 @@ CIC의 실험 결과가 좋다고 해서 continuous skill space가 곧바로 범
 
 ## 12. Representation과 탐색을 함께 묶기
 
-CIC에서 $\tau=(s,s')$는 긴 trajectory가 아니라 한 step의 state transition이다. Contrastive learning은 $I(\tau;Z)$를 바탕으로 skill과 transition을 비교할 representation을 만들고, particle entropy는 그 공간에서 드문 transition에 높은 intrinsic reward를 준다. DDPG는 이 reward의 장기 return을 높이는 skill-conditioned policy를 학습한다.
+CIC에서 $\tau=(s,s^{\prime})$는 긴 trajectory가 아니라 한 step의 state transition이다. Contrastive learning은 $I(\tau;Z)$를 바탕으로 skill과 transition을 비교할 representation을 만들고, particle entropy는 그 공간에서 드문 transition에 높은 intrinsic reward를 준다. DDPG는 이 reward의 장기 return을 높이는 skill-conditioned policy를 학습한다.
 
 > **CIC는 contrastive learning으로 행동을 skill에 정리하고, particle entropy로 그 행동 공간의 coverage를 넓힌다.**
 
