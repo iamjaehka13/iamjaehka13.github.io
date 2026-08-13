@@ -1098,6 +1098,38 @@ body:has(.category-library) article.px-1 {
   animation-delay: calc(var(--star-delay) - 0.37s);
 }
 
+.solar-home.is-random-starlight .solar-home__stars--dust {
+  animation: cosmic-stars-drift 54s linear infinite alternate;
+}
+
+.solar-home.is-random-starlight .solar-home__stars--near {
+  opacity: 0.68;
+  animation: none;
+}
+
+.solar-home.is-random-starlight .cosmic-star {
+  opacity: var(--random-rest-opacity, 0.4);
+  scale: var(--random-rest-scale, 0.82);
+  filter: brightness(0.88) saturate(0.94);
+  animation: none;
+}
+
+.solar-home.is-random-starlight .cosmic-star.is-random-flash {
+  animation: cosmic-random-background-flash var(--random-flash-duration) cubic-bezier(0.22, 0.72, 0.28, 1) 1 both;
+}
+
+.solar-home.is-random-starlight .cosmic-star--spark::before,
+.solar-home.is-random-starlight .cosmic-star--spark::after {
+  opacity: 0.08;
+  scale: 0.5;
+  animation: none;
+}
+
+.solar-home.is-random-starlight .cosmic-star--spark.is-random-flash::before,
+.solar-home.is-random-starlight .cosmic-star--spark.is-random-flash::after {
+  animation: cosmic-random-star-rays var(--random-flash-duration) cubic-bezier(0.22, 0.72, 0.28, 1) 1 both;
+}
+
 .solar-home__stars--far {
   opacity: 0.56;
   background:
@@ -1365,6 +1397,36 @@ body:has(.category-library) article.px-1 {
 
 .solar-constellation--autumn .solar-constellation__flare {
   animation-delay: -3.4s;
+}
+
+.solar-home.is-random-starlight .solar-constellation__star {
+  opacity: var(--random-rest-opacity, 0.5);
+  transform: scale(var(--random-rest-scale, 0.86));
+  filter:
+    brightness(0.9)
+    drop-shadow(0 0 1px rgb(var(--star-color) / 38%));
+  animation: none;
+}
+
+.solar-home.is-random-starlight .solar-constellation__star--major {
+  filter:
+    brightness(0.94)
+    drop-shadow(0 0 2px rgb(var(--star-color) / 58%))
+    drop-shadow(0 0 6px rgb(var(--star-color) / 24%));
+}
+
+.solar-home.is-random-starlight .solar-constellation__star.is-random-flash {
+  animation: cosmic-random-constellation-flash var(--random-flash-duration) cubic-bezier(0.2, 0.7, 0.24, 1) 1 both;
+}
+
+.solar-home.is-random-starlight .solar-constellation__flare {
+  opacity: 0.16;
+  transform: scale(0.74);
+  animation: none;
+}
+
+.solar-home.is-random-starlight .solar-constellation__flare.is-random-flash {
+  animation: cosmic-random-constellation-flare var(--random-flash-duration) cubic-bezier(0.2, 0.7, 0.24, 1) 1 both;
 }
 
 .solar-system {
@@ -1954,6 +2016,117 @@ body:has(.category-library) article.px-1 {
   77% {
     opacity: 0.88;
     scale: 1.16;
+  }
+}
+
+@keyframes cosmic-random-background-flash {
+  0%,
+  100% {
+    opacity: var(--random-rest-opacity);
+    scale: var(--random-rest-scale);
+    filter: brightness(0.88) saturate(0.94);
+  }
+
+  34% {
+    opacity: 0.64;
+    scale: 1.02;
+    filter: brightness(1.08) saturate(1);
+  }
+
+  47% {
+    opacity: var(--random-peak-opacity);
+    scale: var(--random-peak-scale);
+    filter:
+      brightness(var(--random-peak-brightness))
+      saturate(var(--random-peak-saturation));
+  }
+
+  64% {
+    opacity: 0.54;
+    scale: 0.94;
+    filter: brightness(1.04) saturate(0.98);
+  }
+}
+
+@keyframes cosmic-random-star-rays {
+  0%,
+  100% {
+    opacity: 0.08;
+    scale: 0.5;
+  }
+
+  43% {
+    opacity: 0.42;
+    scale: 0.78;
+  }
+
+  49% {
+    opacity: var(--random-ray-opacity);
+    scale: var(--random-ray-scale);
+  }
+
+  67% {
+    opacity: 0.18;
+    scale: 0.62;
+  }
+}
+
+@keyframes cosmic-random-constellation-flash {
+  0%,
+  100% {
+    opacity: var(--random-rest-opacity);
+    transform: scale(var(--random-rest-scale));
+    filter:
+      brightness(0.9)
+      drop-shadow(0 0 1px rgb(var(--star-color) / 38%));
+  }
+
+  38% {
+    opacity: 0.7;
+    transform: scale(1.04);
+    filter:
+      brightness(1.08)
+      drop-shadow(0 0 2px rgb(var(--star-color) / 48%));
+  }
+
+  48% {
+    opacity: var(--random-peak-opacity);
+    transform: scale(var(--random-peak-scale));
+    filter:
+      brightness(var(--random-peak-brightness))
+      drop-shadow(0 0 2px rgb(255 255 255 / 90%))
+      drop-shadow(0 0 8px rgb(var(--star-color) / 68%));
+  }
+
+  66% {
+    opacity: 0.56;
+    transform: scale(0.94);
+    filter:
+      brightness(1.02)
+      drop-shadow(0 0 2px rgb(var(--star-color) / 40%));
+  }
+}
+
+@keyframes cosmic-random-constellation-flare {
+  0%,
+  100% {
+    opacity: 0.16;
+    transform: scale(0.74);
+  }
+
+  42% {
+    opacity: 0.44;
+    transform: scale(0.88);
+  }
+
+  50% {
+    opacity: var(--random-flare-opacity);
+    transform: scale(var(--random-flare-scale));
+  }
+
+  68% {
+    opacity: 0.24;
+    transform: scale(0.82);
   }
 }
 
