@@ -18,12 +18,14 @@
   const clamp = (value, minimum, maximum) =>
     Math.min(Math.max(value, minimum), maximum);
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
+  const autoOrbitRate = 0.0000035;
   const planetCount = planets.length;
   const motion = {
     time: 0,
     targetTime: 0,
     velocity: 0,
-    frame: null
+    frame: null,
+    lastFrameTime: null
   };
 
   const orbitRadii = (orbitIndex, bounds) => {
@@ -69,19 +71,27 @@
     });
   };
 
-  const animateSystem = () => {
+  const animateSystem = (frameTime) => {
+    if (reducedMotionQuery.matches) {
+      motion.time = motion.targetTime;
+      motion.velocity = 0;
+      motion.frame = null;
+      motion.lastFrameTime = null;
+      renderSystem();
+      return;
+    }
+
+    const elapsed =
+      motion.lastFrameTime === null
+        ? 0
+        : clamp(frameTime - motion.lastFrameTime, 0, 50);
+    motion.lastFrameTime = frameTime;
+    motion.targetTime += elapsed * autoOrbitRate;
+
     const difference = motion.targetTime - motion.time;
     motion.velocity = (motion.velocity + difference * 0.095) * 0.79;
     motion.time += motion.velocity;
     renderSystem();
-
-    if (Math.abs(difference) < 0.0003 && Math.abs(motion.velocity) < 0.0003) {
-      motion.time = motion.targetTime;
-      motion.velocity = 0;
-      motion.frame = null;
-      renderSystem();
-      return;
-    }
 
     motion.frame = window.requestAnimationFrame(animateSystem);
   };
@@ -95,6 +105,7 @@
     }
 
     if (motion.frame === null) {
+      motion.lastFrameTime = null;
       motion.frame = window.requestAnimationFrame(animateSystem);
     }
   };
@@ -134,6 +145,7 @@
   );
   system.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown');
   renderSystem();
+  requestSystemAnimation();
 
   let isForwardingProjectedClick = false;
 
@@ -283,4 +295,18 @@
     },
     { passive: true }
   );
+
+  reducedMotionQuery.addEventListener('change', () => {
+    if (reducedMotionQuery.matches && motion.frame !== null) {
+      window.cancelAnimationFrame(motion.frame);
+      motion.frame = null;
+      motion.lastFrameTime = null;
+      motion.time = motion.targetTime;
+      motion.velocity = 0;
+      renderSystem();
+      return;
+    }
+
+    requestSystemAnimation();
+  });
 })();
