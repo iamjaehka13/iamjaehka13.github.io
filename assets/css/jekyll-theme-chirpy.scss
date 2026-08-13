@@ -1072,7 +1072,11 @@ body:has(.category-library) article.px-1 {
 .cosmic-star--cross-diagonal::before,
 .cosmic-star--cross-diagonal::after,
 .cosmic-star--radiant::before,
-.cosmic-star--radiant::after {
+.cosmic-star--radiant::after,
+.cosmic-star--burst-16::before,
+.cosmic-star--burst-16::after,
+.cosmic-star--burst-32::before,
+.cosmic-star--burst-32::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -1088,7 +1092,9 @@ body:has(.category-library) article.px-1 {
 
 .cosmic-star--cross::before,
 .cosmic-star--cross-diagonal::before,
-.cosmic-star--radiant::before {
+.cosmic-star--radiant::before,
+.cosmic-star--burst-16::before,
+.cosmic-star--burst-32::before {
   background:
     linear-gradient(90deg, transparent 0 46%, rgb(var(--star-color) / 16%) 47.5%, rgb(255 255 255 / 92%) 49.6% 50.4%, rgb(var(--star-color) / 16%) 52.5%, transparent 54% 100%),
     linear-gradient(0deg, transparent 0 46%, rgb(var(--star-color) / 13%) 47.5%, rgb(255 255 255 / 82%) 49.6% 50.4%, rgb(var(--star-color) / 13%) 52.5%, transparent 54% 100%);
@@ -1103,6 +1109,28 @@ body:has(.category-library) article.px-1 {
   rotate: 45deg;
   opacity: 0.34;
   animation-delay: calc(var(--star-delay) - 0.37s);
+}
+
+.cosmic-star--burst-16::after,
+.cosmic-star--burst-32::after {
+  width: calc(var(--star-size) * 10.4);
+  height: calc(var(--star-size) * 10.4);
+  border-radius: 50%;
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(circle, #000 0 22%, rgb(0 0 0 / 88%) 42%, transparent 76%);
+  mask-image: radial-gradient(circle, #000 0 22%, rgb(0 0 0 / 88%) 42%, transparent 76%);
+  animation-delay: calc(var(--star-delay) - 0.21s);
+}
+
+.cosmic-star--burst-16::after {
+  background: repeating-conic-gradient(from -0.4deg, rgb(255 255 255 / 88%) 0deg 0.4deg, rgb(var(--star-color) / 42%) 0.4deg 0.8deg, transparent 0.9deg 22.5deg);
+}
+
+.cosmic-star--burst-32::after {
+  width: calc(var(--star-size) * 11.6);
+  height: calc(var(--star-size) * 11.6);
+  background: repeating-conic-gradient(from -0.28deg, rgb(255 255 255 / 78%) 0deg 0.28deg, rgb(var(--star-color) / 34%) 0.28deg 0.56deg, transparent 0.68deg 11.25deg);
+  opacity: 0.26;
 }
 
 .cosmic-star--radiant::after {
@@ -1139,7 +1167,11 @@ body:has(.category-library) article.px-1 {
 .solar-home.is-random-starlight .cosmic-star--cross-diagonal::before,
 .solar-home.is-random-starlight .cosmic-star--cross-diagonal::after,
 .solar-home.is-random-starlight .cosmic-star--radiant::before,
-.solar-home.is-random-starlight .cosmic-star--radiant::after {
+.solar-home.is-random-starlight .cosmic-star--radiant::after,
+.solar-home.is-random-starlight .cosmic-star--burst-16::before,
+.solar-home.is-random-starlight .cosmic-star--burst-16::after,
+.solar-home.is-random-starlight .cosmic-star--burst-32::before,
+.solar-home.is-random-starlight .cosmic-star--burst-32::after {
   opacity: 0.08;
   scale: 0.5;
   animation: none;
@@ -1149,7 +1181,11 @@ body:has(.category-library) article.px-1 {
 .solar-home.is-random-starlight .cosmic-star--cross-diagonal.is-random-flash::before,
 .solar-home.is-random-starlight .cosmic-star--cross-diagonal.is-random-flash::after,
 .solar-home.is-random-starlight .cosmic-star--radiant.is-random-flash::before,
-.solar-home.is-random-starlight .cosmic-star--radiant.is-random-flash::after {
+.solar-home.is-random-starlight .cosmic-star--radiant.is-random-flash::after,
+.solar-home.is-random-starlight .cosmic-star--burst-16.is-random-flash::before,
+.solar-home.is-random-starlight .cosmic-star--burst-16.is-random-flash::after,
+.solar-home.is-random-starlight .cosmic-star--burst-32.is-random-flash::before,
+.solar-home.is-random-starlight .cosmic-star--burst-32.is-random-flash::after {
   animation: cosmic-random-star-rays var(--random-flash-duration) cubic-bezier(0.22, 0.72, 0.28, 1) 1 both;
 }
 
@@ -1392,6 +1428,21 @@ body:has(.category-library) article.px-1 {
   filter:
     drop-shadow(0 0 2px rgb(var(--star-color) / 66%))
     drop-shadow(0 0 7px rgb(var(--star-color) / 28%));
+}
+
+.solar-constellation__flare--burst-16 {
+  stroke-width: 0.44;
+  filter:
+    drop-shadow(0 0 2px rgb(var(--star-color) / 62%))
+    drop-shadow(0 0 7px rgb(var(--star-color) / 24%));
+}
+
+.solar-constellation__flare--burst-32 {
+  stroke: rgb(var(--star-color) / 42%);
+  stroke-width: 0.3;
+  filter:
+    drop-shadow(0 0 1px rgb(255 255 255 / 58%))
+    drop-shadow(0 0 6px rgb(var(--star-color) / 22%));
 }
 
 .solar-constellation__nebula,
@@ -2421,6 +2472,10 @@ body:has(.category-library) article.px-1 {
   .cosmic-star--cross-diagonal::after,
   .cosmic-star--radiant::before,
   .cosmic-star--radiant::after,
+  .cosmic-star--burst-16::before,
+  .cosmic-star--burst-16::after,
+  .cosmic-star--burst-32::before,
+  .cosmic-star--burst-32::after,
   .solar-constellation__star,
   .solar-constellation__star--major,
   .solar-constellation__flare,
