@@ -984,6 +984,38 @@ body:has(.category-library) article.px-1 {
   pointer-events: none;
 }
 
+.solar-home__stars--dust {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle at 18% 27%, rgb(255 255 255 / 66%) 0 0.45px, transparent 0.9px),
+    radial-gradient(circle at 71% 42%, rgb(193 215 255 / 64%) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 39% 76%, rgb(255 245 220 / 58%) 0 0.55px, transparent 1.05px),
+    radial-gradient(circle at 84% 19%, rgb(222 231 255 / 62%) 0 0.6px, transparent 1.15px),
+    radial-gradient(circle at 27% 58%, rgb(255 255 255 / 58%) 0 0.65px, transparent 1.2px),
+    radial-gradient(circle at 62% 83%, rgb(174 207 255 / 58%) 0 0.7px, transparent 1.3px);
+  background-position:
+    3px 7px,
+    19px 31px,
+    41px 13px,
+    73px 61px,
+    101px 29px,
+    149px 97px;
+  background-size:
+    37px 43px,
+    53px 67px,
+    79px 97px,
+    127px 113px,
+    173px 149px,
+    211px 193px;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 1px rgb(187 211 255 / 18%));
+  -webkit-mask-image: radial-gradient(ellipse at center, rgb(0 0 0 / 48%) 0 28%, #000 68%);
+  mask-image: radial-gradient(ellipse at center, rgb(0 0 0 / 48%) 0 28%, #000 68%);
+  animation:
+    cosmic-stars-drift 54s linear infinite alternate,
+    cosmic-dust-twinkle 11s ease-in-out infinite alternate;
+}
+
 .solar-home__stars--far {
   opacity: 0.42;
   background:
@@ -1067,6 +1099,7 @@ body:has(.category-library) article.px-1 {
 
   right: 0;
   bottom: 0;
+  opacity: 0.88;
 }
 
 .solar-constellation__line {
@@ -1084,20 +1117,98 @@ body:has(.category-library) article.px-1 {
 }
 
 .solar-constellation__star {
-  fill: rgb(var(--constellation-color) / 67%);
+  --star-color: var(--constellation-color);
+
+  fill: rgb(var(--star-color) / 67%);
   stroke: rgb(255 255 255 / 24%);
   stroke-width: 0.55;
   vector-effect: non-scaling-stroke;
 }
 
+.solar-constellation__star--blue,
+.solar-constellation__flare--blue,
+.solar-constellation__flare--belt {
+  --star-color: 184 220 255;
+}
+
+.solar-constellation__star--warm,
+.solar-constellation__flare--warm {
+  --star-color: 255 183 118;
+}
+
+.solar-constellation__star--white {
+  --star-color: 245 249 255;
+}
+
+.solar-constellation__star--minor {
+  fill: rgb(var(--star-color) / 50%);
+  stroke-width: 0.35;
+}
+
 .solar-constellation__star--major {
-  fill: rgb(var(--constellation-color) / 92%);
+  fill: rgb(var(--star-color) / 96%);
   filter:
-    drop-shadow(0 0 2px rgb(var(--constellation-color) / 75%))
-    drop-shadow(0 0 7px rgb(var(--constellation-color) / 28%));
+    drop-shadow(0 0 2px rgb(var(--star-color) / 82%))
+    drop-shadow(0 0 8px rgb(var(--star-color) / 36%));
   transform-box: fill-box;
   transform-origin: center;
   animation: cosmic-constellation-pulse 4.8s ease-in-out infinite alternate;
+}
+
+.solar-constellation__line--orion {
+  stroke: rgb(var(--constellation-color) / 38%);
+  stroke-dasharray: 1.2 3.5;
+  stroke-width: 1.25;
+}
+
+.solar-constellation__line--orion-outline {
+  stroke: rgb(var(--constellation-color) / 23%);
+  stroke-dasharray: 0.8 4.3;
+  stroke-width: 1;
+}
+
+.solar-constellation__flare {
+  --star-color: 204 227 255;
+
+  fill: none;
+  stroke: rgb(var(--star-color) / 48%);
+  stroke-width: 0.75;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter:
+    drop-shadow(0 0 2px rgb(var(--star-color) / 58%))
+    drop-shadow(0 0 6px rgb(var(--star-color) / 24%));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosmic-orion-glimmer 5.6s ease-in-out infinite alternate;
+}
+
+.solar-constellation__flare--warm {
+  animation-delay: -1.7s;
+}
+
+.solar-constellation__flare--belt {
+  stroke-width: 0.55;
+  animation-delay: -3.1s;
+}
+
+.solar-constellation__nebula,
+.solar-constellation__nebula-core {
+  fill: rgb(90 190 255 / 17%);
+  filter:
+    blur(3px)
+    drop-shadow(0 0 8px rgb(63 165 255 / 30%));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosmic-nebula-breathe 7.4s ease-in-out infinite alternate;
+}
+
+.solar-constellation__nebula-core {
+  fill: rgb(170 225 255 / 38%);
+  filter:
+    blur(1px)
+    drop-shadow(0 0 5px rgb(94 198 255 / 50%));
+  animation-delay: -2.6s;
 }
 
 .solar-constellation--summer .solar-constellation__star--major {
@@ -1614,6 +1725,16 @@ body:has(.category-library) article.px-1 {
   }
 }
 
+@keyframes cosmic-dust-twinkle {
+  from {
+    opacity: 0.42;
+  }
+
+  to {
+    opacity: 0.62;
+  }
+}
+
 @keyframes cosmic-constellation-pulse {
   from {
     opacity: 0.62;
@@ -1623,6 +1744,30 @@ body:has(.category-library) article.px-1 {
   to {
     opacity: 1;
     transform: scale(1.12);
+  }
+}
+
+@keyframes cosmic-orion-glimmer {
+  from {
+    opacity: 0.5;
+    transform: scale(0.93);
+  }
+
+  to {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes cosmic-nebula-breathe {
+  from {
+    opacity: 0.48;
+    scale: 0.9 0.96;
+  }
+
+  to {
+    opacity: 0.9;
+    scale: 1.12 1.05;
   }
 }
 
@@ -1731,6 +1876,9 @@ body:has(.category-library) article.px-1 {
   .solar-home__galaxy,
   .solar-home__stars,
   .solar-constellation__star--major,
+  .solar-constellation__flare,
+  .solar-constellation__nebula,
+  .solar-constellation__nebula-core,
   .solar-planet__surface,
   .solar-sun__corona,
   .solar-sun__core,
