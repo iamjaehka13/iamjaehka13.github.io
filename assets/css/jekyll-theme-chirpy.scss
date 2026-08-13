@@ -936,6 +936,10 @@ body:has(.category-library) article.px-1 {
   border-radius: 2rem;
   color: #fff;
   background:
+    radial-gradient(circle at 13% 18%, rgb(134 201 168 / 4.5%), transparent 28%),
+    radial-gradient(circle at 87% 18%, rgb(116 169 228 / 4.5%), transparent 28%),
+    radial-gradient(circle at 13% 82%, rgb(218 165 103 / 4%), transparent 28%),
+    radial-gradient(circle at 87% 82%, rgb(161 192 235 / 4.5%), transparent 28%),
     radial-gradient(circle at 50% 50%, rgb(22 27 35 / 92%) 0%, rgb(8 11 16 / 96%) 38%, #020305 82%),
     #020305;
   box-shadow:
@@ -1015,6 +1019,97 @@ body:has(.category-library) article.px-1 {
     radial-gradient(circle at 95% 91%, rgb(194 210 255 / 74%) 0 1px, transparent 2px);
   filter: drop-shadow(0 0 2px rgb(255 255 255 / 22%));
   animation: cosmic-stars-twinkle 7s ease-in-out infinite alternate;
+}
+
+.solar-constellations {
+  position: absolute;
+  inset: 0.8rem;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  pointer-events: none;
+}
+
+.solar-constellation {
+  --constellation-color: 190 211 238;
+
+  position: absolute;
+  width: 45%;
+  height: 40%;
+  overflow: visible;
+  opacity: 0.72;
+  filter: drop-shadow(0 0 5px rgb(var(--constellation-color) / 9%));
+}
+
+.solar-constellation--spring {
+  --constellation-color: 167 215 189;
+
+  top: 0;
+  left: 0;
+}
+
+.solar-constellation--summer {
+  --constellation-color: 151 194 244;
+
+  top: 0;
+  right: 0;
+}
+
+.solar-constellation--autumn {
+  --constellation-color: 229 185 126;
+
+  bottom: 0;
+  left: 0;
+}
+
+.solar-constellation--winter {
+  --constellation-color: 188 214 250;
+
+  right: 0;
+  bottom: 0;
+}
+
+.solar-constellation__line {
+  fill: none;
+  stroke: rgb(var(--constellation-color) / 27%);
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.solar-constellation__line--faint {
+  stroke: rgb(var(--constellation-color) / 17%);
+  stroke-dasharray: 2 5;
+}
+
+.solar-constellation__star {
+  fill: rgb(var(--constellation-color) / 67%);
+  stroke: rgb(255 255 255 / 24%);
+  stroke-width: 0.55;
+  vector-effect: non-scaling-stroke;
+}
+
+.solar-constellation__star--major {
+  fill: rgb(var(--constellation-color) / 92%);
+  filter:
+    drop-shadow(0 0 2px rgb(var(--constellation-color) / 75%))
+    drop-shadow(0 0 7px rgb(var(--constellation-color) / 28%));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cosmic-constellation-pulse 4.8s ease-in-out infinite alternate;
+}
+
+.solar-constellation--summer .solar-constellation__star--major {
+  animation-delay: -1.4s;
+}
+
+.solar-constellation--autumn .solar-constellation__star--major {
+  animation-delay: -2.8s;
+}
+
+.solar-constellation--winter .solar-constellation__star--major {
+  animation-delay: -3.7s;
 }
 
 .solar-system {
@@ -1519,6 +1614,18 @@ body:has(.category-library) article.px-1 {
   }
 }
 
+@keyframes cosmic-constellation-pulse {
+  from {
+    opacity: 0.62;
+    transform: scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
 @keyframes cosmic-surface-drift {
   from {
     background-position: 0% 0%;
@@ -1623,6 +1730,7 @@ body:has(.category-library) article.px-1 {
 @media (prefers-reduced-motion: reduce) {
   .solar-home__galaxy,
   .solar-home__stars,
+  .solar-constellation__star--major,
   .solar-planet__surface,
   .solar-sun__corona,
   .solar-sun__core,
