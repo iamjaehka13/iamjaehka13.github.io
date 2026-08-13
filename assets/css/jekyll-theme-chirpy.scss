@@ -1027,6 +1027,7 @@ body:has(.category-library) article.px-1 {
 
 .cosmic-star {
   --star-color: 246 249 255;
+  --star-duration: 4.6s;
 
   position: absolute;
   left: var(--star-x);
@@ -1035,13 +1036,28 @@ body:has(.category-library) article.px-1 {
   width: var(--star-size);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgb(var(--star-color) / 96%);
+  background: radial-gradient(circle, #fff 0 22%, rgb(var(--star-color) / 100%) 38%, rgb(var(--star-color) / 76%) 58%, transparent 76%);
   box-shadow:
-    0 0 calc(var(--star-size) * 0.8) rgb(var(--star-color) / 78%),
-    0 0 calc(var(--star-size) * 2.6) rgb(var(--star-color) / 31%);
+    0 0 calc(var(--star-size) * 0.45) rgb(255 255 255 / 92%),
+    0 0 calc(var(--star-size) * 1.25) rgb(var(--star-color) / 88%),
+    0 0 calc(var(--star-size) * 3.4) rgb(var(--star-color) / 48%),
+    0 0 calc(var(--star-size) * 6.5) rgb(var(--star-color) / 16%);
   translate: -50% -50%;
   transform-origin: center;
-  animation: cosmic-background-star-twinkle 6.8s ease-in-out var(--star-delay) infinite alternate;
+  will-change: opacity, scale, filter;
+  animation: cosmic-background-star-twinkle var(--star-duration) linear var(--star-delay) infinite;
+}
+
+.cosmic-star:nth-child(3n) {
+  --star-duration: 3.25s;
+}
+
+.cosmic-star:nth-child(3n + 1) {
+  --star-duration: 5.1s;
+}
+
+.cosmic-star:nth-child(5n) {
+  --star-duration: 6.2s;
 }
 
 .cosmic-star--blue {
@@ -1058,20 +1074,28 @@ body:has(.category-library) article.px-1 {
   position: absolute;
   left: 50%;
   top: 50%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgb(var(--star-color) / 64%), transparent);
+  width: calc(var(--star-size) * 7.2);
+  height: calc(var(--star-size) * 7.2);
+  background:
+    linear-gradient(90deg, transparent 0 46%, rgb(var(--star-color) / 16%) 47.5%, rgb(255 255 255 / 92%) 49.6% 50.4%, rgb(var(--star-color) / 16%) 52.5%, transparent 54% 100%),
+    linear-gradient(0deg, transparent 0 46%, rgb(var(--star-color) / 13%) 47.5%, rgb(255 255 255 / 82%) 49.6% 50.4%, rgb(var(--star-color) / 13%) 52.5%, transparent 54% 100%);
   translate: -50% -50%;
+  transform-origin: center;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 calc(var(--star-size) * 1.2) rgb(var(--star-color) / 38%));
+  animation: cosmic-star-rays var(--star-duration) linear var(--star-delay) infinite;
 }
 
 .cosmic-star--spark::before {
-  width: calc(var(--star-size) * 3.6);
-  height: 1px;
+  scale: 1 0.86;
 }
 
 .cosmic-star--spark::after {
-  width: 1px;
-  height: calc(var(--star-size) * 3.6);
-  background: linear-gradient(180deg, transparent, rgb(var(--star-color) / 58%), transparent);
+  width: calc(var(--star-size) * 5.2);
+  height: calc(var(--star-size) * 5.2);
+  rotate: 45deg;
+  opacity: 0.34;
+  animation-delay: calc(var(--star-delay) - 0.37s);
 }
 
 .solar-home__stars--far {
@@ -1831,14 +1855,80 @@ body:has(.category-library) article.px-1 {
 }
 
 @keyframes cosmic-background-star-twinkle {
-  from {
-    opacity: 0.44;
-    scale: 0.84;
+  0%,
+  100% {
+    opacity: 0.42;
+    scale: 0.82;
+    filter: brightness(0.86) saturate(0.92);
   }
 
-  to {
+  13% {
+    opacity: 0.58;
+    scale: 0.92;
+    filter: brightness(1);
+  }
+
+  18% {
     opacity: var(--star-opacity);
-    scale: 1.08;
+    scale: 1.24;
+    filter: brightness(1.6) saturate(1.18);
+  }
+
+  23% {
+    opacity: 0.5;
+    scale: 0.88;
+    filter: brightness(0.92);
+  }
+
+  46% {
+    opacity: var(--star-opacity);
+    scale: 1.1;
+    filter: brightness(1.28) saturate(1.08);
+  }
+
+  58% {
+    opacity: 0.54;
+    scale: 0.91;
+    filter: brightness(0.94);
+  }
+
+  77% {
+    opacity: var(--star-opacity);
+    scale: 1.18;
+    filter: brightness(1.48) saturate(1.14);
+  }
+
+  82% {
+    opacity: 0.48;
+    scale: 0.86;
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes cosmic-star-rays {
+  0%,
+  12%,
+  24%,
+  55%,
+  83%,
+  100% {
+    opacity: 0.13;
+    scale: 0.58;
+  }
+
+  18% {
+    opacity: 0.96;
+    scale: 1.28;
+  }
+
+  46% {
+    opacity: 0.64;
+    scale: 0.94;
+  }
+
+  77% {
+    opacity: 0.88;
+    scale: 1.16;
   }
 }
 
@@ -1983,6 +2073,8 @@ body:has(.category-library) article.px-1 {
   .solar-home__galaxy,
   .solar-home__stars,
   .cosmic-star,
+  .cosmic-star--spark::before,
+  .cosmic-star--spark::after,
   .solar-constellation__star--major,
   .solar-constellation__flare,
   .solar-constellation__nebula,
