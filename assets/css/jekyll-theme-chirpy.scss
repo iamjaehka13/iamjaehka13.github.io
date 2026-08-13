@@ -1094,6 +1094,12 @@ body:has(.category-library) article.px-1 {
   left: 0;
 }
 
+.solar-constellation--spring,
+.solar-constellation--summer,
+.solar-constellation--autumn {
+  opacity: 0.82;
+}
+
 .solar-constellation--winter {
   --constellation-color: 188 214 250;
 
@@ -1116,6 +1122,18 @@ body:has(.category-library) article.px-1 {
   stroke-dasharray: 2 5;
 }
 
+.solar-constellation__line--refined {
+  stroke: rgb(var(--constellation-color) / 35%);
+  stroke-dasharray: 1.2 3.5;
+  stroke-width: 1.2;
+}
+
+.solar-constellation__line--refined-outline {
+  stroke: rgb(var(--constellation-color) / 21%);
+  stroke-dasharray: 0.8 4.3;
+  stroke-width: 1;
+}
+
 .solar-constellation__star {
   --star-color: var(--constellation-color);
 
@@ -1136,7 +1154,13 @@ body:has(.category-library) article.px-1 {
   --star-color: 255 183 118;
 }
 
-.solar-constellation__star--white {
+.solar-constellation__star--gold,
+.solar-constellation__flare--gold {
+  --star-color: 255 217 165;
+}
+
+.solar-constellation__star--white,
+.solar-constellation__flare--white {
   --star-color: 245 249 255;
 }
 
@@ -1180,7 +1204,7 @@ body:has(.category-library) article.px-1 {
     drop-shadow(0 0 6px rgb(var(--star-color) / 24%));
   transform-box: fill-box;
   transform-origin: center;
-  animation: cosmic-orion-glimmer 5.6s ease-in-out infinite alternate;
+  animation: cosmic-constellation-glimmer 5.6s ease-in-out infinite alternate;
 }
 
 .solar-constellation__flare--warm {
@@ -1221,6 +1245,18 @@ body:has(.category-library) article.px-1 {
 
 .solar-constellation--winter .solar-constellation__star--major {
   animation-delay: -3.7s;
+}
+
+.solar-constellation--spring .solar-constellation__flare {
+  animation-delay: -0.8s;
+}
+
+.solar-constellation--summer .solar-constellation__flare {
+  animation-delay: -2.2s;
+}
+
+.solar-constellation--autumn .solar-constellation__flare {
+  animation-delay: -3.4s;
 }
 
 .solar-system {
@@ -1747,7 +1783,7 @@ body:has(.category-library) article.px-1 {
   }
 }
 
-@keyframes cosmic-orion-glimmer {
+@keyframes cosmic-constellation-glimmer {
   from {
     opacity: 0.5;
     transform: scale(0.93);
