@@ -18,7 +18,7 @@
   const clamp = (value, minimum, maximum) =>
     Math.min(Math.max(value, minimum), maximum);
   const toRadians = (degrees) => (degrees * Math.PI) / 180;
-  const autoOrbitRate = 0.000014;
+  const autoOrbitRate = 0.000042;
   const planetCount = planets.length;
   const motion = {
     time: 0,
