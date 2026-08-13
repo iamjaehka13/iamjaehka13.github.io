@@ -985,14 +985,14 @@ body:has(.category-library) article.px-1 {
 }
 
 .solar-home__stars--dust {
-  opacity: 0.55;
+  opacity: 0.26;
   background-image:
-    radial-gradient(circle at 18% 27%, rgb(255 255 255 / 66%) 0 0.45px, transparent 0.9px),
-    radial-gradient(circle at 71% 42%, rgb(193 215 255 / 64%) 0 0.5px, transparent 1px),
-    radial-gradient(circle at 39% 76%, rgb(255 245 220 / 58%) 0 0.55px, transparent 1.05px),
-    radial-gradient(circle at 84% 19%, rgb(222 231 255 / 62%) 0 0.6px, transparent 1.15px),
-    radial-gradient(circle at 27% 58%, rgb(255 255 255 / 58%) 0 0.65px, transparent 1.2px),
-    radial-gradient(circle at 62% 83%, rgb(174 207 255 / 58%) 0 0.7px, transparent 1.3px);
+    radial-gradient(circle at 18% 27%, rgb(255 255 255 / 66%) 0 0.6px, transparent 1.15px),
+    radial-gradient(circle at 71% 42%, rgb(193 215 255 / 64%) 0 0.65px, transparent 1.25px),
+    radial-gradient(circle at 39% 76%, rgb(255 245 220 / 58%) 0 0.7px, transparent 1.3px),
+    radial-gradient(circle at 84% 19%, rgb(222 231 255 / 62%) 0 0.75px, transparent 1.4px),
+    radial-gradient(circle at 27% 58%, rgb(255 255 255 / 58%) 0 0.8px, transparent 1.5px),
+    radial-gradient(circle at 62% 83%, rgb(174 207 255 / 58%) 0 0.85px, transparent 1.6px);
   background-position:
     3px 7px,
     19px 31px,
@@ -1016,40 +1016,99 @@ body:has(.category-library) article.px-1 {
     cosmic-dust-twinkle 11s ease-in-out infinite alternate;
 }
 
+.solar-home__starfield {
+  position: absolute;
+  inset: 1.2rem;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  pointer-events: none;
+}
+
+.cosmic-star {
+  --star-color: 246 249 255;
+
+  position: absolute;
+  left: var(--star-x);
+  top: var(--star-y);
+  display: block;
+  width: var(--star-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(var(--star-color) / 96%);
+  box-shadow:
+    0 0 calc(var(--star-size) * 0.8) rgb(var(--star-color) / 78%),
+    0 0 calc(var(--star-size) * 2.6) rgb(var(--star-color) / 31%);
+  translate: -50% -50%;
+  transform-origin: center;
+  animation: cosmic-background-star-twinkle 6.8s ease-in-out var(--star-delay) infinite alternate;
+}
+
+.cosmic-star--blue {
+  --star-color: 176 214 255;
+}
+
+.cosmic-star--warm {
+  --star-color: 255 211 163;
+}
+
+.cosmic-star--spark::before,
+.cosmic-star--spark::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgb(var(--star-color) / 64%), transparent);
+  translate: -50% -50%;
+}
+
+.cosmic-star--spark::before {
+  width: calc(var(--star-size) * 3.6);
+  height: 1px;
+}
+
+.cosmic-star--spark::after {
+  width: 1px;
+  height: calc(var(--star-size) * 3.6);
+  background: linear-gradient(180deg, transparent, rgb(var(--star-color) / 58%), transparent);
+}
+
 .solar-home__stars--far {
-  opacity: 0.42;
+  opacity: 0.56;
   background:
-    radial-gradient(circle at 6% 18%, rgb(255 255 255 / 72%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 13% 73%, rgb(199 213 255 / 65%) 0 0.8px, transparent 1.5px),
-    radial-gradient(circle at 21% 39%, rgb(255 255 255 / 58%) 0 0.6px, transparent 1.3px),
-    radial-gradient(circle at 29% 9%, rgb(255 241 211 / 65%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 36% 67%, rgb(255 255 255 / 68%) 0 0.8px, transparent 1.5px),
-    radial-gradient(circle at 43% 28%, rgb(204 218 255 / 62%) 0 0.6px, transparent 1.3px),
-    radial-gradient(circle at 51% 82%, rgb(255 255 255 / 55%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 58% 14%, rgb(255 236 206 / 62%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 64% 61%, rgb(255 255 255 / 66%) 0 0.8px, transparent 1.5px),
-    radial-gradient(circle at 72% 32%, rgb(204 218 255 / 64%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 78% 88%, rgb(255 255 255 / 56%) 0 0.6px, transparent 1.3px),
-    radial-gradient(circle at 85% 12%, rgb(255 241 218 / 62%) 0 0.7px, transparent 1.4px),
-    radial-gradient(circle at 92% 54%, rgb(219 227 255 / 68%) 0 0.8px, transparent 1.5px),
-    radial-gradient(circle at 97% 79%, rgb(255 255 255 / 58%) 0 0.7px, transparent 1.4px);
+    radial-gradient(circle at 6% 18%, rgb(255 255 255 / 88%) 0 1.2px, rgb(255 255 255 / 22%) 1.7px, transparent 3px),
+    radial-gradient(circle at 13% 73%, rgb(199 213 255 / 82%) 0 1.4px, rgb(199 213 255 / 20%) 1.9px, transparent 3.2px),
+    radial-gradient(circle at 21% 39%, rgb(255 255 255 / 78%) 0 1px, rgb(255 255 255 / 18%) 1.5px, transparent 2.7px),
+    radial-gradient(circle at 29% 9%, rgb(255 228 183 / 82%) 0 1.3px, rgb(255 228 183 / 20%) 1.8px, transparent 3.1px),
+    radial-gradient(circle at 36% 67%, rgb(255 255 255 / 86%) 0 1.5px, rgb(255 255 255 / 21%) 2px, transparent 3.4px),
+    radial-gradient(circle at 43% 28%, rgb(188 214 255 / 80%) 0 1.1px, rgb(188 214 255 / 19%) 1.6px, transparent 2.9px),
+    radial-gradient(circle at 51% 82%, rgb(255 255 255 / 76%) 0 1.2px, rgb(255 255 255 / 18%) 1.7px, transparent 3px),
+    radial-gradient(circle at 58% 14%, rgb(255 218 173 / 82%) 0 1.4px, rgb(255 218 173 / 20%) 1.9px, transparent 3.2px),
+    radial-gradient(circle at 64% 61%, rgb(255 255 255 / 84%) 0 1.5px, rgb(255 255 255 / 21%) 2px, transparent 3.4px),
+    radial-gradient(circle at 72% 32%, rgb(190 217 255 / 82%) 0 1.2px, rgb(190 217 255 / 20%) 1.7px, transparent 3px),
+    radial-gradient(circle at 78% 88%, rgb(255 255 255 / 78%) 0 1.1px, rgb(255 255 255 / 18%) 1.6px, transparent 2.9px),
+    radial-gradient(circle at 85% 12%, rgb(255 228 189 / 82%) 0 1.3px, rgb(255 228 189 / 20%) 1.8px, transparent 3.1px),
+    radial-gradient(circle at 92% 54%, rgb(205 222 255 / 86%) 0 1.5px, rgb(205 222 255 / 21%) 2px, transparent 3.4px),
+    radial-gradient(circle at 97% 79%, rgb(255 255 255 / 78%) 0 1.2px, rgb(255 255 255 / 18%) 1.7px, transparent 3px);
+  filter: drop-shadow(0 0 2px rgb(205 222 255 / 20%));
   animation: cosmic-stars-drift 36s linear infinite alternate;
 }
 
 .solar-home__stars--near {
-  opacity: 0.7;
+  opacity: 0.82;
   background:
-    radial-gradient(circle at 9% 48%, rgb(255 255 255 / 86%) 0 1px, transparent 2px),
-    radial-gradient(circle at 18% 16%, rgb(184 207 255 / 78%) 0 1.1px, transparent 2.1px),
-    radial-gradient(circle at 26% 84%, rgb(255 237 199 / 74%) 0 1px, transparent 2px),
-    radial-gradient(circle at 39% 45%, rgb(255 255 255 / 84%) 0 0.9px, transparent 1.9px),
-    radial-gradient(circle at 48% 6%, rgb(204 218 255 / 76%) 0 1px, transparent 2px),
-    radial-gradient(circle at 57% 72%, rgb(255 255 255 / 82%) 0 1px, transparent 2px),
-    radial-gradient(circle at 68% 21%, rgb(255 231 188 / 76%) 0 1.1px, transparent 2.1px),
-    radial-gradient(circle at 76% 56%, rgb(203 216 255 / 78%) 0 1px, transparent 2px),
-    radial-gradient(circle at 89% 35%, rgb(255 255 255 / 84%) 0 0.9px, transparent 1.9px),
-    radial-gradient(circle at 95% 91%, rgb(194 210 255 / 74%) 0 1px, transparent 2px);
-  filter: drop-shadow(0 0 2px rgb(255 255 255 / 22%));
+    radial-gradient(circle at 9% 48%, rgb(255 255 255 / 96%) 0 1.8px, rgb(255 255 255 / 32%) 2.4px, transparent 4.4px),
+    radial-gradient(circle at 18% 16%, rgb(177 211 255 / 92%) 0 2.1px, rgb(177 211 255 / 30%) 2.8px, transparent 4.9px),
+    radial-gradient(circle at 26% 84%, rgb(255 220 169 / 90%) 0 1.7px, rgb(255 220 169 / 28%) 2.3px, transparent 4.2px),
+    radial-gradient(circle at 39% 45%, rgb(255 255 255 / 94%) 0 1.6px, rgb(255 255 255 / 30%) 2.2px, transparent 4px),
+    radial-gradient(circle at 48% 6%, rgb(190 216 255 / 92%) 0 1.9px, rgb(190 216 255 / 29%) 2.5px, transparent 4.5px),
+    radial-gradient(circle at 57% 72%, rgb(255 255 255 / 95%) 0 1.8px, rgb(255 255 255 / 31%) 2.4px, transparent 4.4px),
+    radial-gradient(circle at 68% 21%, rgb(255 215 159 / 90%) 0 2px, rgb(255 215 159 / 29%) 2.7px, transparent 4.8px),
+    radial-gradient(circle at 76% 56%, rgb(186 214 255 / 92%) 0 1.9px, rgb(186 214 255 / 30%) 2.5px, transparent 4.5px),
+    radial-gradient(circle at 89% 35%, rgb(255 255 255 / 94%) 0 1.6px, rgb(255 255 255 / 30%) 2.2px, transparent 4px),
+    radial-gradient(circle at 95% 91%, rgb(181 211 255 / 90%) 0 1.8px, rgb(181 211 255 / 28%) 2.4px, transparent 4.4px);
+  filter: drop-shadow(0 0 3px rgb(255 255 255 / 25%));
   animation: cosmic-stars-twinkle 7s ease-in-out infinite alternate;
 }
 
@@ -1763,11 +1822,23 @@ body:has(.category-library) article.px-1 {
 
 @keyframes cosmic-dust-twinkle {
   from {
-    opacity: 0.42;
+    opacity: 0.18;
   }
 
   to {
-    opacity: 0.62;
+    opacity: 0.31;
+  }
+}
+
+@keyframes cosmic-background-star-twinkle {
+  from {
+    opacity: 0.44;
+    scale: 0.84;
+  }
+
+  to {
+    opacity: var(--star-opacity);
+    scale: 1.08;
   }
 }
 
@@ -1911,6 +1982,7 @@ body:has(.category-library) article.px-1 {
 @media (prefers-reduced-motion: reduce) {
   .solar-home__galaxy,
   .solar-home__stars,
+  .cosmic-star,
   .solar-constellation__star--major,
   .solar-constellation__flare,
   .solar-constellation__nebula,
