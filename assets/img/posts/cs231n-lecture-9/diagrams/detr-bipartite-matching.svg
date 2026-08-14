@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">DETR의 one-to-one bipartite matching</title>
+  <desc id="desc">네 개의 object query prediction과 세 개의 실제 객체 및 no-object target을 cost matrix로 일대일 대응한 뒤 set loss를 계산하는 흐름</desc>
+  <rect width="1200" height="640" fill="#ffffff"/>
+  <style>
+    .heading { font: 700 30px Arial, sans-serif; fill: #172033; }
+    .label { font: 700 21px Arial, sans-serif; fill: #172033; }
+    .body { font: 18px Arial, sans-serif; fill: #374151; }
+    .small { font: 16px Arial, sans-serif; fill: #4b5563; }
+    .slot { fill: #eef6ff; stroke: #3277b3; stroke-width: 2; }
+    .target { fill: #fff3e8; stroke: #cf6b2c; stroke-width: 2; }
+    .none { fill: #f3f4f6; stroke: #6b7280; stroke-width: 2; }
+    .matrix { fill: #ffffff; stroke: #9ca3af; stroke-width: 1.5; }
+    .chosen { fill: #dff4e5; stroke: #26834a; stroke-width: 2.5; }
+    .arrow { stroke: #26834a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#26834a"/>
+    </marker>
+  </defs>
+
+  <text x="55" y="58" class="heading">1. Fixed prediction slots</text>
+  <text x="435" y="58" class="heading">2. Minimum-cost matching</text>
+  <text x="880" y="58" class="heading">3. One-to-one set loss</text>
+
+  <text x="55" y="98" class="body">Each learned query emits a class and box.</text>
+  <g transform="translate(55 125)">
+    <rect class="slot" x="0" y="0" width="285" height="66" rx="6"/>
+    <text class="label" x="18" y="28">q1</text><text class="body" x="70" y="28">dog · box 1</text>
+    <text class="small" x="70" y="51">confidence 0.91</text>
+    <rect class="slot" x="0" y="82" width="285" height="66" rx="6"/>
+    <text class="label" x="18" y="110">q2</text><text class="body" x="70" y="110">person · box 2</text>
+    <text class="small" x="70" y="133">confidence 0.87</text>
+    <rect class="slot" x="0" y="164" width="285" height="66" rx="6"/>
+    <text class="label" x="18" y="192">q3</text><text class="body" x="70" y="192">cat · box 3</text>
+    <text class="small" x="70" y="215">confidence 0.62</text>
+    <rect class="slot" x="0" y="246" width="285" height="66" rx="6"/>
+    <text class="label" x="18" y="274">q4</text><text class="body" x="70" y="274">no object</text>
+    <text class="small" x="70" y="297">confidence 0.94</text>
+  </g>
+
+  <text x="435" y="98" class="body">Real-object rows: class + L1 + GIoU cost</text>
+  <g transform="translate(435 125)">
+    <text class="label" x="105" y="-8">q1</text><text class="label" x="190" y="-8">q2</text>
+    <text class="label" x="275" y="-8">q3</text><text class="label" x="360" y="-8">q4</text>
+    <text class="label" x="0" y="38">dog</text>
+    <text class="label" x="0" y="108">person</text>
+    <text class="label" x="0" y="178">cat</text>
+    <text class="label" x="0" y="248">∅</text>
+
+    <rect class="chosen" x="85" y="5" width="68" height="52" rx="4"/><text class="body" x="106" y="38">0.2</text>
+    <rect class="matrix" x="170" y="5" width="68" height="52" rx="4"/><text class="body" x="191" y="38">3.1</text>
+    <rect class="matrix" x="255" y="5" width="68" height="52" rx="4"/><text class="body" x="276" y="38">2.6</text>
+    <rect class="matrix" x="340" y="5" width="68" height="52" rx="4"/><text class="body" x="361" y="38">4.0</text>
+
+    <rect class="matrix" x="85" y="75" width="68" height="52" rx="4"/><text class="body" x="106" y="108">2.8</text>
+    <rect class="chosen" x="170" y="75" width="68" height="52" rx="4"/><text class="body" x="191" y="108">0.3</text>
+    <rect class="matrix" x="255" y="75" width="68" height="52" rx="4"/><text class="body" x="276" y="108">3.4</text>
+    <rect class="matrix" x="340" y="75" width="68" height="52" rx="4"/><text class="body" x="361" y="108">3.8</text>
+
+    <rect class="matrix" x="85" y="145" width="68" height="52" rx="4"/><text class="body" x="106" y="178">2.4</text>
+    <rect class="matrix" x="170" y="145" width="68" height="52" rx="4"/><text class="body" x="191" y="178">3.0</text>
+    <rect class="chosen" x="255" y="145" width="68" height="52" rx="4"/><text class="body" x="276" y="178">0.6</text>
+    <rect class="matrix" x="340" y="145" width="68" height="52" rx="4"/><text class="body" x="361" y="178">3.5</text>
+
+    <rect class="matrix" x="85" y="215" width="68" height="52" rx="4"/><text class="body" x="112" y="248">-</text>
+    <rect class="matrix" x="170" y="215" width="68" height="52" rx="4"/><text class="body" x="197" y="248">-</text>
+    <rect class="matrix" x="255" y="215" width="68" height="52" rx="4"/><text class="body" x="282" y="248">-</text>
+    <rect class="chosen" x="340" y="215" width="68" height="52" rx="4"/><text class="small" x="351" y="247">rest</text>
+  </g>
+
+  <path class="arrow" d="M850 255 C880 255, 885 210, 915 210"/>
+  <g transform="translate(900 125)">
+    <rect class="target" x="20" y="0" width="225" height="58" rx="6"/>
+    <text class="body" x="38" y="35">q1 ↔ dog</text>
+    <rect class="target" x="20" y="72" width="225" height="58" rx="6"/>
+    <text class="body" x="38" y="107">q2 ↔ person</text>
+    <rect class="target" x="20" y="144" width="225" height="58" rx="6"/>
+    <text class="body" x="38" y="179">q3 ↔ cat</text>
+    <rect class="none" x="20" y="216" width="225" height="58" rx="6"/>
+    <text class="body" x="38" y="251">q4 ↔ ∅ · class only</text>
+  </g>
+
+  <rect x="55" y="485" width="1090" height="110" rx="6" fill="#f7fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="85" y="526" class="label">Matching</text>
+  <text x="205" y="526" class="body">Hungarian algorithm chooses one target per prediction and one prediction per target.</text>
+  <text x="85" y="565" class="label">Loss</text>
+  <text x="205" y="565" class="body">Lset = Lclass (all slots) + 1object (λ1 LL1 + λgiou LGIoU)</text>
+  <text x="750" y="565" class="small">Duplicate boxes become costly without a separate NMS step.</text>
+</svg>
