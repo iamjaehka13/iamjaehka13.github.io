@@ -2,10 +2,10 @@
 layout: post
 title: "[AI Paper] 추론 가속에서 World Model과 데이터 효율까지"
 date: 2026-08-16 12:45:00 +0900
-last_modified_at: 2026-08-16 13:36:00 +0900
+last_modified_at: 2026-08-16 14:03:26 +0900
 categories: [AI, Paper]
 tags: [yc-paper-club, llm-inference, speculative-decoding, saguaro, diffusion-mpc, model-predictive-control, world-model, jepa, representation-collapse, pac-bayes, benign-overfitting, soft-inductive-bias, scaling-law, data-efficiency, ensemble, distillation]
-description: "Speculative Speculative Decoding의 draft–verify 병렬화에서 Diffusion MPC, LeWorldModel의 collapse 방지, soft inductive bias, 고정 data pretraining의 regularization·ensemble·distillation까지 다섯 연구의 공통 구조를 정리한다."
+description: "Speculative Speculative Decoding, Diffusion MPC, LeWorldModel, soft inductive bias, fixed-data pretraining을 논문별 섹터로 나누어 문제 설정·핵심 구조·결과와 평가 경계를 정리한다."
 image:
   path: /assets/img/posts/yc-paper-club-inference-world-model-data-efficiency/preview.png
   alt: "추론 병렬화, Diffusion MPC, latent world model, soft inductive bias와 data-constrained scaling을 잇는 핵심 도식"
@@ -13,21 +13,25 @@ math: true
 toc: true
 ---
 
-## **0. 제한된 자원에서 capability를 늘리는 세 가지 설계 축**
+## **0. 다섯 논문의 구성**
 
-Model을 더 크게 만드는 것만으로 다음 병목이 사라지지는 않는다. Autoregressive model은 다음 token을 기다리느라 GPU의 병렬 계산을 충분히 쓰지 못하고, offline data로 학습한 robot policy는 reward나 dynamics가 바뀌면 성능이 무너져 추가 적응이 필요할 수 있다. Raw pixel에서 dynamics와 representation을 함께 학습하면 모든 observation을 같은 latent로 보내는 collapse가 생길 수 있으며, data가 compute보다 느리게 늘어나는 환경에서는 parameter와 epoch만 키울수록 오히려 overfitting이 커진다.
+다섯 논문은 추론 가속, robot planning, pixel world model, generalization, fixed-data pretraining이라는 서로 다른 병목을 다룬다.
 
-서로 다른 문제처럼 보이지만 해결 방향은 세 가지로 모인다.
-
-- 순차 의존성이 만드는 idle time의 병렬 작업 전환
-- Action proposal·dynamics·representation처럼 역할이 다른 component의 명시적 분리
-- 넓은 hypothesis space를 유지하면서 해를 고르는 regularization·ensemble·distillation
-
-핵심은 자원을 더 넣는 것 자체가 아니라 **어떤 dependency를 끊고, 어떤 module을 분리하며, 어떤 bias로 가능한 해 가운데 좋은 해를 선택할지**에 있다.
+1. [Paper 1 · Speculative Speculative Decoding](#paper-1-ssd) — LLM inference의 직렬 대기 시간
+2. [Paper 2 · Diffusion Model Predictive Control](#paper-2-dmpc) — Planning module의 분리와 runtime adaptation
+3. [Paper 3 · LeWorldModel](#paper-3-lewm) — Latent dynamics의 representation collapse
+4. [Paper 4 · Deep Learning Is Not So Mysterious or Different](#paper-4-soft-bias) — Generalization의 soft inductive bias
+5. [Paper 5 · Pre-training Under Infinite Compute](#paper-5-infinite-compute) — 고정 data의 compute scaling
 
 ---
 
-## **1. Speculative Speculative Decoding의 draft–verify 병렬화**
+## **Paper 1. Speculative Speculative Decoding** {#paper-1-ssd}
+
+> **문제:** Draft model과 target verification 사이의 직렬 대기
+>
+> **핵심 구조:** Verification outcome별 다음 draft의 병렬 사전 계산과 cache
+>
+> **평가 경계:** Target distribution 보존과 추가 draft GPU·cache 비용
 
 ### **1.1 Autoregressive decoding의 sequential bottleneck**
 
@@ -114,7 +118,13 @@ Branch를 많이 만들면 hit rate와 hit 시 확정 token 수를 높일 수 �
 
 ---
 
-## **2. Diffusion MPC의 multi-step planning**
+## **Paper 2. Diffusion Model Predictive Control** {#paper-2-dmpc}
+
+> **문제:** 고차원 action 탐색과 one-step dynamics의 horizon 누적 오차
+>
+> **핵심 구조:** Action proposal·multi-step dynamics·runtime objective의 분리
+>
+> **평가 경계:** 매 step의 diffusion sampling 비용과 dynamics adaptation용 추가 data
 
 ### **2.1 Receding-horizon control의 model·proposal·objective 분해**
 
@@ -187,7 +197,13 @@ Ablation에서는 diffusion proposal, multi-step action proposal, multi-step dyn
 
 ---
 
-## **3. LeWorldModel의 end-to-end latent dynamics**
+## **Paper 3. LeWorldModel** {#paper-3-lewm}
+
+> **문제:** Representation과 dynamics의 공동 학습에서 발생하는 latent collapse
+>
+> **핵심 구조:** JEPA prediction과 SIGReg의 two-term objective
+>
+> **평가 경계:** Goal-image planning과 prediction error 기반 surprise signal
 
 ### **3.1 Observation–action–future latent의 예측 구조**
 
@@ -266,7 +282,13 @@ LeWM은 약 15M parameter이고 single GPU에서 수 시간 안에 학습된다.
 
 ---
 
-## **4. PAC-Bayes와 soft inductive bias 기반 일반화**
+## **Paper 4. Deep Learning Is Not So Mysterious or Different** {#paper-4-soft-bias}
+
+> **문제:** Parameter 수만으로 설명되지 않는 overparameterized model의 generalization
+>
+> **핵심 관점:** PAC-Bayes complexity와 compressible solution을 선호하는 soft inductive bias
+>
+> **주장 경계:** 고전 통계 개념의 재사용과 representation·optimization의 고유성
 
 ### **4.1 Expected risk·empirical risk·complexity의 분해**
 
@@ -344,7 +366,13 @@ Hard inductive bias는 hypothesis를 아예 제거한다. Soft inductive bias는
 
 ---
 
-## **5. 고정 data·풍부한 compute 환경의 pretraining**
+## **Paper 5. Pre-training Under Infinite Compute** {#paper-5-infinite-compute}
+
+> **문제:** Fresh data가 고정된 환경에서 epoch와 parameter 증가가 만드는 overfitting
+>
+> **핵심 구조:** 강한 weight decay·parameter scaling·ensemble·sequence distillation
+>
+> **평가 경계:** 특정 corpus와 training recipe에서 추정한 loss asymptote와 data efficiency
 
 ### **5.1 Compute-optimal scaling 이후의 data bottleneck**
 
@@ -433,56 +461,33 @@ $$
 
 ---
 
-## **6. 다섯 연구의 공통 설계 원리**
-
-### **6.1 Sequential dependency의 parallel work 전환**
-
-SSD는 target verification을 기다리던 시간을 outcome별 draft branch 계산에 쓴다. D-MPC는 horizon 전체를 joint variable로 denoise하고 여러 candidate trajectory를 독립적으로 평가한다. Ensemble은 서로 의존하지 않는 training run을 독립적으로 수행한다.
-
-이 셋은 모두 hardware를 더 쓰지만 핵심은 단순한 장치 추가가 아니다. 먼저 algorithmic dependency를 바꾸어 **동시에 실행할 수 있는 작업**을 만들어 낸 뒤 hardware가 그 병렬성을 이용한다.
-
-### **6.2 Module factorization과 runtime adaptation**
-
-D-MPC는 action proposal, dynamics, objective를 분리해 reward가 바뀌면 objective만, physical dynamics가 바뀌면 dynamics만 갱신할 수 있다. 이 factorization은 runtime adaptation을 위한 interface가 된다.
-
-LeWM의 분리는 교체 가능한 runtime module보다 학습 objective의 역할 구분에 가깝다. Representation encoder와 action-conditioned predictor를 함께 학습하되 SIGReg가 latent distribution을 정돈해 reconstruction decoder나 pretrained teacher 없이 joint learning을 안정화한다.
-
-하나의 end-to-end model은 평균 benchmark에서 강할 수 있지만 runtime change가 예상되면 component 경계가 adaptation interface가 된다. 무엇을 함께 학습할지뿐 아니라 **무엇을 나중에 독립적으로 바꿀 수 있어야 하는지**가 architecture 선택에 들어간다.
-
-### **6.3 Classical regularization·ensembling의 재등장**
-
-PAC-Bayes는 큰 hypothesis space 자체보다 선택된 solution의 compressibility를 본다. LeWM은 isotropic-Gaussian target distribution을 강제하는 SIGReg로 representation space를 정돈하고, fixed-data pretraining은 강한 weight decay와 seed ensemble로 같은 data에서 다른 해를 탐색한다.
-
-더 큰 model과 고전적인 통계 원리는 경쟁 관계가 아니다. Model이 커질수록 가능한 해가 많아지므로 어떤 해를 선호할지 정하는 prior·regularization·optimization dynamics가 더 중요해진다.
-
-### **6.4 Fixed-budget metric에서 asymptote·adaptation으로의 평가 전환**
-
-각 연구는 평가 단위도 바꾼다.
-
-| 고정된 단일 지표 | 확장된 평가 축 |
-|---|---|
-| 한 token의 latency | Cache hit·accepted tokens·batch throughput |
-| 고정 reward score | Runtime reward 변경·dynamics adaptation |
-| One-step prediction loss | Planning success·physical surprise |
-| Parameter count | Compressibility·prior-relative complexity |
-| 한 compute point의 loss | Parameter·ensemble scaling의 asymptote |
-
-Model이 무엇을 최적화했는지만 보면 새로운 operating regime에서의 장점을 놓친다. 어떤 resource가 병목이고, 배포 중 무엇이 바뀌며, 어느 한계로 extrapolation하는지를 함께 봐야 결과의 의미가 선명해진다.
-
-다섯 연구를 잇는 기준은 하나다. **더 많은 자원을 투입하기 전에 현재 system에서 직렬로 묶인 작업, 불필요하게 결합된 module, 명시되지 않은 solution preference를 먼저 찾는 것**이다.
-
----
-
 ## **참고 자료**
 
+**영상**
+
 - [Y Combinator, *Inference, Diffusion, World Models, and More | YC Paper Club*](https://www.youtube.com/watch?v=wE1ZgJdt4uM)
+
+**Paper 1 · Speculative Speculative Decoding**
+
 - [Tanishq Kumar, Tri Dao, Avner May, *Speculative Speculative Decoding*](https://arxiv.org/abs/2603.03251)
 - [Yaniv Leviathan, Matan Kalman, Yossi Matias, *Fast Inference from Transformers via Speculative Decoding*](https://arxiv.org/abs/2211.17192)
+
+**Paper 2 · Diffusion Model Predictive Control**
+
 - [Guangyao Zhou et al., *Diffusion Model Predictive Control*](https://arxiv.org/abs/2410.05364)
 - [Cheng Chi et al., *Diffusion Policy: Visuomotor Policy Learning via Action Diffusion*](https://arxiv.org/abs/2303.04137)
 - [Michael Janner et al., *Planning with Diffusion for Flexible Behavior Synthesis*](https://arxiv.org/abs/2205.09991)
 - [Ajay et al., *Is Conditional Generative Modeling all you need for Decision Making?*](https://arxiv.org/abs/2211.15657)
+
+**Paper 3 · LeWorldModel**
+
 - [Lucas Maes et al., *LeWorldModel: Stable End-to-End Joint-Embedding Predictive Architecture from Pixels*](https://arxiv.org/abs/2603.19312)
+
+**Paper 4 · Deep Learning Is Not So Mysterious or Different**
+
 - [Andrew Gordon Wilson, *Position: Deep Learning is Not So Mysterious or Different*](https://proceedings.mlr.press/v267/wilson25a.html)
+
+**Paper 5 · Pre-training Under Infinite Compute**
+
 - [Konwoo Kim et al., *Pre-training under infinite compute*](https://arxiv.org/abs/2509.14786)
 - [Jordan Hoffmann et al., *Training Compute-Optimal Large Language Models*](https://arxiv.org/abs/2203.15556)
