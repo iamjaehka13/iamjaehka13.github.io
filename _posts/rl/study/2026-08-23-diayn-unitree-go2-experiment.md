@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-23 18:00:00 +0900
+last_modified_at: 2026-08-23 18:35:00 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2 시뮬레이션에 적용해 자세 shortcut, 안전 제약, 관측 ablation, K=10·20·30 확장과 20초 평가에서 확인한 결과와 한계를 정리한다."
@@ -27,7 +27,7 @@ image:
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px;">
 
-*K=20, iteration 1000, seed 1. Observation noise·friction randomization·external push·base-mass variation을 모두 끈 clean deterministic 20초 평가 중 8초 구간.*
+*K=20, iteration 1000, seed 1. Observation noise·friction randomization·external push를 모두 끈 clean deterministic 20초 평가 중 8초 구간.*
 
 최종 checkpoint를 skill마다 5 episode씩 다시 평가한 결과는 다음과 같다.
 
@@ -167,13 +167,10 @@ log q(z|f(s)) + log K
 | Observation noise | 켬 | 끔 |
 | Friction randomization | 켬, 0.5–1.25 | 끔, nominal |
 | External push | 켬, 15초 간격 설정 | 끔 |
-| Base-mass randomization | **끔** | 끔, 6.921 kg |
 | Policy action | stochastic | deterministic mean |
 | Episode 길이 | 20초 | 20초 |
 
 여기서 noise·friction·push는 **robustness를 증명하기 위해 새로 넣은 실험 변인**이 아니다. 기존 training 환경이 상속한 조건이다. 최종 결론은 모두 disturbance를 끈 clean deterministic 평가를 기준으로 냈다.
-
-Base-mass randomization은 최종 $K$ 확장 실험에 사용하지 않았다. 질량 변화에 강한 policy를 만드는 것이 이 실험의 질문이 아니었기 때문이다.
 
 ### **3.2 분류 정확도 하나로 성공을 판정하지 않았다**
 
@@ -200,13 +197,13 @@ q accuracy 99%
 
 ## **4. 시도한 실험 전체 지도**
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/01-experiment-map.svg"
+<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/01-experiment-map-v2.svg"
      alt="yaw shortcut, 저상 자세, 정적 자세를 제거하고 dynamic state와 chance constraint를 거쳐 K를 확장한 Go2 DIAYN 실험 흐름"
      width="1400" height="900"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px;">
 
-*한 번에 여러 조건을 바꾸지 않고, 공통 checkpoint에서 한 변인씩 분리했다. 노란 점선 상자는 확인했지만 최종 질문에서는 제외한 우회 실험이다.*
+*한 번에 여러 조건을 바꾸지 않고, 공통 checkpoint에서 한 변인씩 분리했다.*
 
 | 순서 | 바꾼 것 | 관찰 | 판단 |
 |---:|---|---|---|
@@ -218,12 +215,10 @@ q accuracy 99%
 | 6 | Mean Lagrangian | 평균은 맞춰도 희귀하고 깊은 excursion이 남음 | tail을 별도로 봐야 함 |
 | 7 | Mean + chance constraint | 725 통과, 750에서 일부 자세 gate 실패 | rollout 평균 제약도 보장은 아님 |
 | 8 | Frozen anchor / no-anchor | anchor는 안전하지만 saturation·overlap, 제거하면 자세 붕괴 | 안전성과 freedom의 trade-off |
-| 9 | 질량·DR 진단 | 작은 질량 변화에서만 비단조 실패 | payload robustness 결론에서 제외 |
-| 10 | 방향 중립 speed prior | 모두 이동했지만 같은 곡선 보행으로 수렴 | 걷게 만드는 control일 뿐 본질 질문 아님 |
-| 11 | 33D proprioceptive feature | q 약 99%, locomotion 0/6 | static posture shortcut |
-| 12 | 18D dynamic feature | 일부 이동·회전 mode 발생 | 핵심 ablation 채택 |
-| 13 | Dynamic + chance model 600 | clean gate 통과 | $K$ 확장 source로 채택 |
-| 14 | $K=10,20,30$ | 초기 붕괴 뒤 750–850에서 재형성 | 합쳐진 뒤 다시 분화하는 과정 관찰 |
+| 9 | 33D proprioceptive feature | q 약 99%, locomotion 0/6 | static posture shortcut |
+| 10 | 18D dynamic feature | 일부 이동·회전 mode 발생 | 핵심 ablation 채택 |
+| 11 | Dynamic + chance model 600 | clean gate 통과 | $K$ 확장 source로 채택 |
+| 12 | $K=10,20,30$ | 초기 붕괴 뒤 750–850에서 재형성 | 합쳐진 뒤 다시 분화하는 과정 관찰 |
 
 아래부터는 결론을 바꾼 분기만 자세히 본다.
 
@@ -364,26 +359,6 @@ Policy가 계속 경계를 밀면서 일부 skill endpoint가 합쳐졌다. 반�
 
 > Anchor는 안전성을 높였지만 skill freedom을 줄였고, anchor를 빼면 다양성 공간은 넓어졌지만 쉬운 위험 행동이 다시 열렸다.
 
-### **6.5 본질에서 벗어난 두 우회 실험**
-
-#### **질량·DR 진단**
-
-한때 anchor model 750에 base mass variation을 적용했다. seed 3에서 1/30 low-height 종료가 나왔고, 정확히 $+0.101596$ kg에서 재현됐지만 더 큰 $+0.25,+0.5,+1.0$ kg에서는 통과했다.
-
-이것은 monotonic payload limit가 아니라 contact-reset을 포함한 hybrid trajectory sensitivity에 가까웠다. “질량이 늘수록 언제 실패하는가”라는 별도 연구가 되었기 때문에 최종 skill 분화 질문에서는 제외했다.
-
-#### **방향 중립 locomotion prior**
-
-방향을 지정하지 않고 속력만 지원하는 reward도 시험했다.
-
-$$
-r_{\text{speed}}=\min\left(\frac{\lVert v_{xy}\rVert}{0.4},1\right)
-$$
-
-model 550에서 30/30 episode가 이동했지만 여섯 skill이 비슷한 곡선 locomotion family에 모였다. 이후 일부 pair가 합쳐졌다 다시 갈라지기도 했다.
-
-이 control은 “이동 prior를 주면 걷게 만들 수 있다”는 사실은 보여 줬다. 그러나 보고 싶었던 것은 **걷기 보상을 넣었는데도 다양해지는가**가 아니라 **DIAYN의 원리만으로 일부 이동 mode가 나오는가**였다. 따라서 최종 arm에서는 이 reward를 0으로 되돌렸다.
-
 ---
 
 ## **7. 결정적 ablation: discriminator에 무엇을 보여 줄 것인가**
@@ -482,7 +457,6 @@ Unconstrained model 600의 저상 자세 regression을 막기 위해 model 575�
 - skill별 mean-height + low-tail chance constraint
 - **frozen anchor 없음**
 - **locomotion speed reward 없음**
-- **base-mass randomization 없음**
 
 ---
 
@@ -714,7 +688,6 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 - K=30에서 30개의 독립 gait를 발견했다.
 - K가 클수록 skill quality가 단조롭게 좋아진다.
 - 높은 discriminator accuracy가 semantic usefulness를 보장한다.
-- 최종 policy가 domain randomization이나 payload 변화에 robust하다.
 - Simulation 결과가 실물 Go2의 안전성을 보장한다.
 
 ### **실험의 한계**
