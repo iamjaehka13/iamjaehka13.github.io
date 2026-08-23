@@ -1,10 +1,10 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-23 18:35:00 +0900
+last_modified_at: 2026-08-23 20:31:22 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
-description: "DIAYN을 Unitree Go2 시뮬레이션에 적용해 자세 shortcut, 안전 제약, 관측 ablation, K=10·20·30 확장과 20초 평가에서 확인한 결과와 한계를 정리한다."
+description: "DIAYN을 Unitree Go2 시뮬레이션에 적용해 자세 shortcut, 안전 제약, 관측 ablation, K=10·20·30 확장과 frozen skill 반복 전환에서 확인한 결과와 한계를 정리한다."
 math: true
 image:
   path: https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/00-preview.png
@@ -18,6 +18,8 @@ image:
 > **앞으로 가라는 보상도, 특정 속도로 걸으라는 보상도 주지 않았을 때 Unitree Go2의 latent skill 중 일부가 스스로 이동 행동으로 분화하는가?**
 
 결과는 **조건부로 그렇다**였다. 기존 locomotion motor prior에서 시작해 DIAYN discriminator에 동적인 상태만 보여 주자, 일부 latent가 지속적인 평면 이동·곡선 이동·회전 행동으로 분화했다. 반면 모든 latent가 서로 다른 gait가 된 것은 아니다. 느린 mode와 겹치는 mode도 남았다.
+
+학습을 끝낸 $K=30$ policy에서 `z22`와 `z17`을 2초씩 반복 전환한 후속 평가에서는, 한 대각선 방향으로 거의 직선인 이동이 누적됐다. 이는 새 policy를 학습한 결과가 아니라 발견된 두 skill을 시간 순서로 연결한 한 사례다.
 
 아래는 $K=20$, iteration 1000의 clean deterministic 평가다. 각 칸은 같은 policy에 서로 다른 one-hot skill ID만 넣은 결과다.
 
@@ -569,7 +571,88 @@ Checkpoint별로 20초를 채우지 못한 skill 수는 다음과 같다.
 - K=30 skill 25의 평균 평면속도는 0.0718 m/s로 매우 느림
 - 높은 q accuracy는 18D dynamic feature에서 구별된다는 뜻이지, 독립 gait의 개수가 아님
 
-### **9.2 K=10 전체 progression**
+### **9.2 발견된 두 skill을 반복 전환하면 한 방향으로 누적되는가?**
+
+최종 repertoire가 실제로 재사용될 수 있는지 보기 위해 $K=30$ model 1000을 고정하고, policy update 없이 skill ID만 바꾸는 후속 실험을 했다. 먼저 서로 다른 두 skill의 ordered pair $30\times29=870$개를 모두 확인했다. 각 pair는 첫 skill 2초, 두 번째 skill 2초를 한 cycle로 두고 20초 동안 반복했다. 그중 직선성을 우선해 `z22 -> z17`을 최종 비교 대상으로 고정했다.
+
+```text
+K=30 model 1000 frozen
+
+z22 2초 -> z17 2초
+-> 같은 순서를 5 cycle 반복
+
+policy update 없음
+action blending 없음
+goal direction command 없음
+```
+
+최종 비교에서는 `z22` 고정, `z17` 고정, `z22 ↔ z17` 반복을 같은 초기조건에서 정확히 1000 policy transition, 20.00초 동안 동시에 실행했다. Skill을 바꾸는 순간 one-hot 입력을 교체하고 observation을 다시 계산해 다음 policy inference부터 새 skill이 보이게 했다.
+
+반복 schedule은 다음과 같다.
+
+$$
+z(t)=
+\begin{cases}
+22, & 4k \le t < 4k+2 \\
+17, & 4k+2 \le t < 4k+4
+\end{cases}
+$$
+
+$$
+k=0,\ldots,4
+$$
+
+이 실험은 world $+x$를 목표로 두지 않았다. 각 rollout의 시작점 $p_0$와 끝점 $p_T$를 잇는 방향을 사후 기준선으로 정의했다.
+
+$$
+u=\frac{p_T-p_0}{\lVert p_T-p_0\rVert},
+\qquad
+D=\lVert p_T-p_0\rVert
+$$
+
+$$
+L=\sum_t \lVert p_{t+1}-p_t\rVert,
+\qquad
+\eta=\frac{D}{L}
+$$
+
+기준선의 수직 방향을 $u_\perp$라 하면 cross-track error는 다음과 같다.
+
+$$
+e_t=u_\perp^\top(p_t-p_0),
+$$
+
+$$
+e_{\mathrm{RMS}}=\sqrt{\frac{1}{N}\sum_t e_t^2}
+$$
+
+$$
+e_{\max}=\max_t |e_t|
+$$
+
+<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/15-z22-z17-periodic-composition.gif"
+     alt="고정 z22와 고정 z17은 각각 곡선으로 이동하지만 두 skill을 2초씩 반복한 Go2는 대각선 직선에 가까운 trajectory를 만드는 비교"
+     width="960" height="180"
+     class="d-block mx-auto"
+     style="width: 100%; border-radius: 6px;">
+
+*왼쪽은 z22 고정, 가운데는 z17 고정, 오른쪽은 z22와 z17을 2초씩 반복한 결과다. 우측 아래 WORLD XY는 같은 20초 rollout의 누적 trajectory다. [원본 크기로 열기](https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/15-z22-z17-periodic-composition.gif)*
+
+| 실행 | 순이동 $D$ | Path efficiency $\eta$ | RMS cross-track | 최대 cross-track | 최저 높이 | 중도 종료 |
+|---|---:|---:|---:|---:|---:|---:|
+| `z22` 고정 | 7.050 m | 0.8964 | 1.059 m | 1.447 m | 0.3139 m | 0 |
+| `z17` 고정 | 7.683 m | 0.8808 | 1.275 m | 1.763 m | 0.3154 m | 0 |
+| `z22 ↔ z17` 반복 | **8.280 m** | **0.9917** | **0.037 m** | **0.073 m** | 0.3098 m | 0 |
+
+반복 조합의 최종 displacement는 $(-3.853,+7.329)$ m, world bearing은 약 $117.7^\circ$였다. RMS와 최대 cross-track은 순이동 거리의 각각 0.45%, 0.89%였다. 다섯 cycle의 기준선 방향 진행량도 1.710, 1.651, 1.637, 1.644, 1.638 m로 모두 양수였고, 변동계수는 1.67%였다. 한 cycle만 우연히 멀리 간 것이 아니라 같은 방향의 이동이 다섯 번 누적된 것이다.
+
+이 결과가 뜻하는 범위는 제한적이다.
+
+> **이 checkpoint의 `z22`와 `z17`은 특정 2초 주기로 연결했을 때, 추가 policy 학습 없이 거의 직선인 world-frame 이동을 만들었다.**
+
+Pair와 dwell은 전체 탐색 후 고른 값이며 이동축도 endpoint로 사후 정의했다. 따라서 임의의 skill 조합이 일반적으로 유효하다거나 목표 방향을 추종하는 controller를 얻었다고 말할 수는 없다. 중간 skill switch는 training 중 episode 내내 $z$를 고정했던 조건 밖의 입력이며, 최대 switch action jump도 L2 기준 2.301이었다. 또한 이 실험에는 dynamics model, MPC, online replanning이 없다. 학습된 model로 skill sequence를 계획하는 [DADS](/posts/dads-dynamics-aware-skill-discovery/)와 달리, 사람이 고른 고정 주기를 실행한 open-loop temporal composition이다.
+
+### **9.3 K=10 전체 progression**
 
 <details data-diayn-gif style="margin: 1rem 0;">
   <summary><strong>K=10 전체 180.4초 GIF 불러오기</strong> · 54.7 MB</summary>
@@ -582,7 +665,7 @@ Checkpoint별로 20초를 채우지 못한 skill 수는 다음과 같다.
 
 *Iteration 600, 650, …, 1000의 20.05초 source segment를 연결해 5 fps로 변환한 180.40초 clean deterministic GIF. [원본 크기로 열기](https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/09-k10-progression-600-1000.gif)*
 
-### **9.3 K=20 전체 progression**
+### **9.4 K=20 전체 progression**
 
 <details data-diayn-gif style="margin: 1rem 0;">
   <summary><strong>K=20 전체 180.4초 GIF 불러오기</strong> · 93.4 MB</summary>
@@ -595,7 +678,7 @@ Checkpoint별로 20초를 채우지 못한 skill 수는 다음과 같다.
 
 *Iteration 600→1000, 50 iteration 간격, checkpoint당 20.05초. 초기 overlap, 650 collapse, 750 이후 recovery를 같은 skill layout으로 비교할 수 있다. [원본 크기로 열기](https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/10-k20-progression-600-1000.gif)*
 
-### **9.4 K=30 전체 progression**
+### **9.5 K=30 전체 progression**
 
 <details data-diayn-gif style="margin: 1rem 0;">
   <summary><strong>K=30 전체 180.4초 GIF 불러오기</strong> · 113.5 MB</summary>
@@ -637,7 +720,7 @@ Reward를 직접 설계하지 않아도 feature를 고르는 순간 어떤 차�
 2. Skill이 물리적으로 안전한가?
 3. Skill이 downstream에서 쓸 만한가?
 
-33D arm은 1번을 거의 완벽히 만족했지만 locomotion은 없었다. Anchor arm은 2번을 개선했지만 일부 skill이 겹쳤다. 최종 dynamic arm도 일부 이동 mode는 얻었지만 3번의 downstream utility를 검증하지 않았다.
+33D arm은 1번을 거의 완벽히 만족했지만 locomotion은 없었다. Anchor arm은 2번을 개선했지만 일부 skill이 겹쳤다. 최종 dynamic arm에서는 한 pair의 open-loop 반복 전환 가능성까지 확인했지만, 전체 repertoire의 downstream utility를 검증한 것은 아니다.
 
 ### **10.3 안전장치는 terminal condition 하나로 끝나지 않는다**
 
@@ -681,6 +764,7 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 - 18D dynamic feature만 남기자 일부 locomotion-like behavior가 나타났다.
 - K=6 checkpoint를 K=10·20·30으로 확장한 run에서 overlap, collapse, recovery, 재분화를 관찰했다.
 - 4초 평가는 K=30 model 800의 10.12초 지연 실패를 놓쳤고, checkpoint당 20초 기록이 필요했다.
+- Frozen K=30 policy에서 `z22`와 `z17`을 2초씩 반복하자, 한 clean 20초 rollout에서 8.280 m의 거의 직선인 이동이 다섯 cycle에 걸쳐 누적됐다.
 
 ### **말할 수 없는 것**
 
@@ -688,6 +772,8 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 - K=30에서 30개의 독립 gait를 발견했다.
 - K가 클수록 skill quality가 단조롭게 좋아진다.
 - 높은 discriminator accuracy가 semantic usefulness를 보장한다.
+- 임의의 두 skill을 반복하면 항상 새로운 유용한 이동이 만들어진다.
+- 목표 방향을 입력받아 경로를 선택하는 goal-reaching controller를 얻었다.
 - Simulation 결과가 실물 Go2의 안전성을 보장한다.
 
 ### **실험의 한계**
@@ -699,7 +785,7 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 - Training은 upstream observation noise·friction randomization·push 설정을 상속했다.
 - Pretrained motor prior에서 시작했으므로 locomotion capability가 이미 존재했다.
 - 18D feature에도 joint velocity가 있어 joint-motion shortcut 가능성이 남아 있다.
-- Downstream goal reaching, skill composition, energy efficiency는 평가하지 않았다.
+- Skill 조합은 `z22`·`z17`, 2초 dwell, 한 clean 초기조건의 open-loop schedule만 평가했다. Goal reaching, adaptive high-level selection, energy efficiency, switch smoothness는 검증하지 않았다.
 - 현재 실험 checkout을 immutable public release로 정리하는 작업은 별도로 남아 있다.
 
 ---
@@ -712,6 +798,8 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 
 결정적인 변화는 reward 계수를 계속 키운 것이 아니라 **discriminator가 볼 수 있는 정보를 바꾼 것**이었다. Static channel을 제거하고 18D dynamic state만 남기자 일부 latent가 이동과 회전 mode로 분화했다. 이후 $K$를 늘리자 행동이 한 번 겹치고 크게 무너진 뒤 다시 갈라지는 과정도 관찰할 수 있었다.
 
+학습 후에는 발견된 `z22`와 `z17`을 고정 주기로 연결했다. 두 skill을 각각 계속 실행하면 곡선을 그렸지만, 2초씩 반복한 결과에는 curvature가 크게 줄며 한 대각선 방향의 이동이 누적됐다. 이는 repertoire 재사용 가능성의 한 사례이지, DIAYN이 조합 policy나 planner까지 학습했다는 뜻은 아니다.
+
 이번 실험의 결론은 “DIAYN으로 30가지 보행을 만들었다”가 아니다.
 
 > **기존 motor capability 위에서 DIAYN은 task reward 없이 행동을 분할할 수 있었다. 그러나 어떤 skill이 생기는지는 discriminator feature와 feasible action set이 결정했고, 다양성·안전성·유용성은 따로 측정해야 했다.**
@@ -720,9 +808,9 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 
 1. K=10·20·30을 각각 from-scratch multi-seed로 학습
 2. Dynamic feature 안에서도 base motion과 joint motion을 다시 ablation
-3. 발견한 repertoire로 downstream goal-reaching 또는 high-level skill selection 평가
+3. 더 많은 pair·dwell·초기조건에서 반복 조합을 검증하고, 목표 조건부 high-level selector로 확장
 
-DIAYN의 원리를 이해하기 위한 실험은 여기서 충분히 목적을 달성했다. 이제는 “더 오래 학습”보다 **발견된 skill이 실제로 재사용 가능한가**를 검증하는 편이 더 의미 있다.
+DIAYN의 원리를 이해하기 위한 실험은 여기서 충분히 목적을 달성했다. 한 pair에서는 재사용 가능성을 확인했으므로, 이제는 “더 오래 학습”보다 **이 사례를 다른 조합과 목표 조건으로 일반화할 수 있는가**를 검증하는 편이 더 의미 있다.
 
 ---
 
@@ -746,6 +834,19 @@ logs/rough_go2_diayn_physical_dynamic_chance_k{10,20,30}/
     trajectories.csv
     skill_trajectories.png
 ```
+
+반복 skill 조합 산출물:
+
+```text
+logs/rough_go2_diayn_physical_dynamic_chance_k30/
+  video_periodic_axis_free_line_model1000_clean_seed001_z22_z17_20s_3panel_minimal/
+    diayn_k30_z22_z17_periodic_line_3panel.mp4
+    trajectories_per_step.csv
+    switch_events.csv
+    recording_metadata.json
+```
+
+반복 조합은 50 Hz policy에서 정확히 1000 transition을 실행했다. `z22`와 `z17`은 각각 100 transition씩 유지했고, 200 transition의 cycle을 다섯 번 반복했다.
 
 20초 progression source는 iteration 600, 650, …, 1000의 9개 segment로 구성했다. 각 segment는 20.05초, 401 frame이고 원본 합본은 180.45초, 3609 frame이다. 게시용 전체 GIF는 5 fps·64색으로 변환해 각각 902 frame, 180.40초다.
 
