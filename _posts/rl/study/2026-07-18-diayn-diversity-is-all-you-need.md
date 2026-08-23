@@ -4,7 +4,7 @@ date: 2026-07-18 15:45:00 +0900
 last_modified_at: 2026-07-27 22:47:54 +0900
 categories: [RL, Study]
 tags: [diayn, unsupervised-reinforcement-learning, skill-discovery, mutual-information, soft-actor-critic, hierarchical-rl]
-description: DIAYN 논문의 정보이론 목적함수부터 discriminator 보상, SAC 구현, VIC와의 차이, 실험 결과와 로봇 적용 시 한계까지 정리한다.
+description: DIAYN의 정보이론 목적함수부터 discriminator 보상, SAC 구현, 실험 결과와 로봇 적용 시 한계까지 정리한다.
 math: true
 image:
   path: /assets/img/posts/rl/diayn/00-diayn-preview.png
@@ -12,6 +12,8 @@ image:
 ---
 
 ## **0. 전체 그림: 목표를 주지 않고 스킬을 배울 수 있을까?**
+
+> **직접 적용한 글:** [Unitree Go2에서 보행 보상 없이 skill이 분화하는지 확인한 구현·실패·K=30 확장 실험](/posts/diayn-unitree-go2-experiment/)
 
 일반적인 강화학습은 사람이 먼저 목표를 정한다.
 
