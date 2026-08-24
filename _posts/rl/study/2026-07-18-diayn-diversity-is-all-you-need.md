@@ -1,7 +1,7 @@
 ---
 title: "DIAYN: 보상 없이 다양한 스킬을 발견하는 방법"
 date: 2026-07-18 15:45:00 +0900
-last_modified_at: 2026-07-27 22:47:54 +0900
+last_modified_at: 2026-08-24 21:26:07 +0900
 categories: [RL, Study]
 tags: [diayn, unsupervised-reinforcement-learning, skill-discovery, mutual-information, soft-actor-critic, hierarchical-rl]
 description: DIAYN의 정보이론 목적함수부터 discriminator 보상, SAC 구현, 실험 결과와 로봇 적용 시 한계까지 정리한다.
@@ -33,6 +33,10 @@ Eysenbach et al.의 **Diversity Is All You Need, DIAYN**은 질문을 반대로 
 DIAYN은 외부 task reward 없이 latent skill $z$를 조건으로 받는 정책을 학습한다. 각 skill이 서로 다른 상태 분포를 만들도록 하고, 나중에 필요한 skill을 선택하거나 fine-tuning하거나 상위 정책이 조합하게 한다.
 
 > **현재 상태만 보고 어떤 skill이 실행되었는지 맞힐 수 있도록 정책을 학습하고, 그 분류 가능성을 intrinsic reward로 사용한다.**
+
+학습의 핵심은 작은 차이를 반복해서 증폭하는 자기강화 과정이다.
+
+> **탐색 중 생긴 skill별 작은 state 차이 -> discriminator가 발견 -> intrinsic reward로 강화 -> policy가 재현 -> 구별 가능한 skill로 발전**
 
 > **서로 다른 행동**과 **사람에게 유용한 행동**은 같은 말이 아니다.
 
@@ -147,19 +151,27 @@ DIAYN은 $p(z)$를 uniform으로 고정하여 이 sampling collapse를 차단한
 
 DIAYN은 "두 행동이 얼마나 다른가"를 사람이 만든 거리 함수로 정의하지 않는다. 대신 skill $Z$와 방문 상태 $S$ 사이의 mutual information을 사용한다.
 
+먼저 $H(\cdot)$는 **entropy**, 즉 어떤 값이 무엇인지 모르는 정도를 나타낸다. 가능한 답이 많고 어느 답인지 예측하기 어려울수록 entropy가 크고, 답을 거의 확실히 알수록 entropy가 작다.
+
 $$
 I(S;Z)
 =
 H(Z)-H(Z\mid S)
 $$
 
-두 entropy 항의 역할은 아래와 같다.
+이 식을 말로 그대로 옮기면 다음과 같다.
+
+> **상태가 알려주는 skill 정보량 = 상태를 보기 전 skill의 불확실성 - 상태를 본 뒤에도 남아 있는 skill의 불확실성**
+
+조금 더 직관적으로는 **상태로 구별 가능한 skill의 정도 = 설정된 전체 skill ID의 불확실성 - 상태를 보고도 구별되지 않는 부분**이라고 읽을 수 있다. 여기서 $H(Z)$는 실제로 학습된 행동의 폭이나 품질이 아니라, 사전에 정한 skill sampling distribution $p(z)$의 entropy다.
+
+각 항의 의미를 나누면 아래와 같다.
 
 | 항 | 의미 |
 |---|---|
-| $H(Z)$ | 전체 skill sampling distribution의 다양성 |
-| $H(Z\mid S)$ | 상태 $S$를 본 뒤에도 skill $Z$가 얼마나 불확실한가 |
-| $I(S;Z)$ | 상태를 보면 skill에 대해 얼마나 많은 정보를 얻는가 |
+| $H(Z)$ | 상태를 보기 전 skill ID가 무엇인지 모르는 정도 |
+| $H(Z\mid S)$ | 상태를 본 뒤에도 skill ID가 무엇인지 모르는 정도 |
+| $I(S;Z)$ | 상태를 보면서 줄어든 skill ID의 불확실성 |
 
 $H(Z)$는 uniform prior로 이미 최대가 된다.
 
@@ -167,7 +179,9 @@ $$
 H(Z)=\log K
 $$
 
-따라서 policy가 실제로 줄여야 하는 것은 $H(Z\mid S)$. 현재 상태만 보고도 어떤 skill인지 거의 확실히 맞힐 수 있어야 한다.
+따라서 policy가 실제로 줄여야 하는 것은 $H(Z\mid S)$. 현재 상태만 보고 어떤 skill인지 더 잘 맞힐 수 있을수록 DIAYN의 목적함수가 커진다.
+
+논문은 $S$를 state라고 쓰지만, 구현에서는 discriminator가 state 전체가 아니라 선택한 feature $f(s)$를 볼 수도 있다. 이 경우 직관적으로는 **discriminator에게 보여 준 observation에서 skill을 얼마나 구별할 수 있는가**라고 읽으면 된다. 엄밀히는 이때 최적화하는 정보량도 $I(S;Z)$가 아니라 $I(f(S);Z)$가 된다.
 
 ### **4.1 Mutual information이 큰 상태 분포**
 
@@ -193,7 +207,7 @@ z=3 -> 중앙
 
 ### **4.2 왜 action이 아니라 state로 구별하는가?**
 
-관절 torque만 다르고 실제 로봇이나 환경은 똑같이 움직이는 두 policy를 생각해보겠다. Action은 다르지만 외부에서 관찰 가능한 결과는 같다.
+서로 다른 action을 냈지만 벽에 막혀 agent의 위치가 똑같이 남는 두 policy를 생각해보겠다. Action은 다르지만 환경에서 관찰할 수 있는 결과 state는 같다.
 
 DIAYN은 이런 차이를 의미 있는 skill diversity로 보지 않는다. 그래서 skill은 action 자체가 아니라 **그 action이 만든 state**를 통해 구별되어야 한다.
 
@@ -205,7 +219,19 @@ $$
 
 같은 상태에서 skill마다 action만 달라지는 것을 목적에서 제거하려는 항이다.
 
+이 항을 구현에서 별도의 penalty로 직접 계산하는 것은 아니다. 전체 목적함수를 전개하면 $H(A\mid S,Z)$로 정리되고, 실제 학습에서는 skill-conditioned policy의 entropy로 처리한다.
+
 ## **5. 전체 목적함수는 왜 이런 모양인가?**
+
+수식 전개를 보기 전에 목적부터 말로 쓰면 다음과 같다.
+
+> **DIAYN의 학습 목표 = 상태로 skill을 구별할 수 있는 정도 + 각 skill 안에서 행동 선택 분포가 퍼져 있는 정도**
+
+$$
+I(S;Z)+H(A\mid S,Z)
+$$
+
+첫 번째 항은 skill마다 구별되는 state distribution을 만들도록 하고, 두 번째 항은 같은 상태와 같은 skill에서 policy가 항상 하나의 action만 고르지 않도록 한다.
 
 논문은 아래 목적함수에서 출발한다.
 
@@ -233,13 +259,13 @@ $$
 
 | 목적함수 항 | 학습에서 하는 일 |
 |---|---|
-| $H(Z)$ | 다양한 skill이 sampling되게 함. DIAYN에서는 uniform prior로 고정 |
+| $H(Z)$ | Uniform $p(z)$로 최대값 $\log K$에 고정하여 모든 skill에 같은 sampling 기회를 줌 |
 | $-H(Z\mid S)$ | 상태에서 skill ID를 쉽게 맞히도록 함 |
 | $H(A\mid S,Z)$ | 각 skill 내부의 policy entropy를 높여 탐색을 유지 |
 
 ### **5.1 단순히 분류만 잘되면 충분하지 않은 이유**
 
-Entropy 항이 없다면 두 skill이 아주 미세한 차이만 만들어도 discriminator가 구별할 수 있다. 예를 들어 서로 다른 관절 하나를 작은 각도로 유지하는 것만으로 label을 맞힐 수 있을지도 모른다.
+Entropy 항이 없다면 두 skill이 아주 미세한 차이만 만들어도 discriminator가 구별할 수 있다. 예를 들어 한 skill은 2D 좌표의 $x=-0.01$, 다른 skill은 $x=0.01$을 정확히 유지하는 것만으로 label을 맞힐 수 있을지도 모른다.
 
 DIAYN은 각 skill 안에서도 action entropy를 높인다.
 
@@ -247,13 +273,42 @@ $$
 H(A\mid S,Z)
 $$
 
-정책이 어느 정도 무작위로 행동하는데도 skill identity가 유지되려면, 다른 skill과 겹치지 않는 더 넓고 안정적인 상태 영역을 찾아야 한다. 논문 저자들은 이를 단순 discriminability보다 더 넓은 diversity를 만드는 장치로 해석한다.
+이 식을 말로 옮기면 다음과 같다.
 
-다만 entropy를 무조건 크게 한다고 좋은 것은 아니다. Appendix 실험에서는 entropy coefficient가 너무 크면 action randomness 때문에 오히려 skill을 구별하기 어려워진다. 논문은 모든 실험에 $\alpha=0.1$을 사용했다.
+> **Action entropy = 같은 상태와 같은 skill이 주어졌을 때, policy의 행동 선택 분포가 얼마나 넓게 퍼져 있는가**
 
-## **6. 계산할 수 없는 posterior를 discriminator로 근사하기**
+- Entropy가 낮으면 거의 항상 같은 action을 고른다.
+- Entropy가 높으면 여러 action에 확률을 나누어 둔다.
 
-문제는 실제 posterior $p(z\mid s)$를 모른다는 것. 특정 상태가 어떤 skill에서 나왔을 확률을 환경 전체에 대해 정확히 계산하기 어렵다.
+Action entropy가 skill 사이의 거리나 이동 거리를 직접 키우는 것은 아니다. 기억하기 쉽게 표현하면 **skill 사이의 거리를 키우는 항이 아니라, 각 skill의 행동 선택 분포에 두께를 주는 항**에 가깝다.
+
+```text
+Action entropy
+-> 같은 skill 안에서도 action이 어느 정도 달라짐
+
+Discriminability
+-> 그래도 state만 보면 어떤 skill인지 알아볼 수 있어야 함
+```
+
+두 조건을 함께 만족하려면 action의 무작위성에도 skill identity가 사라지지 않는 state distribution을 찾도록 압력을 받는다. 그 결과 skill별 state distribution의 겹침이 줄고 구별 여유가 커질 수 있다. 다만 action의 변화가 state에 거의 영향을 주지 않거나 중요하지 않은 차원에서만 나타난다면, 더 넓은 state 탐색으로 이어진다는 보장은 없다.
+
+또 entropy를 무조건 크게 한다고 좋은 것은 아니다. 이론식에서는 coefficient를 생략했지만, 실제 SAC 구현에서는 이 항을 $\alpha H(A\mid S,Z)$로 조절한다. Appendix 실험에서는 $\alpha$가 너무 크면 action randomness 때문에 오히려 skill을 구별하기 어려워졌고, 논문은 모든 실험에 $\alpha=0.1$을 사용했다.
+
+## **6. 상태만 보고 skill을 맞히는 discriminator**
+
+6절의 작동 원리는 먼저 아래 흐름으로 이해할 수 있다.
+
+```text
+1. skill z를 뽑는다.
+2. policy가 action을 출력한다.
+3. environment가 next state를 만든다.
+4. discriminator는 state만 본다.
+5. discriminator가 skill ID를 예측한다.
+```
+
+여기서 실제 실행한 $z$는 알고리즘이 직접 뽑았으므로 정답 label을 이미 알고 있다. $z$는 discriminator의 입력에는 넣지 않고, 예측값과 비교해 loss를 계산할 때만 정답으로 사용한다.
+
+Posterior $p(z\mid s)$는 **state $s$를 본 뒤, 이 state를 만든 skill이 $z$일 확률**이다. 이것을 정확히 계산하려면 모든 skill이 환경 전체에서 어떤 state를 얼마나 자주 방문하는지 알아야 한다. 고차원 연속 환경에서는 그 분포를 정확히 계산하기 어렵다.
 
 DIAYN은 이를 discriminator로 근사한다.
 
@@ -267,10 +322,10 @@ Discriminator는 상태를 입력받고 skill ID에 대한 categorical probabili
 
 ```text
 input:  state feature f(s)
-output: [P(z=0|s), P(z=1|s), ..., P(z=K-1|s)]
+output: K개 skill ID의 probability
 ```
 
-실제 실행한 $z$를 이미 알고 있으므로 discriminator 학습은 일반적인 supervised classification.
+예를 들어 실제로 $z=2$를 실행했다면 출력 벡터의 $z=2$ 확률을 높이도록 학습한다. 따라서 discriminator 학습 형식은 일반적인 supervised classification이다.
 
 $$
 \mathcal{L}_{D}(\phi)
@@ -281,9 +336,29 @@ $$
 \right]
 $$
 
-Variational lower bound를 사용하면 원래 목적함수는 다음과 같이 최적화할 수 있다.
+형식상 정답 label을 사용하는 분류지만, $z$는 사람이 "왼쪽 이동"처럼 행동 의미를 붙인 label이 아니다. 알고리즘이 무작위로 뽑은 번호를 자동 정답으로 사용하므로 외부 task supervision은 없다.
+
+처음 읽을 때 lower bound를 직접 유도할 필요는 없다. 핵심은 **계산할 수 없는 진짜 posterior 대신 학습 가능한 discriminator의 확률을 사용한다**는 것이다. $q_\phi(z\mid s)$가 실제 posterior $p(z\mid s)$와 같아질수록 계산 가능한 목적도 원래 mutual information 목적에 가까워진다.
+
+<details>
+<summary>왜 variational lower bound가 되는지 수식으로 보기</summary>
+
+원래 mutual information에는 계산할 수 없는 $p(z\mid s)$가 들어간다.
 
 $$
+I(S;Z)
+=
+\mathbb{E}_{s,z}
+\left[
+\log p(z\mid s)-\log p(z)
+\right]
+$$
+
+이를 학습 가능한 $q_\phi(z\mid s)$로 바꾸면 다음 variational lower bound를 얻는다.
+
+$$
+\mathcal{F}(\theta)
+\ge
 \mathcal{G}(\theta,\phi)
 =
 \mathbb{E}_{z\sim p(z),\,s\sim\pi_z}
@@ -293,17 +368,62 @@ $$
 +H(A\mid S,Z)
 $$
 
+두 식의 차이는 $p(z\mid s)$와 $q_\phi(z\mid s)$ 사이의 KL divergence이며 항상 0 이상이다. 두 분포가 같아지면 lower bound의 간격도 사라진다.
+
+</details>
+
 첫 번째 기댓값은 RL reward로, 마지막 entropy 항은 maximum-entropy RL로 처리할 수 있다.
+
+### **6.1 Discriminator와 policy에는 gradient가 어떻게 전달되는가?**
+
+두 network의 학습 경로는 분리되어 있다.
+
+```text
+Discriminator
+(state, 정답 z) -> cross-entropy -> phi에 직접 backpropagation
+
+Policy
+discriminator 확률 -> scalar intrinsic reward -> SAC -> theta 업데이트
+```
+
+Discriminator는 정답 $z$로 classification loss를 계산해 직접 backpropagation한다. Policy는 discriminator의 gradient를 직접 받지 않고, $\log q_\phi(z\mid s)-\log p(z)$를 scalar reward로 받은 뒤 actor-critic 학습을 통해 간접적으로 업데이트된다.
+
+즉 아래 전체 경로를 하나의 신경망처럼 미분하지 않는다.
+
+```text
+Policy -> environment -> next state -> Discriminator
+```
+
+Environment를 가로질러 discriminator에서 policy로 직접 gradient를 보내지 않는다. 두 모델은 **discriminator가 만든 reward**를 사이에 두고 함께 학습된다. Discriminator 입력에 정답 $z$ 자체를 넣으면 state를 보지 않고 답을 맞힐 수 있으므로, $z$는 policy와 critic에는 들어가지만 discriminator에는 들어가면 안 된다.
 
 ## **7. Intrinsic reward의 의미**
 
-DIAYN의 pseudo-reward는
+DIAYN의 intrinsic reward는 discriminator가 정답 skill에 준 확률을 점수로 바꾼 것이다.
 
 $$
 r_z(s)
 =
 \log q_\phi(z\mid s)-\log p(z)
 $$
+
+이 차이 형태를 그대로 말로 읽으면 다음과 같다.
+
+> **내재 보상 = state를 본 뒤 정답 skill에 준 로그확률 - state를 보기 전 그 skill이 선택될 로그확률**
+
+로그의 차이는 로그 비율과 같다.
+
+$$
+r_z(s)
+=
+\log
+\frac{q_\phi(z\mid s)}{p(z)}
+$$
+
+이 식을 말로 옮기면 다음과 같다.
+
+> **Intrinsic reward = state를 보기 전의 기준 확률에 비해, state를 본 뒤 discriminator가 정답 skill에 준 확률이 몇 배가 되었는지의 로그값**
+
+$q_\phi(z\mid s)$에서 사용하는 $z$는 discriminator가 가장 높게 예측한 label이 아니라, **실제로 실행한 정답 skill**이다. 따라서 맞음·틀림을 0과 1로 채점하는 것이 아니라 정답 skill에 준 확률로 연속적인 점수를 만든다.
 
 논문의 실제 알고리즘에서는 transition 뒤의 상태를 사용한다.
 
@@ -313,6 +433,8 @@ r_t
 \log q_\phi(z\mid s_{t+1})
 -\log p(z)
 $$
+
+현재 action의 결과가 $s_{t+1}$에 나타나므로, 그 다음 state를 보고 방금 행동의 점수를 매긴다.
 
 Uniform prior에서는
 
@@ -329,7 +451,21 @@ $$
 r_{\max}=\log K
 $$
 
-반면 정답 skill의 확률이 0에 가까워지면 reward는 큰 음수가 될 수 있다. 구현에서는 `softmax` 후 `log`를 따로 계산하기보다 `log_softmax`를 사용해야 수치적으로 안전하다.
+$K=10$이면 state를 보기 전 각 skill의 기준 확률은 $10\%$다.
+
+| 정답 skill에 준 확률 $q_\phi(z\mid s)$ | 해석 | Reward |
+|---:|---|---:|
+| $10\%$ | 무작위 추측과 같음 | $\log 1=0$ |
+| $80\%$ | 정답 가능성이 기준보다 8배 높아짐 | $\log 8\approx2.08$ |
+| $2\%$ | 정답 가능성이 기준의 0.2배로 낮아짐 | $\log 0.2\approx-1.61$ |
+| $100\%$ | 완벽한 확신 | $\log 10\approx2.30$ |
+
+반면 정답 skill의 확률이 0에 가까워지면 reward는 큰 음수가 될 수 있다.
+
+<details>
+<summary>구현에서 reward를 안정적으로 계산하는 코드</summary>
+
+`softmax` 후 `log`를 따로 계산하기보다 `log_softmax`를 사용해야 수치적으로 안전하다.
 
 ```python
 log_probs = torch.log_softmax(discriminator(skill_obs), dim=-1)
@@ -338,9 +474,17 @@ log_p = -math.log(num_skills)
 reward = log_q - log_p
 ```
 
+</details>
+
 ### **7.1 이 보상은 절대평가가 아니라 상대평가다**
 
-Discriminator가 완벽해서 $q_\phi(z\mid s)=p(z\mid s)$라고 가정하면 Bayes rule로 다음을 얻는다.
+이 reward는 특정 state 자체에 고정된 점수를 주지 않는다.
+
+> **내 skill은 자주 방문하지만 다른 skill은 잘 방문하지 않는 상태일수록 reward가 높다.**
+
+어떤 상태를 한 skill만 반복해서 방문한다면 그 상태는 skill을 구별하는 강한 단서가 된다. 하지만 다른 skill도 같은 상태를 방문하기 시작하면 더 이상 좋은 구별 근거가 아니므로 reward가 내려간다.
+
+Discriminator가 완벽해서 $q_\phi(z\mid s)=p(z\mid s)$라고 가정하면 이 상대평가를 Bayes rule로 표현할 수 있다.
 
 $$
 \begin{aligned}
@@ -353,17 +497,13 @@ $$
 - $p(s\mid z)$: 이 skill이 해당 상태를 얼마나 자주 방문하는가
 - $p(s)$: 모든 skill을 섞었을 때 해당 상태가 얼마나 흔한가
 
-높은 reward는 아래 조건을 만족하는 상태에서 생긴다.
-
-> **내 skill은 자주 방문하지만 다른 skill은 잘 방문하지 않는 상태**
-
-일반 task reward와 가장 다른 지점. 전진 reward는 다른 policy가 무엇을 하든 전진하면 높다. DIAYN reward는 다른 skill도 같은 상태를 방문하기 시작하면 낮아질 수 있다.
+이것이 일반 task reward와 가장 다른 지점이다. 특정 위치로 이동하는 task reward는 다른 policy가 무엇을 하든 목표에 가까워지면 높다. DIAYN reward는 다른 skill도 같은 상태를 방문하기 시작하면 낮아질 수 있다.
 
 ### **7.2 왜 $-\log p(z)$를 남겨두는가?**
 
-$p(z)$가 고정되어 있으므로 $-\log p(z)$는 policy gradient 관점에서 baseline처럼 보인다. 그래도 논문은 이 항을 reward에 남긴다.
+$p(z)$가 고정되어 있으므로 고정 길이 episode만 생각하면 $-\log p(z)$는 policy gradient 관점에서 상수처럼 보인다. 하지만 episode 길이나 termination이 달라질 수 있으면 누적 보상과 생존 유인에 영향을 준다. 논문은 이 항을 reward에 남긴다.
 
-Appendix의 설명은 두 가진다.
+Appendix의 설명은 두 가지다.
 
 1. Skill을 구별할 수 없는 absorbing state에서는 $q(z\mid s)=1/K$가 되므로 uniform prior일 때 reward가 0이 된다.
 2. 이 baseline이 없으면 모든 log probability가 음수이므로 agent가 episode를 빨리 끝내는 행동을 선호할 수 있다.
@@ -372,7 +512,7 @@ Appendix의 설명은 두 가진다.
 
 ### **7.3 같은 transition의 reward가 바뀔 수 있는가?**
 
-가능하다. Reward를 만드는 $q_\phi$ 자체가 학습 중이기 때문.
+같은 transition을 **현재 discriminator로 다시 채점하면** reward가 바뀔 수 있다. Reward를 만드는 $q_\phi$ 자체가 학습 중이기 때문이다. 이미 replay buffer에 scalar reward를 저장했다면 그 저장값이 저절로 바뀐다는 뜻은 아니다.
 
 ```text
 같은 (s', z=3)
@@ -384,14 +524,23 @@ Appendix의 설명은 두 가진다.
 
 따라서 DIAYN은 고정된 reward function을 사용하는 task RL보다 non-stationarity가 강하다.
 
+<details>
+<summary>재구현 메모: replay reward를 저장할지 다시 계산할지</summary>
+
 Off-policy replay에서 구현 선택은 두 가지.
 
 | 방식 | 장점 | 위험 |
 |---|---|---|
-| 수집 시 reward 저장 | TD target 안정 | 과거 $q_\phi$ 기준으로 남음 |
-| Batch에서 reward 재계산 | 최신 $q_\phi$와 일관 | Critic target이 움직임 |
+| 수집 시 reward 저장 | 같은 sample의 reward 항이 고정 | 과거 $q_\phi$ 기준으로 남음 |
+| Batch에서 reward 재계산 | 최신 $q_\phi$와 일관 | 같은 sample의 reward 항도 계속 변함 |
 
 이 비교는 원 논문의 핵심 실험 항목은 아니며, 실제 재구현에서 생기는 설계 문제다. 따라서 어떤 방식이 "원래 DIAYN의 정답"이라고 단정하면 안 된다.
+
+</details>
+
+4절부터 7절까지를 한 문장으로 연결하면 다음과 같다.
+
+> **State에서의 skill posterior를 discriminator로 근사하고, $\log q_\phi(z\mid s)-\log p(z)$라는 sample별 정보 점수를 intrinsic reward로 바꿔 policy를 학습한다.**
 
 ## **8. 알고리즘 전체 흐름**
 
@@ -702,18 +851,7 @@ $$
 
 ### **9.2 Actor가 discriminator까지 직접 미분하는가?**
 
-일반적인 model-free DIAYN에서는 그렇지 않다.
-
-```text
-Actor
--> non-differentiable environment transition
--> next state
--> Discriminator
-```
-
-이 전체 경로로 gradient를 보내는 것이 아니다. Discriminator 출력은 scalar reward가 되고, critic이 return을 학습하며, actor는 critic을 통해 간접적으로 업데이트된다.
-
-Discriminator는 별도의 classification loss로 업데이트한다. 구현 시 critic loss가 discriminator parameter까지 의도치 않게 흘러가지 않도록 reward 계산 경계를 명확히 해야 한다.
+일반적인 model-free DIAYN에서는 그렇지 않다. 6.1절에서 본 것처럼 discriminator는 classification loss로 직접 학습되고, actor는 discriminator가 만든 scalar reward를 critic을 통해 간접적으로 전달받는다. 구현 시 critic loss가 discriminator parameter까지 의도치 않게 흐르지 않도록 reward 계산 경계를 분리해야 한다.
 
 ## **10. 일반 SAC와 DIAYN의 구현 차이**
 
@@ -779,6 +917,27 @@ $$
 $d_{\pi_z}(s)$는 skill $z$의 state visitation distribution. Replay buffer에는 모든 skill의 transition이 섞여 있고, discriminator는 이 mixture에서 각 sample의 label을 구별한다.
 
 Uniform prior는 이 mixture의 label balance를 유지한다. 동시에 skill 수 $K$가 커질수록 skill 하나가 받는 데이터는 대략 $1/K$로 줄어든다. 따라서 $K$는 data budget, network capacity, discriminator difficulty와 함께 결정해야 한다.
+
+### **10.3 작은 차이가 skill로 굳는 과정**
+
+학습 초기의 각 $z$에는 "앞으로 이동"이나 "회전" 같은 의미가 붙어 있지 않다. 하지만 random initialization과 stochastic action exploration 때문에 각 $z$가 방문하는 state distribution에 작은 차이가 생길 수 있다.
+
+이런 자기강화 피드백이 형성되면 작은 차이가 증폭될 수 있다.
+
+```text
+skill z 선택
+-> z마다 조금 다른 state가 발생
+-> discriminator가 반복되는 차이를 발견
+-> 정답 z의 확률과 reward가 높아질 수 있음
+-> policy가 그 state를 더 자주 재현
+-> 반복 가능한 skill로 굳어질 수 있음
+```
+
+여기서 randomness는 외부 sensor noise를 반드시 추가한다는 뜻이 아니다. 초기 network와 stochastic policy가 action을 탐색하는 과정에서 생기는 차이를 말한다. 한 번 생겼다가 사라지는 우연한 변화 자체가 곧 skill이 되는 것도 아니다. 같은 $z$에서 반복적으로 나타나 discriminator가 배울 수 있고, policy가 다시 만들어낼 수 있는 state 차이여야 이 feedback을 통해 강화된다.
+
+> **탐색 중 생긴 작은 state 차이 -> discriminator가 발견 -> reward로 강화 -> policy가 재현 -> 구별 가능한 skill로 발전**
+
+다음 절의 행동들은 사람이 미리 이름과 목표를 지정한 결과가 아니다. 학습이 끝난 뒤 나타난 행동을 사람이 관찰하고 "달리기", "뒤집기", "회전"처럼 이름을 붙인 것이다.
 
 ## **11. 논문에서 실제로 발견한 skill**
 
