@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-24 11:02:00 +0900
+last_modified_at: 2026-08-24 17:48:39 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
@@ -909,6 +909,12 @@ Roll treatment에서 몸체가 더 수평이 되고 yaw 다양성도 줄었으�
 - 높은 discriminator 정확도는 두 경우 모두 가능하므로, 그 값만으로 locomotion skill discovery를 판정하면 안 된다.
 
 결국 safety constraint와 behavior objective는 서로 대체할 수 없다. 이동 skill을 원한다면 안전 범위만 좁히는 것으로 끝내지 말고, discriminator feature를 base displacement·velocity처럼 task-space motion에 더 직접적으로 묶거나, locomotion quality를 별도 평가·선택 단계에서 다뤄야 한다.
+
+### **13.4 이 조건에서는 지속 보행 skill이 나오지 않았다**
+
+후속 실험을 한 문장으로 정리하면, **몸체 높이 0.28 m 하한을 유지하고 절대 roll $5^\circ$ 초과를 억제하자 자세는 안정됐지만, 지속적으로 걷는 skill은 확인되지 않았다.** 대부분의 latent는 원점 주변에서 서서 작은 다리 운동만 만들었다.
+
+안전 제약은 낮은 자세와 큰 기울기를 제거했지만, 남은 행동 중 locomotion을 선택하는 학습 신호를 대신하지는 못했다. 같은 조건을 더 오래 학습하거나 이동 gate를 계속 추가하면 DIAYN의 원리를 확인하는 실험보다 별도의 locomotion objective를 설계하는 문제가 된다. 따라서 DIAYN 실험은 여기서 멈추고, 다음 비교는 단일 상태의 구별 가능성보다 transition representation과 탐색 범위를 직접 다루는 [CIC](/posts/cic-contrastive-intrinsic-control/)로 넘긴다.
 
 ---
 
