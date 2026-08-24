@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-24 18:34:29 +0900
+last_modified_at: 2026-08-24 18:50:36 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
@@ -530,7 +530,7 @@ Checkpoint별로 20초를 채우지 못한 skill 수는 다음과 같다.
 
 다만 회복은 단조롭지 않았다. K=30 model 750은 모두 20초를 채웠지만 model 800의 skill 3은 10.12초에 low-height termination됐다. 이전 4초 영상에서는 보이지 않던 지연 실패였다.
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/08-k30-delayed-termination.gif"
+<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/08-k30-delayed-termination-muted.gif"
      alt="K=30 iteration 800 skill 3이 10.12초에 low-height termination되는 지연 실패"
      width="640" height="360"
      class="d-block mx-auto"
