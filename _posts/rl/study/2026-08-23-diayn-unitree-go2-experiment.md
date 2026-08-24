@@ -1,10 +1,10 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-23 20:31:22 +0900
+last_modified_at: 2026-08-24 11:02:00 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
-description: "DIAYN을 Unitree Go2 시뮬레이션에 적용해 자세 shortcut, 안전 제약, 관측 ablation, K=10·20·30 확장과 frozen skill 반복 전환에서 확인한 결과와 한계를 정리한다."
+description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
 math: true
 image:
   path: https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/00-preview.png
@@ -814,7 +814,105 @@ DIAYN의 원리를 이해하기 위한 실험은 여기서 충분히 목적을 �
 
 ---
 
-## **13. 재현 메모와 참고 자료**
+## **13. 후속 실험: 높이와 roll을 함께 억제하면 무엇이 남는가?**
+
+앞의 $K=10,20,30$ 실험은 $K=6$ model 600에서 skill 입력을 확장한 run이었다. 그 뒤에는 기존 $K=6$ skill을 물려받지 않고, 각 $K$를 iteration 0부터 다시 만드는 matched experiment를 추가했다. 여기서 **처음부터**라는 말은 locomotion motor prior까지 버렸다는 뜻이 아니라, $K=6$ DIAYN checkpoint에서 확장하지 않았다는 뜻이다.
+
+질문은 다음과 같았다.
+
+> **몸체를 낮추거나 옆으로 기울이는 쉬운 shortcut을 동시에 막으면, 더 뚜렷한 이동 skill이 남을까?**
+
+두 arm은 같은 height-safe schedule을 사용했다. Treatment에서만 roll 항을 추가했다.
+
+| 구분 | Height-only control | Height + roll treatment |
+|---|---|---|
+| Skill 수 | $K=10,20,30$ | $K=10,20,30$ |
+| DIAYN 시작 | 각 $K$를 iteration 0부터 학습 | control과 동일 |
+| Height floor | 0.28 m | 0.28 m |
+| Roll regularization | 없음 | `roll_square=-20` + skill별 chance constraint |
+| Roll 기준 | 없음 | 절대 roll $5^\circ$ 초과 tail 감시 |
+| Pitch·yaw 직접 제약 | 없음 | 없음 |
+| Schedule | 0–500 support, 500–700 crossfade, 700–1000 pure DIAYN | control과 동일 |
+| 최종 평가 | clean deterministic, skill당 5 episode, episode당 20초 | control과 동일 |
+
+### **13.1 자세 제약은 성공했지만 이동 분화는 약해졌다**
+
+Iteration 1000의 결과는 명확했다. 모든 arm이 중도 종료 없이 20초를 채웠고, 0.28 m 아래로 내려간 sample도 없었다. Roll treatment는 평균 절대 roll을 74.6–82.9% 줄였고, $5^\circ$ 초과 sample을 세 $K$에서 모두 0으로 만들었다.
+
+| $K$ | Episode/arm | 최저 높이 control→treatment | 평균 절대 roll | RMS roll | $5^\circ$ 초과 비율 | Skill endpoint spread | Yaw spread | $q(z\mid s)$ 정확도 |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10 | 50 | 0.301→0.317 m | 2.306→0.586° | 3.032→0.800° | 11.1→0% | 3.08→4.03 cm | 0.276→0.242 rad | 99.80→99.86% |
+| 20 | 100 | 0.304→0.310 m | 4.028→0.687° | 4.799→0.797° | 33.8→0% | 4.35→2.16 cm | 0.410→0.247 rad | 89.64→99.51% |
+| 30 | 150 | 0.311→0.310 m | 3.331→0.660° | 4.456→0.815° | 23.6→0% | 3.24→3.39 cm | 0.365→0.187 rad | 89.51→99.38% |
+
+그러나 영상에서 더 중요한 결과는 다른 곳에 있었다.
+
+> **로봇은 안전하고 수평에 가까웠지만, 대부분의 skill이 제자리에서 작은 관절 운동만 만들었다.**
+
+Skill별 평균 endpoint는 원점 주변 수 cm에 모였다. Discriminator 정확도는 높았지만, 앞 실험의 지속적인 곡선 이동이나 8 m 반복 조합과 같은 locomotion repertoire는 나타나지 않았다. 특히 roll treatment는 K=20·30에서 yaw spread까지 줄였다.
+
+### **13.2 모든 skill을 영상으로 비교하기**
+
+각 GIF의 위쪽은 height-only control, 아래쪽은 height+roll treatment다. 같은 행의 칸은 같은 skill ID이며, 모든 skill을 20초 동안 그대로 표시했다.
+
+<details data-diayn-gif style="margin: 1rem 0;">
+  <summary><strong>K=10 전체 비교 GIF 불러오기</strong> · 1.5 MB</summary>
+  <img data-src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k10-height-roll-paired.gif"
+       alt="K=10에서 height-only control과 height plus roll treatment의 모든 Unitree Go2 skill을 위아래로 비교한 20초 영상"
+       width="960" height="812"
+       class="d-block mx-auto"
+       style="width: 100%; border-radius: 6px; margin-top: 1rem;">
+</details>
+
+<details data-diayn-gif style="margin: 1rem 0;">
+  <summary><strong>K=20 전체 비교 GIF 불러오기</strong> · 2.2 MB</summary>
+  <img data-src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k20-height-roll-paired.gif"
+       alt="K=20에서 height-only control과 height plus roll treatment의 모든 Unitree Go2 skill을 위아래로 비교한 20초 영상"
+       width="960" height="864"
+       class="d-block mx-auto"
+       style="width: 100%; border-radius: 6px; margin-top: 1rem;">
+</details>
+
+<details data-diayn-gif style="margin: 1rem 0;">
+  <summary><strong>K=30 전체 비교 GIF 불러오기</strong> · 2.5 MB</summary>
+  <img data-src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k30-height-roll-paired.gif"
+       alt="K=30에서 height-only control과 height plus roll treatment의 모든 Unitree Go2 skill을 위아래로 비교한 20초 영상"
+       width="960" height="900"
+       class="d-block mx-auto"
+       style="width: 100%; border-radius: 6px; margin-top: 1rem;">
+</details>
+
+*위쪽 `CONTROL`은 높이 제약만 사용하고, 아래쪽 `ROLL-REG`는 같은 조건에 roll 제약을 추가했다. 세 영상 모두 model 1000, seed 1, clean deterministic 평가다.*
+
+### **13.3 “Roll을 막아서 서 있기만 했다”는 해석은 절반만 맞다**
+
+Roll treatment에서 몸체가 더 수평이 되고 yaw 다양성도 줄었으므로, roll 제약이 feasible behavior space를 좁힌 것은 맞다. 하지만 height-only control도 endpoint spread가 3–4 cm에 그쳤다. 따라서 **roll 제약 하나가 locomotion을 없앴다**고 말할 수는 없다.
+
+더 정확한 해석은 다음과 같다.
+
+```text
+높이 shortcut 차단
++ roll shortcut 차단
++ 초기 500 iteration의 안정화 support
++ 18D dynamic feature 안에 남은 joint-velocity 차이
+
+-> 넘어지지 않고 서서 작은 다리 운동을 만드는 상태가
+   여전히 가장 쉽고 구별 가능한 해법이 됨
+```
+
+이 결과는 안전장치를 늘리면 자동으로 더 좋은 보행 skill이 나온다는 기대와 반대다. 제약은 위험한 해를 제거하지만, 남은 해 중에서 **이동하는 해를 선택해 주지는 않는다**. DIAYN은 여전히 가장 싸게 구별되는 상태를 찾았고, 이번에는 그 상태가 낮은 자세나 큰 roll 대신 안정적인 제자리 동작이었다.
+
+앞의 확장 실험과 이 후속 실험을 함께 보면 trade-off가 더 분명해진다.
+
+- 제약이 약하면 이동·회전 diversity가 커지지만 낮은 자세와 큰 roll도 함께 열린다.
+- 높이와 roll을 강하게 관리하면 안전 지표는 좋아지지만 locomotion diversity가 사라질 수 있다.
+- 높은 discriminator 정확도는 두 경우 모두 가능하므로, 그 값만으로 locomotion skill discovery를 판정하면 안 된다.
+
+결국 safety constraint와 behavior objective는 서로 대체할 수 없다. 이동 skill을 원한다면 안전 범위만 좁히는 것으로 끝내지 말고, discriminator feature를 base displacement·velocity처럼 task-space motion에 더 직접적으로 묶거나, locomotion quality를 별도 평가·선택 단계에서 다뤄야 한다.
+
+---
+
+## **14. 재현 메모와 참고 자료**
 
 최종 $K$ 확장 source checkpoint:
 
@@ -833,6 +931,25 @@ logs/rough_go2_diayn_physical_dynamic_chance_k{10,20,30}/
     skill_summary.csv
     trajectories.csv
     skill_trajectories.png
+```
+
+높이·roll 후속 비교 산출물:
+
+```text
+logs/rough_go2_diayn_physical_dynamic_chance_k{10,20,30}_scratch_support/
+logs/rough_go2_diayn_physical_dynamic_roll_regularized_k{10,20,30}_scratch_support/
+
+각 arm의 최종 checkpoint
+  *_from0950_to1000_seed001/model_1000.pt
+
+각 arm의 clean 평가
+  eval_model{0500,0700,1000}_clean_seed001_complete_episodes/
+    episodes.csv
+    skill_summary.csv
+
+각 arm의 20초 전체 skill 영상
+  video_model1000_clean_seed001_20s_minimal/
+    diayn_skills_k{10,20,30}_grid.mp4
 ```
 
 반복 skill 조합 산출물:
