@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-24 17:48:39 +0900
+last_modified_at: 2026-08-24 18:03:47 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
@@ -853,7 +853,7 @@ Skill별 평균 endpoint는 원점 주변 수 cm에 모였다. Discriminator 정
 
 ### **13.2 모든 skill을 영상으로 비교하기**
 
-각 GIF의 위쪽은 height-only control, 아래쪽은 height+roll treatment다. 같은 행의 칸은 같은 skill ID이며, 모든 skill을 20초 동안 그대로 표시했다.
+각 GIF의 위쪽은 height-only control, 아래쪽은 height+roll treatment다. 같은 행의 칸은 같은 skill ID이며, 모든 skill을 20초 동안 그대로 표시했다. 대표 K=20 비교는 바로 표시하고, K=10·30 비교는 필요할 때 펼쳐 볼 수 있다.
 
 <details data-diayn-gif style="margin: 1rem 0;">
   <summary><strong>K=10 전체 비교 GIF 불러오기</strong> · 1.5 MB</summary>
@@ -864,14 +864,14 @@ Skill별 평균 endpoint는 원점 주변 수 cm에 모였다. Discriminator 정
        style="width: 100%; border-radius: 6px; margin-top: 1rem;">
 </details>
 
-<details data-diayn-gif style="margin: 1rem 0;">
-  <summary><strong>K=20 전체 비교 GIF 불러오기</strong> · 2.2 MB</summary>
-  <img data-src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k20-height-roll-paired.gif"
-       alt="K=20에서 height-only control과 height plus roll treatment의 모든 Unitree Go2 skill을 위아래로 비교한 20초 영상"
-       width="960" height="864"
-       class="d-block mx-auto"
-       style="width: 100%; border-radius: 6px; margin-top: 1rem;">
-</details>
+<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k20-height-roll-paired.gif"
+     alt="K=20에서 height-only control과 height plus roll treatment의 모든 Unitree Go2 skill을 위아래로 비교한 20초 영상"
+     width="960" height="864"
+     decoding="async"
+     class="d-block mx-auto"
+     style="width: 100%; border-radius: 6px; margin: 1rem 0;">
+
+*대표 K=20 비교. 위쪽 `CONTROL`은 높이 제약만 사용하고, 아래쪽 `ROLL-REG`는 같은 조건에 roll 제약을 추가했다. 세 영상 모두 model 1000, seed 1, clean deterministic 평가다. [원본 크기로 열기](https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/16-k20-height-roll-paired.gif)*
 
 <details data-diayn-gif style="margin: 1rem 0;">
   <summary><strong>K=30 전체 비교 GIF 불러오기</strong> · 2.5 MB</summary>
@@ -881,8 +881,6 @@ Skill별 평균 endpoint는 원점 주변 수 cm에 모였다. Discriminator 정
        class="d-block mx-auto"
        style="width: 100%; border-radius: 6px; margin-top: 1rem;">
 </details>
-
-*위쪽 `CONTROL`은 높이 제약만 사용하고, 아래쪽 `ROLL-REG`는 같은 조건에 roll 제약을 추가했다. 세 영상 모두 model 1000, seed 1, clean deterministic 평가다.*
 
 ### **13.3 “Roll을 막아서 서 있기만 했다”는 해석은 절반만 맞다**
 
