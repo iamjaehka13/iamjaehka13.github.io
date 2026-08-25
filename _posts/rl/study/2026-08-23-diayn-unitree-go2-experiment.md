@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-24 18:50:36 +0900
+last_modified_at: 2026-08-26 07:45:00 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
@@ -816,7 +816,7 @@ DIAYN의 원리를 이해하기 위한 실험은 여기서 충분히 목적을 �
 
 ## **13. 후속 실험: 높이와 roll을 함께 억제하면 무엇이 남는가?**
 
-앞의 $K=10,20,30$ 실험은 $K=6$ model 600에서 skill 입력을 확장한 run이었다. 그 뒤에는 기존 $K=6$ skill을 물려받지 않고, 각 $K$를 iteration 0부터 다시 만드는 matched experiment를 추가했다. 여기서 **처음부터**라는 말은 locomotion motor prior까지 버렸다는 뜻이 아니라, $K=6$ DIAYN checkpoint에서 확장하지 않았다는 뜻이다.
+앞의 $K=10,20,30$ 실험은 $K=6$ model 600에서 skill 입력을 확장한 run이었다. 그 뒤에는 각 $K$의 actor·critic과 discriminator를 random initialization에서 시작해 iteration 0부터 다시 만드는 matched experiment를 추가했다. 즉 이 비교에는 $K=6$ DIAYN checkpoint도, 기존 locomotion policy도 이어받지 않았다. 대신 iteration 0–499의 공통 support schedule로 기본 자세와 움직임을 먼저 학습한 뒤, 500–699에서 support를 줄이고 intrinsic objective를 늘렸다.
 
 질문은 다음과 같았다.
 
