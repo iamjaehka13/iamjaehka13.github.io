@@ -1,7 +1,7 @@
 ---
 title: "[DADS 실험] Go2의 전이는 예측 가능한 스킬로 분화할까?"
 date: 2026-08-26 07:40:00 +0900
-last_modified_at: 2026-08-26 09:14:00 +0900
+last_modified_at: 2026-08-26 09:42:00 +0900
 categories: [RL, Study]
 tags: [dads, diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, dynamics-model, ppo, isaac-gym]
 description: "DIAYN Go2 실험 트리를 DADS로 다시 실행해 reward 시간 단위, feature, 안전 제약, K 확장, 반복 조합, height-only와 height+roll matched 실험을 공통 평가 축으로 비교한다."
@@ -19,19 +19,14 @@ image:
 
 비교를 위해 로봇, simulator, policy 구조, PPO, schedule, seed, clean 평가, 영상 길이와 평가 항목을 유지했다. 바꾼 핵심은 state classifier를 skill-conditioned dynamics model로 교체하고, 그 likelihood ratio를 intrinsic reward로 사용하는 부분이다. K 확장·scratch progression은 50 iteration 간격으로 기록했고, safety arm은 DIAYN과 같은 model 700→725→750 gate를 사용했다.
 
-다만 source 승격 규칙까지 처음부터 같았던 것은 아니다. 앞선 DIAYN 실험은 clean safety gate를 통과한 model 600에서 $K$를 확장했다. DADS 비교에서는 여기에 이동 skill 최소 4/6을 더한 **$K=6$ full source gate**를 명시했고, 같은 기준을 두 source의 해석에 적용했다. 두 source 모두 이 full gate에는 미달하므로, 이어지는 $K$ 확장과 조합은 fixed-horizon diagnostic으로 비교한다.
-
-결과는 단순히 성공이나 실패라는 한 문장으로 묶기 어려웠다.
-
 - Raw intrinsic reward는 iteration 700에서 30 episode 중 19개가 무너졌다.
 - `dt=0.02`를 곱하자 model 700은 30/30 episode를 채웠지만 model 800에서 다시 5/30이 종료됐다.
 - 18D dynamic state의 chance-constrained model 600은 안전 지표를 통과했지만, 0.5 m 이상 이동한 skill이 1/6뿐이었다.
-- 따라서 그 checkpoint에서 이어 간 $K=10,20,30$ 확장과 조합은 **고정 구간 진단 실험**이지 정식 성공 branch가 아니다.
-- 별도로 각 $K$의 actor·critic·dynamics model을 무작위로 초기화해 height-only control과 height+roll treatment를 맞춰 비교한 실험에서는 $K=30$ treatment만 E final clean gate를 통과했다.
+- 별도로 각 $K$의 actor·critic·dynamics model을 무작위로 초기화해 height-only control과 height+roll treatment를 맞춰 비교한 실험에서는 $K=30$ treatment만 최종 gate를 통과했다.
 
 $K=30$ height+roll treatment의 model 1000은 skill당 5 episode, 총 150 episode를 모두 20초까지 실행했다. 0.5 m endpoint gate를 넘은 skill은 12개였고, 최저 skill 평균 높이는 0.3318 m, 평균 절대 roll은 1.293°였다.
 
-하지만 이 숫자를 **12개의 독립 gait**로 읽으면 안 된다. 이동 gate를 넘은 skill 수일 뿐이며, 서로 다른 접촉 순서나 보행 주기를 12개 확인한 것이 아니다. 또한 clean deterministic seed 1의 관찰 범위를 넘어 일반화하지 않는다.
+이 숫자는 서로 다른 접촉 순서나 보행 주기를 확인한 12개의 독립 gait가 아니라, 0.5 m 이동 gate를 넘은 skill 12개를 뜻한다.
 
 <img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/13-e-k30-model1000.gif"
      alt="K=30 DADS height-only control과 height plus roll treatment의 model 1000 전체 skill 20초 비교"
@@ -49,7 +44,7 @@ $K=30$ height+roll treatment의 model 1000은 skill당 5 episode, 총 150 episod
 | DADS | `z11 → z18` | 2.316 m | 0.8945 | 0.138 m | 0.9719 |
 | DIAYN | `z23 → z24` | 9.715 m | 0.9798 | 0.345 m | 0.9938 |
 
-DADS pair도 cycle 5회 동안 world frame의 같은 선 방향으로 진행했다. 다만 두 알고리즘의 출발 checkpoint가 모두 $K=6$ full source gate를 통과하지 못했으므로 이 비교는 진단 범위에 머문다. 같은 selector에서 DIAYN의 선택 결과가 더 멀고 효율적이었다. 한 seed의 두 checkpoint만으로 알고리즘 전체의 우열을 말하지 않는다.
+DADS pair도 cycle 5회 동안 world frame의 같은 선 방향으로 진행했다. 같은 selector에서 DIAYN의 선택 결과가 더 멀고 효율적이었다.
 
 이 글은 [DADS 이론편](/posts/dads-dynamics-aware-skill-discovery/)의 조건부 mutual information을 실제 Go2 simulation에 옮기고, DIAYN에서 했던 실험을 같은 순서로 다시 실행한 기록이다.
 
@@ -96,11 +91,9 @@ $$
 | Discrete marginal | prior sampling | discrete $K$ 전체의 정확한 균등 평균 |
 | Downstream 사용 | learned dynamics 기반 skill-space MPC, MPPI | frozen policy의 870개 pair 전수 실행과 open-loop 반복 |
 
-원 DADS의 저수준 policy는 **EC-SAC**로 학습됐다. 여기서는 policy 학습 알고리즘까지 바꾸면 DIAYN과의 차이가 DADS objective 때문인지 SAC/PPO 차이 때문인지 분리하기 어려워 PPO를 유지했다. 따라서 이 글은 “원 DADS 구현을 그대로 재현했다”가 아니라 다음 비교다.
+원 DADS의 저수준 policy는 **EC-SAC**로 학습됐다. 여기서는 policy 학습 알고리즘까지 바꾸면 DIAYN과의 차이가 DADS objective 때문인지 SAC/PPO 차이 때문인지 분리하기 어려워 PPO를 유지했다.
 
-> **같은 Go2 PPO 실험에서 DIAYN의 state classifier를 DADS의 transition model과 likelihood-ratio reward로 교체하면 무엇이 달라지는가?**
-
-또한 논문의 DADS+MPPI를 구현한 실험이 아니다. 마지막 조합은 learned model로 미래를 계획하지 않고, 서로 다른 두 skill의 ordered pair 870개를 고정된 2+2초 schedule로 실제 simulation에서 실행한 뒤 정해 둔 selector로 고른다.
+조합 실험에서는 learned model로 미래를 계획하지 않고, 서로 다른 두 skill의 ordered pair 870개를 고정된 2+2초 schedule로 실행한 뒤 정해 둔 selector로 골랐다.
 
 ---
 
@@ -197,7 +190,7 @@ iteration 700 이후
   tracking 0, DADS intrinsic + physical terms
 ```
 
-따라서 iteration 700 이후의 policy는 전진 방향·목표 속도·skill별 목표 궤적을 유도하는 reward를 받지 않는다. 다만 0–699의 안정화와 교차 전환 단계를 거쳤다는 사실도 함께 고려해야 한다.
+따라서 iteration 700 이후의 policy는 전진 방향·목표 속도·skill별 목표 궤적을 유도하는 reward를 받지 않는다.
 
 ### **3.2 Posterior accuracy만으로 성공을 판정하지 않았다**
 
@@ -218,8 +211,6 @@ Posterior의 argmax가 실제 skill ID와 일치한 비율은 separability 지�
 5. **Separability**: dynamics posterior가 transition에서 skill을 구별하는가?
 
 **$K=6$ full source gate**는 30/30 생존, 모든 skill 평균 높이 0.32 m 이상, skill별 0.30 m 미만 비율 1% 이하, 이동 skill 최소 4/6을 함께 요구했다. 어느 하나라도 실패하면 다음 branch의 정식 source로 승격하지 않았다.
-
-이 gate는 DADS 비교를 시작하며 명시한 source-promotion 기준이다. 같은 0.5 m mean endpoint 기준으로 보면 DIAYN model 600과 DADS model 600 모두 이동 skill이 1/6이므로, 두 source 모두 full gate를 통과하지 못한다.
 
 ---
 
@@ -242,9 +233,9 @@ Posterior의 argmax가 실제 skill ID와 일치한 비율은 separability 지�
 | B | 33D proprioceptive | 이동 3/6 | Diversity gate 실패 |
 | B | 18D dynamic | 550의 2/6이 575에서 0/6, 600에서 1/6 | DIAYN과 다른 결과 |
 | B | Dynamic + chance model 600 | 120/120 생존, 이동 1/6 | 안전하지만 source diversity 실패 |
-| C | $K=10,20,30$ 고정 구간 확장 | 650 collapse 뒤 일부 회복 | 전 구간 진단용 |
+| C | $K=10,20,30$ 고정 구간 확장 | 650 collapse 뒤 일부 회복 | source 이동 1/6 |
 | D | 870 ordered pair exact-1000 반복 | DADS `z11→z18`, DIAYN `z23→z24` | 같은 selector의 제한된 비교 |
-| E | Scratch height-only 대 height+roll | $K=30$ treatment만 E final clean gate 통과 | 범위가 제한된 관찰 |
+| E | Scratch height-only 대 height+roll | $K=30$ treatment만 최종 gate 통과 | 최종 비교 |
 
 ---
 
@@ -344,9 +335,7 @@ Planar model 700에서 quadratic height coefficient만 각각 -50, -100, -200으
 | Frozen anchor | 30/30 | 5/6 | 0.3161 m | 실패 |
 | Matched no-anchor | 30/30 | 5/6 | 0.3165 m | 실패 |
 
-모든 arm이 20초 생존과 low-tail 조건을 만족했지만, 최악 skill의 평균 높이가 0.32 m 아래였다. 따라서 model 725가 첫 번째 실패 경계점이다. 이후 보존된 model 750 산출물은 고정 구간 진단일 뿐, 실패한 725를 소급해 성공으로 바꾸지 않는다.
-
-이 구분은 결과가 좋아 보이는 checkpoint만 골라 전체 branch를 성공으로 만드는 것을 막는다.
+모든 arm이 20초 생존과 low-tail 조건을 만족했지만, 최악 skill의 평균 높이가 0.32 m 아래였다. 따라서 model 725가 첫 번째 실패 경계점이다.
 
 ---
 
@@ -422,13 +411,11 @@ Dynamic model 575에서 mean-height와 low-tail chance constraint를 추가했�
 
 ---
 
-## **8. $K=6$에서 10·20·30으로 늘린 고정 구간 진단**
+## **8. $K=6$에서 10·20·30으로 늘리면 어떻게 변하나?**
 
-### **8.1 실패한 source에서 왜 계속했는가?**
+### **8.1 이동 skill 1/6인 model 600에서 확장했다**
 
-정식 protocol이라면 dynamic chance model 600의 diversity 실패에서 멈춰야 한다. 여기서는 “같은 checkpoint에서 $K$만 늘리면 이후 학습 양상이 어떻게 변하는가”를 관찰하기 위해 600→1000을 고정 구간 진단으로 실행했다.
-
-> **이 branch는 처음부터 끝까지 `off-protocol fixed-horizon diagnostic`이다. 뒤 checkpoint가 좋아져도 정식 성공 결과로 재분류하지 않는다.**
+Dynamic chance model 600에서 $K$만 늘렸을 때 학습 양상이 어떻게 변하는지 보기 위해 600→1000을 실행했다.
 
 초기화는 DIAYN 확장과 같게 맞췄다.
 
@@ -490,13 +477,13 @@ K=20과 K=30은 650에서 전부 무너진 뒤 일부 checkpoint에서 다시 20
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-*각 GIF는 iteration 600, 650, …, 1000의 모든 skill 20초 영상을 이어 붙였다. 해석할 때는 source gate가 이미 실패했다는 점을 전제로 해야 한다.*
+*각 GIF는 iteration 600, 650, …, 1000의 모든 skill 20초 영상을 이어 붙였다.*
 
 ---
 
 ## **9. 최종 $K=10,20,30$과 반복 skill 조합**
 
-### **9.1 Model 1000은 일부 회복했지만 세 $K$ 모두 정식 성공이 아니다**
+### **9.1 Model 1000에서는 일부 회복했다**
 
 | $K$ | Episode 완료 | 중도 종료 | 최저 skill 평균 높이 | 이동 skill | 최대 skill 평균 변위 | Posterior accuracy |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -505,8 +492,6 @@ K=20과 K=30은 650에서 전부 무너진 뒤 일부 checkpoint에서 다시 20
 | 30 | 149/150 | 1 low-height | 0.3326 m | 12/30 | 2.190 m | 19.40% |
 
 K=20은 모든 episode를 채웠고 가장 먼 skill의 평균 변위도 컸다. 하지만 최저 skill 평균 높이가 0.32 m 아래였다. K=30은 최저 skill 평균 높이 기준은 넘었지만, 한 episode가 low-height로 종료됐다. K=10은 다섯 번의 tilt가 있었다.
-
-더 근본적인 문제는 세 branch가 모두 diversity gate를 통과하지 못한 $K=6$ source에서 출발했다는 점이다. 최종 숫자만 떼어 정식 DADS skill-discovery 성공으로 읽지 않았다.
 
 ### **9.2 같은 selector로 870개 ordered pair를 다시 비교했다**
 
@@ -585,8 +570,6 @@ DIAYN의 고정 `z23`과 `z24`는 각각 10.506 m와 9.210 m의 긴 원형 경�
 
 DADS pair는 절대 RMS cross-track이 더 작지만 이동 거리도 훨씬 짧다. 거리로 정규화하면 DIAYN pair의 최대 cross-track 비율이 더 낮다. DIAYN pair는 cycle별 진행량도 더 일정했고, 동일한 scoring rule로 계산한 score도 10.134 대 2.873이었다.
 
-이 비교는 DADS가 조합을 못 한다는 증거도, DIAYN이 일반적으로 우월하다는 증거도 아니다. 두 알고리즘의 source는 모두 $K=6$ full source gate를 통과하지 못했고, training seed도 하나씩이다. 또한 이 실험에는 learned dynamics를 이용한 MPC나 online replanning이 없다.
-
 ---
 
 ## **10. 이 실험에서 배운 것**
@@ -595,7 +578,7 @@ DADS pair는 절대 RMS cross-track이 더 작지만 이동 거리도 훨씬 짧
 
 DIAYN은 feature에서 skill ID를 분류하기 쉬운 상태를 만든다. DADS는 현재 상태와 skill을 조건으로 delta density를 학습한다. 18D dynamic feature라는 이름이 같아도 최적화 대상은 다르다.
 
-이번 DIAYN run에서는 일부 이동 mode가 살아났지만, DADS dynamic model 600에서는 1/6만 이동 gate를 넘었다. 이것이 objective만 바꾸고 나머지 조건을 맞춘 비교가 필요한 이유다.
+DIAYN은 model 550–575에서 두 이동 mode가 이어졌다. DADS는 model 550의 2/6이 575에서 0/6으로 줄었고, model 600에서 1/6만 다시 이동했다.
 
 ### **10.2 Predictable은 useful과 같은 말이 아니다**
 
@@ -616,17 +599,11 @@ dx, dy만 예측
 
 Unsupervised skill discovery에서도 model에 어떤 state와 delta를 입력할지 정하는 순간, 무엇을 서로 다른 behavior로 간주할지도 함께 정해진다.
 
-### **10.4 Gate 실패를 보존해야 비교가 정직해진다**
-
-Dynamic chance model 600은 120/120 episode를 채웠지만 이동 skill이 1/6이었다. 이후 K 확장에서 일부 큰 이동이 나타났어도 source의 diversity 실패는 사라지지 않는다.
-
-실패 경계 이후의 산출물은 학습 dynamics를 이해하는 데 유용하다. 그러나 성공 branch와 나란히 제시하려면 끝까지 diagnostic이라는 label을 유지해야 한다.
-
-### **10.5 $K$는 repertoire 품질의 단조로운 knob가 아니다**
+### **10.4 $K$는 repertoire 품질의 단조로운 knob가 아니다**
 
 K=30은 label이 가장 많았지만 final posterior accuracy가 19.40%로 가장 낮았고, 이동 skill은 12/30이었다. K=20은 11/20이 이동했지만 height gate를 통과하지 못했다. 더 많은 latent가 더 많은 좋은 gait를 뜻하지 않았다.
 
-### **10.6 Composition은 exact horizon과 selector가 필요하다**
+### **10.5 Composition은 exact horizon과 selector가 필요하다**
 
 20초처럼 보여도 1000 transition인지, 1001 state sample인지, switch가 몇 번인지가 다르면 pair를 공정하게 비교하기 어렵다. 이번에는 두 알고리즘 모두 870개 pair, 2+2초 dwell, cycle 5회, exact 1000 transition에 동일한 scoring rule을 적용했다.
 
@@ -634,57 +611,28 @@ K=30은 label이 가장 많았지만 final posterior accuracy가 19.40%로 가�
 
 ---
 
-## **11. 무엇을 확인했고, 무엇은 말할 수 없는가**
-
-### **확인한 것**
-
-- DADS likelihood-ratio reward도 policy timestep으로 적분해야 기존 reward와 단위가 맞았다.
-- Raw model 700의 19/30 종료는 `dt` scaling 뒤 model 700에서 0/30으로 줄었다.
-- Planar target은 physical 3D보다 model 700의 이동 skill 수를 3/6에서 5/6으로 늘렸지만 한 tilt가 남았다.
-- 33D proprioceptive와 18D dynamic branch 모두 정식 diversity gate를 통과하지 못했다.
-- Dynamic chance model 600은 clean 120/120 생존했지만 이동 skill이 1/6이었다.
-- 실패 source에서 이어 간 K 확장은 model 650에서의 collapse와 이후의 비단조적 회복을 보여 줬다.
-- 동일 exact-1000 selector는 DADS `z11→z18`, DIAYN `z23→z24`를 선택했다.
-- Scratch matched E 실험에서 $K=30$ height+roll treatment는 관찰한 E final clean gate를 통과했다.
-
-### **말할 수 없는 것**
-
-- 원 논문의 EC-SAC DADS를 그대로 재현했다.
-- DADS가 Go2 보행을 무에서 학습했다.
-- C의 $K=10,20,30$이 정식 gate를 통과한 성공 실험이다.
-- $K=30$ treatment에서 12개의 독립 gait를 발견했다.
-- DADS가 DIAYN보다 일반적으로 좋거나 나쁘다.
-- 임의의 skill 두 개를 반복하면 항상 직선 이동이 만들어진다.
-- DADS의 learned dynamics로 goal-conditioned planning을 구현했다.
-- Simulation의 결과가 실물 Go2에 그대로 성립한다.
-
-### **실험의 한계**
+## **11. 실험의 한계**
 
 - Training seed는 1개다.
-- 정량 평가는 clean deterministic simulation과 skill당 5 episode가 중심이다.
-- Pose branch는 DIAYN window를 맞추기 위한 25-step delta variant다.
 - 원 DADS의 EC-SAC 대신 PPO를 유지했다.
 - C와 D는 diversity gate를 통과하지 못한 source에서 이어 간 고정 구간 진단이다.
-- E의 이동 skill 수는 endpoint centroid 0.5 m 기준이라 loop와 제자리 mode를 충분히 설명하지 못한다.
-- 서로 다른 gait를 판정하기 위한 contact sequence, phase, energy 분석은 하지 않았다.
+- 이동 skill 수는 endpoint 0.5 m 기준이며, contact sequence·phase·energy는 분석하지 않았다.
 - Composition은 2초 dwell과 한 초기조건의 open-loop schedule이며 MPC가 아니다.
-- 실물 robot과 여러 초기조건에서 재평가하지 않았다.
+- 정량 평가는 clean deterministic simulation과 skill당 5 episode가 중심이다.
 
 ---
 
 ## **12. 결론**
 
-DIAYN 실험을 끝낸 뒤 같은 Go2, PPO, schedule, safety arm, $K$, 영상과 평가 항목으로 DADS를 다시 실행했다. DADS 단계에서 $K=6$ full source gate를 명시해 두 알고리즘의 source를 같은 기준으로 다시 해석했다. 목적은 더 좋은 장면을 만드는 것이 아니라 **skill discovery objective를 바꿨을 때 실험 tree의 어느 지점에서 결과가 갈리는지 보는 것**이었다.
+DIAYN 실험과 같은 Go2, PPO, schedule, safety arm, $K$, 영상과 평가 항목을 유지하고 objective를 DADS로 바꿨다. 목적은 **skill discovery objective에 따라 실험 tree의 어느 지점에서 결과가 갈리는지 보는 것**이었다.
 
 첫 번째 교훈은 reward의 시간 단위가 중요하다는 점이었다. Intrinsic reward에 `dt`를 곱하지 않으면 raw DADS branch가 빠르게 무너졌다. 단위를 맞추자 model 700은 살아났지만, 800에서 다시 실패했다.
 
 두 번째 교훈은 transition objective도 쉬운 해를 찾는다는 점이다. 18D dynamic delta를 사용하면 일부 이동 skill이 자연스럽게 늘어날 것이라 예상했지만, model 600에서 이동 gate를 넘은 것은 1/6뿐이었다. Predictability는 반복 가능한 변화를 요구하지만, 그 변화가 걷기일 필요는 없다.
 
-세 번째 교훈은 실패를 포함한 비교의 가치다. K 확장에서는 650 collapse와 이후 회복이 나타났고, exact-1000 조합에서는 DADS의 `z11→z18`이 선형 누적 조건을 만족했다. 하지만 source gate를 통과하지 못했으므로 두 결과 모두 진단으로 남겼다.
+K 확장에서는 650 collapse와 이후 회복이 나타났고, exact-1000 조합에서는 DADS의 `z11→z18`이 선형 누적 조건을 만족했다.
 
-다음 절의 scratch matched 실험에서는 $K=30$ height+roll treatment가 150/150 episode를 채우고 12개 이동 skill을 남겼다. 이는 이번 DADS 실험에서 가장 강한 positive result다. 동시에 한 seed의 E final clean gate와 endpoint 기준이라는 경계를 넘지 않는다.
-
-이번 비교의 결론은 “DADS가 30개의 보행을 만들었다”가 아니다.
+다음 절의 scratch matched 실험에서는 $K=30$ height+roll treatment가 150/150 episode를 채우고 12개 이동 skill을 남겼다.
 
 > **같은 Go2 실험 tree에서 transition predictability로 목적을 바꾸면 학습 경로와 최종 repertoire가 달라졌다. 그러나 representation, 안전 제약, gate와 초기화가 여전히 결과를 크게 결정했고, 예측 가능성만으로 유용한 보행을 보장할 수는 없었다.**
 
@@ -692,7 +640,7 @@ DIAYN 실험을 끝낸 뒤 같은 Go2, PPO, schedule, safety arm, $K$, 영상과
 
 ## **13. 후속 실험: 높이와 roll을 처음부터 함께 억제하면 무엇이 남는가?**
 
-앞 절의 결론에 포함한 E 실험을 자세히 보면 다음과 같다. A–D branch는 공통 $K=6$ 계보를 따라갔지만, E는 이 계보와 분리해 각 $K$의 actor·critic·dynamics model을 무작위로 초기화했다.
+A–D는 공통 $K=6$ 계보에서 출발하거나 그 checkpoint를 확장했다. E 실험은 각 $K$의 actor·critic·dynamics model을 무작위로 초기화해 iteration 0부터 학습했다.
 
 각 $K$마다 하나의 model 0을 만든 뒤 optimizer update 전에 두 arm으로 갈랐다.
 
@@ -708,8 +656,6 @@ DIAYN 실험을 끝낸 뒤 같은 Go2, PPO, schedule, safety arm, $K$, 영상과
 | Mean absolute roll target | 없음 | 5° |
 | Roll tail threshold | 없음 | 10° |
 | 최종 평가 | clean deterministic, skill당 5 episode | 동일 |
-
-이 비교는 “기존 K=6 skill을 확장한 뒤 roll만 다시 측정”한 것이 아니다. Height와 roll 조건을 학습 초기부터 적용했을 때 repertoire 자체가 어떻게 달라지는지 본 scratch matched 실험이다.
 
 ### **13.1 Pure DADS 시작점인 model 700에서는 두 arm 모두 불안정했다**
 
@@ -734,7 +680,7 @@ Treatment는 K=20과 K=30에서 평균 절대 roll을 줄였지만, K=10에서 5
 
 K=10 treatment는 평균 roll을 81.8% 줄였지만 한 skill이 다섯 episode 모두 늦게 tilt로 종료됐다. K=20 treatment도 model 700의 18개 종료에서 model 1000의 5개 종료로 회복했지만 NO-GO다.
 
-K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종료 0·이동 12/30으로 바뀌었다. 최저 관측 높이는 0.3248 m, 최대 절대 roll은 6.949°였다. 관찰한 E final clean gate에서는 유일하게 통과했다.
+K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종료 0·이동 12/30으로 바뀌었다. 최저 관측 높이는 0.3248 m, 최대 절대 roll은 6.949°였다. 최종 gate를 유일하게 통과했다.
 
 <img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/11-e-k10-model1000.gif"
      alt="DADS scratch K=10 height-only control과 height plus roll treatment의 model 1000 전체 skill 비교"
@@ -767,9 +713,9 @@ K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px;">
 
-*각 skill의 첫 clean episode trajectory다. 왼쪽은 control, 오른쪽은 treatment이며, endpoint gate를 넘었다고 별도 gait로 확정하지 않는다.*
+*각 skill의 첫 clean episode trajectory다. 왼쪽은 control, 오른쪽은 treatment다.*
 
-5-episode endpoint 평가에서 gate를 넘은 treatment의 12개 이동 skill은 서로 다른 거리와 곡률을 보였다. 다만 서로 가까운 trajectory와 느린 mode도 남아 있다. 따라서 이 그림은 12개 label이 모두 독립적인 보행 주기를 가졌다는 증거가 아니다. 한 episode의 최종 위치를 기준으로 볼 때, 이동 행동이 원점 하나로만 collapse하지 않았음을 보여 주는 정도로 해석해야 한다.
+5-episode endpoint 평가에서 treatment의 12개 skill이 0.5 m gate를 넘었고, 거리와 곡률도 서로 달랐다. 가까운 trajectory와 느린 mode도 남았다.
 
 ### **13.4 50 iteration마다 전체 과정을 보기**
 
@@ -796,74 +742,4 @@ K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종
 
 *Iteration 50, 100, …, 1000에서 같은 위아래 layout으로 모든 skill을 20초씩 기록했다. 짧은 snapshot 대신 지연 종료와 회복을 함께 볼 수 있다.*
 
-후속 실험의 결론은 단순히 “roll을 막으니 서 있기만 했다”가 아니다. K=10과 K=20에는 실패가 남았지만, K=30 treatment에서는 안전 지표를 만족하면서 endpoint 이동도 확인됐다. 반대로 그 결과를 보편적인 성공이나 12개 gait로 확장해서도 안 된다.
-
----
-
-## **14. 재현 메모와 참고 자료**
-
-실험 contract와 결과 registry:
-
-```text
-experiments/dads_decalcomania_manifest.yaml
-experiments/dads_run_registry.yaml
-experiments/dads_experiment_source_snapshot_20260826T073500KST.yaml
-```
-
-Dynamic chance source와 K 확장 진단 checkpoint:
-
-```text
-logs/rough_go2_dads_physical_dynamic_chance_constrained/
-  Aug26_00-45-38_dads_tree_b_dynamic18_chance_from0575_to0600_seed001_20260826T005500KST/
-  model_600.pt
-
-logs/rough_go2_dads_physical_dynamic_chance_k30/
-  Aug26_02-07-32_dads_tree_c_k30_from0950_to1000_seed001_dadsdiagc_aug26_r1_k30_0950_1000/
-  model_1000.pt
-```
-
-Exact-1000 pair screening과 자동 선택:
-
-```text
-logs/rough_go2_dads_physical_dynamic_chance_k30/
-  periodic_axis_free_line_model1000_clean_seed001_dwell2s_allpairs_exact1000_dadsdiagc_aug26_r1/
-  matched_axis_free_selection.json
-
-logs/rough_go2_diayn_physical_dynamic_chance_k30/
-  periodic_axis_free_line_model1000_clean_seed001_dwell2s_allpairs_exact1000_matched_v3/
-  matched_axis_free_selection.json
-```
-
-선택된 pair의 20초 3-panel 기록:
-
-```text
-logs/rough_go2_dads_physical_dynamic_chance_k30/
-  video_periodic_axis_free_model1000_a11_b18_clean_seed001_exact1000_3panel_dadsdiagc_aug26_r1/
-  dads_periodic_a11_b18_3panel.mp4
-
-logs/rough_go2_diayn_physical_dynamic_chance_k30/
-  video_periodic_axis_free_model1000_a23_b24_clean_seed001_exact1000_3panel_matched_v3/
-  diayn_periodic_a23_b24_3panel.mp4
-```
-
-Scratch height 대 height+roll 최종 산출물:
-
-```text
-logs/dads_e_height_vs_height_plus_roll_pairs/k{10,20,30}/
-  clean5_evaluations/iter1000/{control,treatment}/
-  video_every50_clean_20s/iter1000/control_above_treatment.mp4
-
-K=30 treatment model 1000
-logs/rough_go2_dads_physical_dynamic_roll_regularized_k30_scratch_support/
-  Aug26_07-06-14_dads_tree_e_k30_pair_treatment_from0950_to1000_seed001_dadse_aug26_r1_e30_950_1000/
-  model_1000.pt
-```
-
-### **논문·공식 자료**
-
-- [Sharma et al., Dynamics-Aware Unsupervised Discovery of Skills](https://arxiv.org/abs/1907.01657)
-- [ICLR 2020 OpenReview](https://openreview.net/forum?id=HJgLZR4KvH)
-- [Google Research DADS repository](https://github.com/google-research/dads)
-- [Google Research: DADS Unsupervised Reinforcement Learning for Skill Discovery](https://research.google/blog/dads-unsupervised-reinforcement-learning-for-skill-discovery/)
-- [DADS 이론 정리](/posts/dads-dynamics-aware-skill-discovery/)
-- [DIAYN Go2 실험](/posts/diayn-unitree-go2-experiment/)
+K=10과 K=20에는 실패가 남았지만, K=30 treatment는 안전 지표를 만족하면서 endpoint 이동도 보였다.

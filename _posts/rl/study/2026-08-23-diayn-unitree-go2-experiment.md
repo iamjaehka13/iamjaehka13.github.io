@@ -1,7 +1,7 @@
 ---
 title: "[DIAYN 실험] Go2는 보행 보상 없이 스킬을 발견할까?"
 date: 2026-08-23 18:00:00 +0900
-last_modified_at: 2026-08-26 09:14:00 +0900
+last_modified_at: 2026-08-26 09:42:00 +0900
 categories: [RL, Study]
 tags: [diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, quadruped-locomotion, ppo, isaac-gym]
 description: "DIAYN을 Unitree Go2에 적용해 자세 shortcut, K=10·20·30 확장, frozen skill 반복 전환, 높이·roll 제약의 trade-off를 정리한다."
@@ -38,8 +38,6 @@ image:
 | $K=10$ | 50 | 0 | 0.3156 m | 0.1663–0.5263 m/s | 97.96–99.50% |
 | $K=20$ | 100 | 0 | 0.3100 m | 0.1897–0.5524 m/s | 96.68–99.34% |
 | $K=30$ | 150 | 0 | 0.3087 m | 0.0718–0.5193 m/s | 93.53–98.30% |
-
-여기서 가장 중요한 문장은 다음 두 문장이다.
 
 > **Iteration 700 이후의 pure intrinsic 구간에서 보행 방향·속도 reward 없이 일부 locomotion-like mode가 나타났다.**
 
@@ -82,7 +80,7 @@ Policy는 어떤 skill $z$가 주어졌는지 알고 행동한다. Discriminator
 
 이 범위가 중요한 이유는 pretrained motor prior가 접촉과 관절 협응의 출발점을 제공하기 때문이다. 이번 결과만으로 DIAYN이 quadruped locomotion을 처음부터 학습했다고 말할 수는 없다.
 
-또한 이 글에서 **보행 보상 없이**라는 표현은 iteration 700 이후의 pure intrinsic 구간과 최종 평가 policy를 가리킨다. 공통 $K=6$ source 계보의 iteration 0–499에서는 기존 motor prior를 유지했고, from-scratch 후속 실험의 같은 구간에서는 기본 자세와 움직임을 학습하는 support를 사용했다. 두 계보 모두 500–699에는 support를 줄이면서 intrinsic objective를 늘렸고, iteration 700 이후에는 다음과 같은 외부 task reward를 사용하지 않았다.
+이 글에서 **보행 보상 없이**는 iteration 700 이후의 pure intrinsic 구간을 뜻한다. 그 전에는 0–499 support와 500–699 crossfade를 사용했다.
 
 - 전진 방향 reward 없음
 - 목표 속도 tracking reward 없음
@@ -174,7 +172,7 @@ log q(z|f(s)) + log K
 
 이 글에서 `model N`은 absolute iteration $N$에 저장한 checkpoint를 뜻한다.
 
-여기서 noise·friction·push는 **robustness를 증명하기 위해 새로 넣은 실험 변인**이 아니다. 기존 training 환경이 상속한 조건이다. 최종 결론은 모두 disturbance를 끈 clean deterministic 평가를 기준으로 냈다.
+최종 결과는 disturbance를 끈 clean deterministic 평가를 기준으로 정리했다.
 
 ### **3.2 분류 정확도 하나로 성공을 판정하지 않았다**
 
@@ -222,9 +220,7 @@ q accuracy 99%
 | 9 | 33D proprioceptive feature | q 약 99%, locomotion 0/6 | static posture shortcut |
 | 10 | 18D dynamic feature | 일부 이동·회전 mode 발생 | 핵심 ablation 채택 |
 | 11 | Dynamic + chance model 600 | clean safety gate 통과, 0.5 m endpoint 이동 1/6 | 당시 $K$ 확장 source로 채택 |
-| 12 | $K=10,20,30$ | 초기 붕괴 뒤 750–850에서 재형성 | 후속 full source gate 기준으로는 진단 실험 |
-
-아래부터는 결론을 바꾼 분기만 자세히 본다.
+| 12 | $K=10,20,30$ | 초기 붕괴 뒤 750–850에서 재형성 | migration dynamics 비교 |
 
 ---
 
@@ -361,8 +357,6 @@ executed_action = anchor_action
 
 Policy가 계속 경계를 밀면서 일부 skill endpoint가 합쳐졌다. 반대로 matched no-anchor arm은 model 725에서 더 잘 갈라졌지만 750에서 stationary collapse와 low-height 종료가 돌아왔다.
 
-> Anchor는 안전성을 높였지만 skill freedom을 줄였고, anchor를 빼면 다양성 공간은 넓어졌지만 쉬운 위험 행동이 다시 열렸다.
-
 ---
 
 ## **7. 결정적 ablation: discriminator에 무엇을 보여 줄 것인가**
@@ -420,7 +414,7 @@ total                     18D
 | 575 | skill 2는 약 0.251 m/s 곡선 이동, skill 4는 작은 loop |
 | 600, unconstrained | 이동은 유지됐지만 5/30 low-height termination |
 
-정적 자세만으로는 label을 구분하기 어려워지자 일부 skill이 지속적인 motion을 만들기 시작했다. 모든 skill이 걷지는 않았지만, 이 결과가 본래 질문에 가장 직접적으로 답했다.
+정적 자세만으로는 label을 구분하기 어려워지자 일부 skill이 지속적인 motion을 만들기 시작했다.
 
 <img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/13-dynamic-state-emergence.gif"
      alt="18D dynamic state를 사용한 model 550과 575를 비교했을 때 일부 Go2 skill의 곡선 이동이 나타나는 장면"
@@ -430,7 +424,7 @@ total                     18D
 
 *위 두 줄은 model 550, 아래 두 줄은 model 575다. 같은 skill layout에서 skill 2·4의 trajectory가 길어지는 것을 볼 수 있다.*
 
-물론 18D에도 joint velocity가 있으므로 고주파 관절 운동 같은 다른 shortcut의 가능성이 완전히 사라진 것은 아니다. 그래서 영상, base trajectory, 높이, joint velocity를 함께 봐야 한다.
+18D에도 joint velocity가 있으므로 고주파 관절 운동 같은 다른 shortcut의 가능성은 남아 있다.
 
 ### **7.3 Dynamic chance model 600을 확장 source로 선택했다**
 
@@ -442,9 +436,7 @@ Unconstrained model 600에서 다시 나타난 낮은 자세를 막기 위해 mo
 - 최종 6개 skill의 dual multiplier는 모두 0
 - randomized seed 1에서는 3/30 low-height 종료
 
-이 checkpoint를 robust safety policy로 채택한 것은 아니다. 당시 DIAYN protocol에서는 clean 조건의 생존·termination·높이·tail을 확인하는 **clean safety gate를 통과한 $K$ 확장 source**로 선택했다.
-
-이후 DADS 비교에서 이동 skill 최소 4/6을 포함한 **$K=6$ full source gate**를 명시했다. 그 기준을 소급 적용하면 이 DIAYN source도 이동 1/6으로 통과하지 못한다. 따라서 8–9절의 $K$ 확장과 조합은 실제 관찰 결과로 유지하되, 후속 matched protocol 기준으로는 fixed-horizon diagnostic으로 해석한다.
+Clean safety gate를 통과한 model 600을 $K$ 확장 source로 사용했다.
 
 <img src="https://media.iamjaehka13.blog/assets/img/posts/rl/diayn-unitree-go2-experiment/14-dynamic-safety-regression.gif"
      alt="18D dynamic model 575와 unconstrained model 600을 비교했을 때 이동은 유지되지만 아래쪽 model 600 일부 skill의 자세가 무너지는 장면"
@@ -470,7 +462,7 @@ Unconstrained model 600에서 다시 나타난 낮은 자세를 막기 위해 mo
 
 ### **8.1 기존 여섯 skill은 보존하고 새 skill은 같은 곳에서 시작했다**
 
-공통 source는 당시 clean safety gate를 통과한 dynamic chance-constrained model 600이다. 위에서 설명했듯 후속 $K=6$ full source gate 기준으로는 diagnostic source다.
+공통 source는 dynamic chance-constrained model 600이다.
 
 ```text
 K=6 model 600
@@ -654,13 +646,7 @@ $$
 
 다섯 cycle에서 기준선 방향으로 진행한 거리도 각각 1.710, 1.651, 1.637, 1.644, 1.638 m였다. 모두 양수였으며 변동계수는 1.67%였다. 한 cycle만 우연히 멀리 간 것이 아니라 같은 방향의 이동이 다섯 번 누적된 것이다.
 
-이 결과가 뜻하는 범위는 제한적이다.
-
-> **이 checkpoint의 `z22`와 `z17`은 특정 2초 주기로 연결했을 때, 추가 policy 학습 없이 거의 직선인 world-frame 이동을 만들었다.**
-
-2초 dwell을 고정한 뒤 870개 ordered pair를 모두 평가해 pair를 선택했고, 이동축도 endpoint를 이용해 사후 정의했다. 따라서 임의의 skill 조합이 일반적으로 유효하거나 목표 방향을 추종하는 controller를 얻었다고 말할 수는 없다.
-
-Training에서는 episode 내내 $z$를 고정했으므로, episode 중간의 skill switch는 training distribution 밖의 입력이다. 최대 switch action jump는 L2 기준 2.301이었다. 또한 이 실험에는 dynamics model, MPC, online replanning이 없다. 학습된 model로 skill sequence를 계획하는 [DADS](/posts/dads-dynamics-aware-skill-discovery/)와 달리, 사람이 고른 고정 주기를 실행한 open-loop temporal composition이다.
+2초 dwell을 고정하고 870개 ordered pair를 평가해 `z22 → z17`을 선택했으며, 이동축은 endpoint로 사후 정의했다. 목표 방향을 추종하는 controller가 아니라, 추가 학습 없이 고정 주기를 실행한 open-loop temporal composition이다.
 
 ### **9.3 K=10 전체 progression**
 
@@ -760,11 +746,11 @@ $K$가 커지면 다음 효과가 동시에 생긴다.
 
 K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은 행동에서 시작했다. 650에서는 안전성까지 크게 무너졌지만 750–850에서 다시 안정적인 mode가 형성됐다.
 
-따라서 이 run에 한해서는 “skill이 일부 합쳐진 뒤 다시 분화하는가?”에 **그렇다**고 답할 수 있다. 다만 이것은 from-scratch 학습의 보편 법칙이 아니라 checkpoint expansion과 optimizer reset을 포함한 한 seed의 관찰이다.
+따라서 이 run에서 “skill이 일부 합쳐진 뒤 다시 분화하는가?”에는 **그렇다**고 답할 수 있다.
 
 ---
 
-## **11. 무엇을 확인했고, 무엇은 말할 수 없는가**
+## **11. 확인한 결과와 한계**
 
 ### **확인한 것**
 
@@ -772,32 +758,18 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 - Yaw를 discriminator에 주면 회전 shortcut이 나타났다.
 - Static joint pose를 주면 q accuracy 약 99%의 정적 자세 shortcut이 나타났다.
 - 18D dynamic feature만 남기자 일부 locomotion-like behavior가 나타났다.
-- Diagnostic $K$ 확장 run에서 K=6 checkpoint를 K=10·20·30으로 늘린 뒤 overlap, collapse, recovery, 재분화를 관찰했다.
+- $K$ 확장 run에서 K=6 checkpoint를 K=10·20·30으로 늘린 뒤 overlap, collapse, recovery, 재분화를 관찰했다.
 - 4초 평가는 K=30 model 800의 10.12초 지연 실패를 놓쳤고, checkpoint당 20초 기록이 필요했다.
 - Frozen K=30 policy에서 `z22`와 `z17`을 2초씩 반복하자, 한 clean 20초 rollout에서 8.280 m의 거의 직선인 이동이 cycle 5회에 걸쳐 누적됐다.
-
-### **말할 수 없는 것**
-
-- DIAYN이 Go2 보행을 무에서 학습했다.
-- K=30에서 30개의 독립 gait를 발견했다.
-- K가 클수록 skill quality가 단조롭게 좋아진다.
-- 높은 discriminator accuracy가 semantic usefulness를 보장한다.
-- 임의의 두 skill을 반복하면 항상 새로운 유용한 이동이 만들어진다.
-- 목표 방향을 입력받아 경로를 선택하는 goal-reaching controller를 얻었다.
-- Simulation 결과가 실물 Go2의 안전성을 보장한다.
 
 ### **실험의 한계**
 
 - Training seed는 1개다.
-- 8–9절의 K=10·20·30 결과는 from-scratch 독립 학습이 아니라 같은 K=6 checkpoint를 확장한 결과다.
-- 이 K=6 source는 당시 clean safety gate로 선택했으며, 이후 명시한 이동 4/6 포함 full source gate에는 미달한다.
+- 8–9절은 K=6 model 600을 확장한 실험이며, 각 $K$를 처음부터 학습한 비교가 아니다.
 - K별 intrinsic reward ceiling $\log K$가 달라 reward scale이 완전히 동일하지 않다.
-- 최종 정량 평가는 clean deterministic simulation이다.
-- Training은 upstream observation noise·friction randomization·push 설정을 상속했다.
-- Pretrained motor prior에서 시작했으므로 locomotion capability가 이미 존재했다.
+- 최종 정량 평가는 clean deterministic simulation이며, pretrained motor prior에서 시작했다.
 - 18D feature에도 joint velocity가 있어 joint-motion shortcut 가능성이 남아 있다.
-- Skill 조합은 `z22`·`z17`, 2초 dwell, 한 clean 초기조건의 open-loop schedule만 평가했다. Goal reaching, adaptive high-level selection, energy efficiency, switch smoothness는 검증하지 않았다.
-- 현재 실험 checkout을 재현 가능한 public release로 정리하는 작업은 별도로 남아 있다.
+- Skill 조합은 `z22`·`z17`, 2초 dwell, 한 초기조건의 open-loop schedule만 평가했다.
 
 ---
 
@@ -807,31 +779,19 @@ K 확장 직후 새 skill 열이 모두 0이었으므로 여러 latent가 같은
 
 이 실패는 DIAYN이 작동하지 않았다는 뜻이 아니다. 오히려 목적함수를 정확히 최적화한 결과다. Policy는 사람이 생각하는 “좋은 skill”이 아니라 discriminator가 가장 쉽게 구별하는 상태를 찾았다.
 
-결정적인 변화는 reward 계수를 계속 키운 것이 아니라 **discriminator가 볼 수 있는 정보를 바꾼 것**이었다. Static channel을 제거하고 18D dynamic state만 남기자 일부 latent가 이동과 회전 mode로 분화했다. 이후 diagnostic $K$ 확장에서는 행동이 한 번 겹치고 크게 무너진 뒤 다시 갈라지는 과정도 관찰할 수 있었다.
+결정적인 변화는 reward 계수를 계속 키운 것이 아니라 **discriminator가 볼 수 있는 정보를 바꾼 것**이었다. Static channel을 제거하고 18D dynamic state만 남기자 일부 latent가 이동과 회전 mode로 분화했다. 이후 $K$ 확장에서는 행동이 한 번 겹치고 크게 무너진 뒤 다시 갈라지는 과정도 관찰할 수 있었다.
 
-학습 후에는 발견된 `z22`와 `z17`을 고정 주기로 연결했다. 두 skill을 각각 계속 실행하면 곡선을 그렸지만, 두 skill을 2초씩 반복하자 curvature가 크게 줄고 한 대각선 방향으로 이동이 누적됐다. 이는 repertoire 재사용 가능성의 한 사례이지, DIAYN이 조합 policy나 planner까지 학습했다는 뜻은 아니다.
-
-이번 실험의 결론은 “DIAYN으로 30가지 보행을 만들었다”가 아니다.
+학습 후에는 발견된 `z22`와 `z17`을 고정 주기로 연결했다. 두 skill을 각각 계속 실행하면 곡선을 그렸지만, 두 skill을 2초씩 반복하자 curvature가 크게 줄고 한 대각선 방향으로 이동이 누적됐다.
 
 > **기존 motor capability 위에서 DIAYN은 pure intrinsic 구간에 task reward 없이 행동을 분할할 수 있었다. 그러나 어떤 skill이 생기는지는 discriminator feature와 가능한 행동 집합이 결정했고, 다양성·안전성·유용성은 따로 측정해야 했다.**
 
-다음 단계로 가치 있는 비교는 세 가지다.
-
-1. 현재 from-scratch matched 실험을 여러 seed로 반복
-2. Dynamic feature 안에서도 base motion과 joint motion을 다시 ablation
-3. 더 많은 pair·dwell·초기조건에서 반복 조합을 검증하고, 목표 조건부 high-level selector로 확장
-
-공통 $K=6$ source를 확장한 실험만으로도 DIAYN의 원리를 이해하려는 목적은 충분히 달성했다. 한 pair에서는 재사용 가능성을 확인했으므로, 이제는 “더 오래 학습”보다 **이 사례를 다른 조합과 목표 조건으로 일반화할 수 있는가**를 검증하는 편이 더 의미 있다.
-
-다음 절에서는 공통 source 계보와 분리한 from-scratch matched 실험을 추가로 살펴본다.
+다음 절에서는 각 $K$를 처음부터 학습한 height-only·height+roll 실험을 비교한다.
 
 ---
 
 ## **13. 후속 실험: 높이와 roll을 함께 억제하면 무엇이 남는가?**
 
-앞의 $K=10,20,30$ 실험은 $K=6$ model 600에서 skill 입력을 확장한 run이었다. 여기까지가 공통 $K=6$ source를 확장한 실험이다. 이후에는 각 $K$의 actor·critic·discriminator를 무작위로 초기화하고 iteration 0부터 학습하는 matched experiment를 추가했다.
-
-이 비교는 $K=6$ DIAYN checkpoint나 기존 locomotion policy를 이어받지 않았다. 다만 iteration 0–499에는 공통 support schedule로 기본 자세와 움직임을 먼저 학습하고, 500–699에는 support를 줄이면서 intrinsic objective를 늘렸다.
+앞의 $K$ 확장과 달리, 이 실험은 각 $K$의 actor·critic·discriminator를 무작위로 초기화해 iteration 0부터 다시 학습했다. $K=6$ checkpoint나 기존 locomotion policy는 이어받지 않았다.
 
 질문은 다음과 같았다.
 
@@ -862,8 +822,6 @@ Iteration 1000의 결과는 명확했다. 모든 평가 episode가 중도 종료
 | 10 | 50 | 0.301→0.317 m | 2.306→0.586° | 3.032→0.800° | 11.1→0% | 3.08→4.03 cm | 0.276→0.242 rad | 99.80→99.86% |
 | 20 | 100 | 0.304→0.310 m | 4.028→0.687° | 4.799→0.797° | 33.8→0% | 4.35→2.16 cm | 0.410→0.247 rad | 89.64→99.51% |
 | 30 | 150 | 0.311→0.310 m | 3.331→0.660° | 4.456→0.815° | 23.6→0% | 3.24→3.39 cm | 0.365→0.187 rad | 89.51→99.38% |
-
-그러나 영상에서 더 중요한 결과는 다른 곳에 있었다.
 
 > **로봇은 안전하고 수평에 가까웠지만, 대부분의 skill이 제자리에서 작은 관절 운동만 만들었다.**
 
@@ -896,100 +854,17 @@ Skill별 평균 endpoint는 원점 주변 수 cm에 모였다. Discriminator 정
 
 Roll treatment에서 몸체가 더 수평이 되고 yaw 다양성도 줄었으므로, roll 제약이 가능한 행동 공간을 좁힌 것은 맞다. 하지만 height-only control도 endpoint spread가 3–4 cm에 그쳤다. 따라서 **roll 제약 하나가 locomotion을 없앴다**고 말할 수는 없다.
 
-더 정확한 해석은 다음과 같다.
-
-```text
-높이 shortcut 차단
-+ roll shortcut 차단
-+ 초기 500 iteration의 안정화 support
-+ 18D dynamic feature 안에 남은 joint-velocity 차이
-
--> 넘어지지 않고 서서 작은 다리 운동을 만드는 상태가
-   여전히 가장 쉽고 구별 가능한 해법이 됨
-```
+두 arm 모두 높이 shortcut을 막고 초기 support를 사용했으며, treatment는 roll shortcut까지 막았다. 남은 가장 쉬운 해는 joint velocity로 구별되는 작은 제자리 동작이었다.
 
 이 결과는 안전장치를 늘리면 자동으로 더 좋은 보행 skill이 나온다는 기대와 반대다. 제약은 위험한 해를 제거하지만, 남은 해 중에서 **이동하는 해를 선택해 주지는 않는다**. DIAYN은 여전히 가장 싸게 구별되는 상태를 찾았고, 이번에는 그 상태가 낮은 자세나 큰 roll 대신 안정적인 제자리 동작이었다.
 
-앞의 확장 실험과 이 후속 실험을 함께 보면 trade-off가 더 분명해진다.
-
-- 제약이 약하면 이동·회전 diversity가 커지지만 낮은 자세와 큰 roll도 함께 열린다.
-- 높이와 roll을 강하게 관리하면 안전 지표는 좋아지지만 locomotion diversity가 사라질 수 있다.
-- 높은 discriminator 정확도는 두 경우 모두 가능하므로, 그 값만으로 locomotion skill discovery를 판정하면 안 된다.
-
-결국 safety constraint와 behavior objective는 서로 대체할 수 없다. 이동 skill을 원한다면 안전 범위만 좁히는 것으로 끝내지 말고, discriminator feature를 base displacement·velocity처럼 task-space motion에 더 직접적으로 묶거나, locomotion quality를 별도 평가·선택 단계에서 다뤄야 한다.
-
 ### **13.4 이 조건에서는 지속 보행 skill이 나오지 않았다**
 
-후속 실험을 한 문장으로 정리하면, **평균 높이 0.32 m와 low-height tail을 관리하고 평균 절대 roll 목표를 $5^\circ$로 두자 자세는 안정됐지만, 지속적으로 걷는 skill은 확인되지 않았다.** 대부분의 latent는 원점 주변에 서서 작은 다리 운동만 만들었다.
+**평균 높이 0.32 m와 low-height tail을 관리하고 평균 절대 roll 목표를 $5^\circ$로 두자 자세는 안정됐지만, 지속적으로 걷는 skill은 확인되지 않았다.** 대부분의 latent는 원점 주변에 서서 작은 다리 운동만 만들었다.
 
 안전 제약은 낮은 자세와 큰 기울기를 제거했지만, 남은 행동 중 locomotion을 선택하는 학습 신호를 대신하지는 못했다. 같은 조건을 더 오래 학습하거나 이동 gate를 계속 추가하면 DIAYN의 원리를 확인하는 실험보다 별도의 locomotion objective를 설계하는 문제가 된다.
 
 따라서 DIAYN 실험은 여기서 멈추고, 다음 글에서는 같은 실험 트리를 transition dynamics를 모델링하는 [DADS](/posts/dads-unitree-go2-experiment/)로 복제해 objective의 차이를 비교한다.
-
----
-
-## **14. 재현 메모와 참고 자료**
-
-최종 $K$ 확장 source checkpoint:
-
-```text
-logs/rough_go2_diayn_physical_dynamic_chance_constrained/
-  Aug22_19-18-17_dynamic18_chance_constrained_from575_to600_seed001/
-  model_600.pt
-```
-
-최종 평가 산출물:
-
-```text
-logs/rough_go2_diayn_physical_dynamic_chance_k{10,20,30}/
-  evaluation_model1000_clean_seed001_5eps/
-    episodes.csv
-    skill_summary.csv
-    trajectories.csv
-    skill_trajectories.png
-```
-
-높이·roll 후속 비교 산출물:
-
-```text
-logs/rough_go2_diayn_physical_dynamic_chance_k{10,20,30}_scratch_support/
-logs/rough_go2_diayn_physical_dynamic_roll_regularized_k{10,20,30}_scratch_support/
-
-각 arm의 최종 checkpoint
-  *_from0950_to1000_seed001/model_1000.pt
-
-각 arm의 clean 평가
-  eval_model{0500,0700,1000}_clean_seed001_complete_episodes/
-    episodes.csv
-    skill_summary.csv
-
-각 arm의 20초 전체 skill 영상
-  video_model1000_clean_seed001_20s_minimal/
-    diayn_skills_k{10,20,30}_grid.mp4
-```
-
-반복 skill 조합 산출물:
-
-```text
-logs/rough_go2_diayn_physical_dynamic_chance_k30/
-  video_periodic_axis_free_line_model1000_clean_seed001_z22_z17_20s_3panel_minimal/
-    diayn_k30_z22_z17_periodic_line_3panel.mp4
-    trajectories_per_step.csv
-    switch_events.csv
-    recording_metadata.json
-```
-
-반복 조합은 50 Hz policy에서 정확히 1000 transition을 실행했다. `z22`와 `z17`은 각각 100 transition씩 유지했고, 200 transition의 cycle을 다섯 번 반복했다.
-
-20초 progression source는 iteration 600, 650, …, 1000의 9개 segment로 구성했다. 각 segment는 20.05초, 401 frame이고 원본 합본은 180.45초, 3609 frame이다. 게시용 전체 GIF는 5 fps·64색으로 변환해 각각 902 frame, 180.40초다.
-
-### **논문·공식 자료**
-
-- [Diversity Is All You Need: Learning Skills without a Reward Function](https://arxiv.org/abs/1802.06070)
-- [ICLR 2019 OpenReview](https://openreview.net/forum?id=SJx63jRqFm)
-- [Official DIAYN project videos](https://sites.google.com/view/diayn/)
-- [Official DIAYN implementation note](https://github.com/ben-eysenbach/sac/blob/master/DIAYN.md)
-- [DIAYN 이론 정리](/posts/diayn-diversity-is-all-you-need/)
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
