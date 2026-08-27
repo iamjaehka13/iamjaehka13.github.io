@@ -1,7 +1,7 @@
 ---
 title: "[DADS 실험] Go2의 전이는 예측 가능한 스킬로 분화할까?"
 date: 2026-08-26 07:40:00 +0900
-last_modified_at: 2026-08-26 09:42:00 +0900
+last_modified_at: 2026-08-27 22:32:53 +0900
 categories: [RL, Study]
 tags: [dads, diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, dynamics-model, ppo, isaac-gym]
 description: "DIAYN Go2 실험 트리를 DADS로 다시 실행해 reward 시간 단위, feature, 안전 제약, K 확장, 반복 조합, height-only와 height+roll matched 실험을 공통 평가 축으로 비교한다."
@@ -28,7 +28,8 @@ $K=30$ height+roll treatment의 model 1000은 skill당 5 episode, 총 150 episod
 
 이 숫자는 서로 다른 접촉 순서나 보행 주기를 확인한 12개의 독립 gait가 아니라, 0.5 m 이동 gate를 넘은 skill 12개를 뜻한다.
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/13-e-k30-model1000.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/13-e-k30-model1000.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/13-e-k30-model1000.gif"
      alt="K=30 DADS height-only control과 height plus roll treatment의 model 1000 전체 skill 20초 비교"
      width="960" height="900"
      decoding="async"
@@ -255,7 +256,8 @@ DADS reward term:     scale × intrinsic_reward
 | Raw 600 | 30/30 | 0 | 0.254 m | 16.49° | 74.25% |
 | Raw 700 | 11/30 | 19 | 0.188 m | 16.92° | 65.81% |
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/02-raw-model700.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/02-raw-model700.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/02-raw-model700.gif"
      alt="시간 적분을 적용하지 않은 DADS raw intrinsic model 700에서 여러 Go2 skill이 중도 종료되는 20초 평가"
      width="960" height="360"
      class="d-block mx-auto"
@@ -271,7 +273,8 @@ Reward에 $dt=0.02$를 곱하자 model 700은 30/30 episode를 채웠다.
 | Scaled 700 | 30/30 | 0 | 0.316 m | 0.1177 m/s | 68.12% |
 | Scaled 800 | 25/30 | 5 | 0.206 m | 0.0878 m/s | 42.28% |
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/03-dt-scaled-model700.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/03-dt-scaled-model700.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/03-dt-scaled-model700.gif"
      alt="DADS intrinsic reward에 policy timestep을 곱한 model 700에서 모든 K=6 Go2 skill이 20초를 채우는 평가"
      width="960" height="360"
      class="d-block mx-auto"
@@ -357,7 +360,8 @@ total                     33D
 
 Model 550은 30/30 episode를 채웠고, 최저 skill 평균 높이는 0.3292 m였다. Posterior accuracy도 83.49%였다. 그러나 이동 gate를 넘은 skill은 3/6뿐이었다.
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/04-proprio33-model550.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/04-proprio33-model550.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/04-proprio33-model550.gif"
      alt="33D proprioceptive delta를 예측한 DADS model 550의 K=6 Go2 skill 전체 20초 평가"
      width="960" height="360"
      class="d-block mx-auto"
@@ -387,7 +391,8 @@ total                     18D
 
 DIAYN에서는 18D dynamic feature가 일부 locomotion-like mode를 열었다. 반면 이 DADS run에서는 model 550의 두 이동 skill이 575에서 사라졌고, 600에서 한 skill만 다시 이동했다.
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/05-dynamic18-model600.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/05-dynamic18-model600.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/05-dynamic18-model600.gif"
      alt="18D dynamic delta를 예측한 DADS model 600에서 한 개의 이동 skill과 다섯 개의 느린 mode가 나타나는 20초 평가"
      width="960" height="360"
      class="d-block mx-auto"
@@ -456,21 +461,24 @@ K=20과 K=30은 650에서 전부 무너진 뒤 일부 checkpoint에서 다시 20
 
 ### **8.4 전체 progression 영상**
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/06-k10-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/06-k10-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/06-k10-progression.gif"
      alt="DADS K=10 iteration 600부터 1000까지 50 iteration 간격의 전체 20초 skill progression"
      width="800" height="338"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/07-k20-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/07-k20-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/07-k20-progression.gif"
      alt="DADS K=20 iteration 600부터 1000까지 overlap collapse recovery를 포함한 전체 20초 skill progression"
      width="960" height="432"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/08-k30-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/08-k30-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/08-k30-progression.gif"
      alt="DADS K=30 iteration 600부터 1000까지 반복 collapse와 recovery를 포함한 전체 20초 skill progression"
      width="960" height="450"
      decoding="async"
@@ -548,7 +556,8 @@ DADS에서는 870개 중 865개가 1000 transition을 모두 실행했고 5개�
 | 최대 switch action jump L2 | 2.697 | 3.814 |
 | Axis-free score | 2.873 | 10.134 |
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/09-diayn-composition.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/09-diayn-composition.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/09-diayn-composition.gif"
      alt="동일 exact-1000 selector가 고른 DIAYN z23과 z24의 고정 실행 및 2초 반복 조합 3-panel 비교"
      width="960" height="180"
      class="d-block mx-auto"
@@ -556,7 +565,8 @@ DADS에서는 870개 중 865개가 1000 transition을 모두 실행했고 5개�
 
 *DIAYN exact-1000 자동 선택 결과. 고정 `z23`, 고정 `z24`, `z23↔z24` 반복을 같은 20초 horizon에서 비교한다.*
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/10-dads-composition.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/10-dads-composition.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/10-dads-composition.gif"
      alt="동일 exact-1000 selector가 고른 DADS z11과 z18의 고정 실행 및 2초 반복 조합 3-panel 비교"
      width="960" height="180"
      class="d-block mx-auto"
@@ -682,26 +692,23 @@ K=10 treatment는 평균 roll을 81.8% 줄였지만 한 skill이 다섯 episode 
 
 K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종료 0·이동 12/30으로 바뀌었다. 최저 관측 높이는 0.3248 m, 최대 절대 roll은 6.949°였다. 최종 gate를 유일하게 통과했다.
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/11-e-k10-model1000.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/11-e-k10-model1000.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/11-e-k10-model1000.gif"
      alt="DADS scratch K=10 height-only control과 height plus roll treatment의 model 1000 전체 skill 비교"
      width="960" height="812"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/12-e-k20-model1000.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/12-e-k20-model1000.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/12-e-k20-model1000.gif"
      alt="DADS scratch K=20 height-only control과 height plus roll treatment의 model 1000 전체 skill 비교"
      width="960" height="864"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/13-e-k30-model1000.gif"
-     alt="DADS scratch K=30 height-only control과 height plus roll treatment의 model 1000 전체 skill 비교"
-     width="960" height="900"
-     decoding="async"
-     class="d-block mx-auto"
-     style="width: 100%; border-radius: 6px; margin: 1rem auto;">
+K=30 비교는 글 첫머리의 대표 영상과 같다.
 
 *각 GIF의 위쪽은 control, 아래쪽은 treatment다. 같은 칸은 같은 skill ID이고 모두 20초 horizon이다.*
 
@@ -719,21 +726,24 @@ K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종
 
 ### **13.4 50 iteration마다 전체 과정을 보기**
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/15-e-k10-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/15-e-k10-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/15-e-k10-progression.gif"
      alt="DADS scratch K=10 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="812"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/16-e-k20-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/16-e-k20-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/16-e-k20-progression.gif"
      alt="DADS scratch K=20 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="864"
      decoding="async"
      class="d-block mx-auto"
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
-<img src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/17-e-k30-progression.gif"
+<img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/17-e-k30-progression.jpg"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/17-e-k30-progression.gif"
      alt="DADS scratch K=30 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="900"
      decoding="async"
@@ -743,3 +753,203 @@ K=30 treatment는 model 700의 31개 종료·이동 1/30에서 model 1000의 종
 *Iteration 50, 100, …, 1000에서 같은 위아래 layout으로 모든 skill을 20초씩 기록했다. 짧은 snapshot 대신 지연 종료와 회복을 함께 볼 수 있다.*
 
 K=10과 K=20에는 실패가 남았지만, K=30 treatment는 안전 지표를 만족하면서 endpoint 이동도 보였다.
+
+<style>
+  .dads-gif-frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .dads-gif-frame[data-dads-gif-state="loading"]::after,
+  .dads-gif-frame[data-dads-gif-state="error"]::after {
+    position: absolute;
+    right: 0.65rem;
+    bottom: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 72%);
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    pointer-events: none;
+  }
+
+  .dads-gif-frame[data-dads-gif-state="loading"]::after {
+    content: "GIF 불러오는 중";
+  }
+
+  .dads-gif-frame[data-dads-gif-state="error"]::after {
+    content: "GIF 로딩 실패";
+  }
+</style>
+
+<script>
+  (() => {
+    const images = [...document.querySelectorAll('img[data-dads-gif-src]')];
+    if (images.length === 0) return;
+
+    let activeImage = null;
+    let pendingImage = null;
+    let activationTimer = null;
+    let scrollIdleTimer = null;
+    let scrolling = false;
+    let updateScheduled = false;
+    let ready = document.readyState !== 'loading';
+
+    const frameOf = (image) => image.closest('a.img-link') || image.parentElement;
+
+    const showPoster = (image) => {
+      const poster = image.dataset.dadsGifPoster;
+      image.loading = 'lazy';
+      if (image.getAttribute('src') !== poster) image.setAttribute('src', poster);
+
+      const frame = frameOf(image);
+      if (frame) {
+        frame.dataset.dadsGifState = 'poster';
+        frame.removeAttribute('aria-busy');
+      }
+    };
+
+    const playGif = (image) => {
+      const source = image.dataset.dadsGifSrc;
+      if (image.getAttribute('src') === source) return;
+
+      const frame = frameOf(image);
+      if (frame) {
+        frame.dataset.dadsGifState = 'loading';
+        frame.setAttribute('aria-busy', 'true');
+      }
+      image.loading = 'eager';
+      image.setAttribute('src', source);
+    };
+
+    const cancelPendingImage = () => {
+      window.clearTimeout(activationTimer);
+      activationTimer = null;
+      pendingImage = null;
+    };
+
+    const selectImage = (nextImage) => {
+      if (nextImage === activeImage && pendingImage === null) return;
+      if (nextImage !== null && nextImage === pendingImage) return;
+      cancelPendingImage();
+
+      if (activeImage) showPoster(activeImage);
+      activeImage = null;
+
+      if (!nextImage) return;
+
+      pendingImage = nextImage;
+      activationTimer = window.setTimeout(() => {
+        if (pendingImage !== nextImage) return;
+        pendingImage = null;
+        activeImage = nextImage;
+        playGif(activeImage);
+      }, 350);
+    };
+
+    const updateActiveImage = () => {
+      updateScheduled = false;
+      if (!ready) return;
+
+      if (document.hidden) {
+        selectImage(null);
+        return;
+      }
+
+      const viewportCenter = window.innerHeight / 2;
+      const visible = images
+        .map((image) => ({ image, rect: image.getBoundingClientRect() }))
+        .filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight)
+        .sort((a, b) => {
+          const aCenter = (a.rect.top + a.rect.bottom) / 2;
+          const bCenter = (b.rect.top + b.rect.bottom) / 2;
+          return Math.abs(aCenter - viewportCenter) - Math.abs(bCenter - viewportCenter);
+        });
+
+      const nextImage = visible.length > 0 ? visible[0].image : null;
+
+      if (scrolling) {
+        cancelPendingImage();
+        if (activeImage && activeImage !== nextImage) {
+          showPoster(activeImage);
+          activeImage = null;
+        }
+        return;
+      }
+
+      selectImage(nextImage);
+    };
+
+    const scheduleUpdate = () => {
+      if (updateScheduled) return;
+      updateScheduled = true;
+      window.requestAnimationFrame(updateActiveImage);
+    };
+
+    const handleScroll = () => {
+      scrolling = true;
+      cancelPendingImage();
+      window.clearTimeout(scrollIdleTimer);
+      scheduleUpdate();
+
+      scrollIdleTimer = window.setTimeout(() => {
+        scrolling = false;
+        scheduleUpdate();
+      }, 250);
+    };
+
+    document.querySelectorAll('article a.popup').forEach((anchor, index) => {
+      anchor.dataset.gallery = `dads-media-${index}`;
+    });
+
+    images.forEach((image) => {
+      image.dataset.dadsGifPoster = image.getAttribute('src');
+
+      const frame = frameOf(image);
+      if (frame) {
+        frame.href = image.dataset.dadsGifSrc;
+        frame.classList.add('dads-gif-frame');
+        frame.dataset.dadsGifState = 'poster';
+      }
+
+      image.addEventListener('load', () => {
+        if (image.getAttribute('src') !== image.dataset.dadsGifSrc) return;
+        const loadedFrame = frameOf(image);
+        if (loadedFrame) {
+          loadedFrame.dataset.dadsGifState = 'playing';
+          loadedFrame.removeAttribute('aria-busy');
+        }
+      });
+
+      image.addEventListener('error', () => {
+        if (image.getAttribute('src') !== image.dataset.dadsGifSrc) return;
+        const failedFrame = frameOf(image);
+        image.setAttribute('src', image.dataset.dadsGifPoster);
+        if (failedFrame) {
+          failedFrame.dataset.dadsGifState = 'error';
+          failedFrame.removeAttribute('aria-busy');
+        }
+      });
+    });
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    document.addEventListener('visibilitychange', scheduleUpdate);
+
+    if (ready) {
+      scheduleUpdate();
+    } else {
+      document.addEventListener('DOMContentLoaded', () => {
+        ready = true;
+        scheduleUpdate();
+      }, { once: true });
+    }
+  })();
+</script>
+
+<noscript>
+  <p><a href="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/13-e-k30-model1000.gif">대표 K=30 GIF 원본 보기</a></p>
+</noscript>
