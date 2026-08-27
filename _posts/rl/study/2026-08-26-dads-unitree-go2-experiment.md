@@ -1,7 +1,7 @@
 ---
 title: "[DADS 실험] Go2의 전이는 예측 가능한 스킬로 분화할까?"
 date: 2026-08-26 07:40:00 +0900
-last_modified_at: 2026-08-27 22:32:53 +0900
+last_modified_at: 2026-08-28 00:30:25 +0900
 categories: [RL, Study]
 tags: [dads, diayn, unitree-go2, unsupervised-reinforcement-learning, skill-discovery, intrinsic-reward, dynamics-model, ppo, isaac-gym]
 description: "DIAYN Go2 실험 트리를 DADS로 다시 실행해 reward 시간 단위, feature, 안전 제약, K 확장, 반복 조합, height-only와 height+roll matched 실험을 공통 평가 축으로 비교한다."
@@ -727,7 +727,7 @@ K=30 비교는 글 첫머리의 대표 영상과 같다.
 ### **13.4 50 iteration마다 전체 과정을 보기**
 
 <img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/15-e-k10-progression.jpg"
-     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/15-e-k10-progression.gif"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/15-e-k10-progression-web-800w-2fps-128c.gif"
      alt="DADS scratch K=10 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="812"
      decoding="async"
@@ -735,7 +735,7 @@ K=30 비교는 글 첫머리의 대표 영상과 같다.
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
 <img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/16-e-k20-progression.jpg"
-     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/16-e-k20-progression.gif"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/16-e-k20-progression-web-800w-2fps-128c.gif"
      alt="DADS scratch K=20 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="864"
      decoding="async"
@@ -743,7 +743,7 @@ K=30 비교는 글 첫머리의 대표 영상과 같다.
      style="width: 100%; border-radius: 6px; margin: 1rem auto;">
 
 <img src="/assets/img/posts/rl/dads-unitree-go2-experiment/posters/17-e-k30-progression.jpg"
-     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/17-e-k30-progression.gif"
+     data-dads-gif-src="https://media.iamjaehka13.blog/assets/img/posts/rl/dads-unitree-go2-experiment/17-e-k30-progression-web-800w-2fps-128c.gif"
      alt="DADS scratch K=30 height-only와 height plus roll pair의 iteration 50부터 1000까지 전체 progression"
      width="960" height="900"
      decoding="async"
