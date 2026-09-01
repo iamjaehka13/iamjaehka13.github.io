@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">HRI Venue Guide 2026</title>
+  <desc id="desc">같은 로봇 연구를 사람과 인터랙션, HRI, 로봇 방법과 학습, 저널의 contribution으로 구분한 미리보기</desc>
+  <rect width="1200" height="630" fill="#0b1426"/>
+  <rect x="52" y="46" width="1096" height="538" rx="24" fill="#111d33" stroke="#2b3c5a" stroke-width="2"/>
+
+  <text x="92" y="118" fill="#7dd3fc" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="22" font-weight="700" letter-spacing="2">CONTRIBUTION-FIRST MAP</text>
+  <text x="92" y="188" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="58" font-weight="800">HRI Venue Guide 2026</text>
+  <text x="94" y="234" fill="#bac7da" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="26">같은 로봇, 다른 독자, 다른 primary claim</text>
+
+  <rect x="92" y="286" width="308" height="102" rx="16" fill="#122b48" stroke="#38bdf8" stroke-width="2"/>
+  <text x="116" y="324" fill="#7dd3fc" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="19" font-weight="700">HUMAN · INTERACTION</text>
+  <text x="116" y="365" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="800">CHI · HAI</text>
+
+  <rect x="446" y="286" width="308" height="102" rx="16" fill="#3a2516" stroke="#fb923c" stroke-width="2"/>
+  <text x="470" y="324" fill="#fdba74" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="19" font-weight="700">HRI ITSELF</text>
+  <text x="470" y="365" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="29" font-weight="800">HRI · RO-MAN · ICSR</text>
+
+  <rect x="800" y="286" width="308" height="102" rx="16" fill="#143329" stroke="#34d399" stroke-width="2"/>
+  <text x="824" y="324" fill="#6ee7b7" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="19" font-weight="700">ROBOTICS · LEARNING</text>
+  <text x="824" y="365" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="27" font-weight="800">ICRA · RSS · CoRL</text>
+
+  <line x1="400" y1="337" x2="446" y2="337" stroke="#62748f" stroke-width="3"/>
+  <path d="M438 329 L446 337 L438 345" fill="none" stroke="#62748f" stroke-width="3"/>
+  <line x1="754" y1="337" x2="800" y2="337" stroke="#62748f" stroke-width="3"/>
+  <path d="M792 329 L800 337 L792 345" fill="none" stroke="#62748f" stroke-width="3"/>
+
+  <rect x="92" y="424" width="1016" height="106" rx="16" fill="#1a2438" stroke="#465774" stroke-width="2"/>
+  <text x="116" y="462" fill="#c4b5fd" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="19" font-weight="700">ARCHIVAL CLAIM</text>
+  <text x="116" y="504" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="28" font-weight="800">THRI</text>
+  <circle cx="236" cy="495" r="4" fill="#64748b"/>
+  <text x="263" y="504" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="28" font-weight="800">IJSR</text>
+  <circle cx="383" cy="495" r="4" fill="#64748b"/>
+  <text x="410" y="504" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="28" font-weight="800">T-RO</text>
+  <text x="642" y="501" fill="#bac7da" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif" font-size="21">주제가 아니라 남길 지식으로 고른다</text>
+</svg>

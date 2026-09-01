@@ -1,0 +1,2004 @@
+updated: "2026-09-01"
+conference_count: 8
+publication_count: 3
+
+venues:
+  - slug: hri
+    order: 1
+    group: conference
+    badge: HRI
+    name: ACM/IEEE HRI
+    full_name: ACM/IEEE International Conference on Human-Robot Interaction
+    meta: Premier HRI Conference · ACM / IEEE
+    accent: "#315ea8"
+    accent_dark: "#203f78"
+    accent_soft: "#eaf0fb"
+    hub_intro: >-
+      HRI를 단순히 “사람을 모집해 robot을 평가하는 학회”로 이해하면 핵심을 놓친다.
+      HRI는 theory·design·technical component·integrated system·user study를 모두 받으며,
+      논문이 남기는 가장 큰 지식이 <strong>human–robot interaction 자체</strong>에 있는지를 묻는다.
+    hub_detail: >-
+      2026 full paper는 Theory & Methods, Design, Technical, Systems, User Studies의 다섯 track으로 나뉜다.
+      Technical·Systems track에는 user study가 항상 필요하지 않으며, reviewer guide는 작은 결함이 있더라도
+      impact와 novelty가 큰 연구를 낮은 impact의 완벽한 연구보다 우선해 보도록 안내한다.
+    definition: >-
+      인간과 robot이 서로 영향을 주는 과정의 이해·설계·방법·기술을 전진시키는 연구가 모이는 HRI의 중심 conference
+    thesis: >-
+      HRI에서 중요한 것은 사람 수나 robot hardware의 화려함이 아니라,
+      <strong>interaction을 제거했을 때 논문의 핵심 claim도 무너지는가</strong>다.
+    thesis_note: >-
+      HRI 2026의 다섯 track은 user study만이 아니라 theory, design, algorithm, interface, system integration도
+      HRI contribution이 될 수 있음을 공식적으로 보여준다.
+    facts:
+      - value: 5 Tracks
+        label: Theory & Methods · Design · Technical · Systems · User Studies
+      - value: ~25% Typical
+        label: Reviewer guide의 통상 full-paper acceptance 안내이며 2026 확정치가 아님
+      - value: Study Optional
+        label: Technical·Systems claim은 적절한 technical evaluation으로 지지 가능
+      - value: ACM + IEEE
+        label: Engineering·design·behavioral·social science가 만나는 공동 community
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Robot behavior, interaction technique, theory, method, integrated capability 또는 사람에게서 얻은 insight 중
+          무엇이든 가능하다. 공통점은 그 결과가 HRI community의 이해나 설계 능력을 직접 확장한다는 것이다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          선택한 track의 principal contribution이 선명한지, novelty와 impact가 충분한지,
+          그리고 claim의 성격에 맞는 evidence를 제시했는지를 본다. “사람을 포함했다”는 사실만으로는 부족하다.
+    scope:
+      - title: Interaction knowledge
+        items:
+          - Trust · legibility · engagement
+          - Collaboration · communication
+          - Relationship · social behavior
+          - Field and longitudinal HRI
+      - title: Design · theory · methods
+        items:
+          - Robot morphology and behavior
+          - Interaction technique and process
+          - HRI theory and measurement
+          - Reporting and evaluation methods
+      - title: Technical · systems
+        items:
+          - HRI algorithm and model
+          - Interface · tool · hardware element
+          - Integrated HRI capability
+          - Human-aware system behavior
+    rule:
+      label: HRI의 기본 단위
+      text: >-
+        <strong>Robot과 사람이 서로 영향을 주는 과정 자체가 contribution</strong>이어야 한다.
+        사람은 단지 label을 주고 robot은 단지 benchmark를 수행한다면, robotics나 robot-learning venue가 더 직접적일 수 있다.
+    position:
+      - label: Primary claim
+        text: HRI를 이해·설계·평가·구현하는 새로운 지식 또는 capability.
+      - label: Core audience
+        text: HRI researcher, roboticist, HCI·design researcher, behavioral and social scientist.
+      - label: Evidence
+        text: User study, field deployment, proof, simulation, component test, system demonstration 중 claim에 맞는 것.
+      - label: Track lens
+        text: Topic label이 아니라 논문이 남기는 principal contribution의 종류로 track을 고른다.
+      - label: Strong signal
+        text: Interaction을 제거하면 연구 질문과 결론이 동시에 무너진다.
+      - label: Weak signal
+        text: Human study가 algorithm accuracy를 확인할 뿐 HRI knowledge를 만들지 않는다.
+    neighbors: >-
+      CHI는 결과를 HCI 전반에 일반화하고, RO-MAN은 communication·team·social application을 넓게 묶는다.
+      ICRA·IROS·RSS·CoRL은 같은 problem에서도 robotics method·system·learning novelty를 먼저 요구한다.
+    boundary: >-
+      Physical robot이 항상 필수인 것은 아니다. HRI 2026 User Studies track은 physical robot 없는 연구도 허용한다.
+      다만 contribution은 human–robot interaction에 남아야 하며, general human–agent insight가 중심이면 HAI가 더 자연스럽다.
+    snapshot:
+      - value: Official scope
+        label: Technical · design · behavioral · theoretical · methodological HRI
+      - value: Typical evidence
+        label: Claim-aligned study, proof, simulation, test, deployment or demonstration
+      - value: Strong fit
+        label: Robot-specific interaction knowledge or HRI-enabling capability
+      - value: Recheck fit
+        label: Generic HCI insight only or robotics benchmark gain only
+    position_note: >-
+      HRI 2026 reviewer guidance는 big-idea, provocative, visionary work를 환영한다. 이것은 rigor를 포기한다는 뜻이 아니라,
+      완성도만 높은 작은 increment보다 field에 남을 차이를 분명히 보여주라는 community signal이다.
+    taste_intro: >-
+      좋은 HRI paper는 “robot을 사용했다”가 아니라 <strong>interaction을 통해 무엇을 새로 알거나 가능하게 했는지</strong>가
+      abstract 첫 문장과 evidence에서 같은 방향을 가리킨다.
+    matrix:
+      - axis: Problem
+        sound: 잘 알려진 robot behavior를 사람에게 평가
+        shaped: 왜 이 behavior가 HRI의 중요한 관계·협업 문제를 바꾸는지 명시
+      - axis: Claim
+        sound: System 성능과 만족도가 모두 상승
+        shaped: 어떤 interaction mechanism 또는 reusable HRI knowledge가 생겼는지 분리
+      - axis: Evidence
+        sound: 큰 표본과 유의한 차이
+        shaped: Claim에 맞는 behavioral·technical·field evidence와 failure boundary
+      - axis: Framing
+        sound: Robot feature와 experiment를 자세히 설명
+        shaped: HRI literature의 gap, principal track, community consequence가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “새 multimodal robot interface를 구현하고 36명에게 사용성을 평가했다.”
+        explain: Interface와 study는 보이지만 HRI에 남는 central knowledge가 무엇인지 아직 흐리다.
+      shaped:
+        sample: “Robot이 불확실성을 질문으로 드러낼 때, 사용자의 correction과 shared task recovery가 어떻게 달라지는지 밝힌다.”
+        explain: Robot-specific behavior, interaction mechanism, generalizable HRI claim이 하나의 문장에 묶인다.
+    lessons:
+      - title: Track을 topic이 아니라 contribution으로 고른다
+        text: 같은 system도 algorithm이 중심이면 Technical, integration이면 Systems, human insight면 User Studies다.
+      - title: User study를 의식처럼 붙이지 않는다
+        text: 사람을 포함할지보다 어떤 evidence가 claim을 실제로 반증 가능하게 만드는지 먼저 정한다.
+      - title: Robot specificity를 설명한다
+        text: Embodiment, motion, autonomy, shared space가 interaction question을 어떻게 바꾸는지 쓴다.
+      - title: Impact와 rigor를 함께 설계한다
+        text: 큰 아이디어를 주장하되 limitation, failure, measurement validity를 숨기지 않는다.
+      - title: HCI·robotics 독자도 읽게 만든다
+        text: Interdisciplinary venue인 만큼 한 subfield의 jargon만으로 contribution을 닫지 않는다.
+    submit:
+      big: HRI itself
+      small: 논문 뒤에 HRI knowledge가 남는가?
+      items:
+        - <b>Track:</b> principal contribution 하나를 먼저 선택
+        - <b>Evaluation:</b> track과 claim에 맞는 evidence
+        - <b>Ethics:</b> 사람·현장 연구의 승인과 reporting 확인
+        - <b>Boundary:</b> CHI·RO-MAN·robotics venue framing과 비교
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>HRI는 사람과 robot 사이의 관계·행동·설계·기술 자체를 연구 단위로 삼는 conference</strong>다.
+      small: >-
+        좋은 HRI paper는 user study의 크기나 system의 복잡성보다, interaction을 통해 생긴 한 가지 차이를 community가 다시 사용할 수 있게 만든다.
+    spectrum_intro: >-
+      아래는 특정 논문의 ranking이 아니라 HRI 2026 공식 track 구조가 허용하는 연구 질문의 폭을 보여주는 예시다.
+      같은 robot이라도 primary question과 evidence가 달라지면 서로 다른 track의 paper가 된다.
+    hero_question:
+      tag: Systems
+      title: 사람이 개입할 시점을 robot이 스스로 조절하는 새로운 shared-task capability
+      text: 여러 component를 통합한 behavior와 reusable system lesson이 primary contribution이라면 Systems lens가 자연스럽다.
+    questions:
+      - tag: Theory & Methods
+        title: Trust를 한 점수 대신 어떤 동적 관계로 모델링할 것인가?
+        text: HRI concept, construct, measurement 또는 reporting practice를 바꾸는 질문.
+      - tag: Design
+        title: Robot의 motion과 morphology가 legibility를 어떻게 만드는가?
+        text: 재현 가능한 design process와 interaction technique가 중심인 질문.
+      - tag: Technical
+        title: Robot이 사람의 intent를 실시간 추론해 behavior를 바꿀 수 있는가?
+        text: Algorithm, model, interface 또는 hardware element의 HRI contribution.
+      - tag: User Studies
+        title: Robot의 explanation이 failure attribution과 recovery를 어떻게 바꾸는가?
+        text: 사람에게서 얻은 generalizable knowledge가 system보다 중심인 질문.
+      - tag: Field HRI
+        title: 가정·병원·교육 현장에서 관계가 시간에 따라 어떻게 변하는가?
+        text: Longitudinal deployment와 실제 practice에서 얻는 HRI insight.
+      - tag: Inclusive HRI
+        title: 누가 현재의 robot behavior에서 배제되고 있으며 어떻게 공동 설계할까?
+        text: Accessibility, participation, power, context를 interaction 설계에 연결하는 질문.
+    selection_note: >-
+      이 질문들은 scope를 설명하기 위한 편집 예시다. 실제 submission의 track, page limit, ethics, anonymity 정책은 해당 연도 공식 CFP를 다시 확인해야 한다.
+    sources:
+      - label: HRI 2026 Full Papers and Track Descriptions
+        url: "https://humanrobotinteraction.org/2026/full-papers/"
+      - label: HRI 2026 Full Paper Reviewer Guidelines
+        url: "https://humanrobotinteraction.org/2026/full-paper-reviewer-guidelines/"
+      - label: HRI 2026 Award Nominees and Track Examples
+        url: "https://humanrobotinteraction.org/2026/award-nominees/"
+      - label: JST/CRDS — Research and Development Trends in HRI (2026)
+        url: "https://doi.org/10.82643/crds-fr-s-ro-hri"
+
+  - slug: icra-iros
+    order: 6
+    group: conference
+    badge: ICRA·IROS
+    name: ICRA · IROS
+    full_name: IEEE International Conference on Robotics and Automation · IEEE/RSJ International Conference on Intelligent Robots and Systems
+    meta: Broad Robotics Conferences · IEEE RAS / RSJ
+    accent: "#2f8065"
+    accent_dark: "#1e5948"
+    accent_soft: "#e9f6f0"
+    hub_intro: >-
+      ICRA는 algorithm, IROS는 application이라는 고정 공식은 두 conference의 공식 범위보다 훨씬 좁다.
+      둘 다 robotics 전 영역을 다루는 broad conference다. 양쪽 공식 keyword에는 HRI와 Human Factors and Human-in-the-Loop가 있고,
+      IROS 2026 CFP는 multimodal interface and human robot interaction을 별도로 명시한다.
+    hub_detail: >-
+      HRI paper도 충분히 자연스럽지만 보통 primary contribution은 shared autonomy, pHRI control, human-aware planning,
+      assistive system, teleoperation 같은 robotics advance다. Human study는 중요할 수 있으나 대개 그 technical·system claim을 지지한다.
+    definition: >-
+      HRI를 포함해 robotics 전 영역의 새로운 method, mechanism, system, integration, capability와 application을 모으는 두 broad robotics conference
+    thesis: >-
+      ICRA·IROS의 HRI paper는 먼저 <strong>좋은 robotics paper</strong>여야 한다.
+      사람을 포함한 맥락이 새 estimation·planning·control·system capability를 왜 필요하게 만드는지 보여준다.
+    thesis_note: >-
+      두 venue의 실제 선택은 영구적인 taste 이분법보다 submission cycle, keyword, session, technical committee,
+      system maturity와 해당 연도 program fit을 확인하는 편이 정확하다.
+    facts:
+      - value: Broad Robotics
+        label: ICRA와 IROS 모두 robotics와 intelligent systems 전 영역을 포괄
+      - value: HRI Explicit
+        label: HRI·human-in-the-loop는 양쪽 keyword, multimodal interface는 IROS 2026 CFP에 명시
+      - value: ICRA Flagship
+        label: IEEE RAS flagship conference이자 robotics 전체의 premier forum
+      - value: IROS
+        label: IEEE/RSJ 명칭의 intelligent robots and systems forum
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Human-aware estimation, planning, control, perception, mechanism, interface 또는 integrated robot system이
+          이전에 없던 capability를 만들고 robotics community가 재사용할 technical knowledge를 남긴다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Original contribution, technical soundness, scope fit과 claim에 맞는 evidence를 종합적으로 본다.
+          HRI 맥락은 중요한 동기와 evidence지만 robotics contribution을 대신하지 않는다.
+    scope:
+      - title: Human-aware autonomy
+        items:
+          - Intent and capability estimation
+          - Human-aware navigation and planning
+          - Shared autonomy and teleoperation
+          - Explainable and adaptive autonomy
+      - title: Physical interaction
+        items:
+          - pHRI control and safety
+          - Haptics · handover · collaboration
+          - Assistive manipulation
+          - Rehabilitation and wearable robots
+      - title: Integrated systems
+        items:
+          - Multimodal robot interface
+          - Service and social robot system
+          - Human–robot team capability
+          - Perception–planning–control stack
+    rule:
+      label: Robotics 기본 단위
+      text: >-
+        <strong>사람과 함께 일하기 위해 어떤 새로운 robot capability를 만들었는가</strong>가 central claim이어야 한다.
+        User perception이나 relationship insight가 system novelty보다 중심이면 HRI·CHI·RO-MAN이 더 직접적이다.
+    position:
+      - label: Primary claim
+        text: HRI 맥락에서 성립하는 original robotics method, system, mechanism or capability.
+      - label: Core audience
+        text: Roboticist across perception, planning, control, learning, mechanisms, systems and applications.
+      - label: Evidence
+        text: Benchmark, simulation, theory, real robot, system integration, safety test and human experiment.
+      - label: Review lens
+        text: Human study도 robotics claim의 validity, utility, safety 또는 integrated performance를 검증한다.
+      - label: Strong signal
+        text: Human context를 제거해도 method novelty가 남고, 동시에 그 context가 problem formulation을 본질적으로 만든다.
+      - label: Weak signal
+        text: Robot은 study apparatus이고 가장 큰 결과가 trust·experience·relationship뿐이다.
+    neighbors: >-
+      RSS는 single-track science/systems claim을 더 압축해서 요구하고, CoRL은 learning contribution을 중심에 둔다.
+      HRI는 같은 system도 interaction knowledge나 HRI-enabling component 자체를 primary claim으로 만들 수 있다.
+    boundary: >-
+      ICRA와 IROS의 scope는 크게 겹친다. “ICRA는 theory, IROS는 application” 같은 folklore를 영구 규칙으로 쓰지 말고,
+      해당 연도의 CFP·keyword·session과 가장 가까운 recent program을 확인한다.
+    snapshot:
+      - value: Official scope
+        label: Robotics · automation · intelligent robots and smart machines
+      - value: Typical evidence
+        label: Technical analysis plus simulation, benchmark, real robot or system validation
+      - value: Strong fit
+        label: Human-aware robotics advance with clear method or capability
+      - value: Recheck fit
+        label: Human insight only, with little robotics novelty
+    position_note: >-
+      ICRA 2026에는 HRI keynote, regular session, Best Paper Award on Human-Robot Interaction이 있었다.
+      HRI가 주변 topic이라는 뜻은 틀리지만, broad robotics program 안에서 technical contribution을 경쟁한다는 위치는 분명하다.
+    taste_intro: >-
+      좋은 ICRA·IROS HRI paper는 <strong>사람이 만든 constraint와 uncertainty를 robotics problem으로 정확히 formalize</strong>하고,
+      새 capability가 실제 system에서 왜 중요한지 보여준다.
+    matrix:
+      - axis: Problem
+        sound: 사람과 함께 쓰는 robot system을 구현
+        shaped: 어떤 human-aware estimation·planning·control 병목을 새 robotics problem으로 정의
+      - axis: Claim
+        sound: Task performance와 만족도 향상
+        shaped: Method·system capability의 novelty와 인간 맥락의 consequence를 분리해 명시
+      - axis: Evidence
+        sound: Demo와 user study
+        shaped: Baseline·ablation·failure·real robot·safety·human evidence를 claim에 맞게 조합
+      - axis: Framing
+        sound: HRI application을 소개
+        shaped: Robotics literature gap과 broad robotics audience가 재사용할 차이가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “사용자 명령을 이해해 책상을 정리하는 multimodal robot을 만들었다.”
+        explain: Demo는 흥미롭지만 technical bottleneck과 robotics novelty가 아직 선명하지 않다.
+      shaped:
+        sample: “Ambiguous deictic command를 active clarification과 task-and-motion planning에 통합해 cluttered manipulation의 recovery rate를 높인다.”
+        explain: Human input이 새 formulation, integrated capability, measurable robotics evidence로 이어진다.
+    lessons:
+      - title: Human context를 robotics problem으로 만든다
+        text: Intent, uncertainty, safety, shared workspace가 state·constraint·objective를 어떻게 바꾸는지 쓴다.
+      - title: Integrated demo만으로 끝내지 않는다
+        text: Central method와 각 component의 역할, failure boundary를 분리한다.
+      - title: User study의 역할을 명확히 한다
+        text: Interaction insight가 아니라 capability utility·safety·performance를 검증한다면 그렇게 쓴다.
+      - title: ICRA·IROS folklore를 피한다
+        text: 고정 taste보다 CFP, keyword, committee, recent session을 근거로 선택한다.
+      - title: Broad audience를 설득한다
+        text: 한 application을 넘어 robotics에 남는 method·system lesson을 보여준다.
+    submit:
+      big: Robotics advance
+      small: 사람과 함께 일하기 위해 무엇을 새로 가능하게 했는가?
+      items:
+        - <b>Method:</b> estimation · planning · control · perception · mechanism
+        - <b>System:</b> integration and end-to-end capability
+        - <b>Evidence:</b> baseline · ablation · real robot · safety · human test
+        - <b>Fit:</b> current CFP · keyword · session · cycle
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>ICRA·IROS의 HRI는 사람과 함께 작동하는 robot의 새 기술·시스템·capability를 만드는 research</strong>다.
+      small: >-
+        Human study의 존재가 venue를 결정하지 않는다. 논문 뒤에 interaction knowledge보다 robotics advance가 더 크게 남는지가 핵심이다.
+    spectrum_intro: >-
+      아래 질문은 ICRA·IROS 공식 scope와 ICRA 2026 HRI program에서 자주 보이는 robotics-first research unit을 보여주는 편집 예시다.
+    hero_question:
+      tag: Shared autonomy
+      title: 사람의 intent와 capability uncertainty를 online으로 추정해 assistance policy를 바꿀 수 있는가?
+      text: Human signal을 estimation·planning·control의 새 formulation과 integrated robot capability로 만드는 질문.
+    questions:
+      - tag: Physical HRI
+        title: 접촉 상태와 human comfort를 보장하는 새로운 control law는 무엇인가?
+        text: Stability, safety, haptics, collaboration을 다루는 robotics 질문.
+      - tag: Navigation
+        title: 사람의 group·motion·social constraint를 planning에 어떻게 넣을까?
+        text: Perception과 human-aware planning을 연결하는 질문.
+      - tag: Teleoperation
+        title: Operator workload와 uncertainty에 따라 autonomy level을 조절할 수 있는가?
+        text: Interface를 shared-control system capability로 만드는 질문.
+      - tag: Assistive robotics
+        title: 사용자의 reachability를 추정해 도움의 timing과 magnitude를 정할 수 있는가?
+        text: Human capability model과 assistance policy의 질문.
+      - tag: System integration
+        title: Language·gesture·vision을 grounding해 manipulation까지 안정적으로 연결할 수 있는가?
+        text: Multimodal perception부터 execution과 recovery까지의 system 질문.
+      - tag: Safety · explainability
+        title: Robot decision의 uncertainty와 reason을 행동 중 전달할 수 있는가?
+        text: Explainable architecture와 safe autonomy를 기술적으로 검증하는 질문.
+    selection_note: >-
+      이 guide는 ICRA와 IROS를 같은 broad-robotics 축에서 설명한다. 실제 submission은 두 venue를 하나로 취급하지 말고 해당 연도 policy와 program을 따로 확인한다.
+    sources:
+      - label: ICRA 2026 — Call for Papers
+        url: "https://2026.ieee-icra.org/contribute/call-for-icra-2026-papers-now-accepting-submissions/"
+      - label: IEEE RAS — ICRA Keywords
+        url: "https://www.ieee-ras.org/conferences-workshops/fully-sponsored/icra/icra-keywords/"
+      - label: IEEE RAS — ICRA Reviewer Guidance
+        url: "https://www.ieee-ras.org/conferences-workshops/fully-sponsored/icra/information-for-icra-reviewers/"
+      - label: ICRA 2026 — HRI Keynote Sessions
+        url: "https://2026.ieee-icra.org/program/keynote-sessions/"
+      - label: ICRA 2026 — HRI Regular Session
+        url: "https://2026.ieee-icra.org/event/regular-sessions-orals-thbt1-thbt2-thbt3-thbt4/"
+      - label: ICRA 2026 — Awards and HRI Finalists
+        url: "https://2026.ieee-icra.org/awards/"
+      - label: IROS 2026 — Call for Papers
+        url: "https://2026.ieee-iros.org/contribute/call-for-papers/"
+      - label: IEEE RAS — IROS Keywords
+        url: "https://www.ieee-ras.org/conferences-workshops/financially-co-sponsored/iros/keywords-4/"
+      - label: IEEE RAS — IROS Reviewer Guidance
+        url: "https://www.ieee-ras.org/conferences-workshops/financially-co-sponsored/iros/information-for-reviewers-4/"
+
+  - slug: rss
+    order: 7
+    group: conference
+    badge: RSS
+    name: RSS
+    full_name: "Robotics: Science and Systems"
+    meta: High-quality Single Track · Independent Foundation
+    accent: "#2d756f"
+    accent_dark: "#1a5350"
+    accent_soft: "#e8f5f3"
+    hub_intro: >-
+      RSS를 “작고 이론적인 robotics conference”로만 보면 science와 systems를 함께 요구하는 정체성을 놓친다.
+      RSS Foundation은 open, high-quality, single-track conference를 지향하고,
+      CFP는 <strong>novel scientific and systems contributions</strong>을 명시한다.
+    hub_detail: >-
+      2026 program에는 HRI session이 별도로 있었고 preference learning, reward repair, engagement,
+      human capability estimation, shared wheelchair control 같은 문제가 포함됐다. 공통점은 human signal을 robotics science·system problem과 연결한다는 것이다.
+    definition: >-
+      서로 다른 robotics subfield가 같은 program을 공유하며, 검증 가능한 novel science 또는 system contribution을 압축된 single-track paper로 제시하는 conference
+    thesis: >-
+      RSS의 HRI paper는 사람의 반응을 보고하는 데서 끝나지 않고
+      <strong>human preference·state·capability·input을 robotics principle과 system으로 만든다</strong>.
+    thesis_note: >-
+      Single track은 topic을 좁힌다는 뜻이 아니라 모든 참석자가 같은 논문을 보게 한다는 뜻이다.
+      그래서 central claim이 명료하고 robotics expert가 핵심 technical idea를 검증할 수 있어야 한다.
+    facts:
+      - value: Single Track
+        label: 서로 다른 robotics subfield가 같은 발표와 논의를 공유
+      - value: Science + Systems
+        label: CFP가 novel scientific and systems contributions를 함께 요청
+      - value: Best Work
+        label: Authors의 가장 강한 work와 self-contained technical story를 요구
+      - value: HRI Session
+        label: RSS 2026 accepted program에 Human-Robot Interaction session 존재
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Formal method, scientific principle, system architecture 또는 integrated capability가 robotics 문제를 새롭게 해결하며,
+          HRI에서는 human signal과 constraint가 그 formulation에 본질적으로 들어간다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Reviewer guidance는 novelty, technical concern, importance와 clarity를 구체적이고 건설적으로 다루도록 한다.
+          Main paper만으로 expert가 핵심 idea를 검증할 수 있어야 하며,
+          user result만으로 science·systems claim을 대신하기 어렵다.
+    scope:
+      - title: Human inference
+        items:
+          - Preference and intent inference
+          - Capability and reachability model
+          - Engagement and state estimation
+          - Reward alignment and explanation
+      - title: Shared autonomy
+        items:
+          - Assistance policy and timing
+          - Shared control and teleoperation
+          - Human-in-the-loop planning
+          - Safety and uncertainty
+      - title: HRI systems
+        items:
+          - Integrated assistive system
+          - Human-aware mechanism
+          - Dataset and benchmark
+          - Reusable system principle
+    rule:
+      label: RSS의 기본 단위
+      text: >-
+        <strong>Human-in-the-loop 문제를 robotics science 또는 system advance로 일반화</strong>해야 한다.
+        User perception과 UX insight가 primary result라면 HRI·CHI·RO-MAN 독자가 더 직접적이다.
+    position:
+      - label: Primary claim
+        text: Significant novel robotics science or system contribution, with human context when essential.
+      - label: Core audience
+        text: Broad robotics researcher in a single-track technical community.
+      - label: Evidence
+        text: Formal analysis, simulation, benchmark, real system, human-in-loop test and failure analysis.
+      - label: Paper lens
+        text: Concise, lucid, self-contained story whose key technical ideas can be verified by experts.
+      - label: Strong signal
+        text: Human state·preference·input becomes a new estimation, policy, control or system principle.
+      - label: Weak signal
+        text: Human study가 primary result이고 robotics formulation이나 capability는 기존 그대로다.
+    neighbors: >-
+      ICRA·IROS는 더 큰 broad program에서 robotics 전 영역을 받고, CoRL은 learning contribution을 중심에 둔다.
+      HRI는 같은 method도 interaction knowledge나 HRI-enabling component를 primary claim으로 만들 수 있다.
+    boundary: >-
+      RSS를 theory·learning 전용으로 좁히지 않는다. 2026 CFP는 novel scientific and systems contributions를 함께 요청하며,
+      2026 HRI session에도 control, assistance, engagement, mechanism과 data-oriented work가 공존한다.
+    snapshot:
+      - value: Official scope
+        label: Novel scientific and systems contributions across robotics
+      - value: Typical evidence
+        label: Expert-verifiable technical idea plus strong system or empirical support
+      - value: Strong fit
+        label: Human-in-loop robotics principle or novel system capability
+      - value: Recheck fit
+        label: Perception·experience insight without robotics advance
+    position_note: >-
+      RSS 2026 accepted program의 HRI example은 해당 연도의 관찰이지 영구적인 scope 정의가 아니다.
+      다만 human behavior를 estimation, policy, control, safety, mechanism과 연결하는 공통 pattern은 venue fit을 이해하는 유용한 evidence다.
+    taste_intro: >-
+      좋은 RSS HRI paper는 <strong>사람이 있다는 사실을 새 robotics state·constraint·objective·system principle로 바꾸고</strong>,
+      그 핵심 idea를 좁고 검증 가능한 claim으로 제시한다.
+    matrix:
+      - axis: Problem
+        sound: Human-in-loop robot system을 구현
+        shaped: 기존 robotics formulation이 human uncertainty를 다루지 못하는 정확한 gap을 정의
+      - axis: Claim
+        sound: User outcome과 success rate 향상
+        shaped: New inference·policy·control·system principle과 consequence를 명시
+      - axis: Evidence
+        sound: Demo와 평균 성능
+        shaped: Formal property·baseline·ablation·failure·system/human evidence를 한 claim에 연결
+      - axis: Framing
+        sound: HRI application이 흥미로움
+        shaped: Broad robotics researcher가 검증하고 재사용할 science/systems difference가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “사용자 feedback을 받아 더 도움이 되는 assistive robot을 만들었다.”
+        explain: Human involvement는 보이지만 formal problem과 novel robotics principle이 아직 흐리다.
+      shaped:
+        sample: “Unknown human reachability를 active query로 추정하고 uncertainty-aware assistance timing policy를 도출한다.”
+        explain: Human capability가 estimation과 policy의 새 technical contribution으로 변환된다.
+    lessons:
+      - title: Human variable을 formalize한다
+        text: Preference, intent, capability, engagement가 state·observation·reward·constraint 중 무엇인지 쓴다.
+      - title: 한 가지 technical idea를 중심에 둔다
+        text: 여러 module보다 expert가 검증할 core principle과 consequence를 압축한다.
+      - title: Science와 systems 중 강점을 명시한다
+        text: Formal result와 integrated capability가 모두 가능하지만 primary unit을 흐리지 않는다.
+      - title: Human study를 mechanism과 연결한다
+        text: Outcome 차이가 왜 policy·control·system design 때문에 생겼는지 보여준다.
+      - title: Failure boundary를 드러낸다
+        text: 어떤 human model과 environment assumption에서 method가 깨지는지 쓴다.
+    submit:
+      big: Science / Systems
+      small: Human-in-loop problem에서 어떤 검증 가능한 robotics 차이가 생겼는가?
+      items:
+        - <b>Formulation:</b> state · preference · capability · constraint
+        - <b>Core idea:</b> estimation · policy · control · mechanism · system
+        - <b>Evidence:</b> formal · baseline · ablation · real system · human
+        - <b>Story:</b> concise · lucid · self-contained
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>RSS의 HRI는 사람을 robotics science와 systems의 본질적인 변수로 만드는 research</strong>다.
+      small: >-
+        좋은 paper는 user study의 크기보다, human context에서 나온 하나의 technical principle과 system consequence가 명확하다.
+    spectrum_intro: >-
+      아래 질문은 RSS 2026 HRI session과 official science/systems language를 바탕으로 구성한 research spectrum 예시다.
+    hero_question:
+      tag: Capability inference
+      title: 사람의 reachability를 능동적으로 추정해 assistance timing을 결정할 수 있는가?
+      text: Human capability uncertainty를 estimation과 policy의 novel robotics problem으로 만드는 질문.
+    questions:
+      - tag: Preference
+        title: 적은 interaction으로 human preference를 빠르고 안전하게 학습할 수 있는가?
+        text: Query design, uncertainty, policy adaptation을 다루는 질문.
+      - tag: Reward repair
+        title: Misaligned robot reward를 targeted explanation과 correction으로 복구할 수 있는가?
+        text: Alignment와 interactive recovery를 technical problem으로 만드는 질문.
+      - tag: Shared control
+        title: Wheelchair control authority를 안전성과 user intent에 따라 어떻게 배분할까?
+        text: Deterministic or uncertainty-aware shared control 질문.
+      - tag: Engagement
+        title: Human engagement를 system state로 넣을 때 policy는 어떻게 달라지는가?
+        text: Human-in-loop dynamics와 adaptive behavior 질문.
+      - tag: Mechanism
+        title: Conversational robot의 facial mechanism을 task와 expression에 맞게 자동 설계할 수 있는가?
+        text: HRI embodiment를 mechanisms and systems contribution으로 만드는 질문.
+      - tag: Safety
+        title: Human model이 틀렸을 때 assistance system은 어떻게 fail safely 할 것인가?
+        text: Robustness, uncertainty, recovery boundary 질문.
+    selection_note: >-
+      이 질문은 venue의 영구 기준이 아니라 2026 program과 CFP에서 읽히는 science/systems pattern을 설명하기 위한 편집 예시다.
+    sources:
+      - label: RSS Foundation — Conference Identity
+        url: "https://roboticsconference.org/committees/foundation/"
+      - label: RSS 2026 — Call for Papers
+        url: "https://roboticsconference.org/2026/information/cfp/"
+      - label: RSS 2026 — Accepted Papers and HRI Session
+        url: "https://roboticsconference.org/2026/program/papers/"
+      - label: RSS 2026 — Official Review Guidelines
+        url: "https://docs.google.com/document/d/1iinlZAhQ4_DrYyLZAQRG4FE5vYTnoJR_EvgjcpQmcig/edit?usp=sharing"
+
+  - slug: corl
+    order: 8
+    group: conference
+    badge: CoRL
+    name: CoRL
+    full_name: Conference on Robot Learning
+    meta: Selective Single Track · Robotics × Machine Learning
+    accent: "#3b7a60"
+    accent_dark: "#275743"
+    accent_soft: "#eaf5ef"
+    hub_intro: >-
+      CoRL을 “ML model을 robot에 적용한 conference”로 이해하면 공식 CFP의 robotics requirement를 놓친다.
+      Submission은 core robotics problem을 중심으로 해야 하며, model·algorithm·dataset·benchmark가
+      <strong>robot learning에 significant original contribution</strong>을 주어야 한다.
+    hub_detail: >-
+      HRI와 natural-language·gesture instruction은 공식 topic이다. 그러나 human feedback을 썼다는 사실만으로 fit이 생기지는 않는다.
+      Real-robot evidence 또는 convincing transfer가 권장되고, robotics focus가 없는 submission은 review 없이 반환될 수 있다.
+    definition: >-
+      Robotics와 machine learning의 교차점에서 core robotics problem을 새 learning formulation·algorithm·data·benchmark로 해결하며,
+      real-robot experiment 또는 convincing transferable simulation evidence를 권장하는 selective single-track conference
+    thesis: >-
+      CoRL의 HRI paper에서 human은 중요한 signal일 수 있지만
+      <strong>primary claim은 여전히 robot learning의 진전</strong>이어야 한다.
+    thesis_note: >-
+      Preference, demonstration, correction, language, gesture, intervention을 사용하더라도
+      무엇을 더 잘 학습하고 generalize·adapt·align하게 되었는지 robotics 관점에서 보여준다.
+    facts:
+      - value: Single Track
+        label: Robotics–ML intersection의 selective international conference
+      - value: Core Robotics
+        label: 모든 submission은 robotics problem과 relevance를 명시해야 함
+      - value: Real Robot
+        label: Real experiment 또는 convincing sim-to-real relevance를 권장
+      - value: HRI in Scope
+        label: HRI · natural language · gesture · alternative instruction devices
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Robot policy, representation, data, world model, learning algorithm, benchmark 또는 safety·alignment method가
+          human signal을 통해 더 잘 learn·generalize·adapt하는 original robotics contribution을 만든다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Significance와 novelty, experiment 또는 analysis로 claim이 객관적으로 성립하는지,
+          scientific·technological impact와 robot-learning relevance를 본다.
+          Generic ML improvement나 agent demo만으로는 robot learning contribution을 대신할 수 없다.
+    scope:
+      - title: Learning from humans
+        items:
+          - Demonstration and imitation
+          - Preference and correction
+          - Intervention and shared autonomy
+          - Interactive personalization
+      - title: Robot instruction
+        items:
+          - Natural language instruction
+          - Gesture and multimodal command
+          - Foundation-model grounding
+          - Human–robot teaching
+      - title: Learning systems
+        items:
+          - Reinforcement and offline learning
+          - World model and representation
+          - Safety · alignment · uncertainty
+          - Dataset · benchmark · evaluation
+    rule:
+      label: CoRL의 기본 단위
+      text: >-
+        <strong>Human input을 통해 robot이 무엇을 새로 학습하고 어디까지 generalize하는가</strong>가 중심이다.
+        Explanation이 trust를 높였다는 결과만 남는다면 HRI·CHI가 더 직접적이다.
+    position:
+      - label: Primary claim
+        text: Core robotics problem에 대한 significant original robot-learning contribution.
+      - label: Core audience
+        text: Robot learning, embodied AI, reinforcement·imitation learning and robotics-system researcher.
+      - label: Evidence
+        text: Learning curve, baseline, ablation, generalization, data analysis, simulation transfer and real robot.
+      - label: Robotics lens
+        text: Method·dataset·benchmark가 왜 robotics에 중요한지 명시하고 physical constraints를 반영하는가.
+      - label: Strong signal
+        text: Human feedback가 learning formulation과 generalization의 핵심 변수다.
+      - label: Weak signal
+        text: LLM·ML을 연결했지만 policy learning, data, adaptation 또는 robot relevance가 없다.
+    neighbors: >-
+      RSS는 learning을 포함하되 broader robotics science/systems contribution을 받고, ICRA·IROS는 technical robotics 전 영역을 다룬다.
+      HRI·CHI는 human response와 interaction knowledge가 primary result일 때 더 자연스럽다.
+    boundary: >-
+      CoRL topic list에 HRI가 있다는 것은 모든 HRI+ML paper가 맞는다는 뜻이 아니다.
+      Core robotics problem, learning novelty, robot relevance와 claim에 맞는 evidence가 함께 보여야 한다.
+    snapshot:
+      - value: Official scope
+        label: Significant original research at robotics–machine learning intersection
+      - value: Typical evidence
+        label: Baseline · ablation · generalization · real robot or convincing transfer
+      - value: Strong fit
+        label: Human signal이 central한 novel robot-learning method or data
+      - value: Recheck fit
+        label: Trust·UX result only or generic ML with nominal robot demo
+    position_note: >-
+      CoRL 2026은 Limitations section을 요구하고, accepted paper와 그 review를 decision 후 공개·de-anonymize한다.
+      Real-robot experiment를 강제하지는 않지만 real-robot experiment 또는 convincing transferable simulation evidence를 제시하도록 권장한다.
+    taste_intro: >-
+      좋은 CoRL HRI paper는 <strong>사람의 demonstration·preference·correction을 learning algorithm의 장식이 아니라 problem formulation의 핵심</strong>으로 만든다.
+    matrix:
+      - axis: Problem
+        sound: Human data로 robot policy를 학습
+        shaped: 기존 learning이 어떤 human signal·physical constraint·generalization gap을 다루지 못하는지 정의
+      - axis: Claim
+        sound: Success rate가 향상
+        shaped: New learning formulation·algorithm·dataset·benchmark와 generalization consequence를 명시
+      - axis: Evidence
+        sound: 한 task의 simulation curve
+        shaped: Strong baseline·ablation·data efficiency·generalization·real robot or transfer evidence
+      - axis: Framing
+        sound: LLM·human feedback를 사용
+        shaped: Core robotics problem과 learning contribution이 title·abstract 첫 문장에 보임
+    framing:
+      diffuse:
+        sample: “사용자가 자연어로 robot을 수정하면 task 성공률이 높아졌다.”
+        explain: Interaction은 보이지만 learning formulation과 generalization contribution이 아직 약하다.
+      shaped:
+        sample: “Sparse natural-language correction을 preference posterior와 policy update에 통합해 unseen manipulation task로 personalization을 transfer한다.”
+        explain: Human correction, learning method, data efficiency, robot generalization이 하나의 claim이 된다.
+    lessons:
+      - title: Core robotics problem을 먼저 쓴다
+        text: Human feedback나 foundation model보다 manipulation·navigation·control problem이 앞에 온다.
+      - title: Learning contribution을 명사로 쓴다
+        text: Formulation, algorithm, dataset, benchmark, representation 중 무엇이 original한지 명시한다.
+      - title: Generalization을 좁게 검증하지 않는다
+        text: New task, object, person, environment, embodiment 중 claim한 축을 실제로 시험한다.
+      - title: Real-robot relevance를 설득한다
+        text: Simulation이라면 sensor noise, dynamics, data collection, transfer assumption을 연결한다.
+      - title: HRI outcome과 learning result를 분리한다
+        text: Trust·preference finding이 primary라면 venue framing 자체를 다시 검토한다.
+    submit:
+      big: Robot learning
+      small: Human signal로 무엇을 새로 learn·adapt·generalize하는가?
+      items:
+        - <b>Problem:</b> core robotics task and constraint
+        - <b>Contribution:</b> method · data · benchmark · representation
+        - <b>Evidence:</b> baseline · ablation · generalization · robot
+        - <b>Limits:</b> mandatory limitations and transfer boundary
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>CoRL의 HRI는 사람을 learning signal로 삼아 robot learning 자체를 전진시키는 research</strong>다.
+      small: >-
+        좋은 paper는 human feedback을 사용했다는 사실보다, 그 feedback으로 어떤 learning problem을 새로 풀고 physical robot에 무엇이 남는지 선명하다.
+    spectrum_intro: >-
+      아래 질문은 CoRL 2026 CFP의 HRI·instruction·safety·foundation-model topic을 robot-learning unit으로 바꾼 편집 예시다.
+    hero_question:
+      tag: Correction learning
+      title: Few-shot human correction으로 robot policy를 personalize하고 unseen task에 transfer할 수 있는가?
+      text: Human input이 learning formulation, data efficiency, personalization, generalization으로 이어지는 질문.
+    questions:
+      - tag: Demonstration
+        title: Suboptimal human demonstration에서 reusable skill structure를 학습할 수 있는가?
+        text: Imitation, representation, robustness를 다루는 질문.
+      - tag: Preference
+        title: 적은 비교 feedback으로 reward와 uncertainty를 함께 추정할 수 있는가?
+        text: Active preference learning과 safe policy update 질문.
+      - tag: Language
+        title: Natural-language instruction을 grounded robot policy로 안정적으로 변환할 수 있는가?
+        text: Foundation model, grounding, action generation 질문.
+      - tag: Intervention
+        title: Human intervention을 failure label이 아니라 online learning signal로 쓸 수 있는가?
+        text: Shared autonomy, correction, continual learning 질문.
+      - tag: Alignment
+        title: Human intent와 learned reward가 어긋날 때 robot은 어떻게 감지·복구하는가?
+        text: Safety, reward misspecification, interactive repair 질문.
+      - tag: Benchmark
+        title: Human-centered robot learning을 재현 가능하게 비교할 dataset과 metric은 무엇인가?
+        text: Data collection, benchmark design, embodiment relevance 질문.
+    selection_note: >-
+      CoRL은 current CFP와 decision timeline이 빠르게 바뀐다. Submission 전 공식 author instruction, page limit, review visibility, ethics·limitations requirement를 다시 확인한다.
+    sources:
+      - label: CoRL 2026 — Call for Papers
+        url: "https://2026.corl.org/contributions/call-for-papers"
+      - label: CoRL 2026 — Instructions for Authors
+        url: "https://2026.corl.org/contributions/instruction-for-authors"
+      - label: CoRL 2025 — Official Reviewer Criteria
+        url: "https://2025.corl.org/contributions/instruction-for-reviews"
+
+  - slug: thri
+    order: 9
+    group: publication
+    badge: THRI
+    name: ACM THRI
+    full_name: ACM Transactions on Human-Robot Interaction
+    meta: HRI Archival Journal · ACM
+    accent: "#7556a8"
+    accent_dark: "#533a7d"
+    accent_soft: "#f0ebf8"
+    hub_intro: >-
+      THRI를 “HRI conference paper를 길게 쓰는 저널”로 이해하면 archival contribution을 놓친다.
+      이 journal은 technology, design, behavioral and social science를 가로질러 HRI understanding을 advance하고,
+      <strong>state of the art·general knowledge를 추가하거나 기존 이해에 도전</strong>하는 work를 요청한다.
+    hub_detail: >-
+      Theory, method, reporting guideline, longitudinal deployment, complete system analysis, review처럼
+      HRI community 전체에 오래 남을 지식이 자연스럽다. Conference extension은 한 경로일 뿐 필수 identity가 아니다.
+    definition: >-
+      HRI 전반의 theory, method, design, technology, empirical knowledge와 synthesis를 interdisciplinary archival article로 남기는 ACM journal
+    thesis: >-
+      THRI의 핵심은 분량이 아니라 <strong>HRI community에 오래 남을 general knowledge와 충분히 완결된 evidence</strong>다.
+    thesis_note: >-
+      한 study의 결과도 가능하지만 broad-interest implication이 선명해야 한다.
+      여러 study·deployment·method를 묶는 work는 conference-size snapshot을 넘어 archival claim을 만들기 좋다.
+    facts:
+      - value: HRI Archival
+        label: Human–robot interaction 전반을 위한 dedicated ACM Transactions
+      - value: Interdisciplinary
+        label: Robotics · computing · engineering · design · behavioral and social science
+      - value: General Knowledge
+        label: State of the art를 확장하거나 기존 HRI understanding에 도전
+      - value: Many Article Forms
+        label: Theory · method · empirical study · system · review and synthesis
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          HRI theory, construct, measure, design principle, technical method, field evidence 또는 synthesis가
+          한 platform과 한 setting을 넘어 broad HRI audience에게 이해 가능하고 reusable해야 한다.
+      - title: Editor와 reviewer가 보는 것
+        text: >-
+          Scholarly quality, novelty, broad HRI interest, interdisciplinary intelligibility와 evidence completeness를 본다.
+          단순 conference extension이나 추가 참가자 수보다 archival claim의 성숙도가 중요하다.
+    scope:
+      - title: HRI knowledge
+        items:
+          - Theory · construct · framework
+          - Method · measure · reporting
+          - Design knowledge and process
+          - Human behavior and relationship
+      - title: Technology · systems
+        items:
+          - HRI-enabling algorithm and tool
+          - Complete interactive system
+          - Long-term adaptive capability
+          - Reproducible system analysis
+      - title: Archival evidence
+        items:
+          - Multiple studies and replication
+          - Field and longitudinal deployment
+          - Survey · review · synthesis
+          - Cross-context comparative work
+    rule:
+      label: THRI의 기본 단위
+      text: >-
+        <strong>HRI 전반에 오래 남을 knowledge claim을 하나의 완결된 article로 닫는다</strong>.
+        길기만 한 system report나 작은 conference increment는 archival contribution을 대신하지 않는다.
+    position:
+      - label: Primary claim
+        text: Broadly useful, durable HRI knowledge or state-of-the-art advance.
+      - label: Core audience
+        text: Interdisciplinary HRI community across technical, design, behavioral and social perspectives.
+      - label: Evidence
+        text: Deep study, multiple studies, field/longitudinal work, theory, method validation, complete system or review.
+      - label: Archival lens
+        text: 현재 결과가 몇 년 뒤에도 reference point, method, framework 또는 evidence로 남는가.
+      - label: Strong signal
+        text: Conference-size result를 넘어 evidence와 synthesis가 한 general claim을 완결한다.
+      - label: Weak signal
+        text: 한 demo의 novelty만 있고 broad HRI implication과 evidence depth가 부족하다.
+    neighbors: >-
+      HRI conference와 scope는 겹치지만 THRI는 archival completeness와 broad general knowledge에 더 자연스럽다.
+      IJSR은 social robot과 사회적 맥락이 중심이고, T-RO는 major robotics advance를 먼저 본다.
+    boundary: >-
+      Journal은 자동으로 conference보다 “위”가 아니며 conference paper를 길게 늘이는 형식도 아니다.
+      Research unit, reader, review cycle과 evidence maturity가 다른 publication choice다.
+    snapshot:
+      - value: Official scope
+        label: Advance HRI understanding, state of the art or general knowledge
+      - value: Typical evidence
+        label: Deep, complete and interdisciplinary archival support
+      - value: Strong fit
+        label: Theory · method · longitudinal · synthesis · complete HRI analysis
+      - value: Recheck fit
+        label: Small system report or narrow increment without general HRI value
+    position_note: >-
+      ACM의 공식 소개는 robotics, computer science, engineering, design, behavioral and social sciences 전반의 submission을 열고,
+      broad interest와 여러 독자가 이해할 수 있는 글을 우선한다고 밝힌다. Interdisciplinary breadth와 intelligibility가 함께 요구된다.
+    taste_intro: >-
+      좋은 THRI article은 <strong>여러 결과를 더하는 데서 끝나지 않고 HRI community가 다시 인용할 framework·evidence·design knowledge로 묶는다</strong>.
+    matrix:
+      - axis: Problem
+        sound: Conference study를 더 큰 표본으로 반복
+        shaped: 어떤 unresolved HRI knowledge gap을 archival evidence로 닫는지 정의
+      - axis: Claim
+        sound: 더 많은 condition에서 effect를 확인
+        shaped: Theory·method·design·system·human knowledge 중 durable contribution을 명시
+      - axis: Evidence
+        sound: Study 수와 appendix가 증가
+        shaped: Triangulation·replication·longitudinal·cross-context evidence가 한 claim을 완결
+      - axis: Framing
+        sound: Conference보다 긴 결과를 보고
+        shaped: Broad HRI audience가 이해하고 재사용할 archival reference point가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “기존 HRI study에 condition과 참가자를 추가해 더 유의한 결과를 얻었다.”
+        explain: Evidence는 늘었지만 어떤 general HRI knowledge가 새로 완결됐는지 약하다.
+      shaped:
+        sample: “세 deployment를 통해 socially appropriate assistance의 context-sensitive framework를 구축하고 measure와 design implication을 검증한다.”
+        explain: Multiple evidence가 framework, method, general knowledge를 하나의 archival claim으로 만든다.
+    lessons:
+      - title: Extension보다 archival claim을 먼저 쓴다
+        text: 무엇을 더 했는지가 아니라 HRI understanding을 어떻게 완결했는지 설명한다.
+      - title: Broad interest를 번역한다
+        text: Technical·social·design reader가 같은 contribution을 이해할 수 있게 jargon을 연결한다.
+      - title: Evidence depth를 claim에 맞춘다
+        text: Multiple study가 필요할 수도 있지만 theory나 method paper는 다른 validation이 적절할 수 있다.
+      - title: Field와 time을 knowledge로 만든다
+        text: Longitudinal deployment를 anecdote가 아니라 relationship·adaptation·practice insight로 정리한다.
+      - title: Review와 synthesis도 contribution이다
+        text: 명확한 method와 새로운 taxonomy·gap·agenda를 제공해야 한다.
+    submit:
+      big: Archival HRI
+      small: 몇 년 뒤에도 무엇이 reference point로 남는가?
+      items:
+        - <b>Claim:</b> theory · method · design · system · general knowledge
+        - <b>Evidence:</b> deep · complete · triangulated · longitudinal
+        - <b>Audience:</b> broad interdisciplinary HRI
+        - <b>Boundary:</b> IJSR sociality and T-RO robotics advance
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>THRI는 HRI community 전체가 오래 사용할 theory·method·evidence·system knowledge의 archival home</strong>이다.
+      small: >-
+        좋은 article은 conference보다 길어서가 아니라, 하나의 HRI claim을 더 넓고 깊고 오래 남게 완결한다.
+    spectrum_intro: >-
+      아래 질문은 THRI 공식 scope와 author guidance를 바탕으로 archival HRI research unit을 보여주는 편집 예시다.
+    hero_question:
+      tag: Framework
+      title: Socially appropriate robot assistance를 context와 user capability에 따라 설명하는 general framework는 무엇인가?
+      text: 여러 study와 system evidence를 하나의 durable HRI knowledge claim으로 묶는 질문.
+    questions:
+      - tag: Method
+        title: LLM 기반 HRI 연구는 model·prompt·failure를 어떻게 보고해야 하는가?
+        text: Reproducibility와 reporting practice를 바꾸는 archival method 질문.
+      - tag: Longitudinal
+        title: 가정에서 robot relationship은 novelty 이후 어떻게 적응·해체되는가?
+        text: 시간과 context를 general HRI knowledge로 만드는 질문.
+      - tag: Theory
+        title: Trust·agency·social presence를 어떤 관계 model로 통합할 수 있는가?
+        text: Construct와 mechanism을 재정의하는 이론 질문.
+      - tag: Complete system
+        title: HRI capability와 실제 interaction outcome을 end-to-end로 어떻게 연결할까?
+        text: Component와 user behavior를 함께 분석하는 system 질문.
+      - tag: Review
+        title: Older adults를 위한 robot 연구는 어떤 population과 outcome을 빠뜨렸는가?
+        text: Systematic evidence와 research agenda를 만드는 synthesis 질문.
+      - tag: Cross-context
+        title: Physical·virtual embodiment effect는 task와 culture를 넘어 유지되는가?
+        text: 여러 context를 가로지르는 archival comparison 질문.
+    selection_note: >-
+      THRI의 review duration, acceptance rate, fee와 impact metric은 시점과 article type에 따라 변한다. Submission decision은 current author guideline을 다시 확인한다.
+    sources:
+      - label: ACM Transactions on Human-Robot Interaction
+        url: "https://dl.acm.org/journal/thri"
+      - label: ACM THRI Author Guidelines
+        url: "https://dl.acm.org/journal/thri/author-guidelines"
+      - label: ACM — Historical THRI Scope Announcement (2017)
+        url: "https://www.acm.org/binaries/content/assets/press-releases/2017/july/thri1.pdf"
+
+  - slug: ijsr
+    order: 10
+    group: publication
+    badge: IJSR
+    name: International Journal of Social Robotics
+    full_name: International Journal of Social Robotics
+    meta: Social Robotics Archival Journal · Springer Nature
+    accent: "#9a5362"
+    accent_dark: "#713846"
+    accent_soft: "#f9ecef"
+    hub_intro: >-
+      IJSR을 “social robot user study를 싣는 비기술 저널”로 이해하면 공식 scope를 놓친다.
+      이 journal은 core technology, system integration, aesthetic design, application, social implication을 폭넓게 열고,
+      <strong>robot–human–environment interaction을 사회·문화적 역할 안에서</strong> 본다.
+    hub_detail: >-
+      AI·control·social navigation 같은 technical paper부터 psychology, ethics, philosophy, ethnography, care·education deployment까지 가능하다.
+      개별 논문이 모든 축에 기여할 필요는 없지만 social robot이 연구의 중심이어야 한다.
+    definition: >-
+      Social robot의 enabling technology, behavior, relationship, design, application, ethics와 societal consequence를 폭넓게 보존하는 interdisciplinary archival journal
+    thesis: >-
+      IJSR에서 중요한 것은 method의 기술성 여부가 아니라
+      <strong>social robot의 capability·role·relationship·사회적 맥락 중 무엇을 전진시키는가</strong>다.
+    thesis_note: >-
+      공식 scope는 engineering and computing뿐 아니라 arts, social science, ethics and philosophy를 함께 포함한다.
+      이 breadth는 method의 다양성을 뜻하며 social framing이 없어도 된다는 뜻은 아니다.
+    facts:
+      - value: Social Robotics
+        label: Robot–human–environment interaction을 social and cultural role 안에서 연구
+      - value: Tech → Society
+        label: Core technology · integration · design · application · social implication
+      - value: Diverse Methods
+        label: Engineering · experiment · qualitative · ethnography · philosophy
+      - value: Applied Contexts
+        label: Care · health · education · home · work · public space
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Social behavior, cognition, affect, relationship, acceptance, navigation, care·education application 또는 ethics가
+          social robot이라는 actor와 그 환경을 어떻게 이해·설계·배치하게 만드는지 다룬다.
+      - title: Editor와 reviewer가 보는 것
+        text: >-
+          Social robotics에 original, rigorous and relevant contribution이 있는지,
+          chosen technical·human-science·design method가 social claim과 context를 충분히 지지하는지를 본다.
+    scope:
+      - title: Enabling technology
+        items:
+          - Social perception and cognition
+          - Affect · dialogue · adaptive behavior
+          - Social navigation and planning
+          - AI · control · system integration
+      - title: People · relationship
+        items:
+          - Psychology and human factors
+          - Acceptance · trust · attachment
+          - Worker and community perspective
+          - Long-term relational autonomy
+      - title: Design · society
+        items:
+          - Aesthetic and interactive design
+          - Care · health · education
+          - Ethics · philosophy · social impact
+          - Arts and cultural context
+    rule:
+      label: IJSR의 기본 단위
+      text: >-
+        <strong>Contribution이 social robotics 자체 또는 그 enabling technology에 직접 연결</strong>되어야 한다.
+        Role·context 분석은 중요한 경로지만 모든 core-technology paper의 필수 형식은 아니다. Generic robot algorithm으로 끝나면 T-RO·RA-L·robotics conference가 더 직접적일 수 있다.
+    position:
+      - label: Primary claim
+        text: Social robot의 technology, behavior, relationship, design, application or societal understanding.
+      - label: Core audience
+        text: Social robotics, HRI, psychology, design, ethics, application and robotics researcher.
+      - label: Evidence
+        text: Technical analysis, experiment, field study, qualitative work, ethnography, design research and philosophy.
+      - label: Archival lens
+        text: Social role과 context를 충분히 설명하고 method가 그 claim에 맞는가.
+      - label: Strong signal
+        text: Social robot이어야 하는 이유가 problem, result, implication 전체에 남는다.
+      - label: Weak signal
+        text: Social이라는 label만 있고 generic control·AI·UX result로 끝난다.
+    neighbors: >-
+      THRI는 HRI 전반의 broad archival knowledge를 받고, T-RO는 major robotics advance를 중심에 둔다.
+      ICSR은 social robotics의 conference counterpart에 가까운 독자층을 제공한다.
+    boundary: >-
+      IJSR이 THRI보다 method가 좁다는 뜻은 아니다. 오히려 technical부터 ethnographic work까지 매우 넓지만,
+      social-robotics relevance가 central해야 한다는 thematic boundary가 더 분명하다.
+    snapshot:
+      - value: Official scope
+        label: Core technologies through systems, design, applications and social implications
+      - value: Typical evidence
+        label: Method varies widely; social-robot relevance must remain central
+      - value: Strong fit
+        label: Social capability, relationship, role, ethics or real deployment
+      - value: Recheck fit
+        label: Generic robotics result with superficial social framing
+    position_note: >-
+      공식 topic list에는 affective·cognitive science, HRI, safety, learning, roboethics, acceptance, design,
+      intelligent control·AI, arts, healthcare, human factors와 socially-aware navigation이 함께 명시된다.
+    taste_intro: >-
+      좋은 IJSR article은 <strong>social이라는 단어를 감성적 수식어로 쓰지 않고 role·norm·relationship·culture·power의 concrete mechanism으로 만든다</strong>.
+    matrix:
+      - axis: Problem
+        sound: Social robot application을 구현·평가
+        shaped: 어떤 social role·relationship·norm·context gap을 다루는지 정의
+      - axis: Claim
+        sound: Acceptance·performance가 향상
+        shaped: Technology·behavior·design·societal understanding 중 archival contribution을 명시
+      - axis: Evidence
+        sound: 한 method의 결과를 제시
+        shaped: Technical·behavioral·qualitative evidence가 social claim에 적절하고 limitation이 투명
+      - axis: Framing
+        sound: Robot과 사용자를 소개
+        shaped: Social robotics literature와 실제 application·society consequence가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “Warehouse robot의 path를 최적화하고 worker satisfaction을 측정했다.”
+        explain: Optimization과 study는 보이지만 social role과 worker-centered consequence가 아직 약하다.
+      shaped:
+        sample: “Worker가 robot route와 priority를 협상할 수 있는 composite cost를 설계하고 ergonomics·agency·throughput trade-off를 field context에서 분석한다.”
+        explain: Technical planning, social relation, workplace consequence가 archival story로 연결된다.
+    lessons:
+      - title: Social을 역할과 norm으로 정의한다
+        text: Likeability만이 아니라 agency, care, labor, distance, relationship을 구체화한다.
+      - title: Method breadth를 강점으로 쓴다
+        text: Technical·qualitative·critical method 중 claim을 가장 잘 검증하는 것을 선택한다.
+      - title: Application context를 충분히 기술한다
+        text: 병원·가정·학교·창고의 institution과 stakeholder가 result를 어떻게 만드는지 본다.
+      - title: 기술과 사회를 억지로 모두 주장하지 않는다
+        text: 한 축의 contribution을 선명히 하되 social-robot relevance를 직접 연결한다.
+      - title: 장기 consequence를 고려한다
+        text: Acceptance, dependency, worker control, privacy, inequality, cultural assumption을 limitation에 포함한다.
+    submit:
+      big: Social context
+      small: Social robot의 어떤 capability·role·relationship을 오래 남기는가?
+      items:
+        - <b>Axis:</b> technology · behavior · design · application · society
+        - <b>Context:</b> role · stakeholder · institution · culture
+        - <b>Method:</b> technical · empirical · qualitative · critical
+        - <b>Boundary:</b> THRI broad HRI and T-RO robotics advance
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>IJSR은 social robot이 어떻게 작동하고 관계 맺고 사회에 놓이는지를 폭넓게 보존하는 archival journal</strong>이다.
+      small: >-
+        좋은 article은 technical인지 qualitative인지보다, social robot이어야 하는 이유와 그 contribution이 처음부터 끝까지 일치한다.
+    spectrum_intro: >-
+      아래 질문은 IJSR official scope와 topic list의 method breadth를 바탕으로 구성한 social robotics spectrum 예시다.
+    hero_question:
+      tag: Worker-centered robotics
+      title: Warehouse robot의 효율과 worker agency·ergonomics를 하나의 system에서 어떻게 조정할까?
+      text: Technical planning과 workplace relation·power·human factor를 social robotics question으로 묶는 예시.
+    questions:
+      - tag: Social navigation
+        title: Group·norm·culture에 따라 navigation cost를 어떻게 바꿔야 하는가?
+        text: Planning과 social behavior를 연결하는 technical 질문.
+      - tag: Relational autonomy
+        title: Meal-assistance robot은 도움과 사용자의 control을 어떻게 협상하는가?
+        text: Care practice와 relationship을 ethnographic lens로 보는 질문.
+      - tag: Acceptance
+        title: Novelty가 사라진 뒤에도 어떤 social role이 robot 사용을 유지하는가?
+        text: Longitudinal acceptance와 role expectation 질문.
+      - tag: Ethics
+        title: Vulnerable user에게 social deception은 언제 정당화될 수 있는가?
+        text: Transparency, benefit, consent, moral agency 질문.
+      - tag: Design
+        title: Morphology와 expressive behavior가 social identity를 어떻게 만든다?
+        text: Aesthetic design과 cultural interpretation 질문.
+      - tag: System integration
+        title: Social perception·dialogue·planning을 실제 deployment에서 어떻게 통합할까?
+        text: Enabling technology를 robust social capability로 만드는 질문.
+    selection_note: >-
+      Journal homepage의 metric과 review time은 변동 가능하며, median first decision은 external review duration과 같은 개념이 아니다. Current author information을 확인한다.
+    sources:
+      - label: International Journal of Social Robotics — Aims and Scope
+        url: "https://link.springer.com/journal/12369/aims-and-scope"
+      - label: International Journal of Social Robotics — Journal Home
+        url: "https://link.springer.com/journal/12369"
+      - label: International Journal of Social Robotics — Submission Guidelines
+        url: "https://link.springer.com/journal/12369/submission-guidelines"
+
+  - slug: t-ro
+    order: 11
+    group: publication
+    badge: T-RO
+    name: IEEE Transactions on Robotics
+    full_name: IEEE Transactions on Robotics
+    meta: Flagship Robotics Archival Journal · IEEE RAS
+    accent: "#2e7767"
+    accent_dark: "#205548"
+    accent_soft: "#e9f5f1"
+    hub_intro: >-
+      T-RO를 “사람 연구는 받지 않는 순수 robotics 저널”로 이해하면 official scope를 잘못 읽게 된다.
+      Robots and Humans 영역에는 physical·cognitive HRI, social robotics, learning from humans, robo-ethics가 포함된다.
+      다만 paper는 <strong>robotics state of the art의 major advance</strong>여야 한다.
+    hub_detail: >-
+      Theory, design, experiment, analysis, algorithm, integration, application case study가 모두 가능하다.
+      HRI 맥락도 열려 있지만 primary claim이 사람의 experience·relationship만이라면 THRI·IJSR의 독자가 더 직접적이다.
+    definition: >-
+      Robotics 전 영역에서 theory, design, algorithms, experiments, systems와 applications의 major state-of-the-art advance를 archival record로 남기는 IEEE RAS journal
+    thesis: >-
+      T-RO의 HRI article은 사람이 등장해서가 아니라
+      <strong>그 HRI problem을 통해 robotics라는 field의 state of the art를 실질적으로 바꾼다</strong>.
+    thesis_note: >-
+      Physical·cognitive HRI, social robotics, human-robot learning도 가능하지만
+      original·significant한 robotics result와 claim에 맞는 충분한 evidence가 broad robotics reader에게 substantive advance로 읽혀야 한다.
+    facts:
+      - value: Major Advance
+        label: All areas of robotics에서 state of the art의 substantive advance
+      - value: Broad Forms
+        label: Theory · design · experiments · analysis · algorithms · integration · case study
+      - value: Robots + Humans
+        label: Physical/cognitive HRI · social robotics · learning from humans · robo-ethics
+      - value: Archival Depth
+        label: Original·significant robotics result와 오래 남을 만큼 complete한 evidence
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Control, planning, estimation, mechanism, learning, system integration 또는 robotics theory가
+          HRI setting을 통해 general robotics state of the art에 major advance를 만든다.
+      - title: Editor와 reviewer가 보는 것
+        text: >-
+          Scope, originality, technical significance, correctness, evidence completeness와 broad robotics relevance를 본다.
+          Clear state-of-the-art advance가 없으면 full review 전 editorial rejection이 가능하다.
+    scope:
+      - title: Robots and humans
+        items:
+          - Physical and cognitive HRI
+          - Human–robot collaboration
+          - Social and assistive robotics
+          - Learning from and with humans
+      - title: Robotics methods
+        items:
+          - Control · planning · estimation
+          - Perception · learning · AI
+          - Mechanism and design
+          - Safety · verification · theory
+      - title: Archival systems
+        items:
+          - System integration
+          - Experimental studies and system validation
+          - Comparative analysis
+          - Application case study
+    rule:
+      label: T-RO의 기본 단위
+      text: >-
+        <strong>HRI context를 넘어 robotics에 남는 major advance</strong>가 있어야 한다.
+        Specific application은 best current practice를 상세한 특성과 성능으로 입증하는 경로도 가능하다. 사람의 perception·trust·relationship이 primary result이면 THRI·IJSR가 더 자연스럽다.
+    position:
+      - label: Primary claim
+        text: Fundamental or major state-of-the-art advance in robotics, including HRI-relevant areas.
+      - label: Core audience
+        text: Broad robotics researcher across theory, methods, systems, mechanisms and applications.
+      - label: Evidence
+        text: Claim에 따라 theory, analysis, algorithms, experiments, system integration 또는 application validation 중 적절한 조합.
+      - label: Archival lens
+        text: Conference-size novelty를 넘어 robotics reference point가 될 technical depth가 있는가.
+      - label: Strong signal
+        text: HRI problem에서 나온 method가 general robotics capability와 state of the art를 바꾼다.
+      - label: Weak signal
+        text: Technical component는 기존이고 human study insight가 가장 큰 contribution이다.
+    neighbors: >-
+      THRI는 broad HRI knowledge, IJSR은 social robot의 role과 context를 중심에 둔다.
+      RA-L은 concise and timely robotics innovation에 더 맞을 수 있고, T-RO는 archival major advance를 요구한다.
+    boundary: >-
+      T-RO가 user study나 social robotics를 배제하는 것은 아니다. Official Robots and Humans keyword가 이를 명시한다.
+      경계는 method가 아니라 primary archival claim이 robotics advance인지에 있다.
+    snapshot:
+      - value: Official scope
+        label: Major advances in the state of the art in all areas of robotics
+      - value: Typical evidence
+        label: Claim-appropriate theoretical, analytical, experimental, system or application evidence
+      - value: Strong fit
+        label: HRI-derived method or system that advances general robotics
+      - value: Recheck fit
+        label: Human experience or social relationship is the main result
+    position_note: >-
+      T-RO는 2025년부터 double-anonymous review를 운영한다. Current author guideline과 scope에는 Robots and Humans topic이 포함되며,
+      fundamental contribution 또는 major state-of-the-art advance가 분명하지 않은 paper는 editorial stage에서 걸러질 수 있다.
+    taste_intro: >-
+      좋은 T-RO HRI article은 <strong>사람을 어려운 environment variable로 다루는 것을 넘어 그 문제에서 새로운 robotics principle과 complete evidence를 만든다</strong>.
+    matrix:
+      - axis: Problem
+        sound: HRI system을 더 큰 scale로 평가
+        shaped: Existing robotics state of the art가 해결하지 못하는 technical bottleneck을 정의
+      - axis: Claim
+        sound: System performance와 user outcome 향상
+        shaped: Fundamental method·theory·mechanism·integration advance와 general robotics consequence를 명시
+      - axis: Evidence
+        sound: 한 benchmark와 user study
+        shaped: Theory·baseline·ablation·experiment·real robot·failure·cross-condition 중 claim에 필요한 조합이 archival claim을 완결
+      - axis: Framing
+        sound: Human-aware application을 소개
+        shaped: Broad robotics reader가 state-of-the-art difference를 첫 페이지에서 이해
+    framing:
+      diffuse:
+        sample: “새 assistive robot을 구현하고 사용자 만족도와 task success를 평가했다.”
+        explain: Application은 중요하지만 major robotics advance가 무엇인지 아직 약하다.
+      shaped:
+        sample: “Unknown human impedance와 intent를 joint belief로 추정하는 safe shared-control framework를 제안하고 stability, generalization, real assistive manipulation에서 검증한다.”
+        explain: HRI context가 theory, method, system evidence를 통해 major robotics contribution으로 변환된다.
+    lessons:
+      - title: Major advance를 한 문장으로 쓴다
+        text: 더 큰 experiment보다 robotics state of the art가 정확히 무엇 때문에 바뀌는지 명시한다.
+      - title: General robotics consequence를 보여준다
+        text: 한 assistive application 밖에서 method·theory·system lesson이 어디까지 유지되는지 쓴다.
+      - title: Evidence를 archival depth로 설계한다
+        text: Theory, baseline, failure, real robot, cross-condition을 claim에 필요한 만큼 완결한다.
+      - title: Human study의 역할을 분리한다
+        text: Technical validity·utility·safety evidence인지 human knowledge contribution인지 혼동하지 않는다.
+      - title: THRI·IJSR와 독자를 비교한다
+        text: 같은 result라도 robotics reader와 HRI/social-robotics reader 중 누가 primary인지 확인한다.
+    submit:
+      big: Major robotics advance
+      small: HRI problem을 통해 state of the art가 어떻게 바뀌는가?
+      items:
+        - <b>Advance:</b> theory · method · mechanism · system integration
+        - <b>Generality:</b> beyond one user study or application
+        - <b>Evidence:</b> claim-appropriate theory · analysis · experiment · integration · application validation
+        - <b>Boundary:</b> THRI · IJSR · RA-L reader and research unit
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>T-RO의 HRI는 사람과 함께 작동하는 robot을 통해 robotics state of the art의 major advance를 만드는 archival research</strong>다.
+      small: >-
+        좋은 article은 HRI가 중요한 application이라는 주장에 머물지 않고, 그 application이 요구한 새로운 robotics principle을 깊고 완결되게 증명한다.
+    spectrum_intro: >-
+      아래 질문은 T-RO official Robots and Humans scope를 major robotics advance의 관점으로 바꾼 편집 예시다.
+    hero_question:
+      tag: Safe shared control
+      title: Unknown human dynamics와 intent를 함께 추정하면서 stability를 보장할 수 있는가?
+      text: HRI context에서 fundamental estimation·control advance와 archival evidence를 만드는 질문.
+    questions:
+      - tag: Physical HRI
+        title: Variable human impedance에서 안전성과 performance를 동시에 보장하는 control은 무엇인가?
+        text: Theory, stability, real interaction을 연결하는 질문.
+      - tag: Human-aware planning
+        title: Human belief와 capability uncertainty를 planning guarantee에 어떻게 넣을까?
+        text: Estimation, planning, formal property 질문.
+      - tag: Learning from humans
+        title: Human demonstration의 bias를 넘어 다른 embodiment로 generalize할 수 있는가?
+        text: Robot learning과 general robotics relevance 질문.
+      - tag: Assistive system
+        title: Perception부터 shared control까지 end-to-end safety를 어떻게 검증할까?
+        text: Complete system integration과 failure analysis 질문.
+      - tag: Social robotics
+        title: Social navigation rule을 scalable planning algorithm으로 만들 수 있는가?
+        text: Social context를 major robotics method로 변환하는 질문.
+      - tag: Robo-ethics
+        title: Human control과 value constraint를 robot decision architecture에 어떻게 formalize할까?
+        text: Ethics concern을 verifiable robotics design으로 연결하는 질문.
+    selection_note: >-
+      T-RO의 metric과 editorial policy는 변할 수 있다. Submission 전 current Information for Authors, scope keywords, double-anonymous requirement를 확인한다.
+    sources:
+      - label: IEEE Transactions on Robotics — Overview
+        url: "https://www.ieee-ras.org/publications/t-ro/"
+      - label: T-RO — Information for Authors and Scope
+        url: "https://www.ieee-ras.org/publications/t-ro/t-ro-information-for-authors/"
+      - label: T-RO — Information for Associate Editors
+        url: "https://www.ieee-ras.org/publications/t-ro/information-for-associate-editors/"
+
+  - slug: chi
+    order: 2
+    group: conference
+    badge: CHI
+    name: ACM CHI
+    full_name: ACM Conference on Human Factors in Computing Systems
+    meta: Flagship HCI Conference · ACM SIGCHI
+    accent: "#4b63a8"
+    accent_dark: "#2e407d"
+    accent_soft: "#edf0fb"
+    hub_intro: >-
+      CHI를 “사용성 평가를 하는 곳”으로만 보면 HRI paper의 가능성을 지나치게 좁힌다.
+      CHI는 interface artifact, user understanding, system, method, theory, vision까지 폭넓게 받지만,
+      모든 경우 primary criterion은 <strong>original contribution to HCI</strong>다.
+    hub_detail: >-
+      Robot이 등장해도 논문이 끝난 뒤 HCI researcher가 사용할 interaction capability, user benefit,
+      socio-technical insight 또는 reusable design knowledge가 남아야 한다. System performance도 가능하지만
+      성능 수치만으로 끝나지 않고 인간 관점의 의미가 보여야 한다.
+    definition: >-
+      Robot을 포함한 interactive technology가 사람·practice·interface·computing에 남기는 지식을 HCI 언어로 일반화하는 flagship conference
+    thesis: >-
+      CHI의 질문은 “robot이 좋아졌는가?”에서 끝나지 않는다.
+      <strong>그 변화가 HCI community에 어떤 새로운 interaction capability와 human knowledge를 남기는가</strong>를 묻는다.
+    thesis_note: >-
+      CHI 2026은 contribution 형태를 artifact, users, systems, methods, theory, vision으로 넓게 열어 두며,
+      subcommittee 선택도 topic이 아니라 core contribution을 어떤 lens로 평가받을지 정하는 과정으로 설명한다.
+    facts:
+      - value: HCI First
+        label: 모든 paper의 primary criterion은 original contribution to HCI
+      - value: 6,730 Submissions
+        label: CHI 2026 completed submissions의 공식 집계
+      - value: 25.3%
+        label: CHI 2026 conditional acceptance 전체 비율, subcommittee별 차이 존재
+      - value: Many Forms
+        label: Artifact · users · systems · method · theory · vision contribution
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Robot interface, embodied interaction, user practice, accessibility, collaboration, organization 또는 field deployment가
+          HCI 전반에 재사용 가능한 지식으로 정리되어야 한다. Robot은 artifact일 수 있지만 인간 관점은 중심에 남는다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Originality, significance, validity, research quality, clarity와 함께 왜 이 결과를 HCI community가 읽어야 하는지를 본다.
+          User study 유무가 아니라 contribution에 적절한 validation이 있는지가 중요하다.
+    scope:
+      - title: Interaction · artifact
+        items:
+          - Interface and interaction technique
+          - Embodied and tangible computing
+          - Tool · system · infrastructure
+          - Accessibility and inclusive design
+      - title: People · practice
+        items:
+          - User understanding and experience
+          - Group and organizational practice
+          - Trust · ethics · social impact
+          - Field and longitudinal study
+      - title: Knowledge · method
+        items:
+          - HCI theory and conceptual framing
+          - Research and design method
+          - Dataset and benchmark for HCI
+          - Innovation and vision
+    rule:
+      label: CHI의 기본 단위
+      text: >-
+        <strong>Robot을 다른 interactive artifact로 바꾸어도 HCI contribution의 의미가 설명되는가</strong>를 본다.
+        반대로 physical robot의 motion·autonomy·shared space가 핵심 mechanism이라면 HRI 또는 robotics venue가 더 직접적일 수 있다.
+    position:
+      - label: Primary claim
+        text: 사람과 interactive technology에 관한 original HCI contribution.
+      - label: Core audience
+        text: HCI researcher, designer, social scientist, computing and interactive-system researcher.
+      - label: Evidence
+        text: Qualitative·quantitative study, system evaluation, deployment, artifact demonstration, theory and method validation.
+      - label: Review lens
+        text: 선택한 subcommittee가 논문의 core contribution을 판단할 적절한 expertise를 갖는지.
+      - label: Strong signal
+        text: 결과가 robot을 넘어 interaction design, user benefit, practice 또는 HCI theory에 남는다.
+      - label: Weak signal
+        text: 사람은 algorithm 성능을 확인하는 역할뿐이며 human viewpoint가 결론에서 사라진다.
+    neighbors: >-
+      HRI는 robot-specific interaction을 중심으로 일반화하고, HAI는 physical·virtual agent를 함께 본다.
+      ICRA·IROS·RSS·CoRL은 인간 관점보다 robot method·system·learning advance를 더 앞에 둘 수 있다.
+    boundary: >-
+      CHI도 technical system paper를 받고 user study가 항상 필수인 것은 아니다. 다만 computation이나 system performance에
+      meaningful human involvement가 거의 없다면 Computational Interaction을 포함한 HCI review lens에서 fit이 약해진다.
+    snapshot:
+      - value: Official criterion
+        label: Excellent original research contribution to HCI
+      - value: Typical evidence
+        label: Subfield-appropriate validation, transparency and rigor
+      - value: Strong fit
+        label: Reusable interaction, user, design, system or practice knowledge
+      - value: Recheck fit
+        label: Robot accuracy gain without a meaningful human consequence
+    position_note: >-
+      CHI 2026의 25.3%는 전체 conditional acceptance 비율이다. Subcommittee별 비율은 15.8%에서 33.6%까지 달랐으므로,
+      이 숫자를 개별 topic의 난이도나 uniform threshold로 해석하면 안 된다.
+    taste_intro: >-
+      좋은 CHI HRI paper는 robot demo를 넘어 <strong>HCI researcher가 다음 interface·study·deployment에서 사용할 수 있는 차이</strong>를 만든다.
+    matrix:
+      - axis: Problem
+        sound: Robot interface의 사용성을 개선
+        shaped: 어떤 interaction barrier와 user practice가 기존 HCI로 설명되지 않는지 명시
+      - axis: Claim
+        sound: Task time과 만족도가 향상
+        shaped: 새 interaction capability, user benefit 또는 design knowledge를 분리해 일반화
+      - axis: Evidence
+        sound: Usability scale과 통계적 차이
+        shaped: Claim에 맞는 behavior·experience·practice evidence와 alternative explanation
+      - axis: Framing
+        sound: Robot 기능과 experiment를 기술
+        shaped: HCI literature gap과 이 결과가 robot 밖에서도 갖는 의미가 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “안경으로 robot을 지시하자 기존 controller보다 task time이 줄었다.”
+        explain: 성능 차이는 보이지만 HCI에 남는 interaction principle과 user consequence가 아직 약하다.
+      shaped:
+        sample: “Hands-busy 상황에서 gaze와 deictic gesture를 결합한 instruction이 attention switching과 error recovery를 어떻게 바꾸는지 밝힌다.”
+        explain: Interface, human cost, reusable interaction knowledge가 HCI 언어로 연결된다.
+    lessons:
+      - title: HCI contribution을 명사로 쓴다
+        text: Technique, system, user insight, method, theory 중 무엇을 남기는지 abstract에서 명시한다.
+      - title: Human viewpoint를 끝까지 유지한다
+        text: Technical section 이후 conclusion에서 사람이 단지 test subject로 축소되지 않게 한다.
+      - title: Subcommittee를 topic으로 고르지 않는다
+        text: 어떤 reviewer lens가 core contribution을 가장 공정하게 판단할지 선택한다.
+      - title: Performance의 인간적 의미를 설명한다
+        text: 빠름·정확함이 attention, agency, accessibility, practice에 어떤 차이를 만드는지 보여준다.
+      - title: Robot specificity와 generality를 함께 쓴다
+        text: Embodiment가 만든 mechanism과 다른 interactive system에 남는 principle을 분리한다.
+    submit:
+      big: HCI contribution
+      small: Robot을 통해 사람과 computing에 무엇을 남기는가?
+      items:
+        - <b>Contribution:</b> artifact · user · system · method · theory · vision
+        - <b>Subcommittee:</b> core claim을 평가할 lens
+        - <b>Validation:</b> claim에 맞는 qualitative·quantitative·technical evidence
+        - <b>Boundary:</b> HRI-specific claim과 robotics advance를 분리
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>CHI의 HRI paper는 robot을 통해 HCI knowledge를 만드는 논문</strong>이다.
+      small: >-
+        Robot performance도 contribution의 일부가 될 수 있지만, 그 성능이 사람과 interaction에 어떤 새로운 가능성과 지식을 남기는지까지 설명해야 한다.
+    spectrum_intro: >-
+      아래 질문은 CHI 2026의 공식 contribution types와 HRI가 실제로 놓일 수 있는 subcommittee lens를 바탕으로 구성한 편집 예시다.
+    hero_question:
+      tag: Interaction
+      title: Robot instruction interface가 사용자의 attention과 recovery strategy를 어떻게 바꾸는가?
+      text: 새 artifact와 technique가 인간 관점의 capability와 reusable HCI knowledge로 이어질 때 CHI framing이 강해진다.
+    questions:
+      - tag: User understanding
+        title: 사람은 autonomous robot의 uncertainty를 어떤 cue로 해석하는가?
+        text: Mental model, attribution, trust calibration을 HCI knowledge로 만드는 질문.
+      - tag: Accessibility
+        title: 기존 robot interface가 누구의 몸과 감각을 기본값으로 가정하는가?
+        text: Inclusive design과 assistive interaction의 barrier를 드러내는 질문.
+      - tag: Beyond individual
+        title: Robot이 팀의 역할·권한·책임 배분을 어떻게 바꾸는가?
+        text: Group, organization, collaboration practice를 다루는 HCI 질문.
+      - tag: System
+        title: 새로운 sensing·feedback loop가 이전에 불가능한 interaction을 여는가?
+        text: Technical artifact를 human capability와 함께 검증하는 system contribution.
+      - tag: Field study
+        title: 병원·가정·공공공간에서 robot이 실제 work practice에 어떻게 편입되는가?
+        text: Deployment를 socio-technical insight로 일반화하는 질문.
+      - tag: Method · theory
+        title: Embodied AI를 연구하기 위해 기존 HCI method를 어떻게 바꿔야 하는가?
+        text: HRI를 넘어 HCI research practice 자체를 전진시키는 질문.
+    selection_note: >-
+      CHI contribution은 특정 method와 일대일 대응하지 않는다. System paper도 user study가 필수는 아니며, 사람을 연구했다고 자동으로 CHI contribution이 되는 것도 아니다.
+    sources:
+      - label: CHI 2026 — Contributions to CHI
+        url: "https://chi2026.acm.org/contributions-to-chi/"
+      - label: CHI 2026 — Guide to a Successful Submission
+        url: "https://chi2026.acm.org/guide-to-a-successful-submission/"
+      - label: CHI 2026 — Selecting a Subcommittee
+        url: "https://chi2026.acm.org/authors/papers/selecting-a-subcommittee/"
+      - label: CHI 2026 — Papers Track Outcomes
+        url: "https://chi2026.acm.org/2026/02/06/insights-into-the-papers-track-post-pc-meeting-outcomes/"
+
+  - slug: ro-man
+    order: 3
+    group: conference
+    badge: RO-MAN
+    name: IEEE RO-MAN
+    full_name: IEEE International Conference on Robot and Human Interactive Communication
+    meta: HRI Specialist Forum · IEEE RAS
+    accent: "#27736e"
+    accent_dark: "#18524f"
+    accent_soft: "#e8f5f3"
+    hub_intro: >-
+      RO-MAN을 “HRI보다 낮은 단계의 응용 학회”로 보면 공식 범위와 community를 왜곡한다.
+      이 venue는 robot and human interactive communication의 theory·methodology·technology·empirical study를
+      <strong>communication, collaboration, coexistence</strong>라는 넓은 언어 아래 모은다.
+    hub_detail: >-
+      2026 FAQ는 robot design에 관한 perspective·position paper 문의에 대해, 고도로 technical하지 않다는 이유만으로
+      거절하지 않으며 quality와 community contribution을 본다고 안내한다. Technical novelty만이 유일한 평가 축은 아니라는 뜻이다.
+    definition: >-
+      사람과 robot이 어떻게 소통·협업·공존하는지를 theory부터 technology, experiment, design, application까지 폭넓게 다루는 HRI 전문 forum
+    thesis: >-
+      RO-MAN의 중심 언어는 <strong>interactive communication과 human–robot symbiosis</strong>다.
+      기술과 연구 방법의 종류보다 이 관계를 어떤 문제로 만들었는지가 paper identity를 결정한다.
+    thesis_note: >-
+      HRI와 scope는 크게 겹친다. 두 venue의 차이를 quality hierarchy로 만들기보다,
+      HRI track-specific contribution과 RO-MAN의 communication·team·social/application 중심 program language 중 어디가 더 자연스러운지 본다.
+    facts:
+      - value: Since 1992
+        label: Robot and Human Interactive Communication community의 장기 conference series
+      - value: Broad Methods
+        label: Theory · methodology · technology · empirical and experimental study
+      - value: Symbiosis + AI
+        label: RO-MAN 2026의 공식 conference theme
+      - value: Technicality ≠ Quality
+        label: Perspective·position paper도 technicality 부족만으로 거절하지 않으며 quality와 community contribution을 평가
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Verbal·non-verbal signal, affect, trust, team coordination, assistive application, social role,
+          shared autonomy가 사람과 robot의 communication·coexistence를 어떻게 바꾸는지가 중심이다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          논문이 RO-MAN community에 meaningful contribution을 하는지, method와 evidence가 claim에 적절한지,
+          그리고 communication·interaction 문제의 맥락이 충분히 설명되는지를 본다.
+    scope:
+      - title: Communication
+        items:
+          - Dialogue and multimodal interaction
+          - Non-verbal cue and social signal
+          - Affect · emotion · personality
+          - Explainability and transparency
+      - title: Teams · collaboration
+        items:
+          - Human–robot team and cooperation
+          - Shared autonomy and teleoperation
+          - Trust · intent · mental model
+          - Human-centered navigation
+      - title: Society · application
+        items:
+          - Assistive · care · rehabilitation
+          - Child–robot and education
+          - Ethics · value alignment · safety
+          - Co-design and social identity
+    rule:
+      label: RO-MAN의 기본 단위
+      text: >-
+        <strong>사람과 robot이 어떻게 의미를 주고받고 역할을 조정하는가</strong>가 하나의 coherent story를 만들어야 한다.
+        Pure robotics method나 human-free benchmark가 중심이면 broad robotics venue가 더 자연스럽다.
+    position:
+      - label: Primary claim
+        text: Human–robot communication, collaboration, team, relationship 또는 coexistence의 진전.
+      - label: Core audience
+        text: HRI researcher, social roboticist, assistive-robotics and human–robot team researcher.
+      - label: Evidence
+        text: Experiment, user study, system test, design case, field deployment, qualitative or position argument.
+      - label: Program lens
+        text: Cognition·intent·embodied AI부터 care·ethics·teleoperation·manufacturing까지 폭넓은 HRI program.
+      - label: Strong signal
+        text: Communication behavior와 application context가 하나의 HRI contribution으로 묶인다.
+      - label: Weak signal
+        text: Robot algorithm의 성능만 남고 사람과의 communication mechanism이 결론에 없다.
+    neighbors: >-
+      ACM/IEEE HRI는 principal contribution을 다섯 track으로 더 선명하게 분리한다.
+      ICSR은 social robot 자체와 사회적 역할을 더 중심에 두며, ICRA·IROS는 robotics capability를 먼저 본다.
+    boundary: >-
+      RO-MAN의 broad scope를 “덜 선택적” 또는 “응용 위주”로 번역하면 안 된다.
+      Perspective·position paper에 대한 FAQ 답변은 contribution 형식의 폭을 보여주지만 quality requirement가 낮다는 근거가 아니다.
+    snapshot:
+      - value: Official scope
+        label: Theory · methodology · technology · empirical and experimental studies
+      - value: Typical evidence
+        label: Communication behavior, team process, system and application evidence
+      - value: Strong fit
+        label: Social · assistive · team · multimodal HRI의 coherent story
+      - value: Recheck fit
+        label: Human interaction이 거의 없는 pure robotics advance
+    position_note: >-
+      RO-MAN 2026 program은 cognition and intent, children and companions, ethics and methodology, handover and teleoperation,
+      proactive assistance, emotion and anthropomorphism, safe motion and manufacturing을 함께 묶었다. 이것이 venue의 실제 breadth를 잘 보여준다.
+    taste_intro: >-
+      좋은 RO-MAN paper는 여러 technical·human component를 나열하기보다 <strong>사람과 robot이 소통하고 역할을 조정하는 한 장면</strong>을 중심 story로 만든다.
+    matrix:
+      - axis: Problem
+        sound: Social robot의 새 기능을 평가
+        shaped: 어떤 communication·relationship·team breakdown을 해결하는지 명시
+      - axis: Claim
+        sound: Trust와 task performance가 향상
+        shaped: 어떤 cue·behavior·coordination mechanism이 결과를 만들었는지 설명
+      - axis: Evidence
+        sound: User rating과 system accuracy
+        shaped: Behavioral·technical·context evidence를 communication claim에 맞게 연결
+      - axis: Framing
+        sound: Application과 demo를 소개
+        shaped: Communication, collaboration, coexistence에 남는 community contribution이 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “LLM을 탑재한 social robot이 baseline보다 더 자연스럽다는 평가를 받았다.”
+        explain: Technology와 rating은 보이지만 무엇이 communication을 바꿨는지 설명이 약하다.
+      shaped:
+        sample: “Robot persona의 일관성이 깨질 때 사용자의 repair strategy와 장기적 role expectation이 어떻게 변하는지 밝힌다.”
+        explain: Communication breakdown, social mechanism, application consequence가 하나의 story가 된다.
+    lessons:
+      - title: Communication을 대화만으로 좁히지 않는다
+        text: Motion, gaze, timing, distance, handover, explanation도 의미를 주고받는 channel이다.
+      - title: Application context를 장식으로 쓰지 않는다
+        text: Care, education, logistics의 실제 role과 constraint가 research question을 만들게 한다.
+      - title: Technicality를 quality와 혼동하지 않는다
+        text: Perspective·design argument도 technicality 부족만으로 배제되지는 않지만 quality와 community contribution은 엄밀해야 한다.
+      - title: HRI와의 차이를 서열로 쓰지 않는다
+        text: Track-specific HRI claim과 communication-centered program fit을 비교한다.
+      - title: Social consequence를 숨기지 않는다
+        text: Trust, identity, ethics, power, safety가 system behavior와 어떻게 연결되는지 쓴다.
+    submit:
+      big: Communication
+      small: 사람과 robot은 어떻게 의미와 역할을 조정하는가?
+      items:
+        - <b>Story:</b> communication · collaboration · coexistence
+        - <b>Method:</b> theory부터 system·experiment·design까지 claim에 맞게
+        - <b>Context:</b> team·care·education·industry의 실제 constraint
+        - <b>Boundary:</b> HRI track 또는 robotics-first framing과 비교
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>RO-MAN은 사람과 robot의 interactive communication을 넓은 HRI 언어로 조직하는 전문 conference</strong>다.
+      small: >-
+        좋은 paper는 기술이 얼마나 복잡한가보다, 그 기술·study·design이 사람과 robot의 관계를 어떻게 다르게 만드는지 명확하다.
+    spectrum_intro: >-
+      아래 질문은 RO-MAN 2026 CFP와 program category를 바탕으로 communication·team·social application의 폭을 보여주는 편집 예시다.
+    hero_question:
+      tag: Collaboration
+      title: Robot이 언제 도움을 제안하고 언제 기다려야 human–robot team이 안정되는가?
+      text: Timing, intent inference, communication cue, role negotiation을 하나의 collaborative story로 묶는 질문.
+    questions:
+      - tag: Multimodal
+        title: Speech·gaze·gesture가 충돌할 때 robot은 무엇을 우선해야 하는가?
+        text: 여러 channel의 meaning과 repair behavior를 다루는 질문.
+      - tag: Social robot
+        title: Persona와 emotion 표현이 장기적 관계 기대를 어떻게 만드는가?
+        text: Anthropomorphism, trust, social identity를 연결하는 질문.
+      - tag: Team
+        title: 사람과 robot은 uncertainty와 responsibility를 어떻게 나누는가?
+        text: Coordination, shared autonomy, mental model을 다루는 질문.
+      - tag: Assistive HRI
+        title: 도움은 언제 autonomy를 높이고 언제 통제감을 낮추는가?
+        text: Care·rehabilitation에서 role과 agency를 함께 보는 질문.
+      - tag: Safety · ethics
+        title: 설명 가능성과 human control을 실제 behavior에 어떻게 넣을까?
+        text: Value alignment, transparency, safe interaction의 구현 질문.
+      - tag: Design · position
+        title: Social humanoid의 capability gap을 어떤 design principle로 다룰까?
+        text: Empirical paper뿐 아니라 rigorous perspective와 co-design argument의 예시.
+    selection_note: >-
+      RO-MAN은 HRI와 상당히 겹친다. 이 질문들은 영구적인 분리 규칙이 아니라 해당 venue의 program language를 드러내기 위한 예시다.
+    sources:
+      - label: RO-MAN 2026 — Call for Papers
+        url: "https://ro-man2026.org/call-for-papers/"
+      - label: RO-MAN 2026 — Frequently Asked Questions
+        url: "https://ro-man2026.org/faq/"
+      - label: RO-MAN 2026 — Program at a Glance
+        url: "https://ro-man2026.org/program-at-a-glance/"
+      - label: RO-MAN 2026 — Reviewer Guidelines
+        url: "https://ro-man2026.org/wp-content/uploads/2026/01/RO-MAN-2026-Reviewer-Guidelines_20260121_clean.pdf"
+      - label: RO-MAN — Conference History
+        url: "https://ro-man.org/"
+
+  - slug: hai
+    order: 4
+    group: conference
+    badge: HAI
+    name: HAI
+    full_name: International Conference on Human-Agent Interaction
+    meta: Human–Agent Interaction · Interdisciplinary
+    accent: "#7556a8"
+    accent_dark: "#533a7d"
+    accent_soft: "#f0ebf8"
+    hub_intro: >-
+      HAI를 “robot 없는 HRI”로 설명하면 일반화 대상의 차이를 놓친다.
+      HAI는 physical robot, virtual agent, avatar, agentic AI, digitally mediated interaction 등 다양한 context를 열고
+      <strong>human–agent interaction 자체의 기여</strong>를 묻는다.
+    hub_detail: >-
+      HRI도 physical robot 없는 연구를 받을 수 있으므로 구분 기준은 embodiment 유무가 아니다.
+      특정 agent 하나를 다룬 연구도 가능하며, 결과가 human–robot interaction보다 broader human–agent literature와 독자에게 말하는지가 더 정확한 경계다.
+    definition: >-
+      Physical robot부터 virtual character와 agentic AI까지 다양한 agent 맥락에서 사람의 perception·trust·collaboration을 연구하는 interdisciplinary conference
+    thesis: >-
+      HAI의 중심 질문은 <strong>agent가 어떤 몸을 가졌는가보다 사람이 agency를 어떻게 지각하고 관계를 형성하는가</strong>다.
+    thesis_note: >-
+      HAI 2026은 robot, virtual agent, digitally mediated human–human communication뿐 아니라 agentic AI,
+      delegation, social simulation, avatar까지 conventional interaction boundary를 넓혀 다룬다.
+    facts:
+      - value: Many Agent Forms
+        label: Physical robot · virtual agent · avatar · conversational and agentic AI
+      - value: Human–Agent
+        label: 특정 embodiment보다 agency와 interaction을 공통 기준점으로 사용
+      - value: Interdisciplinary
+        label: Computing · psychology · communication · design · social science
+      - value: HAI 2026
+        label: Agentic AI · delegation · collaboration · trust를 공식 scope에 포함
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          하나 또는 여러 agent form에서 embodiment, autonomy, identity, social cue가 사람의
+          trust·delegation·coordination·relationship을 어떻게 바꾸는지 설명한다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Human–agent interaction에 original theoretical, methodological, technical 또는 empirical contribution이 있는지,
+          그리고 chosen agent form과 evidence가 claim에 적절한지를 본다.
+    scope:
+      - title: Agent forms
+        items:
+          - Robot and embodied agent
+          - Virtual human and avatar
+          - Conversational and voice agent
+          - Agentic and generative AI
+      - title: Interaction
+        items:
+          - Trust · delegation · collaboration
+          - Social cue and relationship
+          - Identity · presence · embodiment
+          - Human–AI teamwork
+      - title: Methods · society
+        items:
+          - Quantitative and qualitative study
+          - Design and technical system
+          - Theory and social simulation
+          - Ethics and societal consequence
+    rule:
+      label: HAI의 기본 단위
+      text: >-
+        <strong>특정 agent 하나를 다루더라도 human–agent interaction에 어떤 original contribution을 남기는가</strong>를 본다.
+        Cross-agent comparison이나 cross-form generalization은 가능한 기여 형식이지 공식 필수요건이 아니다.
+    position:
+      - label: Primary claim
+        text: Robot, virtual agent, avatar, agentic AI 등 하나 이상의 form에서 얻은 human–agent perception, behavior, design or collaboration contribution.
+      - label: Core audience
+        text: HAI, HCI, HRI, conversational agent, virtual human and human-centered AI researcher.
+      - label: Evidence
+        text: Experiment, qualitative study, system, design, theory, simulation 또는 필요한 경우 cross-agent comparison.
+      - label: HAI lens
+        text: 선택한 agent 맥락에서 human–agent interaction에 남는 기여가 선명한가.
+      - label: Strong signal
+        text: Human–agent interaction에 명확한 theoretical, methodological, technical 또는 empirical contribution이 남는다.
+      - label: Weak signal
+        text: Physical contact·robot control만이 핵심이고 human–agent interaction contribution이 결론에 없다.
+    neighbors: >-
+      CHI는 HCI 전반에 남는 contribution을 요구하고, HRI는 human–robot interaction을 중심에 둔다.
+      ICSR은 social robot의 역할과 사회적 배치가 더 핵심이다.
+    boundary: >-
+      HAI와 HRI 모두 physical·virtual comparison을 다룰 수 있다. 차이는 제출물의 이름표가 아니라
+      paper가 최종적으로 human–agent interaction과 human–robot interaction 중 어느 literature와 독자에게 말하는지에 있다.
+    snapshot:
+      - value: Official scope
+        label: Robot · virtual agent · mediated interaction · agentic AI
+      - value: Typical evidence
+        label: Interaction study, design, system, theory or method에 맞는 evidence
+      - value: Strong fit
+        label: Human–agent interaction에 명확한 original contribution
+      - value: Recheck fit
+        label: Robot physicality와 control이 conclusion 전체를 규정
+    position_note: >-
+      HAI 2026은 agentic AI를 별도 관심사로 포함한다. 하지만 LLM이나 agent를 사용했다는 사실만으로 fit이 생기지는 않는다.
+      사람이 agency를 어떻게 해석하고 협업·위임·신뢰하는지에 관한 interaction contribution이 필요하다.
+    taste_intro: >-
+      좋은 HAI paper는 agent 종류를 늘어놓는 대신 <strong>선택한 agent와 interaction을 통해 어떤 original HAI contribution을 만들었는지</strong>가 선명하다.
+    matrix:
+      - axis: Problem
+        sound: Robot과 avatar의 선호도를 비교
+        shaped: Embodiment·presence·agency 중 어떤 mechanism을 분리하는 비교인지 명시
+      - axis: Claim
+        sound: 한 agent가 더 신뢰받음
+        shaped: Agent form이 trust·delegation·coordination을 바꾸는 일반 원리를 설명
+      - axis: Evidence
+        sound: Rating과 task result
+        shaped: Perception·behavior·interaction trace와 manipulation validity를 함께 제시
+      - axis: Framing
+        sound: 여러 agent interface를 소개
+        shaped: Human–agent literature의 gap과 robot 밖에 남는 consequence가 보임
+    framing:
+      diffuse:
+        sample: “같은 LLM을 robot과 화면 avatar에 넣고 호감도를 비교했다.”
+        explain: Agent type은 두 개지만 무엇을 이론적으로 분리하는지 아직 약하다.
+      shaped:
+        sample: “동일한 policy의 physical co-presence와 virtual representation을 분리해 delegation threshold와 error tolerance의 변화를 설명한다.”
+        explain: Embodiment manipulation과 general human–agent claim이 직접 연결된다.
+    lessons:
+      - title: Agent type을 독립변수로만 쓰지 않는다
+        text: Embodiment, presence, autonomy, identity 중 어떤 mechanism을 뜻하는지 정의한다.
+      - title: HRI와의 차이를 physicality 하나로 만들지 않는다
+        text: HRI도 non-physical comparison을 받을 수 있으므로 generalization target을 쓴다.
+      - title: Agentic AI의 agency를 검토한다
+        text: 위임, control, responsibility, expectation이 interaction에서 어떻게 구성되는지 본다.
+      - title: Cross-form validity를 확인한다
+        text: Robot과 avatar의 visual·timing·capability 차이가 confound가 되지 않게 설계한다.
+      - title: Broader audience에 답한다
+        text: 한 platform의 UX를 넘어 HAI researcher가 다시 사용할 principle을 남긴다.
+    submit:
+      big: Human–agent interaction
+      small: 선택한 agent 맥락에서 어떤 original contribution이 남는가?
+      items:
+        - <b>Agent forms:</b> physical · virtual · conversational · agentic
+        - <b>Mechanism:</b> presence · agency · identity · autonomy
+        - <b>Evidence:</b> claim-aligned study · system · design · theory
+        - <b>Boundary:</b> HRI-specific physical question과 분리
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>HAI는 다양한 agent 맥락에서 인간이 agency와 관계를 어떻게 구성하는지 연구하는 conference</strong>다.
+      small: >-
+        좋은 HAI paper는 여러 agent를 비교해서가 아니라 human–agent interaction에 남는 original contribution을 분명히 만든다.
+    spectrum_intro: >-
+      아래 질문은 HAI 2026 scope를 바탕으로 physical·virtual·agentic form을 가로지르는 research spectrum을 보여주는 편집 예시다.
+    hero_question:
+      tag: Embodiment
+      title: 동일한 agent policy라도 physical co-presence가 delegation과 responsibility를 바꾸는가?
+      text: Agent form의 차이를 human–agent interaction mechanism으로 일반화하는 대표 질문.
+    questions:
+      - tag: Agentic AI
+        title: 사람은 autonomous agent에게 언제 task와 decision authority를 위임하는가?
+        text: Delegation, control, accountability를 다루는 질문.
+      - tag: Virtual human
+        title: Avatar의 identity와 social cue가 disclosure를 어떻게 바꾸는가?
+        text: Presence, relationship, mediated interaction을 연결하는 질문.
+      - tag: Cross-agent
+        title: Robot·voice agent·avatar의 error는 왜 다르게 용서되는가?
+        text: Embodiment와 expectation의 일반 원리를 분리하는 질문.
+      - tag: Human–AI team
+        title: Agent가 teammate로 받아들여질 때 역할 협상은 어떻게 달라지는가?
+        text: Coordination, mental model, team identity를 다루는 질문.
+      - tag: Design
+        title: 여러 agent form에서 일관되게 작동하는 feedback language는 무엇인가?
+        text: Cross-platform interaction technique와 design knowledge 질문.
+      - tag: Society · ethics
+        title: Digital agent의 representation은 stereotype과 power를 어떻게 재생산하는가?
+        text: Identity, ethics, social consequence를 interaction과 연결하는 질문.
+    selection_note: >-
+      HAI의 넓은 scope는 agent가 등장하는 모든 AI paper를 뜻하지 않는다. Human–agent interaction에 남는 명확한 contribution이 여전히 중심이다.
+    sources:
+      - label: HAI 2026 — Conference Scope and Topics
+        url: "https://hai-conference.net/hai2026/"
+      - label: HAI 2026 — Call for Full Papers
+        url: "https://hai-conference.net/hai2026/call-for-full-papers/"
+      - label: HRI 2026 — Full Papers and Non-physical Robot Guidance
+        url: "https://humanrobotinteraction.org/2026/full-papers/"
+
+  - slug: icsr
+    order: 5
+    group: conference
+    badge: ICSR
+    name: ICSR
+    full_name: International Conference on Social Robotics
+    meta: Social Robotics Conference · Interdisciplinary
+    accent: "#a44f61"
+    accent_dark: "#793444"
+    accent_soft: "#faecef"
+    hub_intro: >-
+      ICSR을 “social behavior user study만 받는 곳”으로 보면 범위를 지나치게 좁힌다.
+      Regular Paper는 technically rigorous original research를 요구하고, Short Paper·Grand Challenge·Debate Proposal·Robot Fringe 같은
+      별도 형식이 exploratory·creative work, art·performance·debate·robot design을 확장한다.
+    hub_detail: >-
+      HRI·RO-MAN과 topic은 겹치지만 ICSR의 중심 명사는 interaction보다 <strong>social robot</strong>이다.
+      Robot이 social actor, companion, tutor, caregiver로 어떤 역할을 갖고 사회에 배치되는지가 primary question이면 직접적인 독자층을 만난다.
+    definition: >-
+      Social robot의 enabling technology부터 behavior, design, application, ethics와 사회적 역할까지 하나의 interdisciplinary community에서 다루는 conference
+    thesis: >-
+      ICSR의 질문은 “사람이 robot과 상호작용했는가?”보다
+      <strong>이 robot이 어떤 social actor이며 사회에서 어떤 역할과 영향을 갖는가</strong>에 가깝다.
+    thesis_note: >-
+      Official call은 technically rigorous advance를 요구하면서 design, application, societal impact도 함께 열어 둔다.
+      Technical과 social contribution을 서로 배타적인 축으로 보지 않는 것이 중요하다.
+    facts:
+      - value: Social Robot
+        label: Robot의 social role과 behavior가 venue identity의 중심
+      - value: Full Spectrum
+        label: Core technology · design · application · social impact
+      - value: Applied Contexts
+        label: Assistive · medical · healthcare · education · entertainment · immersive-media applications
+      - value: Multiple Formats
+        label: Creative work·debate·performance는 Short Paper·Grand Challenge·Debate Proposal·Robot Fringe 등 별도 call로 운영
+    identity:
+      - title: Primary knowledge unit
+        text: >-
+          Social presence, personality, relationship, acceptance, moral agency, care·education role 또는 socially aware behavior가
+          robot이라는 social actor의 설계와 배치를 어떻게 바꾸는지 다룬다.
+      - title: Reviewer가 먼저 보는 것
+        text: >-
+          Social robotics에 original and rigorous contribution이 있는지, technical·empirical·design·societal evidence가
+          주장한 social role과 mechanism을 실제로 지지하는지를 본다.
+    scope:
+      - title: Social capability
+        items:
+          - Social perception and cognition
+          - Dialogue · affect · personality
+          - Embodied intelligence and behavior
+          - Adaptive and personalized interaction
+      - title: Design · relationship
+        items:
+          - Morphology and expressive behavior
+          - Social presence and embodiment
+          - Acceptance · trust · attachment
+          - Co-design and participatory process
+      - title: Application · society
+        items:
+          - Care · health · rehabilitation
+          - Education · child–robot interaction
+          - Ethics · philosophy · moral agency
+          - Art · culture · societal impact
+    rule:
+      label: ICSR의 기본 단위
+      text: >-
+        <strong>Robot의 sociality가 research question을 규정</strong>해야 한다.
+        Technical advance도 가능하지만 왜 그 advance가 social role, behavior, acceptance 또는 deployment에 중요한지를 보여야 한다.
+    position:
+      - label: Primary claim
+        text: Social robot의 behavior, relationship, role, design, application 또는 societal consequence.
+      - label: Core audience
+        text: Social roboticist, HRI researcher, designer, psychologist, ethicist and application-domain researcher.
+      - label: Evidence
+        text: Regular Paper는 technical·empirical·design evidence를, creative work·debate·performance는 각각의 별도 submission format을 따른다.
+      - label: Social lens
+        text: Robot을 tool만이 아니라 social actor로 인식·설계·배치하는가.
+      - label: Strong signal
+        text: Social mechanism과 robot role이 결과와 design implication을 함께 조직한다.
+      - label: Weak signal
+        text: Generic assistant UI 또는 control method이고 social robot이어야 할 이유가 없다.
+    neighbors: >-
+      HRI는 interaction 자체의 theory·method·technical·system·study contribution을 넓게 받고,
+      RO-MAN은 communication과 team·application을 중심으로 조직한다. IJSR은 같은 social-robot spectrum의 archival journal이다.
+    boundary: >-
+      Social이라는 단어를 emotion이나 귀여움으로 좁히지 않는다. Role, norm, distance, autonomy, care, power, ethics,
+      social navigation도 social robotics의 핵심이며 technical system paper도 공식 범위에 포함된다.
+    snapshot:
+      - value: Official scope
+        label: Technical advance · design · application · interaction · societal impact
+      - value: Typical evidence
+        label: Social capability test, behavioral study, field context or design argument
+      - value: Strong fit
+        label: Robot의 social role과 mechanism이 primary question
+      - value: Recheck fit
+        label: Social framing 없이 generic robot system만 남음
+    position_note: >-
+      ICSR 2026의 art·performance·debate 요소는 Regular Paper와 동일한 category가 아니다.
+      Short Paper, Grand Challenge, Debate Proposal, Robot Fringe 등 각기 다른 call과 형식으로 interdisciplinary program을 구성한다.
+    taste_intro: >-
+      좋은 ICSR paper는 “사람이 robot을 좋아했다”가 아니라 <strong>어떤 social mechanism과 role이 그 반응을 만들었고 설계에 무엇을 남기는지</strong>를 설명한다.
+    matrix:
+      - axis: Problem
+        sound: Social robot의 새 표정 기능을 평가
+        shaped: 어떤 social cue·role·relationship gap을 표정 behavior가 해결하는지 명시
+      - axis: Claim
+        sound: Likeability와 engagement가 상승
+        shaped: Social presence·norm·expectation이 변한 mechanism과 boundary를 설명
+      - axis: Evidence
+        sound: Survey와 task result
+        shaped: Behavior, perception, context, longitudinal consequence를 role claim에 연결
+      - axis: Framing
+        sound: Robot feature와 application을 소개
+        shaped: Social robotics literature와 실제 deployment implication이 첫 페이지에 보임
+    framing:
+      diffuse:
+        sample: “귀여운 눈 모양을 사용한 robot이 더 높은 likeability를 얻었다.”
+        explain: Design effect는 있지만 어떤 social relationship mechanism인지 아직 약하다.
+      shaped:
+        sample: “의존을 요구하지 않는 weak-robot behavior가 가족의 도움·대화·care role을 어떻게 재구성하는지 장기 배치에서 밝힌다.”
+        explain: Social role, relationship, field consequence가 하나의 archival question으로 연결된다.
+    lessons:
+      - title: Sociality를 construct로 정의한다
+        text: Likeability 하나가 아니라 presence, norm, role, relationship 중 무엇을 뜻하는지 쓴다.
+      - title: Technical contribution을 social consequence에 연결한다
+        text: Perception·planning·dialogue가 social behavior를 왜 다르게 만드는지 보여준다.
+      - title: Application role을 구체화한다
+        text: Tutor, caregiver, companion, coworker의 권한과 기대가 서로 다르다.
+      - title: 장기적·사회적 영향을 고려한다
+        text: Novelty effect, attachment, dependency, labor, privacy, power를 limitation에 포함한다.
+      - title: HRI와 ICSR 독자를 구분한다
+        text: Interaction generality보다 social robot identity가 central claim인지 확인한다.
+    submit:
+      big: Social robot
+      small: 이 robot은 어떤 social actor이며 무엇을 바꾸는가?
+      items:
+        - <b>Mechanism:</b> presence · norm · role · relationship
+        - <b>Capability:</b> social perception · behavior · adaptation · dialogue
+        - <b>Context:</b> care · education · home · public · work
+        - <b>Consequence:</b> acceptance · ethics · social impact
+    final:
+      big: >-
+        가장 간결하게 말하면, <strong>ICSR은 social robot 자체의 capability·design·role·사회적 영향을 연구 단위로 삼는 conference</strong>다.
+      small: >-
+        좋은 paper는 robot이 social하게 보였다는 관찰을 넘어, sociality가 어떻게 구성되고 실제 관계와 사회에 무엇을 남기는지 보여준다.
+    spectrum_intro: >-
+      아래 질문은 ICSR 2026 call이 여는 technical·design·application·societal spectrum을 보여주는 편집 예시다.
+    hero_question:
+      tag: Social role
+      title: Care robot은 도움을 제공하면서 사용자의 autonomy와 관계를 어떻게 보존할 수 있는가?
+      text: Capability, interaction behavior, role expectation, ethical consequence가 동시에 만나는 social robotics 질문.
+    questions:
+      - tag: Social behavior
+        title: Robot의 timing·distance·gaze는 어떤 social norm을 전달하는가?
+        text: Expressive behavior와 human interpretation을 연결하는 질문.
+      - tag: Relationship
+        title: 장기 상호작용에서 novelty 이후에도 관계가 어떻게 유지되는가?
+        text: Attachment, expectation, repair, disengagement를 다루는 질문.
+      - tag: Education
+        title: Robot tutor는 authority와 peer role을 어떻게 조절해야 하는가?
+        text: Learning outcome뿐 아니라 social role과 classroom practice를 보는 질문.
+      - tag: Social navigation
+        title: Navigation policy는 거리뿐 아니라 group과 norm을 어떻게 고려해야 하는가?
+        text: Technical planning을 social behavior와 연결하는 질문.
+      - tag: Ethics
+        title: Social robot의 persuasion과 deception은 어디까지 허용되는가?
+        text: Moral agency, transparency, vulnerable user를 다루는 질문.
+      - tag: Art · design
+        title: Performance와 speculative design이 social robot의 미래를 어떻게 비판할 수 있는가?
+        text: Artifact와 debate를 social robotics knowledge로 만드는 질문.
+    selection_note: >-
+      ICSR 2026 공식 topics는 AI·learning·explainability, embodied intelligence·adaptation, assistive·medical robotics 같은 technical 영역과 design·arts·ethics·governance를 함께 포함한다.
+    sources:
+      - label: ICSR 2026 — Calls and Scope
+        url: "https://icsr2026.uk/calls/"
+      - label: ICSR 2026 — Topics
+        url: "https://icsr2026.uk/topics/"
+      - label: International Journal of Social Robotics — Aims and Scope
+        url: "https://link.springer.com/journal/12369/aims-and-scope"
+      - label: JST/CRDS — Research and Development Trends in HRI (2026)
+        url: "https://doi.org/10.82643/crds-fr-s-ro-hri"

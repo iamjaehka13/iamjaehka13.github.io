@@ -1,0 +1,259 @@
+{% assign guide = site.data.hri_venue_guides.venues | where: "slug", page.venue | first %}
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ guide.name | escape }} 학생 가이드 · HRI Venue Guides</title>
+    <meta name="description" content="{{ guide.definition | strip_html | strip_newlines | escape }}">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ guide.name | escape }} 학생 가이드">
+    <meta property="og:description" content="{{ guide.definition | strip_html | strip_newlines | escape }}">
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+    <meta property="og:image" content="{{ site.url }}/assets/img/posts/hri/hri-venue-guide-2026/00-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/hri-venue-guides.css">
+  </head>
+  <body
+    class="guide-shell"
+    style="--guide-accent: {{ guide.accent }}; --guide-accent-dark: {{ guide.accent_dark }}; --guide-accent-soft: {{ guide.accent_soft }};"
+  >
+    <a class="guide-control" href="/hri-venue-guides/" aria-label="HRI Venue Guides 허브로 이동">ALL GUIDES</a>
+
+    <main>
+      <section class="guide-sheet" aria-labelledby="guide-title">
+        <div class="guide-topbar"></div>
+        <div class="guide-inner">
+          <p class="guide-eyebrow">HRI Venue Guides · Student Edition</p>
+          <h1 id="guide-title">{{ guide.name }}</h1>
+          <p class="guide-subtitle"><strong>{{ guide.full_name }}</strong><br>{{ guide.definition }}</p>
+
+          <div class="guide-hero">
+            <p class="big">{{ guide.thesis }}</p>
+            <p class="small">{{ guide.thesis_note }}</p>
+          </div>
+
+          <div class="guide-facts" aria-label="핵심 사실">
+            {% for fact in guide.facts %}
+              <div class="guide-fact">
+                <b>{{ fact.value }}</b>
+                <span>{{ fact.label }}</span>
+              </div>
+            {% endfor %}
+          </div>
+
+          <section class="guide-section" aria-labelledby="identity-title">
+            <div class="guide-section-head">
+              <div>
+                <p class="guide-section-kicker">Identity</p>
+                <h2 id="identity-title">이 venue가 논문에서 찾는 중심 단위</h2>
+              </div>
+              <p class="guide-section-note">공식 scope와 reviewer 문서에 근거한 요약</p>
+            </div>
+            <div class="guide-two-columns">
+              {% for item in guide.identity %}
+                <article class="guide-box{% if forloop.index == 2 %} soft{% endif %}">
+                  <h3>{{ item.title }}</h3>
+                  <p>{{ item.text }}</p>
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="guide-section" aria-labelledby="scope-title">
+            <div class="guide-section-head">
+              <div>
+                <p class="guide-section-kicker">Scope</p>
+                <h2 id="scope-title">어떤 연구가 이 안에 들어오는가</h2>
+              </div>
+            </div>
+            <div class="guide-scope-grid">
+              {% for area in guide.scope %}
+                <article class="guide-scope">
+                  <h3>{{ area.title }}</h3>
+                  <ul>
+                    {% for item in area.items %}<li>{{ item }}</li>{% endfor %}
+                  </ul>
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+
+          <div class="guide-rule">
+            <div class="tag">{{ guide.rule.label }}</div>
+            <div class="text">{{ guide.rule.text }}</div>
+          </div>
+        </div>
+        <span class="guide-page-number">01 / 04</span>
+      </section>
+
+      <section class="guide-sheet" aria-labelledby="position-title">
+        <div class="guide-topbar"></div>
+        <div class="guide-inner">
+          <div class="guide-page-title">
+            <div>
+              <p class="guide-eyebrow">Position &amp; Community</p>
+              <h2 id="position-title">{{ guide.name }}의 community 내 위치와 review lens</h2>
+            </div>
+            <span class="number" aria-hidden="true">02</span>
+          </div>
+
+          <div class="guide-position-list">
+            {% for item in guide.position %}
+              <div class="guide-position-item">
+                <div class="label">{{ item.label }}</div>
+                <div class="text">{{ item.text }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="guide-bridge">
+            <article class="dark">
+              <h3>가까운 이웃과의 관계</h3>
+              <p>{{ guide.neighbors }}</p>
+            </article>
+            <article class="light">
+              <h3>경계를 다시 확인해야 할 때</h3>
+              <p>{{ guide.boundary }}</p>
+            </article>
+          </div>
+
+          <section class="guide-snapshot" aria-labelledby="snapshot-title">
+            <div class="head" id="snapshot-title">Current snapshot · 2026-09-01 기준</div>
+            <div class="guide-snapshot-grid">
+              {% for item in guide.snapshot %}
+                <div>
+                  <b>{{ item.value }}</b>
+                  <span>{{ item.label }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+
+          <div class="guide-position-note">{{ guide.position_note }}</div>
+        </div>
+        <span class="guide-page-number">02 / 04</span>
+      </section>
+
+      <section class="guide-sheet" aria-labelledby="taste-title">
+        <div class="guide-topbar"></div>
+        <div class="guide-inner">
+          <div class="guide-page-title">
+            <div>
+              <p class="guide-eyebrow">Taste &amp; Framing</p>
+              <h2 id="taste-title">무엇이 ‘{{ guide.name }}다운 논문’을 만드는가</h2>
+            </div>
+            <span class="number" aria-hidden="true">03</span>
+          </div>
+
+          <div class="guide-taste-intro">{{ guide.taste_intro }}</div>
+
+          <div class="guide-matrix" role="table" aria-label="논문 framing 비교">
+            <div class="guide-matrix-row header" role="row">
+              <div role="columnheader">관점</div>
+              <div role="columnheader">아직 넓거나 흐린 표현</div>
+              <div role="columnheader">이 venue에 맞게 다듬은 표현</div>
+            </div>
+            {% for row in guide.matrix %}
+              <div class="guide-matrix-row" role="row">
+                <div class="axis" role="cell">{{ row.axis }}</div>
+                <div role="cell">{{ row.sound }}</div>
+                <div role="cell">{{ row.shaped }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="guide-framing">
+            <article class="guide-frame diffuse">
+              <p class="label">Diffuse framing</p>
+              <p class="sample">{{ guide.framing.diffuse.sample }}</p>
+              <p class="explain">{{ guide.framing.diffuse.explain }}</p>
+            </article>
+            <article class="guide-frame shaped">
+              <p class="label">Venue-shaped framing</p>
+              <p class="sample">{{ guide.framing.shaped.sample }}</p>
+              <p class="explain">{{ guide.framing.shaped.explain }}</p>
+            </article>
+          </div>
+
+          <div class="guide-lessons">
+            <div class="guide-lesson-list">
+              {% for lesson in guide.lessons %}
+                <article class="guide-lesson">
+                  <h3>{{ lesson.title }}</h3>
+                  <p>{{ lesson.text }}</p>
+                </article>
+              {% endfor %}
+            </div>
+            <aside class="guide-submit">
+              <h3>Submission test</h3>
+              <p class="big">{{ guide.submit.big }}<small>{{ guide.submit.small }}</small></p>
+              <ul>
+                {% for item in guide.submit.items %}<li>{{ item }}</li>{% endfor %}
+              </ul>
+            </aside>
+          </div>
+
+          <div class="guide-final">
+            <p class="big">{{ guide.final.big }}</p>
+            <p class="small">{{ guide.final.small }}</p>
+          </div>
+        </div>
+        <span class="guide-page-number">03 / 04</span>
+      </section>
+
+      <section class="guide-sheet" aria-labelledby="spectrum-title">
+        <div class="guide-topbar"></div>
+        <div class="guide-inner">
+          <div class="guide-page-title">
+            <div>
+              <p class="guide-eyebrow">Question Spectrum &amp; Sources</p>
+              <h2 id="spectrum-title">대표 연구 질문으로 보는 {{ guide.name }} spectrum</h2>
+            </div>
+            <span class="number" aria-hidden="true">04</span>
+          </div>
+
+          <p class="guide-spectrum-intro">{{ guide.spectrum_intro }}</p>
+
+          <article class="guide-question-hero">
+            <div class="tag">{{ guide.hero_question.tag }}</div>
+            <div>
+              <h3>{{ guide.hero_question.title }}</h3>
+              <p>{{ guide.hero_question.text }}</p>
+            </div>
+          </article>
+
+          <div class="guide-question-grid">
+            {% for question in guide.questions %}
+              <article class="guide-question">
+                <p class="tag">{{ question.tag }}</p>
+                <h3>{{ question.title }}</h3>
+                <p>{{ question.text }}</p>
+              </article>
+            {% endfor %}
+          </div>
+
+          <div class="guide-selection-note">{{ guide.selection_note }}</div>
+
+          <div class="guide-sources">
+            <div class="label">Primary sources</div>
+            <ol>
+              {% for source in guide.sources %}
+                <li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.label }}</a></li>
+              {% endfor %}
+            </ol>
+          </div>
+        </div>
+
+        <p class="guide-credit">
+          공식 문서가 보여주는 범위와 이 guide의 편집 해석을 구분해 작성했다. 정보 구조는
+          <a href="https://gisbi-kim.github.io/robotics-venue-guides/" target="_blank" rel="noopener noreferrer">Giseop Kim의 Robotics Venue Guides</a>에서 영감을 받아 독립 구현했다.
+          Updated {{ site.data.hri_venue_guides.updated }}.
+        </p>
+        <span class="guide-page-number">04 / 04</span>
+      </section>
+    </main>
+  </body>
+</html>
