@@ -43,11 +43,22 @@ button:focus-visible {
 }
 
 /* Hub */
+.vg-hub {
+  --vg-ink: #122033;
+  --vg-muted: #5c6979;
+  --vg-line: #dbe2e9;
+  --vg-soft: #f3f6f8;
+  --vg-deep: #0b2b49;
+  --vg-blue: #0d66ad;
+  --vg-conference: #0d6b63;
+  --vg-publication: #965a16;
+}
+
 .vg-hub .hub-hero {
   color: #fff;
   background:
-    radial-gradient(circle at 84% 12%, rgba(91, 188, 183, 0.28), transparent 29rem),
-    linear-gradient(132deg, #142541 0%, #203f68 58%, #287b83 100%);
+    radial-gradient(circle at 85% 10%, rgba(83, 169, 220, 0.28), transparent 28rem),
+    linear-gradient(130deg, #081e34 0%, #0b3457 58%, #0d5f8e 100%);
 }
 
 .hub-inner,
@@ -62,26 +73,27 @@ button:focus-visible {
 }
 
 .hub-eyebrow {
-  color: #aee1de;
+  margin: 0;
+  color: #9fd2f1;
   font-size: 0.78rem;
-  font-weight: 850;
+  font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .hub-hero h1 {
-  max-width: 880px;
+  max-width: 850px;
   margin: 16px 0 0;
   font-size: clamp(2.35rem, 6vw, 4.75rem);
-  font-weight: 860;
+  font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.055em;
 }
 
 .hub-copy {
-  max-width: 790px;
+  max-width: 750px;
   margin: 22px 0 0;
-  color: #dcebf0;
+  color: #d9e8f2;
   font-size: clamp(1rem, 2vw, 1.18rem);
   line-height: 1.75;
 }
@@ -120,10 +132,10 @@ button:focus-visible {
   align-items: flex-start;
   gap: 14px;
   padding: 17px 19px;
-  border: 1px solid #cedae7;
+  border: 1px solid #cddae4;
   border-radius: 14px;
-  color: #3d546c;
-  background: #e9f1f7;
+  color: #385267;
+  background: #eaf2f7;
   font-size: 0.9rem;
   line-height: 1.55;
 }
@@ -198,7 +210,7 @@ button:focus-visible {
   border: 1px solid var(--vg-line);
   border-radius: 18px;
   background: var(--vg-paper);
-  box-shadow: 0 8px 24px rgba(23, 32, 51, 0.045);
+  box-shadow: 0 8px 24px rgba(18, 32, 51, 0.045);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
@@ -222,13 +234,13 @@ button:focus-visible {
 }
 
 .conference .hub-badge {
-  color: #0c5b56;
+  color: #07554e;
   background: #dff3ef;
 }
 
 .publication .hub-badge {
-  color: #65428d;
-  background: #eee6f8;
+  color: #7f480e;
+  background: #faecd9;
 }
 
 .hub-card-body {
@@ -238,7 +250,8 @@ button:focus-visible {
 }
 
 .hub-meta {
-  color: #748196;
+  margin: 0;
+  color: #718093;
   font-size: 0.7rem;
   font-weight: 850;
   letter-spacing: 0.1em;
@@ -254,7 +267,7 @@ button:focus-visible {
 
 .hub-full-name {
   margin: 6px 0 0;
-  color: #68768a;
+  color: #687688;
   font-size: 0.78rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -262,7 +275,7 @@ button:focus-visible {
 
 .hub-desc {
   margin: 14px 0 0;
-  color: #36485e;
+  color: #36485d;
   font-size: 0.91rem;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -272,7 +285,7 @@ button:focus-visible {
   margin-top: 13px;
   padding: 2px 0 2px 14px;
   border-left: 3px solid #c8d0da;
-  color: #717d8d;
+  color: #727d89;
   font-size: 0.82rem;
   line-height: 1.65;
 }
@@ -312,9 +325,9 @@ button:focus-visible {
 }
 
 .hub-button.secondary {
-  border: 1px solid #ccd6e1;
-  color: #43536a;
-  background: #f8fafc;
+  border: 1px solid #cfd8e1;
+  color: #435266;
+  background: #f8fafb;
 }
 
 .hub-button.secondary:hover {
