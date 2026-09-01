@@ -22,7 +22,7 @@ sitemap: false
     <meta property="og:url" content="{{ site.url }}/hri-venue-guides/">
     <meta property="og:image" content="{{ site.url }}/assets/img/posts/hri/hri-venue-guide-2026/00-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/hri-venue-guides.css?v=20260901-2">
+    <link rel="stylesheet" href="/assets/css/hri-venue-guides.css?v=20260901-4">
   </head>
   <body class="vg-hub">
     <header class="hub-hero">
@@ -42,13 +42,143 @@ sitemap: false
     </header>
 
     <main class="hub-main">
-      <div class="hub-notice">
-        <span class="hub-notice-mark" aria-hidden="true">i</span>
-        <div>
-          공식 CFP·reviewer guide·journal scope가 보여주는 범위와 이 guide의 편집 해석을 구분했다.
-          실제 투고 전에는 해당 연도의 정책을 다시 확인해야 한다.
+      <section class="hub-notation" aria-labelledby="guide-notation-title">
+        <div class="hub-notation-head">
+          <div>
+            <p class="hub-notation-kicker">Guide notation</p>
+            <h2 id="guide-notation-title">세 종류의 문장을 구분해 읽는다.</h2>
+          </div>
+          <p>
+            이 hub는 공식 문서를 출발점으로 삼되, venue 사이의 차이를 읽기 위한 편집 해석과
+            가상의 framing 예시를 명시적으로 분리한다.
+          </p>
         </div>
-      </div>
+        <div class="hub-notation-grid">
+          <article class="hub-notation-item official">
+            <span class="hub-notation-label">Official</span>
+            <h3>공식 문서가 직접 말하는 것</h3>
+            <p>CFP, reviewer guide, journal scope, 공식 program처럼 출처가 확인되는 범위와 절차.</p>
+          </article>
+          <article class="hub-notation-item editorial">
+            <span class="hub-notation-label">Editorial lens</span>
+            <h3>venue를 비교하기 위한 편집 해석</h3>
+            <p>공식 문서와 대표 연구를 함께 읽고 정리한 research unit, academic taste, routing heuristic.</p>
+          </article>
+          <article class="hub-notation-item example">
+            <span class="hub-notation-label">Framing example</span>
+            <h3>같은 project를 다시 쓰는 사고 실험</h3>
+            <p>실제 채택 논문이나 보장된 recipe가 아니라, contribution의 중심을 비교하는 가상 예시.</p>
+          </article>
+        </div>
+        <p class="hub-notation-caution">
+          <strong>중요:</strong> 이 guide는 acceptance 가능성이나 venue 서열을 예측하지 않는다.
+          실제 투고 전에는 해당 연도의 공식 정책을 다시 확인해야 한다.
+        </p>
+      </section>
+
+      <section class="hub-section hub-decision" aria-labelledby="decision-title">
+        <div class="hub-section-head">
+          <div>
+            <p class="hub-section-kicker">Editorial lens · Primary-contribution matrix</p>
+            <h2 id="decision-title">12개 venue, 논문 뒤에 무엇이 남아야 하는가</h2>
+          </div>
+          <p class="hub-section-note">
+            topic이 아니라 가장 강한 claim과 evidence가 어느 community의 지식으로 남는지부터 고른다.
+          </p>
+        </div>
+        <div class="hub-decision-table" role="table" aria-label="12개 HRI 관련 venue의 primary contribution 비교">
+          <div class="hub-decision-header" role="row">
+            <div role="columnheader">Venue</div>
+            <div role="columnheader">Primary contribution</div>
+            <div role="columnheader">First routing question</div>
+            <div role="columnheader">Recheck fit when</div>
+          </div>
+          {% for venue in venues %}
+            {% assign primary_claim = venue.position | first %}
+            {% assign recheck_fit = venue.snapshot | last %}
+            <div class="hub-decision-row" role="row">
+              <div role="cell" data-label="Venue">
+                <a class="hub-decision-venue" href="/hri-venue-guides/guides/{{ venue.slug }}/">
+                  <span class="hub-mini-badge {{ venue.group }}">{{ venue.badge }}</span>
+                  <span>{{ venue.name }}</span>
+                </a>
+              </div>
+              <div role="cell" data-label="Primary contribution">{{ primary_claim.text }}</div>
+              <div role="cell" data-label="First routing question">{{ venue.submit.small }}</div>
+              <div role="cell" data-label="Recheck fit when">{{ recheck_fit.label }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="hub-section hub-framing" aria-labelledby="framing-title">
+        <div class="hub-section-head">
+          <div>
+            <p class="hub-section-kicker">Framing example · One project, six framings</p>
+            <h2 id="framing-title">같은 스마트글래스와 책상 정리 robot, 무엇을 논문으로 남길까</h2>
+          </div>
+          <p class="hub-section-note">
+            hardware와 task를 고정하고 primary contribution만 바꿔 venue fit의 차이를 본다.
+          </p>
+        </div>
+        <div class="hub-project-constant">
+          <span>Constant project</span>
+          <p>
+            사용자는 스마트글래스의 gaze·speech·gesture로 cluttered desk의 정리 목표를 전달하고,
+            mobile manipulator는 모호한 지시를 확인한 뒤 물건을 분류·이동한다.
+          </p>
+        </div>
+        <div class="hub-framing-grid">
+          <article class="hub-framing-card chi">
+            <div class="hub-framing-top"><span>CHI</span><b>attention·interaction burden·error recovery</b></div>
+            <p class="hub-framing-claim">
+              Gaze·voice·AR confirmation을 결합한 interaction technique가 사용자의 attention switching,
+              interaction burden과 error-recovery strategy를 어떻게 바꾸는가?
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> comparative user study, attention·correction behavior, workload와 reusable HCI design implication.</p>
+          </article>
+          <article class="hub-framing-card hri">
+            <div class="hub-framing-top"><span>HRI</span><b>상호작용 mechanism과 recovery</b></div>
+            <p class="hub-framing-claim">
+              Robot이 불확실성을 질문과 motion cue로 드러낼 때 사용자의 correction과 joint-task recovery가
+              어떻게 달라지는가?
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> interaction-specific behavioral result와 system evidence, reusable HRI mechanism.</p>
+          </article>
+          <article class="hub-framing-card roman">
+            <div class="hub-framing-top"><span>RO-MAN</span><b>reference와 역할의 협상</b></div>
+            <p class="hub-framing-claim">
+              Gaze·speech·gesture가 충돌할 때 human–robot team은 object reference와 task ownership을
+              어떻게 협상하는가?
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> communication protocol, team metric, breakdown·repair, role negotiation.</p>
+          </article>
+          <article class="hub-framing-card icra">
+            <div class="hub-framing-top"><span>ICRA · IROS</span><b>새로운 integrated capability</b></div>
+            <p class="hub-framing-claim">
+              Deictic command grounding, active clarification, task-and-motion planning을 통합해
+              cluttered manipulation의 recovery rate를 높인다.
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> robotics baseline·ablation, real-robot success, latency·safety·failure analysis.</p>
+          </article>
+          <article class="hub-framing-card rss">
+            <div class="hub-framing-top"><span>RSS</span><b>검증 가능한 하나의 principle</b></div>
+            <p class="hub-framing-claim">
+              Ambiguous human input을 belief update와 query action으로 함께 다루는 uncertainty-aware
+              shared-autonomy principle을 제안한다.
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> formulation, strongest baseline, ablation·failure boundary, expert-verifiable core.</p>
+          </article>
+          <article class="hub-framing-card corl">
+            <div class="hub-framing-top"><span>CoRL</span><b>human signal로 학습·일반화</b></div>
+            <p class="hub-framing-claim">
+              Sparse gaze·language correction으로 tidying policy를 personalize하고 unseen object와
+              desk layout으로 transfer한다.
+            </p>
+            <p class="hub-framing-evidence"><strong>Evidence:</strong> learning curve, data efficiency, baseline·ablation, generalization과 convincing robot transfer.</p>
+          </article>
+        </div>
+      </section>
 
       <section class="hub-section conference" aria-labelledby="conference-title">
         <div class="hub-section-head">

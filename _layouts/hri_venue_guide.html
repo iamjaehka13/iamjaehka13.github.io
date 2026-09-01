@@ -14,7 +14,7 @@
     <meta property="og:url" content="{{ site.url }}{{ page.url }}">
     <meta property="og:image" content="{{ site.url }}/assets/img/posts/hri/hri-venue-guide-2026/00-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/hri-venue-guides.css?v=20260901-2">
+    <link rel="stylesheet" href="/assets/css/hri-venue-guides.css?v=20260901-4">
   </head>
   <body
     class="guide-shell"
@@ -31,10 +31,19 @@
           <p class="guide-subtitle"><strong>{{ guide.full_name }}</strong><br>{{ guide.definition }}</p>
 
           <div class="guide-hero">
+            <p class="guide-content-label editorial">Editorial lens</p>
             <p class="big">{{ guide.thesis }}</p>
             <p class="small">{{ guide.thesis_note }}</p>
           </div>
 
+          <div class="guide-notation" aria-label="이 가이드의 표기법">
+            <span class="title">Guide notation</span>
+            <span><b class="official">Official</b> CFP·scope·review 문서</span>
+            <span><b class="editorial">Editorial lens</b> venue-fit 해석</span>
+            <span><b class="example">Framing example</b> 제출 규칙이 아닌 재구성 예시</span>
+          </div>
+
+          <p class="guide-content-label official">Official snapshot</p>
           <div class="guide-facts" aria-label="핵심 사실">
             {% for fact in guide.facts %}
               <div class="guide-fact">
@@ -81,10 +90,6 @@
             </div>
           </section>
 
-          <div class="guide-rule">
-            <div class="tag">{{ guide.rule.label }}</div>
-            <div class="text">{{ guide.rule.text }}</div>
-          </div>
         </div>
         <span class="guide-page-number">01 / 04</span>
       </section>
@@ -94,14 +99,14 @@
         <div class="guide-inner">
           <div class="guide-page-title">
             <div>
-              <p class="guide-eyebrow">Position &amp; Community</p>
+              <p class="guide-eyebrow">Official context · Editorial fit signals</p>
               <h2 id="position-title">{{ guide.name }}의 community 내 위치와 review lens</h2>
             </div>
             <span class="number" aria-hidden="true">02</span>
           </div>
 
           <div class="guide-position-list">
-            {% for item in guide.position %}
+            {% for item in guide.position offset: 4 %}
               <div class="guide-position-item">
                 <div class="label">{{ item.label }}</div>
                 <div class="text">{{ item.text }}</div>
@@ -120,19 +125,6 @@
             </article>
           </div>
 
-          <section class="guide-snapshot" aria-labelledby="snapshot-title">
-            <div class="head" id="snapshot-title">Current snapshot · 2026-09-01 기준</div>
-            <div class="guide-snapshot-grid">
-              {% for item in guide.snapshot %}
-                <div>
-                  <b>{{ item.value }}</b>
-                  <span>{{ item.label }}</span>
-                </div>
-              {% endfor %}
-            </div>
-          </section>
-
-          <div class="guide-position-note">{{ guide.position_note }}</div>
         </div>
         <span class="guide-page-number">02 / 04</span>
       </section>
@@ -142,21 +134,19 @@
         <div class="guide-inner">
           <div class="guide-page-title">
             <div>
-              <p class="guide-eyebrow">Taste &amp; Framing</p>
+              <p class="guide-eyebrow">Editorial lens · Taste &amp; Framing</p>
               <h2 id="taste-title">무엇이 ‘{{ guide.name }}다운 논문’을 만드는가</h2>
             </div>
             <span class="number" aria-hidden="true">03</span>
           </div>
 
-          <div class="guide-taste-intro">{{ guide.taste_intro }}</div>
-
           <div class="guide-matrix" role="table" aria-label="논문 framing 비교">
             <div class="guide-matrix-row header" role="row">
               <div role="columnheader">관점</div>
-              <div role="columnheader">아직 넓거나 흐린 표현</div>
-              <div role="columnheader">이 venue에 맞게 다듬은 표현</div>
+              <div role="columnheader">Diffuse example</div>
+              <div role="columnheader">Venue-shaped example</div>
             </div>
-            {% for row in guide.matrix %}
+            {% for row in guide.matrix limit: 2 %}
               <div class="guide-matrix-row" role="row">
                 <div class="axis" role="cell">{{ row.axis }}</div>
                 <div role="cell">{{ row.sound }}</div>
@@ -178,28 +168,6 @@
             </article>
           </div>
 
-          <div class="guide-lessons">
-            <div class="guide-lesson-list">
-              {% for lesson in guide.lessons %}
-                <article class="guide-lesson">
-                  <h3>{{ lesson.title }}</h3>
-                  <p>{{ lesson.text }}</p>
-                </article>
-              {% endfor %}
-            </div>
-            <aside class="guide-submit">
-              <h3>Submission test</h3>
-              <p class="big">{{ guide.submit.big }}<small>{{ guide.submit.small }}</small></p>
-              <ul>
-                {% for item in guide.submit.items %}<li>{{ item }}</li>{% endfor %}
-              </ul>
-            </aside>
-          </div>
-
-          <div class="guide-final">
-            <p class="big">{{ guide.final.big }}</p>
-            <p class="small">{{ guide.final.small }}</p>
-          </div>
         </div>
         <span class="guide-page-number">03 / 04</span>
       </section>
@@ -209,7 +177,7 @@
         <div class="guide-inner">
           <div class="guide-page-title">
             <div>
-              <p class="guide-eyebrow">Question Spectrum &amp; Sources</p>
+              <p class="guide-eyebrow">Framing Examples &amp; Sources</p>
               <h2 id="spectrum-title">대표 연구 질문으로 보는 {{ guide.name }} spectrum</h2>
             </div>
             <span class="number" aria-hidden="true">04</span>
@@ -226,7 +194,7 @@
           </article>
 
           <div class="guide-question-grid">
-            {% for question in guide.questions %}
+            {% for question in guide.questions limit: 3 %}
               <article class="guide-question">
                 <p class="tag">{{ question.tag }}</p>
                 <h3>{{ question.title }}</h3>
@@ -235,10 +203,13 @@
             {% endfor %}
           </div>
 
-          <div class="guide-selection-note">{{ guide.selection_note }}</div>
+          <div class="guide-selection-note">
+            <strong>Reading note.</strong> Editorial lens, Strong/Weak signal, Diffuse→Shaped는 공식 acceptance rubric이 아니라
+            CFP·review guidance·accepted program을 바탕으로 구성한 venue-fit heuristic이다. {{ guide.selection_note }}
+          </div>
 
           <div class="guide-sources">
-            <div class="label">Primary sources</div>
+            <div class="label">Official &amp; cited sources</div>
             <ol>
               {% for source in guide.sources %}
                 <li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.label }}</a></li>
