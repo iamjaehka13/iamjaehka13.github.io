@@ -35,6 +35,7 @@ h1:focus, h2:focus { outline: none; }
 .subtitle { margin-top: 14px; color: var(--muted); font-size: 17px; }
 .introduction { display: flex; flex-direction: column; justify-content: center; text-align: center; }
 .intro-author { font-size: 24px; margin-top: 28px; }
+.future-topic { margin-top: 72px; font-size: 28px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere; }
 .personal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 32px; margin-top: 32px; }
 .personal-item { border-top: 1px solid var(--line); padding-top: 16px; }
 .personal-item h3 { font-size: 18px; }
@@ -139,6 +140,7 @@ figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top:
   h2 { font-size: 30px; }
   .eyebrow { font-size: 10px; margin-bottom: 12px; }
   .intro-author { font-size: 20px; margin-top: 24px; }
+  .future-topic { margin-top: 48px; font-size: 22px; }
   .personal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 20px; margin-top: 26px; }
   .personal-item h3 { font-size: 15px; }
   .personal-item ul { font-size: 14px; line-height: 1.7; }
