@@ -33,14 +33,9 @@ h1:focus, h2:focus { outline: none; }
 .deck-ready .slide + .slide { border-top: 0; }
 .eyebrow { color: var(--green); font-size: 12px; font-weight: 650; margin-bottom: 14px; }
 .subtitle { margin-top: 14px; color: var(--muted); font-size: 17px; }
-.lead { font-size: 25px; line-height: 1.5; margin-top: 18px; }
-.introduction .slide-heading { display: grid; grid-template-columns: 1fr 1fr; align-items: end; column-gap: 24px; }
-.introduction .eyebrow { grid-column: 1 / -1; }
-.introduction .lead { margin: 0; font-size: 24px; }
-.intro-media { margin-top: 26px; }
-.intro-media img { display: block; width: 100%; max-height: 43dvh; height: auto; object-fit: contain; background: #ecefed; }
+.introduction { display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.intro-author { font-size: 24px; margin-top: 28px; }
 figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 10px; }
-.intro-footer { display: flex; gap: 24px; justify-content: space-between; color: var(--muted); font-size: 13px; margin-top: 18px; }
 .background-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 64px; margin-top: 34px; }
 .education { font-size: 23px; font-weight: 650; margin-bottom: 8px; }
 .muted { color: var(--muted); font-size: 16px; }
@@ -104,7 +99,6 @@ figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top:
   .project-grid { grid-template-columns: 1.2fr 1fr; gap: 24px; }
   .project-copy ul { font-size: 15px; }
   .takeaway { font-size: 16px; }
-  .introduction .lead { font-size: 20px; }
   .interest-list > div { grid-template-columns: 30px 1.2fr 1fr; gap: 12px; }
   .interest-list h3 { font-size: 16px; }
   .interest-list p { font-size: 14px; }
@@ -113,7 +107,6 @@ figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top:
   h1 { font-size: 52px; }
   h2 { font-size: 34px; }
   .slide { padding-top: 24px; }
-  .intro-media img { max-height: 35dvh; }
   .project-grid { margin-top: 20px; }
   .project-copy ul { font-size: 15px; margin: 14px 0 18px; }
   .project-copy li { margin-bottom: 8px; }
@@ -136,10 +129,7 @@ figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top:
   h1 { font-size: 44px; }
   h2 { font-size: 30px; }
   .eyebrow { font-size: 10px; margin-bottom: 12px; }
-  .introduction .slide-heading { display: block; }
-  .introduction .lead { font-size: 20px; margin-top: 16px; }
-  .intro-media img { max-height: none; aspect-ratio: 16 / 9; }
-  .intro-footer { flex-direction: column; gap: 8px; font-size: 12px; }
+  .intro-author { font-size: 20px; margin-top: 24px; }
   .background-grid { grid-template-columns: 1fr; gap: 28px; margin-top: 28px; }
   .education { font-size: 20px; }
   .muted { font-size: 14px; }
@@ -185,7 +175,6 @@ figcaption { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top:
   .slide:last-child { break-after: auto; }
   h1 { font-size: 40px; }
   h2, .closing h2 { font-size: 28px; }
-  .intro-media img { max-height: 100mm; }
   .project-grid { margin-top: 20px; gap: 28px; }
   .project-copy ul { font-size: 14px; }
   .takeaway { font-size: 15px; }

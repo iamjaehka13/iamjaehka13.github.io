@@ -20,7 +20,7 @@ date: 2026-09-18 21:00:00 +0900
     <meta property="og:image" content="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | absolute_url }}">
     <link rel="icon" href="{{ '/assets/img/favicons/favicon.ico' | relative_url }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ '/assets/css/self-introduction.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/css/self-introduction.css' | relative_url }}?v={{ site.time | date: '%Y%m%d%H%M%S' }}">
     <script defer src="{{ '/assets/js/self-introduction.js' | relative_url }}"></script>
   </head>
   <body>
@@ -43,15 +43,9 @@ date: 2026-09-18 21:00:00 +0900
     <main id="presentation" aria-label="Jaeha Kang 자기소개 발표">
       <section class="slide introduction" id="slide-1" aria-labelledby="title-1">
         <div class="slide-heading">
-          <p class="eyebrow">KONKUK UNIVERSITY · ROBOT LEARNING</p>
-          <h1 id="title-1" tabindex="-1">Jaeha Kang</h1>
-          <p class="lead">시뮬레이션에서 배운 움직임을<br>실제 로봇의 움직임으로 연결합니다.</p>
+          <h1 id="title-1" tabindex="-1">자기소개</h1>
+          <p class="intro-author">건국대학교 강재하</p>
         </div>
-        <figure class="intro-media">
-          <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" width="854" height="480" alt="학습한 보행 정책을 실제 Unitree Go2에 배포한 실험 장면">
-          <figcaption>Unitree Go2 · 실제 로봇 보행 정책 배포</figcaption>
-        </figure>
-        <div class="intro-footer"><span>건국대학교 학부 재학 · 2027년 2월 졸업 예정</span><span>Reinforcement Learning / Sim-to-Real</span></div>
       </section>
 
       <section class="slide" id="slide-2" aria-labelledby="title-2">
