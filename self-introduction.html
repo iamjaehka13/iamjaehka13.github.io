@@ -1,0 +1,161 @@
+---
+layout: null
+title: "Jaeha Kang | 자기소개"
+description: "로봇 강화학습과 실제 배포 경험을 소개합니다."
+permalink: /intro/7b2e94f1c8a64d03/
+sitemap: false
+date: 2026-09-18 21:00:00 +0900
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="referrer" content="no-referrer">
+    <title>{{ page.title | escape }}</title>
+    <meta name="description" content="{{ page.description | escape }}">
+    <meta property="og:title" content="Jaeha Kang | 자기소개">
+    <meta property="og:description" content="로봇 강화학습, Sim-to-Real, 그리고 다음 연구 질문.">
+    <meta property="og:image" content="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | absolute_url }}">
+    <link rel="icon" href="{{ '/assets/img/favicons/favicon.ico' | relative_url }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ '/assets/css/self-introduction.css' | relative_url }}">
+    <script defer src="{{ '/assets/js/self-introduction.js' | relative_url }}"></script>
+  </head>
+  <body>
+    <header class="deck-header">
+      <a class="identity" href="#1">Jaeha Kang<span>SELF INTRODUCTION</span></a>
+      <label class="section-picker">
+        <span class="sr-only">발표 장 선택</span>
+        <select id="section-select">
+          <option value="0">01 · 소개</option>
+          <option value="1">02 · 배경과 경험</option>
+          <option value="2">03 · 디지털 트윈</option>
+          <option value="3">04 · Sim-to-Real</option>
+          <option value="4">05 · Thermal-Aware 보행</option>
+          <option value="5">06 · 연구 관심사</option>
+          <option value="6">07 · 마무리</option>
+        </select>
+      </label>
+    </header>
+
+    <main id="presentation" aria-label="Jaeha Kang 자기소개 발표">
+      <section class="slide introduction" id="slide-1" aria-labelledby="title-1">
+        <div class="slide-heading">
+          <p class="eyebrow">KONKUK UNIVERSITY · ROBOT LEARNING</p>
+          <h1 id="title-1" tabindex="-1">Jaeha Kang</h1>
+          <p class="lead">시뮬레이션에서 배운 움직임을<br>실제 로봇의 움직임으로 연결합니다.</p>
+        </div>
+        <figure class="intro-media">
+          <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" width="854" height="480" alt="학습한 보행 정책을 실제 Unitree Go2에 배포한 실험 장면">
+          <figcaption>Unitree Go2 · 실제 로봇 보행 정책 배포</figcaption>
+        </figure>
+        <div class="intro-footer"><span>건국대학교 학부 재학 · 2027년 2월 졸업 예정</span><span>Reinforcement Learning / Sim-to-Real</span></div>
+      </section>
+
+      <section class="slide" id="slide-2" aria-labelledby="title-2">
+        <div class="slide-heading"><p class="eyebrow">BACKGROUND</p><h2 id="title-2" tabindex="-1">데이터에서 시작해,<br>실제 로봇까지.</h2></div>
+        <div class="background-grid">
+          <div>
+            <p class="education">Konkuk University</p>
+            <p class="muted">Mechanical, Robotics and Automotive Engineering<br>2023.03 – 2027.02 (Expected)</p>
+            <dl class="skills">
+              <div><dt>Code</dt><dd>Python · C</dd></div>
+              <div><dt>Robotics</dt><dd>ROS 2</dd></div>
+              <div><dt>Simulation</dt><dd>Isaac Sim · Isaac Lab</dd></div>
+            </dl>
+          </div>
+          <ol class="timeline">
+            <li><time>2023</time><div><h3>데이터 어노테이션 인턴</h3><p>KoreaExpert · AI-Hub SOC 균열 이미지의 polygon·polyline 어노테이션</p></div></li>
+            <li><time>2024</time><div><h3>전력시장 가격 예측</h3><p>POSTECH OIBC · XGBoost 기반 예측<br>팀 12위 · Participation Award</p></div></li>
+            <li><time>2025</time><div><h3>자율주행 Planning</h3><p>창작 모빌리티 경진대회 · Autoware 신호·정지선 planning, K-City 현장 시험 참여</p></div></li>
+            <li><time>2026</time><div><h3>로봇 강화학습과 실제 배포</h3><p>Go2 디지털 트윈, Sim-to-Real 보행,<br>열 부하를 고려한 보행 정책</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="slide" id="slide-3" aria-labelledby="title-3">
+        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · COLLABORATIVE PROJECT</p><h2 id="title-3" tabindex="-1">디지털 트윈 안에서<br>Go2를 움직이다.</h2><p class="subtitle">Isaac Sim · 2025.12 – 2026.01</p></div>
+        <div class="project-grid">
+          <figure class="project-media">
+            <video controls muted playsinline preload="none" poster="{{ '/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg' | relative_url }}" aria-label="캠퍼스 디지털 트윈에서 Go2 보행 정책을 실행한 영상">
+              <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/03-go2-digital-twin.mp4" type="video/mp4">
+            </video>
+            <figcaption>가져온 캠퍼스 환경에서 기존 pretrained 보행 정책 실행</figcaption>
+          </figure>
+          <div class="project-copy">
+            <h3>제가 맡은 부분</h3>
+            <ul><li>재구성한 캠퍼스 환경을 Isaac Sim에 가져오기</li><li>장면 안에 Go2를 배치하고 기존 rough-terrain PPO checkpoint 연결</li><li>환경 안에서 정책 기반 보행을 실행하고 기록</li></ul>
+            <p class="takeaway">로봇 모델, 환경, 정책이<br>하나의 실행 흐름으로 이어지는 경험.</p>
+            <a class="source-link" href="{{ '/posts/isaacsim5-ros2-go2/' | relative_url }}" target="_blank" rel="noopener noreferrer">프로젝트 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="slide-4" aria-labelledby="title-4">
+        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · INDEPENDENT PROJECT</p><h2 id="title-4" tabindex="-1">학습한 보행 정책을<br>실제 Go2에 배포하다.</h2><p class="subtitle">Isaac Lab → ROS 2 / Unitree SDK2 → Unitree Go2</p></div>
+        <div class="project-grid">
+          <figure class="project-media">
+            <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" data-motion="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif" width="854" height="480" alt="실제 Go2가 배포한 정책으로 회전 명령에 반응하는 실험">
+            <figcaption>실제 하드웨어에서 전진·회전 명령에 반응하는 보행 확인</figcaption>
+          </figure>
+          <div class="project-copy">
+            <h3>배포에서 확인한 것</h3>
+            <ul><li>Observation 순서와 joint 순서</li><li>Action scaling과 control frequency</li><li>접촉, 지연, 모델 차이를 반영한 domain randomization</li></ul>
+            <p class="takeaway">시뮬레이션의 성공을 실제 로봇으로 옮기려면,<br>정책이 받는 입력과 만드는 출력까지 맞아야 했습니다.</p>
+            <a class="source-link" href="{{ '/posts/unitree-go2-part-5-sim2real-success/' | relative_url }}" target="_blank" rel="noopener noreferrer">실제 배포 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide thermal" id="slide-5" aria-labelledby="title-5">
+        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · INDIVIDUAL CAPSTONE</p><h2 id="title-5" tabindex="-1">보행을 유지하면서,<br>열 부하를 줄일 수 있을까?</h2></div>
+        <p class="thermal-method">실제 Go2 전류·온도 로그 → temperature-rate proxy → 온도·torque·positive power를 고려한 정책</p>
+        <div class="result-strip">
+          <div><strong>−22.5<span>%</span></strong><p>Proxy thermal dose</p></div>
+          <div><strong>−27.0<span>%</span></strong><p>Hotspot dose</p></div>
+          <p class="result-context">MuJoCo · 명령 속도 1.5 m/s · 480초<br>Baseline 대비 Thermal–Torque Feedback<br>이동거리로 정규화한 proxy 지표</p>
+        </div>
+        <figure class="thermal-media"><img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_paper_thermal_metrics.png' | relative_url }}" width="1760" height="638" alt="MuJoCo에서 Baseline, Thermal Feedback, Thermal-Torque Feedback의 thermal dose와 온도 상승, hotspot dose를 비교한 그래프"><figcaption>정책 비교는 시뮬레이션 결과입니다. 실제 로봇은 데이터 수집과 proxy 구성에 사용했고, 학습한 thermal 정책의 하드웨어 검증은 예정돼 있습니다.</figcaption></figure>
+        <a class="source-link" href="{{ '/posts/unitree-go2-part-8-thermal-policy-comparison/' | relative_url }}" target="_blank" rel="noopener noreferrer">비교 조건과 결과 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+      </section>
+
+      <section class="slide interests" id="slide-6" aria-labelledby="title-6">
+        <div class="slide-heading"><p class="eyebrow">RESEARCH INTERESTS</p><h2 id="title-6" tabindex="-1">움직임을 배우는 로봇,<br>그리고 다음 질문.</h2></div>
+        <div class="interest-list">
+          <div><span>01</span><h3>Legged Robot Learning</h3><p>실제 환경에서 동작하는 보행 정책</p></div>
+          <div><span>02</span><h3>Unsupervised Skill Discovery</h3><p>다양한 행동을 학습하고 활용하는 방법</p></div>
+          <div><span>03</span><h3>Sim-to-Real Reinforcement Learning</h3><p>시뮬레이션과 하드웨어 사이의 차이</p></div>
+          <div><span>04</span><h3>Physical Human–Robot Interaction</h3><p>사람과 로봇의 물리적 상호작용</p></div>
+        </div>
+        <div class="next-question"><p class="eyebrow">EXPLORE NEXT · PERCEPTION-AWARE LOCOMOTION</p><p>보행에 따른 몸체·센서 움직임은<br><strong>LiDAR SLAM의 안정성에 어떤 영향을 줄까?</strong></p><small>Go2 프로젝트 회고에서 제안한 후속 연구 질문</small></div>
+      </section>
+
+      <section class="slide closing" id="slide-7" aria-labelledby="title-7">
+        <p class="eyebrow">JAEHA KANG · KONKUK UNIVERSITY</p>
+        <h2 id="title-7" tabindex="-1">직접 구현하고,<br>실제 로봇에서 확인하고,<br>다음 질문으로 이어갑니다.</h2>
+        <p class="closing-summary">데이터와 시뮬레이션을 실제 로봇 실험으로 연결하는 경험을 쌓고 있습니다.<br>앞으로도 로봇의 움직임과 학습을 함께 연구하고 싶습니다.</p>
+        <div class="contact-links">
+          <a href="mailto:iamjaehka13@gmail.com"><i class="far fa-envelope" aria-hidden="true"></i>iamjaehka13@gmail.com</a>
+          <a href="https://github.com/iamjaehka13" target="_blank" rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i>GitHub</a>
+          <a href="{{ '/cv/' | relative_url }}" target="_blank" rel="noopener noreferrer"><i class="far fa-id-card" aria-hidden="true"></i>CV &amp; Portfolio</a>
+        </div>
+        <p class="thanks">감사합니다.</p>
+      </section>
+    </main>
+
+    <footer class="deck-controls" hidden>
+      <div class="progress-track" aria-hidden="true"><span id="deck-progress"></span></div>
+      <span class="deck-label" id="deck-label">소개</span>
+      <nav aria-label="발표 이동">
+        <button type="button" id="previous" title="이전 장" aria-label="이전 장"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
+        <output id="slide-count" aria-live="polite" aria-atomic="true">01 / 07</output>
+        <button type="button" id="next" title="다음 장" aria-label="다음 장"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+        <span class="control-divider" aria-hidden="true"></span>
+        <button type="button" id="fullscreen" title="전체 화면" aria-label="전체 화면" aria-pressed="false"><i class="fas fa-expand" aria-hidden="true"></i></button>
+        <button type="button" id="print" title="발표 인쇄 또는 PDF 저장" aria-label="발표 인쇄 또는 PDF 저장"><i class="fas fa-print" aria-hidden="true"></i></button>
+      </nav>
+    </footer>
+  </body>
+</html>
