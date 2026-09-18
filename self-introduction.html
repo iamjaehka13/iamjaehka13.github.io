@@ -31,9 +31,9 @@ date: 2026-09-18 21:00:00 +0900
         <select id="section-select">
           <option value="0">01 · 소개</option>
           <option value="1">02 · 자기소개</option>
-          <option value="2">03 · 디지털 트윈</option>
-          <option value="3">04 · Sim-to-Real</option>
-          <option value="4">05 · Thermal-Aware 보행</option>
+          <option value="2">03 · Isaac Sim</option>
+          <option value="3">04 · Isaac Lab</option>
+          <option value="4">05 · Sim-to-Real</option>
           <option value="5">06 · 연구 관심사</option>
           <option value="6">07 · 마무리</option>
         </select>
@@ -83,49 +83,52 @@ date: 2026-09-18 21:00:00 +0900
       </section>
 
       <section class="slide" id="slide-3" aria-labelledby="title-3">
-        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · COLLABORATIVE PROJECT</p><h2 id="title-3" tabindex="-1">디지털 트윈 안에서<br>Go2를 움직이다.</h2><p class="subtitle">Isaac Sim · 2025.12 – 2026.01</p></div>
+        <div class="slide-heading"><h2 id="title-3" tabindex="-1">Isaac Sim</h2><p class="subtitle">Go2 디지털 트윈</p></div>
         <div class="project-grid">
           <figure class="project-media">
             <video controls muted playsinline preload="none" poster="{{ '/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg' | relative_url }}" aria-label="캠퍼스 디지털 트윈에서 Go2 보행 정책을 실행한 영상">
               <source src="https://media.iamjaehka13.blog/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/03-go2-digital-twin.mp4" type="video/mp4">
             </video>
-            <figcaption>가져온 캠퍼스 환경에서 기존 pretrained 보행 정책 실행</figcaption>
+            <figcaption>캠퍼스 디지털 트윈에서 기존 보행 정책 실행</figcaption>
           </figure>
           <div class="project-copy">
-            <h3>제가 맡은 부분</h3>
-            <ul><li>재구성한 캠퍼스 환경을 Isaac Sim에 가져오기</li><li>장면 안에 Go2를 배치하고 기존 rough-terrain PPO checkpoint 연결</li><li>환경 안에서 정책 기반 보행을 실행하고 기록</li></ul>
-            <p class="takeaway">로봇 모델, 환경, 정책이<br>하나의 실행 흐름으로 이어지는 경험.</p>
+            <h3>작업 내용</h3>
+            <ul><li>캠퍼스 디지털 트윈 환경 가져오기</li><li>Go2 배치 및 기존 PPO 보행 정책 연결</li><li>시뮬레이션에서 보행 실행</li></ul>
             <a class="source-link" href="{{ '/posts/isaacsim5-ros2-go2/' | relative_url }}" target="_blank" rel="noopener noreferrer">프로젝트 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
           </div>
         </div>
       </section>
 
       <section class="slide" id="slide-4" aria-labelledby="title-4">
-        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · INDEPENDENT PROJECT</p><h2 id="title-4" tabindex="-1">학습한 보행 정책을<br>실제 Go2에 배포하다.</h2><p class="subtitle">Isaac Lab → ROS 2 / Unitree SDK2 → Unitree Go2</p></div>
+        <div class="slide-heading"><h2 id="title-4" tabindex="-1">Isaac Lab</h2><p class="subtitle">Go2 강화학습 보행 정책 학습</p></div>
         <div class="project-grid">
           <figure class="project-media">
-            <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" data-motion="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif" width="854" height="480" alt="실제 Go2가 배포한 정책으로 회전 명령에 반응하는 실험">
-            <figcaption>실제 하드웨어에서 전진·회전 명령에 반응하는 보행 확인</figcaption>
+            <video controls muted playsinline preload="none" poster="{{ '/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1-preview.jpg' | relative_url }}" aria-label="Isaac Lab에서 학습한 Go2 보행 정책 실행 영상">
+              <source src="{{ '/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1.mp4' | relative_url }}" type="video/mp4">
+            </video>
+            <figcaption>학습한 PPO checkpoint 실행 결과</figcaption>
           </figure>
           <div class="project-copy">
-            <h3>배포에서 확인한 것</h3>
-            <ul><li>Observation 순서와 joint 순서</li><li>Action scaling과 control frequency</li><li>접촉, 지연, 모델 차이를 반영한 domain randomization</li></ul>
-            <p class="takeaway">시뮬레이션의 성공을 실제 로봇으로 옮기려면,<br>정책이 받는 입력과 만드는 출력까지 맞아야 했습니다.</p>
-            <a class="source-link" href="{{ '/posts/unitree-go2-part-5-sim2real-success/' | relative_url }}" target="_blank" rel="noopener noreferrer">실제 배포 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            <h3>작업 내용</h3>
+            <ul><li>Go2 학습 환경 구성</li><li>Observation, action, reward 설정</li><li>RSL-RL PPO로 보행 정책 학습</li><li>저장한 checkpoint 실행 및 보행 확인</li></ul>
+            <a class="source-link" href="{{ '/posts/isaaclab-part-3-rl-training/' | relative_url }}" target="_blank" rel="noopener noreferrer">학습 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
           </div>
         </div>
       </section>
 
-      <section class="slide thermal" id="slide-5" aria-labelledby="title-5">
-        <div class="slide-heading"><p class="eyebrow">SELECTED WORK · INDIVIDUAL CAPSTONE</p><h2 id="title-5" tabindex="-1">보행을 유지하면서,<br>열 부하를 줄일 수 있을까?</h2></div>
-        <p class="thermal-method">실제 Go2 전류·온도 로그 → temperature-rate proxy → 온도·torque·positive power를 고려한 정책</p>
-        <div class="result-strip">
-          <div><strong>−22.5<span>%</span></strong><p>Proxy thermal dose</p></div>
-          <div><strong>−27.0<span>%</span></strong><p>Hotspot dose</p></div>
-          <p class="result-context">MuJoCo · 명령 속도 1.5 m/s · 480초<br>Baseline 대비 Thermal–Torque Feedback<br>이동거리로 정규화한 proxy 지표</p>
+      <section class="slide" id="slide-5" aria-labelledby="title-5">
+        <div class="slide-heading"><h2 id="title-5" tabindex="-1">Sim-to-Real</h2><p class="subtitle">학습한 보행 정책을 실제 Go2에 배포</p></div>
+        <div class="project-grid">
+          <figure class="project-media">
+            <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" data-motion="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif" width="854" height="480" alt="실제 Go2가 배포한 보행 정책으로 회전 명령에 반응하는 실험">
+            <figcaption>실제 Go2에서 전진·회전 명령에 따른 보행 확인</figcaption>
+          </figure>
+          <div class="project-copy">
+            <h3>작업 내용</h3>
+            <ul><li>ROS 2 / Unitree SDK2 배포 연결</li><li>Observation, joint 순서 및 action scale 확인</li><li>제어 주기와 PD gain 설정</li><li>실제 로봇에서 보행 테스트</li></ul>
+            <a class="source-link" href="{{ '/posts/unitree-go2-part-5-sim2real-success/' | relative_url }}" target="_blank" rel="noopener noreferrer">배포 기록 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+          </div>
         </div>
-        <figure class="thermal-media"><img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-8-thermal-policy-comparison/vx15_paper_thermal_metrics.png' | relative_url }}" width="1760" height="638" alt="MuJoCo에서 Baseline, Thermal Feedback, Thermal-Torque Feedback의 thermal dose와 온도 상승, hotspot dose를 비교한 그래프"><figcaption>정책 비교는 시뮬레이션 결과입니다. 실제 로봇은 데이터 수집과 proxy 구성에 사용했고, 학습한 thermal 정책의 하드웨어 검증은 예정돼 있습니다.</figcaption></figure>
-        <a class="source-link" href="{{ '/posts/unitree-go2-part-8-thermal-policy-comparison/' | relative_url }}" target="_blank" rel="noopener noreferrer">비교 조건과 결과 <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
       </section>
 
       <section class="slide interests" id="slide-6" aria-labelledby="title-6">
