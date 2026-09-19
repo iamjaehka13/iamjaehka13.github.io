@@ -217,11 +217,12 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .language-gallery figcaption { margin-top: 12px; color: var(--text); font-size: 22px; text-align: center; }
   .presentation-sized .preference-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: center; gap: 28px; margin-top: 30px; }
   .presentation-sized .preference-gallery img { display: block; width: 100%; height: min(50dvh, 470px); object-fit: contain; }
-  .presentation-sized .food-groups { display: grid; gap: 22px; margin-top: 24px; }
+  .presentation-sized .food-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; margin-top: 30px; }
   .presentation-sized .food-group { min-width: 0; }
   .presentation-sized .food-group h3 { font-size: 28px; }
-  .presentation-sized .food-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; width: 100%; max-width: 100%; margin-top: 10px; }
-  .presentation-sized .food-gallery img { display: block; width: 100%; height: min(22dvh, 190px); object-fit: cover; }
+  .presentation-sized .food-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 100%; margin-top: 12px; }
+  .presentation-sized .food-gallery img { display: block; width: 100%; height: min(18dvh, 160px); object-fit: cover; }
+  .presentation-sized .food-gallery img:first-child { grid-column: 1 / -1; height: min(24dvh, 210px); }
   .presentation-sized .goal-media { display: flex; justify-content: center; margin-top: 28px; }
   .presentation-sized .goal-media img { display: block; width: 100%; height: min(58dvh, 520px); object-fit: contain; }
   .presentation-sized .tmi-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; margin-top: 54px; }
@@ -268,10 +269,11 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .language-gallery figcaption { margin-top: 8px; font-size: 19px; }
   .presentation-sized .preference-gallery { gap: 22px; margin-top: 18px; }
   .presentation-sized .preference-gallery img { height: min(43dvh, 310px); }
-  .presentation-sized .food-groups { gap: 16px; margin-top: 14px; }
+  .presentation-sized .food-groups { gap: 24px; margin-top: 14px; }
   .presentation-sized .food-group h3 { font-size: 24px; }
-  .presentation-sized .food-gallery { gap: 16px; margin-top: 8px; }
-  .presentation-sized .food-gallery img { height: min(21dvh, 150px); }
+  .presentation-sized .food-gallery { gap: 12px; margin-top: 8px; }
+  .presentation-sized .food-gallery img { height: min(16dvh, 110px); }
+  .presentation-sized .food-gallery img:first-child { height: min(22dvh, 150px); }
   .presentation-sized .goal-media { margin-top: 18px; }
   .presentation-sized .goal-media img { height: min(53dvh, 380px); }
   .presentation-sized .tmi-columns { gap: 48px; margin-top: 36px; }
@@ -331,10 +333,10 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .language-gallery figcaption { margin-top: 6px; font-size: 17px; }
   .presentation-sized .preference-gallery { grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
   .presentation-sized .preference-gallery img { height: auto; }
-  .presentation-sized .food-groups { gap: 16px; margin-top: 20px; }
-  .presentation-sized .food-group h3 { font-size: 22px; }
-  .presentation-sized .food-gallery { display: flex; gap: 14px; margin-top: 10px; padding-bottom: 6px; overflow-x: auto; scroll-snap-type: x mandatory; }
-  .presentation-sized .food-gallery img { flex: 0 0 auto; width: 58vw; height: auto; aspect-ratio: 4 / 3; scroll-snap-align: start; }
+  .presentation-sized .food-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .presentation-sized .food-group h3 { font-size: 18px; }
+  .presentation-sized .food-gallery { grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+  .presentation-sized .food-gallery img, .presentation-sized .food-gallery img:first-child { grid-column: auto; width: 100%; height: auto; aspect-ratio: 4 / 3; }
   .presentation-sized .goal-media { margin-top: 24px; }
   .presentation-sized .goal-media img { height: auto; }
   .presentation-sized .tmi-columns { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
