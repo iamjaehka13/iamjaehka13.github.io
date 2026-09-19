@@ -195,6 +195,13 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .personal-item { padding-top: 20px; }
   .presentation-sized .personal-item h3 { font-size: 26px; }
   .presentation-sized .personal-item ul { font-size: 24px; line-height: 1.6; margin-top: 16px; }
+  .presentation-sized .tmi-list { max-width: 1100px; margin: 54px 0 0; padding: 24px 0 0 42px; border-top: 1px solid var(--line); font-size: 36px; line-height: 1.65; }
+  .presentation-sized .tmi-list li { margin-bottom: 12px; padding-left: 8px; word-break: keep-all; overflow-wrap: anywhere; }
+  .presentation-sized .tmi-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; margin-top: 54px; }
+  .presentation-sized .tmi-columns section { min-height: 280px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .presentation-sized .tmi-columns h3 { font-size: 30px; }
+  .presentation-sized .tmi-columns ul { margin: 24px 0 0; padding-left: 34px; font-size: 32px; line-height: 1.65; }
+  .presentation-sized .tmi-columns li { margin-bottom: 12px; padding-left: 6px; word-break: keep-all; overflow-wrap: anywhere; }
   .presentation-sized .project-grid { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 48px; margin-top: 32px; }
   .presentation-sized .project-media img, .presentation-sized .project-media video { max-height: calc(100dvh - 350px); }
   .presentation-sized .project-copy h3 { font-size: 28px; }
@@ -216,6 +223,11 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .personal-item { padding-top: 14px; }
   .presentation-sized .personal-item h3 { font-size: 24px; }
   .presentation-sized .personal-item ul { font-size: 22px; line-height: 1.45; margin-top: 12px; }
+  .presentation-sized .tmi-list { margin-top: 36px; font-size: 30px; line-height: 1.55; }
+  .presentation-sized .tmi-columns { gap: 48px; margin-top: 36px; }
+  .presentation-sized .tmi-columns section { min-height: 220px; padding-top: 18px; }
+  .presentation-sized .tmi-columns h3 { font-size: 26px; }
+  .presentation-sized .tmi-columns ul { margin-top: 18px; font-size: 28px; line-height: 1.55; }
   .presentation-sized .project-grid { gap: 36px; margin-top: 20px; }
   .presentation-sized .project-copy h3 { font-size: 26px; }
   .presentation-sized .project-copy ul { font-size: 24px; line-height: 1.5; margin: 16px 0 18px; }
@@ -228,6 +240,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized h2 { font-size: 48px; }
   .presentation-sized .intro-author { font-size: 32px; }
   .presentation-sized .personal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+  .presentation-sized .tmi-list { font-size: 30px; }
+  .presentation-sized .tmi-columns { gap: 32px; }
+  .presentation-sized .tmi-columns ul { font-size: 27px; }
   .presentation-sized .project-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .presentation-sized .project-media img, .presentation-sized .project-media video { max-height: none; }
   .presentation-sized .project-copy ul { font-size: 24px; }
@@ -242,6 +257,11 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .personal-item { padding-top: 14px; }
   .presentation-sized .personal-item h3 { font-size: 20px; }
   .presentation-sized .personal-item ul { font-size: 18px; line-height: 1.65; margin-top: 12px; }
+  .presentation-sized .tmi-list { margin-top: 32px; padding: 18px 0 0 28px; font-size: 24px; line-height: 1.6; }
+  .presentation-sized .tmi-columns { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
+  .presentation-sized .tmi-columns section { min-height: 150px; padding-top: 18px; }
+  .presentation-sized .tmi-columns h3 { font-size: 24px; }
+  .presentation-sized .tmi-columns ul { margin-top: 16px; padding-left: 28px; font-size: 22px; line-height: 1.6; }
   .presentation-sized .project-grid { margin-top: 24px; }
   .presentation-sized .project-copy h3 { font-size: 24px; }
   .presentation-sized .project-copy ul { font-size: 20px; margin: 16px 0 18px; padding-left: 24px; }
