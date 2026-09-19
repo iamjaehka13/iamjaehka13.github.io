@@ -42,6 +42,10 @@ h1:focus, h2:focus { outline: none; }
 .locomotion-videos video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #111; }
 .locomotion-videos figcaption { margin-top: 8px; }
 .locomotion-links { display: flex; flex-wrap: wrap; gap: 24px; }
+.future-hri .future-topic { margin-top: 18px; }
+.hri-media { margin-top: 24px; }
+.hri-media video { display: block; width: min(100%, 820px); aspect-ratio: 16 / 9; object-fit: cover; background: #111; }
+.hri-media figcaption { margin-top: 0; }
 .personal-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 1fr); gap: 28px 32px; margin-top: 32px; }
 .personal-item { border-top: 1px solid var(--line); padding-top: 16px; }
 .personal-item h3 { font-size: 20px; }
@@ -123,6 +127,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .future-locomotion .locomotion-videos { gap: 22px; margin-top: 14px; }
   .future-locomotion .locomotion-videos video { height: min(31dvh, 220px); aspect-ratio: auto; }
   .future-locomotion .source-link { margin-top: 8px; }
+  .future-hri .future-topic { margin-top: 10px; }
+  .future-hri .hri-media { margin-top: 14px; }
+  .future-hri .hri-media video { width: min(100%, 640px); }
   .personal-grid { margin-top: 22px; gap: 18px 32px; }
   .personal-item { padding-top: 12px; }
   .personal-item ul { font-size: 18px; margin-top: 12px; }
@@ -159,6 +166,8 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .locomotion-videos { gap: 10px; margin-top: 18px; }
   .locomotion-videos figcaption { margin-top: 6px; font-size: 11px; }
   .future-locomotion .source-link { margin-top: 12px; font-size: 12px; }
+  .future-hri .future-topic { margin-top: 14px; }
+  .hri-media { margin-top: 18px; }
   .personal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 20px; margin-top: 26px; }
   .personal-item h3 { font-size: 16px; }
   .personal-item ul { font-size: 15px; line-height: 1.7; }

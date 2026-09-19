@@ -22,7 +22,13 @@
     }
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       slides[index].querySelectorAll('video[data-autoplay]').forEach(video => {
-        video.play().catch(() => {});
+        const play = () => {
+          const start = Number(video.dataset.start || 0);
+          if (Number.isFinite(start) && start > 0 && video.currentTime < start) video.currentTime = start;
+          video.play().catch(() => {});
+        };
+        if (video.readyState >= 1) play();
+        else video.addEventListener('loadedmetadata', play, { once: true });
       });
     }
     picker.value = String(index);
