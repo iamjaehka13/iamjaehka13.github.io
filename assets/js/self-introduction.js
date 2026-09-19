@@ -70,6 +70,7 @@
   });
   document.addEventListener('fullscreenchange', () => {
     const active = Boolean(document.fullscreenElement);
+    document.body.classList.toggle('fullscreen-active', active);
     fullscreen.setAttribute('aria-pressed', String(active));
     fullscreen.setAttribute('aria-label', active ? '전체 화면 종료' : '전체 화면');
     fullscreen.title = active ? '전체 화면 종료' : '전체 화면';
