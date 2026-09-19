@@ -209,6 +209,8 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .travel-name { margin-top: 20px; font-size: 30px; font-weight: 650; }
   .presentation-sized .travel-gallery { display: flex; align-items: center; justify-content: space-between; gap: 22px; margin-top: 16px; }
   .presentation-sized .travel-gallery img { display: block; width: auto; max-width: 24%; height: min(49dvh, 500px); object-fit: contain; }
+  .presentation-sized .sports-gallery { display: flex; align-items: center; justify-content: center; gap: 28px; margin-top: 30px; }
+  .presentation-sized .sports-gallery img { display: block; width: auto; max-width: 60%; height: min(52dvh, 480px); object-fit: contain; }
   .presentation-sized .tmi-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; margin-top: 54px; }
   .presentation-sized .tmi-columns section { min-height: 280px; padding-top: 24px; border-top: 1px solid var(--line); }
   .presentation-sized .tmi-columns h3 { font-size: 30px; }
@@ -246,6 +248,8 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .travel-name { margin-top: 14px; font-size: 26px; }
   .presentation-sized .travel-gallery { margin-top: 12px; }
   .presentation-sized .travel-gallery img { height: min(43dvh, 310px); }
+  .presentation-sized .sports-gallery { gap: 22px; margin-top: 18px; }
+  .presentation-sized .sports-gallery img { height: min(43dvh, 310px); }
   .presentation-sized .tmi-columns { gap: 48px; margin-top: 36px; }
   .presentation-sized .tmi-columns section { min-height: 220px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 26px; }
@@ -295,6 +299,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .travel-name { margin-top: 18px; font-size: 24px; }
   .presentation-sized .travel-gallery { justify-content: flex-start; gap: 16px; margin-top: 16px; padding-bottom: 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
   .presentation-sized .travel-gallery img { flex: 0 0 auto; width: 58vw; max-width: none; height: auto; scroll-snap-align: start; }
+  .presentation-sized .sports-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+  .presentation-sized .sports-gallery img { width: 100%; max-width: none; height: auto; aspect-ratio: 1; object-fit: cover; }
+  .presentation-sized .sports-gallery img:first-child { object-position: center 68%; }
   .presentation-sized .tmi-columns { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
   .presentation-sized .tmi-columns section { min-height: 150px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 24px; }
