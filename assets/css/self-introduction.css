@@ -211,6 +211,10 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .travel-gallery img { display: block; width: auto; max-width: 24%; height: min(49dvh, 500px); object-fit: contain; }
   .presentation-sized .sports-gallery { display: flex; align-items: center; justify-content: center; gap: 28px; margin-top: 30px; }
   .presentation-sized .sports-gallery img { display: block; width: auto; max-width: 60%; height: min(52dvh, 480px); object-fit: contain; }
+  .presentation-sized .language-gallery { display: grid; grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr); align-items: start; gap: 28px; margin-top: 30px; }
+  .presentation-sized .language-gallery figure { margin: 0; }
+  .presentation-sized .language-gallery img { display: block; width: 100%; height: min(42dvh, 380px); object-fit: contain; }
+  .presentation-sized .language-gallery figcaption { margin-top: 12px; color: var(--text); font-size: 22px; text-align: center; }
   .presentation-sized .tmi-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; margin-top: 54px; }
   .presentation-sized .tmi-columns section { min-height: 280px; padding-top: 24px; border-top: 1px solid var(--line); }
   .presentation-sized .tmi-columns h3 { font-size: 30px; }
@@ -250,6 +254,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .travel-gallery img { height: min(43dvh, 310px); }
   .presentation-sized .sports-gallery { gap: 22px; margin-top: 18px; }
   .presentation-sized .sports-gallery img { height: min(43dvh, 310px); }
+  .presentation-sized .language-gallery { gap: 22px; margin-top: 18px; }
+  .presentation-sized .language-gallery img { height: min(37dvh, 270px); }
+  .presentation-sized .language-gallery figcaption { margin-top: 8px; font-size: 19px; }
   .presentation-sized .tmi-columns { gap: 48px; margin-top: 36px; }
   .presentation-sized .tmi-columns section { min-height: 220px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 26px; }
@@ -302,6 +309,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .sports-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
   .presentation-sized .sports-gallery img { width: 100%; max-width: none; height: auto; aspect-ratio: 1; object-fit: cover; }
   .presentation-sized .sports-gallery img:first-child { object-position: center 68%; }
+  .presentation-sized .language-gallery { grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+  .presentation-sized .language-gallery img { height: min(26dvh, 210px); }
+  .presentation-sized .language-gallery figcaption { margin-top: 6px; font-size: 17px; }
   .presentation-sized .tmi-columns { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
   .presentation-sized .tmi-columns section { min-height: 150px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 24px; }
