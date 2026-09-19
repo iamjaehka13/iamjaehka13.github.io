@@ -270,47 +270,77 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
 @media screen and (min-width: 1600px) {
   .slide.presentation-sized { padding: 44px 64px 38px; }
 }
-@media screen and (min-width: 1600px) and (min-height: 900px) {
-  .fullscreen-active .slide.presentation-sized { max-width: 1840px; padding: 56px 72px 42px; }
-  .fullscreen-active .presentation-sized h1 { font-size: 112px; }
-  .fullscreen-active .presentation-sized h2 { font-size: 72px; }
-  .fullscreen-active .presentation-sized .intro-author { margin-top: 42px; font-size: 46px; }
-  .fullscreen-active .presentation-sized .subtitle { margin-top: 14px; font-size: 30px; }
-  .fullscreen-active .presentation-sized .personal-grid { gap: 38px; margin-top: 44px; }
+@media screen and (min-width: 1100px) and (min-height: 760px) {
+  .fullscreen-active .slide.presentation-sized { max-width: 1520px; padding: 34px 44px 30px; }
+  .fullscreen-active .presentation-sized h1 { font-size: 120px; }
+  .fullscreen-active .presentation-sized h2 { font-size: 76px; }
+  .fullscreen-active .presentation-sized .intro-author { margin-top: 36px; font-size: 50px; }
+  .fullscreen-active .presentation-sized .subtitle { margin-top: 10px; font-size: 30px; }
+  .fullscreen-active .presentation-sized .personal-grid { gap: 32px; margin-top: 32px; }
   .fullscreen-active .presentation-sized .personal-item h3 { font-size: 30px; }
   .fullscreen-active .presentation-sized .personal-item ul { font-size: 28px; }
-  .fullscreen-active .presentation-sized .tmi-list { max-width: 1240px; margin-top: 62px; font-size: 40px; }
-  .fullscreen-active .presentation-sized .tmi-personality { gap: 56px; margin-top: 38px; }
-  .fullscreen-active .presentation-sized .tmi-personality .tmi-list { font-size: 34px; }
-  .fullscreen-active .presentation-sized .game-name, .fullscreen-active .presentation-sized .concert-name, .fullscreen-active .presentation-sized .travel-name { font-size: 36px; }
-  .fullscreen-active .presentation-sized .game-images { gap: 36px; margin-top: 28px; }
-  .fullscreen-active .presentation-sized .game-images img { max-height: calc(100dvh - 500px); }
-  .fullscreen-active .presentation-sized .concert-videos, .fullscreen-active .presentation-sized .travel-gallery { gap: 28px; margin-top: 22px; }
-  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .travel-gallery img { height: min(55dvh, 590px); }
-  .fullscreen-active .presentation-sized .sports-gallery { gap: 36px; margin-top: 36px; }
-  .fullscreen-active .presentation-sized .sports-gallery img { height: min(55dvh, 560px); }
-  .fullscreen-active .presentation-sized .language-gallery { gap: 36px; margin-top: 36px; }
-  .fullscreen-active .presentation-sized .language-gallery img { height: min(45dvh, 470px); }
+  .fullscreen-active .presentation-sized .tmi-list { max-width: 1240px; margin-top: 44px; font-size: 38px; }
+  .fullscreen-active .presentation-sized .tmi-personality { gap: 44px; margin-top: 26px; }
+  .fullscreen-active .presentation-sized .tmi-personality img { max-height: calc(100dvh - 450px); }
+  .fullscreen-active .presentation-sized .tmi-personality .tmi-list { font-size: 32px; }
+  .fullscreen-active .presentation-sized .game-name, .fullscreen-active .presentation-sized .concert-name, .fullscreen-active .presentation-sized .travel-name { margin-top: 14px; font-size: 38px; }
+  .fullscreen-active .presentation-sized .game-images { gap: 30px; margin-top: 16px; }
+  .fullscreen-active .presentation-sized .game-images img { max-height: calc(100dvh - 440px); }
+  .fullscreen-active .presentation-sized .concert-videos, .fullscreen-active .presentation-sized .travel-gallery { gap: 24px; margin-top: 14px; }
+  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .travel-gallery img { height: min(45dvh, 430px); }
+  .fullscreen-active .presentation-sized .sports-gallery { gap: 30px; margin-top: 22px; }
+  .fullscreen-active .presentation-sized .sports-gallery img { height: min(50dvh, 480px); }
+  .fullscreen-active .presentation-sized .language-gallery { gap: 30px; margin-top: 22px; }
+  .fullscreen-active .presentation-sized .language-gallery img { height: min(42dvh, 400px); }
   .fullscreen-active .presentation-sized .language-gallery figcaption { font-size: 26px; }
-  .fullscreen-active .presentation-sized .preference-gallery { gap: 36px; margin-top: 36px; }
-  .fullscreen-active .presentation-sized .preference-gallery img { height: min(55dvh, 560px); }
-  .fullscreen-active .presentation-sized .food-groups { gap: 40px; margin-top: 34px; }
-  .fullscreen-active .presentation-sized .food-group h3 { font-size: 32px; }
-  .fullscreen-active .presentation-sized .food-gallery { gap: 18px; margin-top: 14px; }
-  .fullscreen-active .presentation-sized .food-gallery img { height: min(19dvh, 190px); }
-  .fullscreen-active .presentation-sized .food-gallery img:first-child { height: min(26dvh, 260px); }
-  .fullscreen-active .presentation-sized .goal-media { margin-top: 34px; }
-  .fullscreen-active .presentation-sized .goal-media img { height: min(61dvh, 630px); }
-  .fullscreen-active .presentation-sized .competition-grid { gap: 48px; margin-top: 34px; }
-  .fullscreen-active .presentation-sized .competition-item h3 { font-size: 32px; }
-  .fullscreen-active .presentation-sized .competition-item p { font-size: 24px; }
-  .fullscreen-active .presentation-sized .competition-item img, .fullscreen-active .presentation-sized .competition-item video { height: min(46dvh, 470px); }
-  .fullscreen-active .presentation-sized .project-grid { gap: 56px; margin-top: 38px; }
-  .fullscreen-active .presentation-sized .project-media img, .fullscreen-active .presentation-sized .project-media video { max-height: calc(100dvh - 420px); }
+  .fullscreen-active .presentation-sized .preference-gallery { gap: 30px; margin-top: 22px; }
+  .fullscreen-active .presentation-sized .preference-gallery img { height: min(48dvh, 450px); }
+  .fullscreen-active .presentation-sized .food-groups { gap: 32px; margin-top: 20px; }
+  .fullscreen-active .presentation-sized .food-group h3 { font-size: 34px; }
+  .fullscreen-active .presentation-sized .food-gallery { gap: 14px; margin-top: 10px; }
+  .fullscreen-active .presentation-sized .food-gallery img { height: min(19dvh, 170px); }
+  .fullscreen-active .presentation-sized .food-gallery img:first-child { height: min(27dvh, 235px); }
+  .fullscreen-active .presentation-sized .goal-media { margin-top: 22px; }
+  .fullscreen-active .presentation-sized .goal-media img { height: min(52dvh, 480px); }
+  .fullscreen-active .presentation-sized .competition-grid { gap: 36px; margin-top: 22px; }
+  .fullscreen-active .presentation-sized .competition-item h3 { font-size: 30px; }
+  .fullscreen-active .presentation-sized .competition-item p { font-size: 22px; }
+  .fullscreen-active .presentation-sized .competition-item img, .fullscreen-active .presentation-sized .competition-item video { height: min(39dvh, 360px); margin-top: 12px; }
+  .fullscreen-active .presentation-sized .project-grid { gap: 42px; margin-top: 24px; }
+  .fullscreen-active .presentation-sized .project-media img, .fullscreen-active .presentation-sized .project-media video { max-height: calc(100dvh - 460px); }
   .fullscreen-active .presentation-sized .project-copy h3 { font-size: 32px; }
-  .fullscreen-active .presentation-sized .project-copy ul { font-size: 30px; }
+  .fullscreen-active .presentation-sized .project-copy ul { font-size: 28px; }
   .fullscreen-active .presentation-sized figcaption, .fullscreen-active .presentation-sized .source-link { font-size: 20px; }
-  .fullscreen-active .presentation-sized.future .future-topic { font-size: 32px; }
+  .fullscreen-active .presentation-sized.future .future-topic { font-size: 34px; }
+  .fullscreen-active .future-hri .hri-media video { width: min(100%, 840px); }
+}
+@media screen and (min-width: 1600px) and (min-height: 900px) {
+  .fullscreen-active .slide.presentation-sized { max-width: 1840px; padding: 42px 56px 36px; }
+  .fullscreen-active .presentation-sized h1 { font-size: 150px; }
+  .fullscreen-active .presentation-sized h2 { font-size: 88px; }
+  .fullscreen-active .presentation-sized .intro-author { margin-top: 44px; font-size: 58px; }
+  .fullscreen-active .presentation-sized .subtitle { margin-top: 12px; font-size: 38px; }
+  .fullscreen-active .presentation-sized .tmi-personality { gap: 52px; margin-top: 30px; }
+  .fullscreen-active .presentation-sized .tmi-personality img { max-height: calc(100dvh - 430px); }
+  .fullscreen-active .presentation-sized .tmi-personality .tmi-list { font-size: 38px; }
+  .fullscreen-active .presentation-sized .game-name, .fullscreen-active .presentation-sized .concert-name, .fullscreen-active .presentation-sized .travel-name { font-size: 44px; }
+  .fullscreen-active .presentation-sized .game-images img { max-height: calc(100dvh - 480px); }
+  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .travel-gallery img { height: min(56dvh, 600px); }
+  .fullscreen-active .presentation-sized .sports-gallery img { height: min(59dvh, 620px); }
+  .fullscreen-active .presentation-sized .language-gallery img { height: min(50dvh, 520px); }
+  .fullscreen-active .presentation-sized .preference-gallery img { height: min(58dvh, 600px); }
+  .fullscreen-active .presentation-sized .food-group h3 { font-size: 38px; }
+  .fullscreen-active .presentation-sized .food-gallery img { height: min(21dvh, 220px); }
+  .fullscreen-active .presentation-sized .food-gallery img:first-child { height: min(29dvh, 300px); }
+  .fullscreen-active .presentation-sized .goal-media img { height: min(65dvh, 650px); }
+  .fullscreen-active .presentation-sized .competition-item h3 { font-size: 36px; }
+  .fullscreen-active .presentation-sized .competition-item p { font-size: 26px; }
+  .fullscreen-active .presentation-sized .competition-item img, .fullscreen-active .presentation-sized .competition-item video { height: min(49dvh, 500px); }
+  .fullscreen-active .presentation-sized .project-media img, .fullscreen-active .presentation-sized .project-media video { max-height: calc(100dvh - 480px); }
+  .fullscreen-active .presentation-sized .project-copy h3 { font-size: 38px; }
+  .fullscreen-active .presentation-sized .project-copy ul { font-size: 34px; }
+  .fullscreen-active .presentation-sized figcaption, .fullscreen-active .presentation-sized .source-link { font-size: 23px; }
+  .fullscreen-active .presentation-sized.future .future-topic { font-size: 40px; }
   .fullscreen-active .future-hri .hri-media video { width: min(100%, 1100px); }
 }
 @media screen and (min-width: 901px) and (max-height: 800px) {
