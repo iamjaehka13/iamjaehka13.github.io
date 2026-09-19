@@ -227,7 +227,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .game-images img { display: block; width: 100%; height: auto; max-height: calc(100dvh - 440px); object-fit: contain; background: #ecefed; }
   .presentation-sized .concert-name { margin-top: 20px; font-size: 30px; font-weight: 650; }
   .presentation-sized .concert-videos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 24px; margin-top: 16px; }
-  .presentation-sized .concert-videos video { display: block; width: auto; max-width: 100%; height: min(49dvh, 500px); margin: 0 auto; background: #111; }
+  .presentation-sized .concert-videos video, .presentation-sized .concert-videos img { display: block; width: auto; max-width: 100%; height: min(49dvh, 500px); margin: 0 auto; object-fit: contain; background: #111; }
   .presentation-sized .travel-name { margin-top: 20px; font-size: 30px; font-weight: 650; }
   .presentation-sized .travel-gallery { display: flex; align-items: center; justify-content: space-between; gap: 22px; margin-top: 16px; }
   .presentation-sized .travel-gallery img { display: block; width: auto; max-width: 24%; height: min(49dvh, 500px); object-fit: contain; }
@@ -287,7 +287,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .fullscreen-active .presentation-sized .game-images { gap: 30px; margin-top: 16px; }
   .fullscreen-active .presentation-sized .game-images img { max-height: calc(100dvh - 440px); }
   .fullscreen-active .presentation-sized .concert-videos, .fullscreen-active .presentation-sized .travel-gallery { gap: 24px; margin-top: 14px; }
-  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .travel-gallery img { height: min(45dvh, 430px); }
+  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .concert-videos img, .fullscreen-active .presentation-sized .travel-gallery img { height: min(45dvh, 430px); }
   .fullscreen-active .presentation-sized .sports-gallery { gap: 30px; margin-top: 22px; }
   .fullscreen-active .presentation-sized .sports-gallery img { height: min(50dvh, 480px); }
   .fullscreen-active .presentation-sized .language-gallery { gap: 30px; margin-top: 22px; }
@@ -325,7 +325,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .fullscreen-active .presentation-sized .tmi-personality .tmi-list { font-size: 38px; }
   .fullscreen-active .presentation-sized .game-name, .fullscreen-active .presentation-sized .concert-name, .fullscreen-active .presentation-sized .travel-name { font-size: 44px; }
   .fullscreen-active .presentation-sized .game-images img { max-height: calc(100dvh - 480px); }
-  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .travel-gallery img { height: min(56dvh, 600px); }
+  .fullscreen-active .presentation-sized .concert-videos video, .fullscreen-active .presentation-sized .concert-videos img, .fullscreen-active .presentation-sized .travel-gallery img { height: min(56dvh, 600px); }
   .fullscreen-active .presentation-sized .sports-gallery img { height: min(59dvh, 620px); }
   .fullscreen-active .presentation-sized .language-gallery img { height: min(50dvh, 520px); }
   .fullscreen-active .presentation-sized .preference-gallery img { height: min(58dvh, 600px); }
@@ -360,7 +360,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .game-images { margin-top: 16px; }
   .presentation-sized .concert-name { margin-top: 14px; font-size: 26px; }
   .presentation-sized .concert-videos { margin-top: 12px; }
-  .presentation-sized .concert-videos video { height: min(43dvh, 310px); }
+  .presentation-sized .concert-videos video, .presentation-sized .concert-videos img { height: min(43dvh, 310px); }
   .presentation-sized .travel-name { margin-top: 14px; font-size: 26px; }
   .presentation-sized .travel-gallery { margin-top: 12px; }
   .presentation-sized .travel-gallery img { height: min(43dvh, 310px); }
@@ -427,7 +427,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .game-images { gap: 18px; margin-top: 18px; }
   .presentation-sized .concert-name { margin-top: 18px; font-size: 24px; }
   .presentation-sized .concert-videos { display: flex; gap: 16px; margin-top: 16px; padding-bottom: 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
-  .presentation-sized .concert-videos video { flex: 0 0 auto; width: 58vw; max-width: none; height: auto; margin: 0; scroll-snap-align: start; }
+  .presentation-sized .concert-videos video, .presentation-sized .concert-videos img { flex: 0 0 auto; width: 58vw; max-width: none; height: auto; margin: 0; scroll-snap-align: start; }
   .presentation-sized .travel-name { margin-top: 18px; font-size: 24px; }
   .presentation-sized .travel-gallery { justify-content: flex-start; gap: 16px; margin-top: 16px; padding-bottom: 8px; overflow-x: auto; scroll-snap-type: x mandatory; }
   .presentation-sized .travel-gallery img { flex: 0 0 auto; width: 58vw; max-width: none; height: auto; scroll-snap-align: start; }

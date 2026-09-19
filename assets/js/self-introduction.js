@@ -13,12 +13,14 @@
       slide.hidden = position !== index;
       if (position !== index) slide.querySelectorAll('video').forEach(video => video.pause());
     });
-    const motion = slides[index].querySelector('[data-motion]');
-    if (motion && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const animated = new Image();
-      animated.onload = () => { motion.src = animated.src; };
-      animated.src = motion.dataset.motion;
-      motion.removeAttribute('data-motion');
+    const motions = slides[index].querySelectorAll('[data-motion]');
+    if (motions.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      motions.forEach(motion => {
+        const animated = new Image();
+        animated.onload = () => { motion.src = animated.src; };
+        animated.src = motion.dataset.motion;
+        motion.removeAttribute('data-motion');
+      });
     }
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       slides[index].querySelectorAll('video[data-autoplay]').forEach(video => {
