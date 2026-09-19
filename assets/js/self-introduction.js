@@ -20,6 +20,11 @@
       animated.src = motion.dataset.motion;
       motion.removeAttribute('data-motion');
     }
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      slides[index].querySelectorAll('video[data-autoplay]').forEach(video => {
+        video.play().catch(() => {});
+      });
+    }
     picker.value = String(index);
     previous.disabled = index === 0;
     next.disabled = index === slides.length - 1;
