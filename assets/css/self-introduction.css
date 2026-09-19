@@ -225,6 +225,12 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-gallery img:first-child { grid-column: 1 / -1; height: min(24dvh, 210px); }
   .presentation-sized .goal-media { display: flex; justify-content: center; margin-top: 28px; }
   .presentation-sized .goal-media img { display: block; width: 100%; height: min(58dvh, 520px); object-fit: contain; }
+  .presentation-sized .competition-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; margin-top: 28px; }
+  .presentation-sized .competition-item { min-width: 0; color: var(--text); text-decoration: none; }
+  .presentation-sized .competition-item h3 { font-size: 28px; line-height: 1.3; }
+  .presentation-sized .competition-item p { margin-top: 8px; color: var(--muted); font-size: 20px; }
+  .presentation-sized .competition-item img { display: block; width: 100%; height: min(43dvh, 390px); margin-top: 16px; object-fit: cover; }
+  .presentation-sized .competition-item:first-child img { object-position: center top; }
   .presentation-sized .tmi-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 72px; margin-top: 54px; }
   .presentation-sized .tmi-columns section { min-height: 280px; padding-top: 24px; border-top: 1px solid var(--line); }
   .presentation-sized .tmi-columns h3 { font-size: 30px; }
@@ -276,6 +282,10 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-gallery img:first-child { height: min(22dvh, 150px); }
   .presentation-sized .goal-media { margin-top: 18px; }
   .presentation-sized .goal-media img { height: min(53dvh, 380px); }
+  .presentation-sized .competition-grid { gap: 28px; margin-top: 18px; }
+  .presentation-sized .competition-item h3 { font-size: 24px; }
+  .presentation-sized .competition-item p { margin-top: 6px; font-size: 17px; }
+  .presentation-sized .competition-item img { height: min(37dvh, 270px); margin-top: 12px; }
   .presentation-sized .tmi-columns { gap: 48px; margin-top: 36px; }
   .presentation-sized .tmi-columns section { min-height: 220px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 26px; }
@@ -339,6 +349,10 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-gallery img, .presentation-sized .food-gallery img:first-child { grid-column: auto; width: 100%; height: auto; aspect-ratio: 4 / 3; }
   .presentation-sized .goal-media { margin-top: 24px; }
   .presentation-sized .goal-media img { height: auto; }
+  .presentation-sized .competition-grid { gap: 12px; margin-top: 18px; }
+  .presentation-sized .competition-item h3 { font-size: 17px; }
+  .presentation-sized .competition-item p { margin-top: 6px; font-size: 14px; }
+  .presentation-sized .competition-item img { height: min(30dvh, 220px); margin-top: 10px; }
   .presentation-sized .tmi-columns { grid-template-columns: 1fr; gap: 28px; margin-top: 32px; }
   .presentation-sized .tmi-columns section { min-height: 150px; padding-top: 18px; }
   .presentation-sized .tmi-columns h3 { font-size: 24px; }

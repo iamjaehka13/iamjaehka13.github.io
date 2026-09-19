@@ -39,11 +39,12 @@ date: 2026-09-18 21:00:00 +0900
           <option value="7">08 · 취향</option>
           <option value="8">09 · 음식</option>
           <option value="9">10 · 버킷리스트 / 목표</option>
-          <option value="10">11 · Isaac Sim</option>
-          <option value="11">12 · Isaac Lab</option>
-          <option value="12">13 · Sim-to-Real</option>
-          <option value="13">14 · Locomotion</option>
-          <option value="14">15 · 스마트글래스 / HRI</option>
+          <option value="10">11 · 나가본 대회</option>
+          <option value="11">12 · Isaac Sim</option>
+          <option value="12">13 · Isaac Lab</option>
+          <option value="13">14 · Sim-to-Real</option>
+          <option value="14">15 · Locomotion</option>
+          <option value="15">16 · 스마트글래스 / HRI</option>
         </select>
       </label>
     </header>
@@ -153,8 +154,24 @@ date: 2026-09-18 21:00:00 +0900
         </div>
       </section>
 
-      <section class="slide presentation-sized" id="slide-11" aria-labelledby="title-11">
-        <div class="slide-heading"><h2 id="title-11" tabindex="-1">Isaac Sim</h2><p class="subtitle">Go2 디지털 트윈</p></div>
+      <section class="slide presentation-sized tmi-slide" id="slide-11" aria-labelledby="title-11">
+        <div class="slide-heading"><h2 id="title-11" tabindex="-1">TMI</h2><p class="subtitle">나가본 대회</p></div>
+        <div class="competition-grid">
+          <a class="competition-item" href="{{ '/cv/#oibc-2024-title' | relative_url }}" target="_blank" rel="noopener noreferrer">
+            <h3>6th POSTECH OIBC Challenge</h3>
+            <p>제주 전력시장 가격 예측 · 12위</p>
+            <img src="{{ '/assets/img/cv/2024-oibc-challenge-poster.png' | relative_url }}" width="1830" height="2588" alt="POSTECH OIBC Big Data Challenge 포스터">
+          </a>
+          <a class="competition-item" href="{{ '/posts/autoware-kcity-planning-system/' | relative_url }}" target="_blank" rel="noopener noreferrer">
+            <h3>대학생 창작 모빌리티 경진대회</h3>
+            <p>무인 모빌리티 · Planning 팀</p>
+            <img src="{{ '/assets/img/posts/autonomous-driving/autoware-kcity-planning-system/08-closed-course-platform.png' | relative_url }}" width="1400" height="958" alt="K-City 콘 코스를 주행하는 무인 모빌리티 차량">
+          </a>
+        </div>
+      </section>
+
+      <section class="slide presentation-sized" id="slide-12" aria-labelledby="title-12">
+        <div class="slide-heading"><h2 id="title-12" tabindex="-1">Isaac Sim</h2><p class="subtitle">Go2 디지털 트윈</p></div>
         <div class="project-grid">
           <figure class="project-media">
             <video controls muted playsinline preload="none" poster="{{ '/assets/img/posts/isaac/sim/isaacsim5-ros2-go2/04-go2-digital-twin-poster.jpg' | relative_url }}" aria-label="캠퍼스 디지털 트윈에서 Go2 보행 정책을 실행한 영상">
@@ -170,8 +187,8 @@ date: 2026-09-18 21:00:00 +0900
         </div>
       </section>
 
-      <section class="slide presentation-sized" id="slide-12" aria-labelledby="title-12">
-        <div class="slide-heading"><h2 id="title-12" tabindex="-1">Isaac Lab</h2><p class="subtitle">Go2 강화학습 보행 정책 학습</p></div>
+      <section class="slide presentation-sized" id="slide-13" aria-labelledby="title-13">
+        <div class="slide-heading"><h2 id="title-13" tabindex="-1">Isaac Lab</h2><p class="subtitle">Go2 강화학습 보행 정책 학습</p></div>
         <div class="project-grid">
           <figure class="project-media">
             <video controls muted playsinline preload="none" poster="{{ '/assets/img/posts/isaac/lab/unitree-go2-part-3-rl-training/08-trained-policy-result-1-preview.jpg' | relative_url }}" aria-label="Isaac Lab에서 학습한 Go2 보행 정책 실행 영상">
@@ -187,8 +204,8 @@ date: 2026-09-18 21:00:00 +0900
         </div>
       </section>
 
-      <section class="slide presentation-sized" id="slide-13" aria-labelledby="title-13">
-        <div class="slide-heading"><h2 id="title-13" tabindex="-1">Sim-to-Real</h2><p class="subtitle">학습한 보행 정책을 실제 Go2에 배포</p></div>
+      <section class="slide presentation-sized" id="slide-14" aria-labelledby="title-14">
+        <div class="slide-heading"><h2 id="title-14" tabindex="-1">Sim-to-Real</h2><p class="subtitle">학습한 보행 정책을 실제 Go2에 배포</p></div>
         <div class="project-grid">
           <figure class="project-media">
             <img src="{{ '/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn-preview.jpg' | relative_url }}" data-motion="https://media.iamjaehka13.blog/assets/img/posts/unitree/sim2real/unitree-go2-part-5-sim2real-success/success-turn.gif" width="854" height="480" alt="실제 Go2가 배포한 보행 정책으로 회전 명령에 반응하는 실험">
@@ -202,13 +219,13 @@ date: 2026-09-18 21:00:00 +0900
         </div>
       </section>
 
-      <section class="slide future" id="slide-14" aria-labelledby="title-14">
-        <h2 id="title-14" tabindex="-1">앞으로 하고 싶은 것</h2>
+      <section class="slide future" id="slide-15" aria-labelledby="title-15">
+        <h2 id="title-15" tabindex="-1">앞으로 하고 싶은 것</h2>
         <p class="future-topic">RL / Unsupervised Skill Discovery<br>기반 Locomotion</p>
       </section>
 
-      <section class="slide future" id="slide-15" aria-labelledby="title-15">
-        <h2 id="title-15" tabindex="-1">앞으로 하고 싶은 것</h2>
+      <section class="slide future" id="slide-16" aria-labelledby="title-16">
+        <h2 id="title-16" tabindex="-1">앞으로 하고 싶은 것</h2>
         <p class="future-topic">스마트글래스를 활용한 HRI</p>
       </section>
     </main>
@@ -218,7 +235,7 @@ date: 2026-09-18 21:00:00 +0900
       <span class="deck-label" id="deck-label">소개</span>
       <nav aria-label="발표 이동">
         <button type="button" id="previous" title="이전 장" aria-label="이전 장"><i class="fas fa-arrow-left" aria-hidden="true"></i></button>
-        <output id="slide-count" aria-live="polite" aria-atomic="true">01 / 15</output>
+        <output id="slide-count" aria-live="polite" aria-atomic="true">01 / 16</output>
         <button type="button" id="next" title="다음 장" aria-label="다음 장"><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
         <span class="control-divider" aria-hidden="true"></span>
         <button type="button" id="fullscreen" title="전체 화면" aria-label="전체 화면" aria-pressed="false"><i class="fas fa-expand" aria-hidden="true"></i></button>
