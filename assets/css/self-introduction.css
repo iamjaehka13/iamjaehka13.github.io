@@ -459,55 +459,33 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .project-copy li { margin-bottom: 12px; }
   .presentation-sized figcaption, .presentation-sized .source-link { font-size: 15px; }
 }
-/* Extra media emphasis for the selected fullscreen slides. */
-.fullscreen-active #slide-4 h2,
-.fullscreen-active #slide-6 h2,
-.fullscreen-active #slide-10 h2,
-.fullscreen-active #slide-16 h2 { font-size: 46px; }
-.fullscreen-active #slide-4 .subtitle,
-.fullscreen-active #slide-6 .subtitle,
-.fullscreen-active #slide-10 .subtitle { margin-top: 6px; font-size: 23px; }
-.fullscreen-active #slide-4 .concert-name { margin-top: 8px; font-size: 24px; }
+/* Enlarge only the selected slides' media in fullscreen mode. */
+.fullscreen-active #slide-4 .concert-name { margin-top: 8px; }
 .fullscreen-active #slide-4 .concert-videos { gap: 20px; margin-top: 8px; }
 .fullscreen-active #slide-4 .concert-videos img { height: min(50dvh, 360px); }
 .fullscreen-active #slide-6 .sports-gallery { margin-top: 12px; }
 .fullscreen-active #slide-6 .sports-gallery img { height: min(52dvh, 380px); }
 .fullscreen-active #slide-10 .goal-media { margin-top: 12px; }
 .fullscreen-active #slide-10 .goal-media img { height: min(60dvh, 430px); }
-.fullscreen-active #slide-16 .future-topic { margin-top: 6px; font-size: 28px; }
+.fullscreen-active #slide-16 .future-topic { margin-top: 6px; }
 .fullscreen-active #slide-16 .hri-media { margin-top: 10px; }
 .fullscreen-active #slide-16 .hri-media video { width: min(100%, 780px); }
+.fullscreen-active #slide-16 { padding-top: 18px; }
 
 @media screen and (min-width: 1100px) and (min-height: 760px) {
-  .fullscreen-active #slide-4 h2,
-  .fullscreen-active #slide-6 h2,
-  .fullscreen-active #slide-10 h2,
-  .fullscreen-active #slide-16 h2 { font-size: 64px; }
-  .fullscreen-active #slide-4 .subtitle,
-  .fullscreen-active #slide-6 .subtitle,
-  .fullscreen-active #slide-10 .subtitle { font-size: 30px; }
-  .fullscreen-active #slide-4 .concert-name { font-size: 34px; }
   .fullscreen-active #slide-4 .concert-videos img { height: min(53dvh, 500px); }
   .fullscreen-active #slide-6 .sports-gallery img { height: min(57dvh, 520px); }
-  .fullscreen-active #slide-10 .goal-media img { height: min(61dvh, 550px); }
-  .fullscreen-active #slide-16 .future-topic { font-size: 30px; }
-  .fullscreen-active #slide-16 .hri-media video { width: min(100%, 930px); }
+  .fullscreen-active #slide-10 .goal-media img { height: min(58dvh, 520px); }
+  .fullscreen-active #slide-16 .hri-media video { width: min(100%, 920px); }
+  .fullscreen-active #slide-16 { padding-top: 20px; }
 }
 
 @media screen and (min-width: 1600px) and (min-height: 900px) {
-  .fullscreen-active #slide-4 h2,
-  .fullscreen-active #slide-6 h2,
-  .fullscreen-active #slide-10 h2 { font-size: 76px; }
-  .fullscreen-active #slide-16 h2 { font-size: 72px; }
-  .fullscreen-active #slide-4 .subtitle,
-  .fullscreen-active #slide-6 .subtitle,
-  .fullscreen-active #slide-10 .subtitle { font-size: 34px; }
-  .fullscreen-active #slide-4 .concert-name { font-size: 38px; }
-  .fullscreen-active #slide-4 .concert-videos img { height: min(61dvh, 650px); }
+  .fullscreen-active #slide-4 .concert-videos img { height: min(58dvh, 610px); }
   .fullscreen-active #slide-6 .sports-gallery img { height: min(65dvh, 680px); }
-  .fullscreen-active #slide-10 .goal-media img { height: min(70dvh, 700px); }
-  .fullscreen-active #slide-16 .future-topic { font-size: 36px; }
+  .fullscreen-active #slide-10 .goal-media img { height: min(68dvh, 680px); }
   .fullscreen-active #slide-16 .hri-media video { width: min(100%, 1180px); }
+  .fullscreen-active #slide-16 { padding-top: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { #deck-progress { transition: none; } }
 @media print {
