@@ -245,8 +245,15 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 100%; margin-top: 12px; }
   .presentation-sized .food-gallery img { display: block; width: 100%; height: min(18dvh, 160px); object-fit: cover; }
   .presentation-sized .food-gallery img:first-child { grid-column: 1 / -1; height: min(24dvh, 210px); }
-  .presentation-sized .goal-media { display: flex; justify-content: center; margin-top: 28px; }
+  .presentation-sized .goal-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.75fr); align-items: center; gap: 44px; margin-top: 28px; }
+  .presentation-sized .goal-media { display: flex; justify-content: flex-start; min-width: 0; }
   .presentation-sized .goal-media img { display: block; width: 100%; height: min(58dvh, 520px); object-fit: contain; }
+  .presentation-sized .goal-copy { display: grid; gap: 34px; min-width: 0; }
+  .presentation-sized .goal-copy section { padding-top: 16px; border-top: 1px solid var(--line); }
+  .presentation-sized .goal-copy h3 { font-size: 28px; }
+  .presentation-sized .goal-copy ol { margin: 14px 0 0; padding-left: 32px; font-size: 26px; line-height: 1.55; }
+  .presentation-sized .goal-copy li { margin-bottom: 10px; word-break: keep-all; }
+  .presentation-sized .goal-copy p { margin-top: 14px; font-size: 32px; font-weight: 650; }
   .presentation-sized .competition-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; margin-top: 28px; }
   .presentation-sized .competition-item { min-width: 0; margin: 0; color: var(--text); }
   .presentation-sized .competition-item h3 a { color: inherit; text-decoration: none; }
@@ -300,8 +307,11 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .fullscreen-active .presentation-sized .food-gallery { gap: 14px; margin-top: 10px; }
   .fullscreen-active .presentation-sized .food-gallery img { height: min(19dvh, 170px); }
   .fullscreen-active .presentation-sized .food-gallery img:first-child { height: min(27dvh, 235px); }
-  .fullscreen-active .presentation-sized .goal-media { margin-top: 22px; }
+  .fullscreen-active .presentation-sized .goal-layout { gap: 44px; margin-top: 22px; }
   .fullscreen-active .presentation-sized .goal-media img { height: min(52dvh, 480px); }
+  .fullscreen-active .presentation-sized .goal-copy h3 { font-size: 30px; }
+  .fullscreen-active .presentation-sized .goal-copy ol { font-size: 28px; }
+  .fullscreen-active .presentation-sized .goal-copy p { font-size: 36px; }
   .fullscreen-active .presentation-sized .competition-grid { gap: 36px; margin-top: 22px; }
   .fullscreen-active .presentation-sized .competition-item h3 { font-size: 30px; }
   .fullscreen-active .presentation-sized .competition-item p { font-size: 22px; }
@@ -376,8 +386,12 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-gallery { gap: 12px; margin-top: 8px; }
   .presentation-sized .food-gallery img { height: min(16dvh, 110px); }
   .presentation-sized .food-gallery img:first-child { height: min(22dvh, 150px); }
-  .presentation-sized .goal-media { margin-top: 18px; }
+  .presentation-sized .goal-layout { gap: 28px; margin-top: 18px; }
   .presentation-sized .goal-media img { height: min(53dvh, 380px); }
+  .presentation-sized .goal-copy { gap: 22px; }
+  .presentation-sized .goal-copy h3 { font-size: 24px; }
+  .presentation-sized .goal-copy ol { font-size: 21px; line-height: 1.45; }
+  .presentation-sized .goal-copy p { font-size: 28px; }
   .presentation-sized .competition-grid { gap: 28px; margin-top: 18px; }
   .presentation-sized .competition-item h3 { font-size: 24px; }
   .presentation-sized .competition-item p { margin-top: 6px; font-size: 17px; }
@@ -443,8 +457,12 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .presentation-sized .food-group h3 { font-size: 18px; }
   .presentation-sized .food-gallery { grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
   .presentation-sized .food-gallery img, .presentation-sized .food-gallery img:first-child { grid-column: auto; width: 100%; height: auto; aspect-ratio: 4 / 3; }
-  .presentation-sized .goal-media { margin-top: 24px; }
+  .presentation-sized .goal-layout { grid-template-columns: 1fr; gap: 24px; margin-top: 24px; }
   .presentation-sized .goal-media img { height: auto; }
+  .presentation-sized .goal-copy { gap: 20px; }
+  .presentation-sized .goal-copy h3 { font-size: 22px; }
+  .presentation-sized .goal-copy ol { font-size: 19px; }
+  .presentation-sized .goal-copy p { font-size: 26px; }
   .presentation-sized .competition-grid { gap: 12px; margin-top: 18px; }
   .presentation-sized .competition-item h3 { font-size: 17px; }
   .presentation-sized .competition-item p { margin-top: 6px; font-size: 14px; }
@@ -465,7 +483,7 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
 .fullscreen-active #slide-4 .concert-videos img { height: min(50dvh, 360px); }
 .fullscreen-active #slide-6 .sports-gallery { margin-top: 12px; }
 .fullscreen-active #slide-6 .sports-gallery img { height: min(52dvh, 380px); }
-.fullscreen-active #slide-10 .goal-media { margin-top: 12px; }
+.fullscreen-active #slide-10 .goal-layout { margin-top: 12px; }
 .fullscreen-active #slide-10 .goal-media img { height: min(60dvh, 430px); }
 .fullscreen-active #slide-16 .future-topic { margin-top: 6px; }
 .fullscreen-active #slide-16 .hri-media { margin-top: 10px; }
@@ -484,6 +502,9 @@ figcaption { color: var(--muted); font-size: 14px; line-height: 1.5; margin-top:
   .fullscreen-active #slide-4 .concert-videos img { height: min(58dvh, 610px); }
   .fullscreen-active #slide-6 .sports-gallery img { height: min(65dvh, 680px); }
   .fullscreen-active #slide-10 .goal-media img { height: min(68dvh, 680px); }
+  .fullscreen-active #slide-10 .goal-copy h3 { font-size: 34px; }
+  .fullscreen-active #slide-10 .goal-copy ol { font-size: 32px; }
+  .fullscreen-active #slide-10 .goal-copy p { font-size: 42px; }
   .fullscreen-active #slide-16 .hri-media video { width: min(100%, 1180px); }
   .fullscreen-active #slide-16 { padding-top: 24px; }
 }
