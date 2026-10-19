@@ -8,6 +8,9 @@ Detailed authoring, media, validation, and publishing instructions are in
 [`docs/BLOG_WORKFLOW.md`](docs/BLOG_WORKFLOW.md). Codex sessions must also
 follow the repository-specific [`AGENTS.md`](AGENTS.md).
 
+Google Analytics setup and daily visitor reporting are documented in
+[`docs/BLOG_ANALYTICS.md`](docs/BLOG_ANALYTICS.md).
+
 ## Write a Post
 
 Create a Markdown file in `_posts/` with this filename format:
