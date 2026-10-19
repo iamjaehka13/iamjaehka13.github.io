@@ -204,7 +204,11 @@ compress_html:
   ignore:
     envs: [development]
 
+public_visitors:
+  endpoint: "https://visitors.iamjaehka13.blog"
+
 exclude:
+  - workers
   - "*.gem"
   - "*.gemspec"
   - AGENTS.md

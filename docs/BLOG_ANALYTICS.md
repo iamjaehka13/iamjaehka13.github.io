@@ -1,5 +1,59 @@
 # 블로그 방문 통계
 
+## 공개 방문자 표시
+
+블로그 메뉴의 **방문자**(`/visitors/`)와 페이지 하단에서 누구나 합계를 확인한다.
+공개 집계는 GA4와 독립적이며 2026-10-20부터 기록한다.
+
+- **지금 방문 중:** 최근 5분 이내에 보이는 탭에서 방문 신호를 보낸 브라우저 수.
+- **오늘 / 어제:** 한국 시간 자정 기준 하루 순 브라우저 수. 새로고침·여러 탭은 중복 집계하지 않는다.
+- **날짜별:** 최근 28일. 시작 전 날짜는 `집계 전`, 시작 후 신호가 없는 날짜는 `0명`.
+- 페이지가 보일 때 1분마다 갱신한다. 오류일 때는 0으로 바꾸지 않고 마지막 갱신 시각과 지연 안내를 표시한다.
+
+`_config.yml`의 `public_visitors.endpoint`는 `https://visitors.iamjaehka13.blog`의
+Cloudflare Worker를 가리킨다. 전용 하위 도메인은 Worker Custom Domain으로 연결한다.
+서버 코드는 `workers/visitors/`에 있으며 GitHub Pages 산출물에서는 제외한다.
+`GET /stats`는 합계만 읽고, `POST /visit`은 허용된 블로그 Origin에서만 받는다.
+키나 Google 로그인 정보는 프런트엔드에 필요하지 않다.
+
+브라우저에는 최대 30일간 유지되는 임의 UUID를 저장한다. 서버는 SHA-256 해시와
+최근 신호 시각을 오늘·어제 범위에서 유지하며, 시간당 정리 알람으로 삭제한다.
+날짜별 숫자만 장기 보관한다. IP는 저장하지 않고 요청 제한의 일시적인 키로만 쓴다.
+요청 본문은 256바이트로 제한하고, IP별 분당 60회 제한을 적용한다.
+공개 API의 Origin/요청 제한은 완전한 봇·조작 방지 수단은 아니다.
+Workers 요청 로그 수집은 꺼져 있다.
+
+로컬 미리보기, 저장소 차단, DNT/GPC 활성화 브라우저는 합계를 읽기만 한다.
+운영 사이트에서 확인하는 테스트 방문은 실제 공개 수치에 포함된다.
+GA4와 정의·차단 여부가 다르므로 두 숫자가 같을 것으로 가정하지 않는다.
+
+### 서버 검증과 재배포
+
+Node 24와 pnpm을 사용한다. 인증은 저장소 외부의 OS 키체인에 두며,
+Cloudflare 공식 `wrangler login --use-keyring` 흐름으로 연결한다.
+필요한 범위는 `account:read`, `user:read`, `workers_scripts:write`이다.
+
+```sh
+cd workers/visitors
+pnpm install --frozen-lockfile
+pnpm test
+pnpm exec wrangler dev
+pnpm exec wrangler deploy --dry-run
+pnpm run deploy
+```
+
+실제 API 검증은 로컬 Worker에서 반복 방문·다른 브라우저·잘못된 Origin·본문을
+확인한다. 운영 API에는 가짜 방문자를 넣지 않는다. 저장소 단위 검증에는
+한국 자정, 5분 만료, 식별자 정리 후 합계 보존이 포함된다.
+Worker 배포와 GitHub Pages 배포는 별개다. 화면 변경은 기존 Pages 절차를 따른다.
+Workers 무료 한도 내에서 운영하며 유료 요금제 전환을 자동화하지 않는다.
+
+관련 문서: [Durable Objects](https://developers.cloudflare.com/durable-objects/get-started/),
+[SQLite 저장소](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/),
+[요청 제한](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+
+## Google Analytics 상세 보고서
+
 Google Analytics 4(GA4)에서 `https://iamjaehka13.blog`의 방문 통계를 확인한다.
 통계는 해당 Analytics 속성에 권한이 있는 Google 계정으로 로그인해서 본다.
 

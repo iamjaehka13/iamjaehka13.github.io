@@ -1,5 +1,9 @@
 <!-- The Footer -->
 
+{% if site.public_visitors.endpoint and site.public_visitors.endpoint != empty %}
+  {% include visitor-summary.html %}
+{% endif %}
+
 <footer
   aria-label="Site Info"
   class="

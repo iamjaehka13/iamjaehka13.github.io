@@ -94,6 +94,13 @@
   >
 
   <!-- Web Font -->
+  {% if site.public_visitors.endpoint and site.public_visitors.endpoint != empty %}
+    <link rel="stylesheet" href="{{ '/assets/css/visitors.css' | relative_url }}?v={{ theme_css_version }}">
+    <script defer src="{{ '/assets/js/visitors.js' | relative_url }}?v={{ theme_css_version }}"
+      data-visitors-endpoint="{{ site.public_visitors.endpoint | escape }}"
+      data-visitors-track="{% if jekyll.environment == 'production' %}true{% else %}false{% endif %}"></script>
+  {% endif %}
+
   <link rel="stylesheet" href="{{ site.data.origin[type].webfonts | relative_url }}">
 
   <!-- Font Awesome Icons -->

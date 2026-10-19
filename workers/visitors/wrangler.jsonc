@@ -1,0 +1,21 @@
+{
+  "name": "jaehka13-blog-visitors",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": false,
+  "routes": [{ "pattern": "visitors.iamjaehka13.blog", "custom_domain": true }],
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://iamjaehka13.blog,https://iamjaehka13.github.io"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "VISITORS", "class_name": "BlogVisitors" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["BlogVisitors"] }],
+  "ratelimits": [{
+    "name": "VISIT_LIMITER",
+    "namespace_id": "1001",
+    "simple": { "limit": 60, "period": 60 }
+  }]
+}

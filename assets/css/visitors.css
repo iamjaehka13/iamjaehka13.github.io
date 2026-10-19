@@ -1,0 +1,48 @@
+.visitor-summary {
+  margin: 1.5rem 0;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--main-border-color);
+  border-radius: 8px;
+  background: var(--card-bg);
+}
+body:has([data-visitor-history]) #tail-wrapper .visitor-summary { display: none; }
+.visitor-summary__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+.visitor-summary__heading a { font-size: .8rem; font-weight: 400; }
+.visitor-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+.visitor-metrics dt { min-height: 2.5rem; font-size: .8rem; font-weight: 400; color: var(--text-muted-color); }
+.visitor-metrics dt small { display: block; font-size: .65rem; }
+.visitor-metrics dd { display: flex; align-items: baseline; gap: .3rem; margin: .35rem 0 0; }
+.visitor-metrics strong { color: var(--heading-color); font-size: 1.65rem; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.visitor-metrics dd span { font-size: .75rem; color: var(--text-muted-color); }
+.visitor-metrics [data-visitor-value="yesterday"][data-unavailable] { font-size: .95rem; }
+.visitor-status, .visitor-note { color: var(--text-muted-color); font-size: .75rem; line-height: 1.6; }
+.visitor-summary .visitor-status { margin: .85rem 0 0; }
+.visitor-history { width: 100%; margin: 1rem 0 2rem; }
+.visitor-history table { display: table; width: 100%; margin: 0; table-layout: fixed; }
+.visitor-history th:first-child { width: 8rem; }
+.visitor-history th:nth-child(2) { width: 5rem; }
+.visitor-history td, .visitor-history th { padding: .6rem .7rem; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.visitor-history td:nth-child(2) { text-align: right; white-space: nowrap; }
+.visitor-history__bar { display: block; height: .45rem; background: var(--link-color); border-radius: 2px; }
+@media (max-width: 420px) {
+  .visitor-summary { padding: 1rem; }
+  .visitor-metrics { gap: .6rem; }
+  .visitor-metrics strong { font-size: 1.4rem; }
+  .visitor-history th:first-child { width: 7.2rem; }
+  .visitor-history th:nth-child(2) { width: 4.6rem; }
+  .visitor-history td, .visitor-history th { padding: .55rem .4rem; }
+}
+@media print { .visitor-summary, .visitor-history { break-inside: avoid; } }
