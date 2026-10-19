@@ -6,25 +6,12 @@ permalink: /visitors/
 toc: false
 ---
 
-<p>이 블로그를 찾아주신 방문자 수입니다. 누구나 볼 수 있으며, 1분마다 갱신합니다.</p>
+{% include visitor-summary.html detail=true %}
 
-{% include visitor-summary.html %}
-
-<h2>날짜별 방문자</h2>
-<p class="visitor-note">최근 28일 · 한국 시간 기준 · 같은 브라우저는 하루에 한 번 집계</p>
+<h2>최근 7일</h2>
 <div class="visitor-history">
-  <table>
-    <caption class="visually-hidden">최근 28일의 날짜별 방문자 수</caption>
-    <thead><tr><th scope="col">날짜</th><th scope="col">방문자</th><th scope="col"><span class="visually-hidden">날짜별 비교</span></th></tr></thead>
-    <tbody data-visitor-history><tr><td colspan="3">통계를 불러오는 중입니다.</td></tr></tbody>
+  <table aria-label="최근 7일의 날짜별 방문자 수">
+    <thead><tr><th scope="col">날짜</th><th scope="col">방문자</th></tr></thead>
+    <tbody data-visitor-history><tr><td colspan="2">불러오는 중…</td></tr></tbody>
   </table>
 </div>
-
-<h2>집계 기준</h2>
-<ul>
-  <li>‘지금 방문 중’은 최근 5분 이내에 화면이 열린 상태로 방문 신호를 보낸 브라우저 수입니다. 창을 닫은 뒤 숫자가 줄어들기까지 최대 5분이 걸립니다.</li>
-  <li>하루는 한국 시간 자정에 바뀝니다. 새로고침하거나 여러 글을 읽어도 같은 브라우저의 오늘 방문자 수는 한 번만 늘어납니다.</li>
-  <li>공개 집계를 시작한 날부터 기록합니다. ‘집계 전’은 기록이 없는 기간이고, 0명은 집계가 시작된 이후 방문 신호가 없었던 날입니다.</li>
-  <li>기기·브라우저 변경, 저장소 삭제, 차단 설정 등에 따라 실제 인원과 차이가 날 수 있습니다. 공개 집계는 Google Analytics와 별도로 동작합니다.</li>
-</ul>
-<p><a href="{{ '/privacy/' | relative_url }}">방문 통계와 개인정보 안내</a></p>
